@@ -149,6 +149,9 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .tc-lv{font-size:11px;color:var(--am);font-weight:600}
 .tc-mid{display:flex;gap:10px;align-items:center}
 .tc-art{flex:1;display:flex;align-items:center;justify-content:center;min-height:86px}
+/* v645: training-card art is clickable (opens the stats modal) — glow on hover so it reads as interactive */
+#training-list .train-card .tc-art{transition:filter .15s ease,transform .15s ease;border-radius:10px}
+#training-list .train-card .tc-art:hover{filter:drop-shadow(0 0 8px #ffd24d) brightness(1.15);transform:scale(1.05)}
 .tc-stats{flex-shrink:0;min-width:122px;font-size:12.5px;color:var(--td);display:flex;flex-direction:column;gap:2px;background:#00000022;border:0.5px solid var(--br);border-radius:8px;padding:6px 8px}
 .tc-forces{font-size:10px;color:#c8a040;background:#00000022;border:0.5px solid var(--br);border-radius:7px;padding:3px 6px;text-align:center}
 .tc-forces .f0{opacity:.4}
@@ -188,7 +191,7 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .stat-up-glow-red{color:#e05050;font-weight:600;font-size:10px;animation:statGlowRed .6s ease-in-out infinite alternate}
 @keyframes statGlow{from{opacity:.7;text-shadow:none}to{opacity:1;text-shadow:0 0 6px #ffd700}}
 @keyframes statGlowRed{from{opacity:.7;text-shadow:none}to{opacity:1;text-shadow:0 0 6px #e05050}}
-@keyframes elemSynPulse{from{opacity:.8;border-color:transparent}to{opacity:1;border-color:#ffd700;box-shadow:0 0 8px #ffd700}}background:var(--bm);border:0.5px solid var(--br);border-radius:12px;padding:.9rem;display:flex;align-items:center;gap:12px;margin-bottom:8px}
+@keyframes elemSynPulse{from{opacity:.85;border-color:transparent}to{opacity:1;border-color:#ffd700;box-shadow:0 0 8px #ffd700}} /* v643: orphaned rule-body after the keyframes removed — malformed CSS could break parsing here */
 .merc-unit-card{background:var(--bm);border:0.5px solid var(--br);border-radius:12px;padding:.85rem;margin-bottom:8px;display:flex;align-items:center;gap:12px}
 .merc-unit-card.hired{opacity:.5}
 .altar-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid #3a1a3a;gap:8px}
@@ -568,13 +571,12 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
     <div class="tab" onclick="switchTab('altar')" id="tab-altar">✿ Sacrifice Altar</div>
     <div class="tab" onclick="switchTab('pochteca')" id="tab-pochteca">✨ Special</div><div class="tab" onclick="switchTab('penance')" id="tab-penance" style="display:none">🗡️ Tecpatl</div>
   </div>
-  <div id="panel-training" class="tab-panel active"><p class="ftue-tip" style="font-size:12px">Level up allies with <span style="color:#e05050;font-weight:600">🩸 Blood</span>.</p><div id="training-list"></div><div id="ally-special-section" style="display:none"><div style="font-size:11px;color:var(--td);padding:6px 0 3px;border-top:0.5px solid var(--br);margin-top:8px;text-transform:uppercase;letter-spacing:.5px">Ally Special Upgrades</div><div id="ally-special-list"></div></div></div>
+  <div id="panel-training" class="tab-panel active"><p class="ftue-tip" style="font-size:12px" id="tip-level-allies">Level up allies with <span style="color:#e05050;font-weight:600">🩸 Blood</span>.</p><div id="training-list"></div><div id="ally-special-section" style="display:none"><div style="font-size:11px;color:var(--td);padding:6px 0 3px;border-top:0.5px solid var(--br);margin-top:8px;text-transform:uppercase;letter-spacing:.5px">Ally Special Upgrades</div><div id="ally-special-list"></div></div></div>
   <div id="panel-mercs" class="tab-panel">
     <p style="font-size:12px;color:var(--td);margin-bottom:.75rem">Use <strong style="color:#c0844a">🫘 Cacao</strong> for the Temazcal or to hire mercenaries.</p>
     <div style="font-size:11px;color:#9050c0;font-weight:500;margin-bottom:.4rem;border-bottom:0.5px solid var(--br);padding-bottom:.3rem">🫘 Temazcal — Restore Tonalli & Vitality</div>
-    <p style="font-size:11px;color:var(--td);margin-bottom:.5rem">✨ TP and ❤️ HP are not restored automatically between battles.</p>
     <div id="temazcal-list"></div>
-    <div style="font-size:11px;color:var(--am);font-weight:500;margin:.8rem 0 .4rem;border-bottom:0.5px solid var(--br);padding-bottom:.3rem">Otomies Mercenaries</div>
+    <div id="mercs-header" style="font-size:11px;color:var(--am);font-weight:500;margin:.8rem 0 .4rem;border-bottom:0.5px solid var(--br);padding-bottom:.3rem">Otomies Mercenaries</div>
     <div id="mercs-list"></div>
   </div>
   <div id="panel-penance" class="tab-panel"><div id="panel-penance-content"></div></div>
@@ -618,8 +620,8 @@ const TREE_NODES=[
   // ═══ NORTH — GODS ═══
   {id:'god_stats_1',label:'Divine Strength I',desc:'All gods gain +5% ATK, MAG, DEF and RES',cost:50,cat:'gods',req:['synergy_unlock'],tier:2,x:450,y:196},
   {id:'god_stats_2',label:'Divine Strength II',desc:'All gods gain another +5% ATK, MAG, DEF and RES (stacks with I)',cost:1200,cat:'gods',req:['god_stats_1'],tier:2,x:312,y:196},
-  {id:'synergy_unlock',label:'Elemental Bond',desc:'Each same-element deployed ally grants ×1.15 to ATK, DEF, RES and SPD of all same-element units (not HP or NP)',cost:30,cat:'gods',req:['hub'],tier:1,x:450,y:278},
-  {id:'synergy_unlock_2',label:'Elemental Bond II',desc:'Each same-element ally grants an additional ×1.15 (×1.32 total per ally) to ATK, DEF, RES and SPD of all same-element units',cost:2750,cat:'gods',req:['synergy_unlock'],tier:2,x:312,y:278},
+  {id:'synergy_unlock',label:'Elemental Bond I',desc:'Elemental Synergy strengthens: each other patron-element deployed unit grants +10% ATK/MAG/DEF/RES (up from the innate +5%)',cost:22,cat:'gods',req:['hub'],tier:1,x:450,y:278}, // v640: synergy is innate now; this node upgrades it
+  {id:'synergy_unlock_2',label:'Elemental Bond II',desc:'Elemental Synergy peaks: each other patron-element deployed unit grants +20% ATK/MAG/DEF/RES',cost:2750,cat:'gods',req:['synergy_unlock'],tier:2,x:312,y:278},
   {id:'god_special_up',label:'God Health Boost I',desc:'Increase all God HP by 10%',cost:400,cat:'gods',req:['god_stats_1'],tier:2,x:588,y:196},
   {id:'sacred_oblation',label:'Sacred Oblation',desc:'Sacrifice an Ally God at the Altar to bestow their patron ability upon your Patron God — for this run',cost:1000,cat:'gods',req:['god_special_up'],tier:3,x:588,y:114},
   {id:'god_special_up_2',label:'God Health Boost II',desc:'Increase all God HP by another 15% (total +25%)',cost:1500,cat:'gods',req:['god_special_up'],tier:3,x:450,y:114},
@@ -1089,6 +1091,19 @@ function statTip(e,key){
 function statTipTap(e,key){if(e&&e.stopPropagation)e.stopPropagation();statTip(e,key);setTimeout(()=>{document.addEventListener('click',relicTipHide,{once:true});},50);}
 // v620: special move typing derived from its description — 🗡️ physical, 🪄 magical, both for hybrid, ❤️ heal/support (no damage multiplier)
 function specTypeEmoji(ad){const s=String(ad||'');const a=/(×\s*ATK|ATK\s*[×+])/i.test(s),m=/(×\s*MAG|MAG\s*[×+])/i.test(s);if(a&&m)return '🗡️🪄';if(a)return '🗡️';if(m)return '🪄';return '❤️';} // v620: matches both '1.5×MAG' and 'MAG×0.55' / '(MAG+2)' notations; buff text like 'ATK/MAG UP ×1' stays support
+function synTip(e){ // v643: hover the 🔗 label for the live synergy explanation
+  const tt=document.getElementById('relic-tooltip');if(!tt)return;
+  const az=hasPassive('azureZephyr');
+  const _chip=el=>{const m=ELEM_META[el];return m?('<span class="elem-badge '+m.cls+'" style="font-size:10px">'+m.icon+' '+m.label+'</span>'):el;};
+  const en=az?(_chip('fire')+' or '+_chip('wind')):_chip(G.god?G.god.element:'');
+  tt.innerHTML='<strong style="color:#d4af37">🔗 Elemental Synergy</strong><br><span style="color:var(--td)">For each '+en+' unit in party, strengthens all of them.</span>'; // v644/v645: simplified — rate on the pill, floor implicit
+  tt.style.display='block';
+  const x=(e.clientX!==undefined?e.clientX:(e.touches&&e.touches[0]?e.touches[0].clientX:0));
+  const y=(e.clientY!==undefined?e.clientY:(e.touches&&e.touches[0]?e.touches[0].clientY:0));
+  tt.style.left=Math.min(x+12,window.innerWidth-216)+'px';tt.style.top=Math.min(y+14,window.innerHeight-96)+'px';
+}
+function synTipTap(e){if(e&&e.stopPropagation)e.stopPropagation();synTip(e);setTimeout(()=>{document.addEventListener('click',relicTipHide,{once:true});},50);}
+const SYN_ATTRS='style="cursor:help" onmouseenter="synTip(event)" onmouseleave="relicTipHide()" ontouchstart="synTipTap(event)" onclick="event.stopPropagation();synTipTap(event)"';
 function specTip(e,name,ad){ // v635: hover a special's name for its full detail (altar cards)
   const tt=document.getElementById('relic-tooltip');if(!tt)return;
   tt.innerHTML='<strong style="color:#6090e0">🔮 '+name+'</strong><br><span style="color:var(--td)">'+ad+'</span>';
@@ -1555,7 +1570,7 @@ function calcTeotlEarned(){
 // STORY
 // ============================================================
 const STORY_LINES=[
-  "You wake to the sound of black water.",
+  "You wake to the sound of running water.",
   "You are dead — or close enough. Your divine power has been stripped away, your soul cast into <strong>Mictlan</strong>, the realm of the dead.",
   "But you are a god. And gods do not simply <em>die</em>.",
   "Your <strong class='teotl'>TEOTL</strong> — your divine essence — still flickers within you. Faint, but unbroken. To reclaim your full power, you must cross all nine layers of Mictlan and emerge on the other side.",
@@ -2850,6 +2865,7 @@ function resumeRun(){
   if(G.god&&G.god.id){const gg=GODS.find(x=>x.id===G.god.id); if(gg)G.god=gg;} // relink patron to canonical object
   G.dte=getDTEffects();
   loadV();
+  if(!hasV('ftue_shop_done'))markV('ftue_shop_done'); // v641: band-aid — resuming a run ends the tutorial; a mid-tutorial quit could soft-lock the gate (per playtest)
   const _st=G._stage;
   if(_st==='spoils'){ afterSpoils(); }            // bank done; lands on Tianguis for the next battle
   else if(_st==='shop'){ G._resumingShop=true; showShop(); G._resumingShop=false; }            // resume on the Tianguis (don't skip it)
@@ -2899,17 +2915,20 @@ function renderRes(id){
   const _mbIc={1:'🦎',2:'🗿',3:'🐊',4:'🌪️',5:'🦉',6:'🏹'}[G.layer||1]||'⚔';
   const _mbNm={1:'Xochitonal',2:'Quinametzin',3:'Xiuhnel & Mimich',4:'Mictlampehecatl',5:'Tlacateocotl',6:'The Lake Lords'}[G.layer||1]||'Mini-boss';
   let _mm='';for(let _b=1;_b<=8;_b++){const _cur=_b===G.battleNum,_done=_b<G.battleNum;const _ic=_b===5?_mbIc:_b===8?'💀':'●';const _col=_cur?'#ffd060':_done?'#50c080':'#3a3428';const _pill=_cur?'background:rgba(255,208,96,.20);border:1px solid #ffd060;border-radius:7px;padding:0 3px;':'';_mm+=`<span title="Battle ${_b}${_b===5?' — Mini-boss: '+_mbNm:_b===8?' — Layer Boss':''}" style="color:${_col};font-size:${(_b===5||_b===8)?'11px':'9px'};${_pill}margin:0 1px">${_ic}</span>`;}
-  document.getElementById(id).innerHTML=resHtml+capChip+`<div class="res" style="margin-left:auto"><span style="letter-spacing:1px;margin-right:8px;white-space:nowrap">${_mm}</span><span style="font-size:11px;color:var(--td)">L${G.layer||1} · Battle ${G.battleNum}/8</span> <span style="font-size:10px;color:#3a3020;margin-left:6px">v639</span></div>`;
+  document.getElementById(id).innerHTML=resHtml+capChip+`<div class="res" style="margin-left:auto"><span style="letter-spacing:1px;margin-right:8px;white-space:nowrap">${_mm}</span><span style="font-size:11px;color:var(--td)">L${G.layer||1} · Battle ${G.battleNum}/8</span> <span style="font-size:10px;color:#3a3020;margin-left:6px">v653</span></div>`;
 }
 function eb(elem,compact=false){const e=ELEM_META[elem];if(!e)return'';
   const isAzure=hasPassive('azureZephyr');
   // Azure Zephyr: glow both fire and wind badges when Xiuhtecuhtli is patron
   const elemMatches=isAzure?(elem==='fire'||elem==='wind'):(G.god&&G.god.element===elem);
-  const synUnlocked=DT&&DT.unlocked&&DT.unlocked.has('synergy_unlock')&&elemMatches&&G.dte&&G.dte.synergyUnlocked;
+  const synUnlocked=!!(elemMatches&&G&&G.god); // v640: synergy innate — matching chips always glow
   // In battle: require ≥1 OTHER living ally with same element
   // Out of battle (tianguis/shop): require ≥1 party member (captured or god) with same element
   const elemCheck=isAzure?(e2=>e2==='fire'||e2==='wind'):(e2=>e2===elem);
-  const synActive=synUnlocked&&(G.units&&G.units.length>0?(G.units.filter(u=>elemCheck(u.element)&&u.isAlly&&u.currentHp>0&&u.id!==('god_'+G.god?.id)).length>0):([...(G.captured||[]).map(c=>c.element),...(G.party||[]).filter(id=>id!==G.god?.id).map(id=>{const g=GODS.find(x=>x.id===id);return g?g.element:null;})].some(elemCheck)));if(compact)return`<span${synActive?' style="animation:elemSynPulse .8s ease-in-out infinite alternate;display:inline-block"':''}>${e.icon}</span>`;return`<span class="elem-badge ${e.cls}"${synActive?' style="animation:elemSynPulse .8s ease-in-out infinite alternate"':''}>${e.icon} ${e.label}</span>`;}
+  /* v651: bond-existence comes from calcSynergy (deployment-based) — the old battle-units branch read the
+     PREVIOUS battle's stale G.units in the shop, so freshly-hired bonds never glowed; the old roster branch
+     counted undeployed reserves, glowing without a real bond. One source of truth now. */
+  const synActive=synUnlocked&&calcSynergy().count>0;if(compact)return`<span${synActive?' style="animation:elemSynPulse .8s ease-in-out infinite alternate;display:inline-block"':''}>${e.icon}</span>`;return`<span class="elem-badge ${e.cls}"${synActive?' style="animation:elemSynPulse .8s ease-in-out infinite alternate"':''}>${e.icon} ${e.label}</span>`;}
 function fmtN(n){n=Math.round(n);if(n>=1000000)return(n/1000000).toFixed(1).replace(/\.0$/,'')+'M';if(n>=1000)return(n/1000).toFixed(1).replace(/\.0$/,'')+'K';return n;}
 function getLevel(id){return G.levels[id]||1;}
 function lvCost(id){
@@ -3367,10 +3386,11 @@ function calcSynergy(){
     const cid=cu._captureId||cu.id;
     if(deployedIds.has(cid)&&(cu.element===elem||(azureZephyr&&(cu.element==='fire'||cu.element==='wind'))))count++;
   });
-  if(count===0)return{count:0,mult:1};
-  // EB I: ×1.15 per ally; EB II adds another ×1.15 per ally → ×1.3225 per ally total
-  const perAlly=G.dte&&G.dte.synergyUnlocked2?1.15*1.15:1.15;
-  return{count,mult:Math.pow(perAlly,count)};
+  // v640: additive tiers — innate +5% per other matching deployed unit; Bond I → +10%; Bond II → +20%.
+  // 'count' is matching non-patron deployed units, which equals 'other matching units' for every recipient
+  // (the patron always matches its own element), so no unit ever boosts itself and the bonus is uniform.
+  const per=G.dte&&G.dte.synergyUnlocked2?0.20:(G.dte&&G.dte.synergyUnlocked?0.10:0.05);
+  return{count,per,pct:per*count};
 }
 function calcAffinity(){
   const deployedIds=new Set(G.deplSel||[]);
@@ -3378,20 +3398,16 @@ function calcAffinity(){
   return{count:n,mult:n>0?Math.pow(1.1,n):1};
 }
 function applySyn(units){
-  if(!G.dte.synergyUnlocked)return;
-  const{count,mult}=calcSynergy();
+  // v640: Elemental Synergy is innate from the first run — no DT gate. Flat +pct per other matching
+  // deployed unit on ATK/MAG/DEF/RES, floored at +1 per stat so L1 vassals feel it immediately.
+  const{count,per,pct}=calcSynergy();
   if(count>0){
     const patronElem=G.god?G.god.element:null;
     const azureZephyr=hasPassive('azureZephyr');
-    // Azure Zephyr: boost both fire and wind units
-    const targets=azureZephyr?units.filter(u=>u.element==='fire'||u.element==='wind'):patronElem?units.filter(u=>u.element===patronElem):units;
-    targets.forEach(u=>{
-      // Boost ATK/MAG/DEF/RES/SPD — NOT HP or NP
-      u.atk=Math.round(u.atk*mult);u.mag=Math.round((u.mag||0)*mult);
-      u.def=Math.round(u.def*mult);u.res=Math.round((u.res||0)*mult);
-      u.spd=Math.round((u.spd||0)*mult);
-    });
-    addLog(`<span class="log-elem">✦ Elemental Synergy ×${count}: ×${mult.toFixed(2)} ATK/DEF/RES/SPD (${azureZephyr?'fire and wind':patronElem} units)!</span>`);
+    const targets=azureZephyr?units.filter(u=>u.isAlly&&(u.element==='fire'||u.element==='wind')):patronElem?units.filter(u=>u.isAlly&&u.element===patronElem):[];
+    const bump=v=>(v||0)+Math.max(1,Math.round((v||0)*pct));
+    targets.forEach(u=>{u.atk=bump(u.atk);u.mag=bump(u.mag);u.def=bump(u.def);u.res=bump(u.res);});
+    addLog(`<span class="log-elem">✦ Elemental Synergy: +${Math.round(pct*100)}% ATK/MAG/DEF/RES to ${azureZephyr?'fire and wind':patronElem} units (${count} bond${count>1?'s':''})!</span>`);
   }
 }
 function applyAff(units){
@@ -3763,7 +3779,7 @@ function showL5BossChoice(onChoice){
     const label=isMal?'🌵 Malinalxochitl':'🔵 Xiuhtecuhtli';
     const sublabel=isMal?'Sorcerer Goddess of the Desert':'Turquoise God of Heat Winds'; // v342
     let list=`<div class="choice-enemy"><span style="color:${color};font-weight:600">${boss.icon} ${boss.name}</span> <span style="font-size:10px;color:var(--td)">Lv${lv} [Boss]</span></div>`;
-    escorts.forEach(e=>{if(!e)return;const em=ELEM_META[e.element];list+=`<div class="choice-enemy">${e.icon} ${e.name} <span style="font-size:10px;color:var(--td)">Lv${lv}</span>${(em&&G.dte.synergyUnlocked)?` <span class="${em.cls} elem-badge">${em.icon}</span>`:''}</div>`;});
+    escorts.forEach(e=>{if(!e)return;const em=ELEM_META[e.element];list+=`<div class="choice-enemy">${e.icon} ${e.name} <span style="font-size:10px;color:var(--td)">Lv${lv}</span>${em?` <span class="${em.cls} elem-badge">${em.icon}</span>`:''}</div>`;});
     return {boss,escorts,color,label,sublabel,list};
   }
   window._l5ChoiceCb=onChoice;
@@ -4285,7 +4301,7 @@ function renderChoiceCards(){
     if(G.battleNum===1){return;}
     // Hard battle card — RIGHT
     const hCard=document.createElement('div');hCard.className='choice-card hard';
-    let hList='';(G.cachedHard||[]).forEach(e=>{const em=ELEM_META[e.element];const mb=e.isMiniBoss?' <span style="font-size:10px;color:#60a0e0">[Mini-Boss]</span>':'';hList+=`<div class="choice-enemy">${e.icon} ${e.name}${mb} <span style="font-size:10px;color:var(--td)">Lv${e.enemyLevel}</span>${(em&&G.dte.synergyUnlocked)?` <span class="${em.cls} elem-badge">${em.icon}</span>`:''}</div>`;});
+    let hList='';(G.cachedHard||[]).forEach(e=>{const em=ELEM_META[e.element];const mb=e.isMiniBoss?' <span style="font-size:10px;color:#60a0e0">[Mini-Boss]</span>':'';hList+=`<div class="choice-enemy">${e.icon} ${e.name}${mb} <span style="font-size:10px;color:var(--td)">Lv${e.enemyLevel}</span>${em?` <span class="${em.cls} elem-badge">${em.icon}</span>`:''}</div>`;});
     hCard.innerHTML=`<div style="font-size:13px;font-weight:500;color:#e07070;margin-bottom:4px">Harder Path</div><div style="font-size:11px;color:var(--td);margin-bottom:.6rem">+20% Blood &amp; Cacao.</div>${hList}<button class="btn btn-hard" onclick="pickDiff('hard')" style="width:100%;margin-top:.5rem">Choose</button>`;
     el.appendChild(hCard);
   }else{
@@ -4293,14 +4309,14 @@ function renderChoiceCards(){
     if(hasMB){
       // Mini-boss battle: hard path only
       const card=document.createElement('div');card.className='choice-card hard';
-      let list='';(G.cachedHard||[]).forEach(e=>{const em=ELEM_META[e.element];const mb=e.isMiniBoss?' <span style="font-size:10px;color:#60a0e0">[Mini-Boss]</span>':'';list+=`<div class="choice-enemy">${e.icon} ${e.name}${mb} <span style="font-size:10px;color:var(--td)">Lv${e.enemyLevel}</span>${(em&&G.dte.synergyUnlocked)?` <span class="${em.cls} elem-badge">${em.icon}</span>`:''}</div>`;});
+      let list='';(G.cachedHard||[]).forEach(e=>{const em=ELEM_META[e.element];const mb=e.isMiniBoss?' <span style="font-size:10px;color:#60a0e0">[Mini-Boss]</span>':'';list+=`<div class="choice-enemy">${e.icon} ${e.name}${mb} <span style="font-size:10px;color:var(--td)">Lv${e.enemyLevel}</span>${em?` <span class="${em.cls} elem-badge">${em.icon}</span>`:''}</div>`;});
       card.innerHTML=`<div style="font-size:13px;font-weight:500;color:#e07070;margin-bottom:4px">⚔ Mini-Boss Battle</div>${list}<button class="btn btn-hard" onclick="pickDiff('hard')" style="width:100%;margin-top:.5rem">Enter Battle</button>`;
       el.appendChild(card);
     }else{
       // Normal Easy / Hard cards
       [['easy',G.cachedEasy,'Easier Path',''],['hard',G.cachedHard,'Harder Path','+20% Blood & Cacao.']].forEach(([diff,enemies,label,desc])=>{
         const card=document.createElement('div');card.className=`choice-card ${diff}`;
-        let list='';(enemies||[]).forEach(e=>{const em=ELEM_META[e.element];const mb=e.isMiniBoss?' <span style="font-size:10px;color:#60a0e0">[Mini-Boss]</span>':'';list+=`<div class="choice-enemy">${e.icon} ${e.name}${mb} <span style="font-size:10px;color:var(--td)">Lv${e.enemyLevel}</span>${(em&&G.dte.synergyUnlocked)?` <span class="${em.cls} elem-badge">${em.icon}</span>`:''}</div>`;});
+        let list='';(enemies||[]).forEach(e=>{const em=ELEM_META[e.element];const mb=e.isMiniBoss?' <span style="font-size:10px;color:#60a0e0">[Mini-Boss]</span>':'';list+=`<div class="choice-enemy">${e.icon} ${e.name}${mb} <span style="font-size:10px;color:var(--td)">Lv${e.enemyLevel}</span>${em?` <span class="${em.cls} elem-badge">${em.icon}</span>`:''}</div>`;});
         card.innerHTML=`<div style="font-size:13px;font-weight:500;color:${diff==='easy'?'#50c080':'#e07070'};margin-bottom:4px">${label}</div>${desc?`<div style="font-size:11px;color:var(--td);margin-bottom:.6rem">${desc}</div>`:''} ${list}<button class="btn btn-${diff==='easy'?'easy':'hard'}" onclick="pickDiff('${diff}')" style="width:100%;margin-top:.5rem">Choose</button>`;
         el.appendChild(card);
       });
@@ -5777,53 +5793,25 @@ function renderEnemyPreview(){
 }
 
 function renderSynPanel(){
+  // v640: synergy is innate — the panel teaches the tier and shows live bonds instead of an unlock nag
   const el=document.getElementById('synergy-panel');el.innerHTML='';const gd=G.god;if(!gd)return;
-  if(!G.dte.synergyUnlocked){el.innerHTML='<div style="font-size:11px;color:var(--td);padding:4px 0">Unlock Elemental Bond in Divinity Tree to activate synergy bonuses.</div>';return;}
   const em=ELEM_META[gd.element];
-  const deployedIds=new Set(G.deplSel||[]);
-  // Elemental synergy: deployed non-patron same-element gods + vassals
-  const elemGods=G.party.filter(id=>id!==G.god.id&&deployedIds.has('god_'+id)).map(id=>{const g=GODS.find(x=>x.id===id);return g&&g.element===gd.element?{icon:g.icon,name:g.name,isGod:true}:null;}).filter(Boolean);
-  const elemVassals=G.captured.filter(c=>c.element===gd.element&&(deployedIds.has(c._captureId||c.id))).map(c=>({icon:c.icon,name:c.name,isGod:false}));
-  // God affinity: all deployed non-patron gods (regardless of element)
-  const affGods=G.party.filter(id=>id!==G.god.id&&deployedIds.has('god_'+id)).map(id=>{const g=GODS.find(x=>x.id===id);return g?{icon:g.icon,name:g.name,isGod:true,elemMatch:g.element===gd.element}:null;}).filter(Boolean);
-  const dtBonus=Math.round((G.dte.godStatsMult-1)*100);
-
-  // Elemental Bond multiplier per ally
-  const perAlly=G.dte.synergyUnlocked2?1.15*1.15:1.15;
-  const elemCount=elemGods.length+elemVassals.length;
-  const elemMult=elemCount>0?Math.pow(perAlly,elemCount):1;
-  const affBonus=0.10; // per affinity god
-
-  // Build per-unit contribution table
-  const seen=new Map();
-  [...elemGods,...elemVassals].forEach(u=>{seen.set(u.name,{...u,isElem:true,aff:0});});
-  affGods.forEach(u=>{if(seen.has(u.name)){seen.get(u.name).aff=affBonus;}else{seen.set(u.name,{...u,isElem:false,aff:affBonus});}});
-
-  const affMult=affGods.length>0?Math.pow(1.1,affGods.length):1;
-
-  el.innerHTML='<div style="font-size:11px;font-weight:500;color:var(--td);margin-bottom:6px">Element: <span class="elem-badge '+em.cls+'">'+em.icon+' '+em.label+'</span></div>';
-  if(seen.size===0&&dtBonus===0){el.innerHTML+='<div style="font-size:11px;color:var(--td)">No active synergy bonuses.</div>';return;}
-
-  // Gods list (all deployed gods except patron)
-  if(affGods.length>0){
-    el.innerHTML+='<div style="font-size:10px;font-weight:600;color:#6a5a2a;letter-spacing:.5px;margin-bottom:2px;margin-top:4px">GODS</div>';
-    affGods.forEach(u=>{
-      el.innerHTML+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;border-bottom:0.5px solid #2a2018"><span style="color:#a0c060">'+u.icon+' '+u.name+'</span></div>';
-    });
-    el.innerHTML+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;border-bottom:0.5px solid #2a2018"><span style="color:#a0c060">⊕ God Affinity ×'+affGods.length+'</span><span style="color:#a0c060">×'+affMult.toFixed(2)+' god HP</span></div>';
+  const {count,per,pct}=calcSynergy();
+  const azure=hasPassive('azureZephyr');
+  const tier=G.dte&&G.dte.synergyUnlocked2?'Elemental Bond II':(G.dte&&G.dte.synergyUnlocked?'Elemental Bond I':'Innate');
+  const elemLabel=azure?('<span class="elem-badge elem-fire">🔥 Fire</span> / <span class="elem-badge elem-wind">'+(ELEM_META.wind?ELEM_META.wind.icon:'')+' Wind</span>'):('<span class="elem-badge '+(em?em.cls:'')+'">'+(em?em.icon+' '+em.label:gd.element)+'</span>');
+  el.innerHTML='<div style="font-size:12px;margin-bottom:3px"><span style="color:#d4af37;font-weight:600">🔗 Elemental Synergy</span> <span style="font-size:10px;color:var(--td)">('+tier+' — +'+Math.round(per*100)+'% per bond)</span></div>'
+    +'<div style="font-size:11px;color:var(--td);margin-bottom:4px">Each other deployed '+elemLabel+' unit strengthens all of them by +'+Math.round(per*100)+'% ATK/MAG/DEF/RES (min +1 each).</div>'
+    +(count>0
+      ?'<div style="font-size:12px;color:#90d070">Active: '+count+' bond'+(count>1?'s':'')+' → <strong>+'+Math.round(pct*100)+'%</strong> to all matching units</div>'
+      :'<div style="font-size:11px;color:var(--td)">No bonds yet — deploy another '+(azure?'fire or wind':(em?em.label:gd.element))+' unit to activate.</div>');
+  // God Affinity (unchanged mechanic, still gated on Bond I)
+  if(G.dte&&G.dte.synergyUnlocked){
+    const aff=calcAffinity();
+    if(aff.count>0)el.innerHTML+='<div style="font-size:11px;color:#60c0ff;margin-top:3px">✦ God Affinity ×'+aff.count+': gods ×'+aff.mult.toFixed(2)+' HP</div>';
   }
-
-  // Element synergy units
-  if(elemGods.length+elemVassals.length>0){
-    el.innerHTML+='<div style="font-size:10px;font-weight:600;color:#6a5a2a;letter-spacing:.5px;margin-bottom:2px;margin-top:6px">ELEMENT BOND</div>';
-    [...elemGods,...elemVassals].forEach(u=>{
-      const col=u.isGod?'#a0c060':'#d4af37';
-      el.innerHTML+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;border-bottom:0.5px solid #2a2018"><span style="color:'+col+'">'+u.icon+' '+u.name+'</span></div>';
-    });
-    el.innerHTML+='<div style="display:flex;justify-content:space-between;font-size:12px;font-weight:500;color:#d4af37;padding:4px 0;margin-top:2px"><span>Total Element Bond</span><span>×'+elemMult.toFixed(2)+' all '+em.icon+' ('+em.label+') units</span></div>';
-  }
-
-  if(dtBonus>0)el.innerHTML+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;border-bottom:0.5px solid #2a2018"><span style="color:#60c0ff">✦ Divine Strength</span><span style="color:#60c0ff">+'+dtBonus+'% ATK/MAG/DEF/RES</span></div>';
+  const dtBonus=Math.round(((G.dte&&G.dte.godStatsMult||1)-1)*100);
+  if(dtBonus>0)el.innerHTML+='<div style="font-size:11px;color:#60c0ff;margin-top:2px">✦ Divine Strength: gods +'+dtBonus+'% ATK/MAG/DEF/RES</div>';
 }
 function renderAffPanel(){
   const el=document.getElementById('god-affinity-panel');if(el)el.innerHTML='';
@@ -11474,12 +11462,13 @@ function renderTemazcal(){
   const info=document.createElement('div');info.style.cssText='font-size:12px;color:var(--td);margin-bottom:.75rem';
   // v519: the toggle only appears after the first run — new players keep the guardrail
   const _frT=DT.teotl===0&&[...DT.unlocked].length===0&&DT.tecpatl_level===0;
-  info.innerHTML=`Cost: <span style="color:#c0844a;font-weight:500">🫘 ${cost} Cacao</span> per unit.`+(_frT?'':` &nbsp;·&nbsp; <span onclick="toggleTemazcalWarn()" style="cursor:pointer;text-decoration:underline dotted;color:#9050c0">⚠ Pre-battle warning: ${V['temazcal_warn_off']?'OFF':'ON'}</span>`);el.appendChild(info);
+  info.innerHTML=(_frT?'':`<span onclick="toggleTemazcalWarn()" style="cursor:pointer;text-decoration:underline dotted;color:#9050c0">⚠ Pre-battle warning: ${V['temazcal_warn_off']?'OFF':'ON'}</span>`);el.appendChild(info); // v641: cost line removed — it lives on the Restore buttons now
   const _hpOv=G.unitHpOverride||{};
   const all=[...G.party.map(gdId=>{const gd=GODS.find(g=>g.id===gdId);if(!gd)return null;const baseId='god_'+gdId;const maxNP=maxNPFor(baseId,gd.np||30);const curNP=G.unitNP[baseId]!==undefined?G.unitNP[baseId]:maxNP;const maxHp=allyMaxHpFor(baseId,gd.hp||140,G.dte.godHpMult||1);const curHp=rosterCurHp(baseId,maxHp);const _sn=(G.unitHpSnap||{})[baseId];const _fS=_sn?(maxHp/(_sn.rosterMax||maxHp)):1;return{id:baseId,_gd:gd,name:gd.name,icon:gd.icon,element:gd.element,curNP,maxNP,curHp,maxHp,curHpD:_sn?Math.round(_sn.cur*_fS):curHp,maxHpD:_sn?Math.round(_sn.max*_fS):maxHp};}).filter(Boolean),...G.captured.map(cu=>{const ck=capKey(cu);const maxNP=maxNPFor(ck,cu.np||20);const curNP=G.unitNP[ck]!==undefined?G.unitNP[ck]:maxNP;const maxHp=allyMaxHpFor(ck,cu.hp||50,G.dte.vassalHpMult||1);const curHp=rosterCurHp(ck,maxHp);const _sn=(G.unitHpSnap||{})[ck];const _fS=_sn?(maxHp/(_sn.rosterMax||maxHp)):1;return{id:ck,name:cu.name,icon:cu.icon,element:cu.element,curNP,maxNP,curHp,maxHp,curHpD:_sn?Math.round(_sn.cur*_fS):curHp,maxHpD:_sn?Math.round(_sn.max*_fS):maxHp};})];
   if(!all.length){el.innerHTML='<div style="font-size:12px;color:var(--td)">No units available.</div>';return;}
   const _nf=all.filter(u=>u.curNP<u.maxNP||u.curHp<u.maxHp); // v417: Restore-All button · v511: HP counts too
-  if(_nf.length>=2){
+  const _ftueTz=ftueGateActive()&&!G._ftueDidTemazcal; /* v652: FTUE temazcal step — patron first */
+  if(_nf.length>=2&&!_ftueTz){
     const _tot=cost*_nf.length;const _can=G.res.cacao>=_tot;
     const ra=document.createElement('div');ra.style.cssText='margin-bottom:.6rem';
     ra.innerHTML='<button class="btn btn-ca" onclick="doTemazcalAll()" '+(_can?'':'disabled')+' style="width:100%;font-size:15px">Restore all units ('+_tot+' 🫘)</button>'; // v632: mockup wording, single row
@@ -11493,11 +11482,12 @@ function renderTemazcal(){
     const card=document.createElement('div');card.className='tz-card';
     card.innerHTML='<div class="tz-art">'+(u._gd?godIconHtml(u._gd,64):unitIconHtml(u,64))+'</div>' // v635: gods show their portraits, not emoji
       +'<div class="tz-body">'
-      +'<div class="tz-name">'+u.name+' <span style="color:var(--am);font-size:11px">Lv'+_lv+'</span> <span style="font-size:12px">'+((ELEM_META[u.element]||{}).icon||'')+'</span></div>'
+      +'<div class="tz-name">'+u.name+' <span style="color:var(--am);font-size:11px">Lv'+_lv+'</span> <span style="font-size:12px">'+eb(u.element,true)+'</span></div>' /* v650: compact eb — pulses when a bond is live, so patron + vassal visibly light up after the hire */
       +'<div class="tz-barwrap"><div class="tz-fill-hp" style="transform:scaleX('+(u.maxHp>0?Math.min(1,u.curHp/u.maxHp):0)+')"></div><div class="tz-barlbl">❤️ '+Math.round(u.curHpD)+'/'+u.maxHpD+'</div></div>'
       +'<div class="tz-barwrap"><div class="tz-fill-tp" style="transform:scaleX('+(u.maxNP>0?u.curNP/u.maxNP:0)+')"></div><div class="tz-barlbl">✨ '+Math.round(u.curNP)+'/'+u.maxNP+'</div></div>'
       +'</div>'
-      +(full?'<div style="text-align:center;font-size:12px;color:#50c080;padding:6px">Full ✦</div>':'<button class="btn btn-ca" onclick="doTemazcal(\''+u.id+'\')" '+(canAfford?'':'disabled')+'>Restore ('+cost+' 🫘)</button>');
+      +(full?'<div style="text-align:center;font-size:12px;color:#50c080;padding:6px">Full ✦</div>':'<button class="btn btn-ca'+((_ftueTz&&u._gd&&u.id===('god_'+(G.god?G.god.id:'')))?' tab-pulse':'')+'" onclick="doTemazcal(\''+u.id+'\')" '+(canAfford?'':'disabled')+'>Restore ('+cost+' 🫘)</button>'); /* v652: FTUE glow rides the patron's Restore */
+    if(_ftueTz&&u.id!==('god_'+(G.god?G.god.id:''))){card.style.opacity='.35';card.style.pointerEvents='none';} /* v652: patron heals first */
     grid.appendChild(card);
   });
 }
@@ -11523,7 +11513,8 @@ function doTemazcal(unitId){
     if(maxHp>0){if(G.unitHpOverride)delete G.unitHpOverride[unitId];if(G.unitHpRatio)delete G.unitHpRatio[unitId];if(G.unitHpSnap&&G.unitHpSnap[unitId])G.unitHpSnap[unitId].cur=G.unitHpSnap[unitId].max;} // v514: full = no override, no ratio · v515: snap shows full too
   }
   notify('🌿 TP & HP restored!','#9050c0');renderRes('rb-shop');renderTemazcal();
-  if(ftueGateActive()&&!G._ftueDidTemazcal){G._ftueDidTemazcal=true;renderMercs();ftueGateUpdate();} // v305 (item 6) · v307: unlock mercs
+  if(document.getElementById('mercs-list'))renderMercs(); /* v652: hire buttons reflect the cacao just spent */
+  if(ftueGateActive()&&!G._ftueDidTemazcal){G._ftueDidTemazcal=true;renderMercs();renderTemazcal();ftueGateUpdate();} /* v305/v307 · v653: re-render temazcal AFTER the flag flips — the earlier render in this function ran pre-flag and left the other units greyed */
 }
 // ─── v305 (item 6): FTUE shop gate — first run only, blocks Continue until 3 guided steps done ───
 function doTemazcalAll(){ // v417: restore every unit's TP for the sum of individual Temazcal costs
@@ -11539,7 +11530,7 @@ function doTemazcalAll(){ // v417: restore every unit's TP for the sum of indivi
   G.unitHpOverride=G.unitHpOverride||{};
   tasks.forEach(t=>{G.unitNP[t.id]=t.maxNP;if(t.hp>0){if(G.unitHpOverride)delete G.unitHpOverride[t.id];if(G.unitHpRatio)delete G.unitHpRatio[t.id];if(G.unitHpSnap&&G.unitHpSnap[t.id])G.unitHpSnap[t.id].cur=G.unitHpSnap[t.id].max;}});
   notify('🌿 All TP restored! ('+tasks.length+' units · '+total+' 🫘)','#9050c0');
-  renderRes('rb-shop');renderTemazcal();
+  renderRes('rb-shop');renderTemazcal();if(document.getElementById('mercs-list'))renderMercs(); /* v652 */
   if(ftueGateActive()&&!G._ftueDidTemazcal){G._ftueDidTemazcal=true;renderMercs();ftueGateUpdate();}
 }
 function ftuePatronGlowActive(){ // v604: first-ever run, L1 B1 — playtesters didn't know where to click to act
@@ -11558,6 +11549,14 @@ function ftueAutoChecks(){
   if(!G._ftueDidMerc){const mp=getMercPool();if(!mp||!mp.length)G._ftueDidMerc=true;}
 }
 function ftueGateUpdate(){
+  // v641 debloat: Temazcal tab appears only after the patron has been trained (first run);
+  // the 'Level up allies' tip hides while the patron-weak tip is on stage, then returns gendered.
+  {const _act=ftueGateActive();const _s1=!!G._ftueDidTrain;
+   const tm=document.getElementById('tab-mercs');if(tm)tm.style.display=(_act&&!_s1)?'none':'';
+   const la=document.getElementById('tip-level-allies');
+   if(la){if(_act&&!_s1)la.style.display='none';
+     else{la.style.display='';const _fem=G.god&&['coatlicue','itzpapalotl','chicomecoatl','mayahuel','malinalxochitl','cihuacoatl'].includes(G.god.id);
+       la.innerHTML='Level up allies with <span style="color:#e05050;font-weight:600">🩸 Blood</span>.';}}} // v642: pronoun clause removed per playtest
   const cont=document.getElementById('continue-btn');
   // Clear previous gate UI, then rebuild from current state
   ['ftue-tip-training','ftue-tip-mercs','ftue-gate-hint'].forEach(i=>{const e=document.getElementById(i);if(e)e.remove();});
@@ -11580,18 +11579,14 @@ function ftueGateUpdate(){
   const pM=document.getElementById('panel-mercs');
   if(pM&&(!s2||!s3)){
     const d=document.createElement('div');d.id='ftue-tip-mercs';d.className='ftue-tip';
-    d.innerHTML=(!s2?'💡 Restore your patron\'s ✨ TP & ❤️ HP at the Temazcal — mercenaries unlock afterwards':(!s3?'💡 Hire a mercenary to bring an extra unit into battle':''));
+    d.innerHTML=(!s2?'💡 Restore your patron\'s ✨ TP & ❤️ HP at the Temazcal':(!s3?'💡 Hire a mercenary to bring an extra unit into battle':''));
     pM.prepend(d);
   }
   // v312: while the training step is pending, the patron's Level Up button glows (via renderTraining)
   // instead of the tab the player is already standing on.
-  if(s1&&(!s2||!s3)){const tb=document.getElementById('tab-mercs');if(tb)tb.classList.add('tab-pulse');}
+  if(s1&&(!s2||!s3)){const tb=document.getElementById('tab-mercs');const _onPanel=document.getElementById('panel-mercs')&&document.getElementById('panel-mercs').classList.contains('active');if(tb&&!_onPanel)tb.classList.add('tab-pulse');} /* v652: once here, the glow moves to the Restore / Hire buttons */
   else if(s1&&s2&&s3&&!s4&&epBtn)epBtn.classList.add('tab-pulse');
-  if(cont&&cont.parentElement){
-    const d=document.createElement('div');d.id='ftue-gate-hint';d.style.cssText='font-size:11px;color:#d4af37;margin-top:6px';
-    d.innerHTML='Complete to unlock: '+[(s1?'✓':'○')+' Train your patron',(s2?'✓':'○')+' Restore patron HP & TP',(s3?'✓':'○')+' Hire a mercenary'].concat(G._ftueNeedsParty?[(s4?'✓':'○')+' Check Edit Party — your recruit awaits']:[]).join(' · ');
-    cont.parentElement.appendChild(d);
-  }
+  // v641 debloat: the 'Complete to unlock' checklist header is gone — the step tips carry the guidance
 }
 function showShop(){
   // v536: Tianguis Decay penance — chance the market is skipped entirely between battles.
@@ -11644,7 +11639,7 @@ function showShop(){
   const altarPanel=document.getElementById('panel-altar');
   const isFirstRun=DT.teotl===0&&[...DT.unlocked].length===0&&DT.tecpatl_level===0;
   const altarUnlocked=!isFirstRun||G.battleNum>2||V['altar_intro_seen'];
-  if(altarTab){altarTab.style.opacity=altarUnlocked?'1':'0.4';altarTab.style.pointerEvents=altarUnlocked?'':'none';}
+  if(altarTab){altarTab.style.display=altarUnlocked?'':'none';altarTab.style.opacity='1';altarTab.style.pointerEvents=altarUnlocked?'':'none';} // v641: hidden until introduced
   if(altarPanel&&!altarUnlocked&&document.getElementById('panel-altar').classList.contains('active')){switchTab('training');}
   // First-ever Tianguis intro popup
   if(!V['tianguis_intro_seen']){
@@ -11738,10 +11733,10 @@ d.innerHTML=`<div style="margin-bottom:1px">${unitIconHtml(u,28)}</div><div styl
   });
   // + Available slot chip — v614: shown for ANY open slot (was gated on undeployed captures existing,
   // which hid the open slot exactly when the fix was hiring rather than deploying)
-  if(G.deplSel.length<ma){
+  for(let _sl=G.deplSel.length;_sl<ma;_sl++){ // v642: one chip per open slot (2 open → 2 chips)
     const btn=document.createElement('div');btn.className='party-chip';btn.style.cssText='cursor:pointer;opacity:.7;border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center';
     btn.innerHTML='<div style="font-size:20px">+</div><div style="font-size:10px;color:var(--td)">Available Slot</div>';
-    btn.onclick=()=>showEditPartyModal();el.appendChild(btn); // v607: was calling showAddAllyPanel(), which never existed — pre-existing dead reference, now routes to Edit Party
+    btn.onclick=()=>showEditPartyModal();el.appendChild(btn);
   }
   if(all.length===1){const note=document.createElement('div');note.style.cssText='font-size:11px;color:var(--td);align-self:center';note.textContent='No allies selected.';el.appendChild(note);}
 }
@@ -11755,6 +11750,8 @@ function showUnitTooltip(u){
   const npCostAtLv=Math.ceil(Math.max(1,baseNpCostFromObj(bo,lv,!!u.isGod)-sb.cost-getOfferingEffects().tpCostFlat)*_tpLvMult); // v428: match in-battle effectiveNpCost (was crude fallback)
   const typeLabel=bo.type==='MAG'?'Magical':bo.type==='MIX'?'MIX':'Physical';
   const _isTl=u._isTlaloque||isTlaloqueUnit(u);const _ol=offeringStatLayer({hp,atk,mag,def,res,tp:np},u.element,u.isGod,bo.type,u._turquoise||0,_isTl,!!u.isPatron);const T=_ol.total; /* v639: azure-aware */
+  // v642: Elemental Synergy joins the modal math — same +max(1,round(stat×pct)) bump the battle build applies, in the same order (after offerings, before buffs)
+  const _synInfo=(()=>{const cs=calcSynergy();const _m=G.god&&(u.element===G.god.element||(hasPassive('azureZephyr')&&(u.element==='fire'||u.element==='wind')));if(!_m||!cs.count)return null;const _b=v=>Math.max(1,Math.round((v||0)*cs.pct));T.atk+=_b(T.atk);T.mag+=_b(T.mag);T.def+=_b(T.def);T.res+=_b(T.res);return cs;})();
   const _abS=u.atkBuffStacks||0,_dbS=u.defBuffStacks||0,_cbS=u.critBuffStacks||0;
   const _abM=1+0.10*_abS,_dbM=1+0.10*_dbS;
   if(_abM>1){T.atk=Math.round(T.atk*_abM);T.mag=Math.round(T.mag*_abM);}
@@ -11813,6 +11810,7 @@ function showUnitTooltip(u){
     +patronLine
     +abilLine
     +oblLine
+    +(_synInfo?('<div style="font-size:11px;color:#d4af37;margin-top:4px">🔗 Elemental Synergy: +'+Math.round(_synInfo.pct*100)+'% ATK/MAG/DEF/RES ('+_synInfo.count+' bond'+(_synInfo.count>1?'s':'')+')</div>'):'')
     +offSec
     +buffSec
     +'</div>';
@@ -11834,11 +11832,13 @@ function buildEditPartyRows(){
       ?`G.deplSel=G.deplSel.filter(x=>x!=='${uid}');`
       :`if(G.deplSel.length<${ma})G.deplSel.push('${uid}');else{notify('Max ${ma} slots!','#e05050');return;}`;
     const elemHtml=ELEM_META[u.element]?('<span class="elem-badge '+ELEM_META[u.element].cls+'" style="font-size:9px">'+ELEM_META[u.element].icon+' '+ELEM_META[u.element].label+'</span>'):'';
+    const _synMatch=calcSynergy().count>0&&G.god&&(u.element===G.god.element||(hasPassive('azureZephyr')&&(u.element==='fire'||u.element==='wind'))); // v640
+    const synPill=_synMatch?('<span '+SYN_ATTRS.replace('style="','style="font-size:9px;color:#d4af37;background:#1e1604;border:0.5px solid #5a4a10;border-radius:6px;padding:1px 5px;')+'>🔗 +'+Math.round((calcSynergy().pct)*100)+'%</span>'):''; // v647: total
     const rowOpacity=disabled?'opacity:0.35;':'';
     return`<div style="display:flex;align-items:center;gap:8px;padding:5px 4px;border-bottom:0.5px solid var(--br);${rowOpacity}">
       <span style="display:inline-flex;align-items:center">${unitIconHtml(u,28)}</span>
-      <div style="flex:1"><div style="font-size:12px;font-weight:500">${u.name} ${elemHtml}</div><div style="font-size:10px;color:var(--td)">Lv${lv} · ${uType}</div></div>
-      <button ${disabled?'disabled':''} onclick="(function(){${addFn}renderPartyChips();renderAltar();var ec=document.getElementById('edit-party-content');if(ec)ec.innerHTML=buildEditPartyRows();var sc=document.getElementById('party-slot-counter');if(sc)sc.textContent='Slots: '+G.deplSel.length+'/${ma}. Patron always deploys.';})()" style="font-size:18px;padding:2px 8px;border-radius:6px;border:none;background:transparent;cursor:${disabled?'default':'pointer'}">${inParty?'✅':'⬜'}</button>
+      <div style="flex:1"><div style="font-size:12px;font-weight:500">${u.name} ${elemHtml} ${synPill}</div><div style="font-size:10px;color:var(--td)">Lv${lv} · ${uType}</div></div>
+      <button ${disabled?'disabled':''} onclick="(function(){${addFn}renderPartyChips();renderAltar();if(document.getElementById('training-list'))renderTraining();if(document.getElementById('synergy-panel'))renderSynPanel();var ec=document.getElementById('edit-party-content');if(ec)ec.innerHTML=buildEditPartyRows();var sc=document.getElementById('party-slot-counter');if(sc)sc.textContent='Slots: '+G.deplSel.length+'/${ma}. Patron always deploys.';})()" style="font-size:18px;padding:2px 8px;border-radius:6px;border:none;background:transparent;cursor:${disabled?'default':'pointer'}">${inParty?'✅':'⬜'}</button>
     </div>`;
   }).join('');
   return patronRow+allyRows;
@@ -11847,12 +11847,13 @@ function showEditPartyModal(){
   if(ftueGateActive()&&G._ftueNeedsParty&&!G._ftueDidParty){G._ftueDidParty=true;setTimeout(ftueGateUpdate,0);} // v306
   const ma=getMaxAllies();
   const content=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div id="party-slot-counter" style="font-size:11px;color:var(--td)">Slots: ${G.deplSel.length}/${ma}. Patron always deploys.</div><button class="btn" onclick="doAutoEquip()" style="font-size:10px;padding:3px 9px;margin-left:auto">⚡ Auto-Equip</button></div><div id="edit-party-content" style="max-height:55vh;overflow-y:auto">${buildEditPartyRows()}</div>`;
-  showMo('⚔','Edit Party',content,[{label:'Done',fn:()=>{renderPartyChips();renderAltar();if(typeof renderDeployChips==='function'&&document.getElementById('screen-deploy')&&document.getElementById('screen-deploy').style.display!=='none')renderDeployChips();}}]);
+  showMo('⚔','Edit Party',content,[{label:'Done',fn:()=>{renderPartyChips();renderAltar();if(document.getElementById('training-list'))renderTraining();if(document.getElementById('synergy-panel'))renderSynPanel();if(typeof renderDeployChips==='function'&&document.getElementById('screen-deploy')&&document.getElementById('screen-deploy').style.display!=='none')renderDeployChips();}}]); // v646: refresh deployment-aware surfaces after party edits
 }
 // v305 (6C): fill all slots greedily — ally gods first, then vassals, level descending within each group.
 // autoSel() already does exactly this because getAllyPool() returns gods (level desc) then caps (level desc).
 function doAutoEquip(){
   autoSel();
+  if(document.getElementById('training-list'))renderTraining();if(document.getElementById('synergy-panel'))renderSynPanel(); // v647
   const c=document.getElementById('edit-party-content');if(c)c.innerHTML=buildEditPartyRows();
   const sc2=document.getElementById('party-slot-counter');if(sc2)sc2.textContent='Slots: '+G.deplSel.length+'/'+getMaxAllies()+'. Patron always deploys.';
   renderPartyChips();
@@ -11960,6 +11961,7 @@ function renderTraining(){
     const shKey=u.isGod?u.id:capKey(u);const sh=G.shields[shKey]||0,shHp=G.unitArmor[shKey]!==undefined?G.unitArmor[shKey]:sh*G.dte.chimaArmorPerStack;
     const cfp=!u.isGod?sacFPAtLv(u,lv):0,nfp=!u.isGod?sacFPAtLv(u,lv+1):0;
     const isDeployed=G.deplSel.includes(u.id)||(u._captureId&&G.deplSel.includes(u._captureId));
+    G._tcModal=G._tcModal||{};G._tcModal[uk]={id:uk,name:u.name,icon:u.icon,element:u.element,level:lv,isPatron:!!isPatronRow,isGod:!!u.isGod,_captureId:u._captureId,_isHiredMerc:u._isHiredMerc,baseObj:u.isGod?(GODS.find(g=>'god_'+g.id===uk)||u):u}; // v643: modal payload for the art click
     // v312: ▲ now means "what your last Soul Surge pick actually added" (flashes ~6s), per design feedback.
     const fl=(G._surgeFlash&&G._surgeFlash.key===uk)?G._surgeFlash.deltas:null;
     // v605: level-up reveal — gains accumulated since the pre-burst baseline level flash briefly, then settle
@@ -12018,10 +12020,10 @@ function renderTraining(){
     d.innerHTML='<div class="tc-head">'
       +'<div class="tc-name">'+u.name+(u.isPatron?' ⭐':u.isGod?' ✦':'')+(isDeployed?' <span class="tc-dep">Deployed</span>':'')+(shHp?' <span style="font-size:10px;color:#60c0e0;font-weight:400">🛡 '+shHp+' HP</span>':'')+'</div>' // v617: Deployed pill rides with the name
       +'<div class="tc-meta"><div class="tc-lv">Level <span data-lvnum>'+lv+'</span>'+(lvf&&lvf.lv>0?' <span class="stat-up-glow">+'+lvf.lv+'</span>':'')+'</div>'
-      +'<div style="margin-top:2px">'+eb(u.element)+'</div></div>' // v617–v620: type emoji moved into the special line, meta keeps the element chip only
+      +'<div style="margin-top:2px">'+eb(u.element)+((calcSynergy().count>0&&G.god&&(u.element===G.god.element||(hasPassive('azureZephyr')&&(u.element==='fire'||u.element==='wind'))))?'<div style="font-size:9px;color:#d4af37;margin-top:2px" '+SYN_ATTRS+'>🔗 Synergy: +'+Math.round(calcSynergy().pct*100)+'%</div>':'')+'</div></div>' /* v617–v620 · v640 pill · v647 total · v648: a trailing // comment had commented out these closing divs, shattering the card layout */
       +'</div>'
       +'<div class="tc-mid">'
-      +'<div class="tc-art">'+unitIconHtml(u,92)+'</div>' // v628: fills the remaining space
+      +'<div class="tc-art" style="cursor:pointer" onclick="showUnitTooltip(G._tcModal[\''+uk+'\'])" title="View full stats">'+unitIconHtml(u,92)+'</div>' // v628 · v643: art opens the stats modal
       +'<div class="tc-stats">'
       +'<span data-stat="hp" '+statAttrs('hp')+'>❤️ <b>HP</b> '+sg(ch,nh,'hp')+'</span>'
       +'<span data-stat="tp" '+statAttrs('tp')+'>✨ <b>TP</b> '+sg(np,np2,'tp')+'</span>'
@@ -12033,6 +12035,7 @@ function renderTraining(){
       +forcesRow
       +specBlock
       +'<div class="tc-action">'+rightColHtml+'</div>';
+    if(ftueGateActive()&&!G._ftueDidTrain&&!isPatronRow){d.style.opacity='.35';d.style.pointerEvents='none';} // v641: allies wait until the patron has trained once
     if(sec.inline){ // v613: overline label on the group's first card keeps patron + deployed in one row flow
       const wrap=document.createElement('div');wrap.className='tc-wrap';
       const gl=document.createElement('div');gl.className='tc-grouplbl';gl.textContent=(_ui===0?sec.label:'');
@@ -12079,14 +12082,11 @@ function renderMercs(){
   // otherwise leave the player unable to afford the restore and soft-lock the gate.
   if(ftueGateActive())ftueAutoChecks(); // refresh auto-completes before reading the lock state
   const ftueMercLock=ftueGateActive()&&!G._ftueDidTemazcal;
-  el.style.opacity=ftueMercLock?'.4':'';
-  el.style.pointerEvents=ftueMercLock?'none':'';
-  if(ftueMercLock){
-    const note=document.createElement('div');
-    note.className='ftue-tip';
-    note.innerHTML='🔒 Mercenaries unlock after you restore your patron\'s ✨ TP at the Temazcal above';
-    el.appendChild(note);
-  }
+  // v641 debloat: mercenaries are invisible (not dimmed) until the Temazcal step is done
+  {const _mh=document.getElementById('mercs-header');if(_mh)_mh.style.display=ftueMercLock?'none':'';}
+  el.style.display=ftueMercLock?'none':'';
+  el.style.opacity='';el.style.pointerEvents='';
+  if(ftueMercLock)return;
   const pool=getMercPool();if(!pool.length){el.innerHTML+='<div style="font-size:12px;color:var(--td)">All available mercenaries hired.</div>';return;}
   const _isFR=DT.teotl===0&&[...DT.unlocked].length===0&&DT.tecpatl_level===0;const _altarOn=!_isFR||G.battleNum>2||V['altar_intro_seen']; // v417: gate merc flower-yield display behind altar unlock
   pool.forEach((u)=>{
@@ -12101,8 +12101,13 @@ function renderMercs(){
     // v632: training-card anatomy — HP/TP/type/element/special only (+ flowers when the altar exists)
     card.className='train-card merc-card';if(hired)card.style.opacity='.55';
     // v634: name+level own the full row; element chip sits below — the side-by-side head wrapped long names at 3-across width
+    /* v650: prospective synergy — if hiring this merc would bond with the patron's element, its chip
+       pulses even at zero current bonds, signaling that something activates on hire */
+    const _wouldBond=G.god&&(u.element===G.god.element||(hasPassive('azureZephyr')&&(u.element==='fire'||u.element==='wind')));
+    const _mm=ELEM_META[u.element];
+    const _chip=(_wouldBond&&_mm)?('<span class="elem-badge '+_mm.cls+'" style="animation:elemSynPulse .8s ease-in-out infinite alternate" '+SYN_ATTRS.replace('style="','style="display:inline-block;')+'>'+_mm.icon+' '+_mm.label+'</span>'):eb(u.element);
     card.innerHTML='<div class="tc-name">'+u.name+' <span style="color:var(--am);font-size:12px">Lv '+lv+'</span></div>'
-      +'<div style="margin-top:2px">'+eb(u.element)+'</div>'
+      +'<div style="margin-top:2px">'+_chip+'</div>'
       +'<div class="tc-mid"><div class="tc-art">'+unitIconHtml(u,60)+'</div><div class="tc-stats">'
       +'<span data-stat="hp" '+statAttrs('hp')+'>❤️ <b>HP</b> '+hp+'</span>'
       +'<span data-stat="tp" '+statAttrs('tp')+'>✨ <b>TP</b> '+tpMax+'</span>'
@@ -12110,7 +12115,7 @@ function renderMercs(){
       +'</div></div>'
       +'<div class="tc-spec"><span class="tc-spec-name">🔮 '+u.ability+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(u.ad)+'</span></span></div>'
       +'<div class="tc-desc">'+u.ad+'</div>'
-      +'<div class="tc-action">'+(hired?'<div style="text-align:center;font-size:12px;color:#50c080;padding:6px">Hired ✦</div>':'<button class="btn btn-ca" onclick="doHireMerc(\''+u.id+'\')" '+(canAfford?'':'disabled')+' style="width:100%;font-size:15px">Hire <span style="font-size:13px;opacity:.9">🫘 '+tier.cost+'</span></button>')+'</div>';
+      +'<div class="tc-action">'+(hired?'<div style="text-align:center;font-size:12px;color:#50c080;padding:6px">Hired ✦</div>':'<button class="btn btn-ca'+((ftueGateActive()&&G._ftueDidTemazcal&&!G._ftueDidMerc&&canAfford)?' tab-pulse':'')+'" onclick="doHireMerc(\''+u.id+'\')" '+(canAfford?'':'disabled')+' style="width:100%;font-size:15px">Hire <span style="font-size:13px;opacity:.9">🫘 '+tier.cost+'</span></button>') /* v652: FTUE glow on affordable hires */+'</div>';
     el.appendChild(card);
   });
 }
