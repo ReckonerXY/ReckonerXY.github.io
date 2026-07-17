@@ -166,7 +166,7 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .tc-action>div{min-width:0!important}
 .tc-dep{font-size:9px;color:#50c080;background:#042010;border-radius:4px;padding:1px 4px}
 /* v632: Temazcal battle-card style */
-.tz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.tz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,210px));gap:10px;justify-content:center} /* v654 */
 .tz-card{background:var(--bm);border:1px solid var(--br);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
 .tz-art{background:#00000033;display:flex;align-items:center;justify-content:center;min-height:92px}
 .tz-body{padding:6px 8px;display:flex;flex-direction:column;gap:4px}
@@ -177,11 +177,11 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .tz-barlbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 2px #000}
 .tz-card .btn{margin:6px;font-size:13px}
 /* v632: mercenary training-card grid, 3 across */
-#mercs-list{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#mercs-list{display:grid;grid-template-columns:repeat(3,minmax(230px,320px));gap:10px;justify-content:center} /* v654: capped + centered like the training cards */
 @media(max-width:520px){#mercs-list{grid-template-columns:1fr}} /* v633: 760px breakpoint was tripping on ~690px viewports (Retina windows), stacking the cards — 3-up holds fine down to ~520px */
 #mercs-list>*:not(.merc-card){grid-column:1/-1}
 /* v635: Sacrifice Altar card grids */
-.sac-grid,.rg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px}
+.sac-grid,.rg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,320px));gap:10px;margin-top:6px;justify-content:center} /* v654 */
 @media(max-width:520px){.sac-grid,.rg-grid{grid-template-columns:1fr}}
 .sac-card.sel{outline:2px solid #8a208a;background:#1a0a1a!important}
 .sac-fv{font-size:20px;font-weight:700;color:#d4af37;line-height:1.1}
@@ -2915,7 +2915,7 @@ function renderRes(id){
   const _mbIc={1:'🦎',2:'🗿',3:'🐊',4:'🌪️',5:'🦉',6:'🏹'}[G.layer||1]||'⚔';
   const _mbNm={1:'Xochitonal',2:'Quinametzin',3:'Xiuhnel & Mimich',4:'Mictlampehecatl',5:'Tlacateocotl',6:'The Lake Lords'}[G.layer||1]||'Mini-boss';
   let _mm='';for(let _b=1;_b<=8;_b++){const _cur=_b===G.battleNum,_done=_b<G.battleNum;const _ic=_b===5?_mbIc:_b===8?'💀':'●';const _col=_cur?'#ffd060':_done?'#50c080':'#3a3428';const _pill=_cur?'background:rgba(255,208,96,.20);border:1px solid #ffd060;border-radius:7px;padding:0 3px;':'';_mm+=`<span title="Battle ${_b}${_b===5?' — Mini-boss: '+_mbNm:_b===8?' — Layer Boss':''}" style="color:${_col};font-size:${(_b===5||_b===8)?'11px':'9px'};${_pill}margin:0 1px">${_ic}</span>`;}
-  document.getElementById(id).innerHTML=resHtml+capChip+`<div class="res" style="margin-left:auto"><span style="letter-spacing:1px;margin-right:8px;white-space:nowrap">${_mm}</span><span style="font-size:11px;color:var(--td)">L${G.layer||1} · Battle ${G.battleNum}/8</span> <span style="font-size:10px;color:#3a3020;margin-left:6px">v653</span></div>`;
+  document.getElementById(id).innerHTML=resHtml+capChip+`<div class="res" style="margin-left:auto"><span style="letter-spacing:1px;margin-right:8px;white-space:nowrap">${_mm}</span><span style="font-size:11px;color:var(--td)">L${G.layer||1} · Battle ${G.battleNum}/8</span> <span style="font-size:10px;color:#3a3020;margin-left:6px">v654</span></div>`;
 }
 function eb(elem,compact=false){const e=ELEM_META[elem];if(!e)return'';
   const isAzure=hasPassive('azureZephyr');
@@ -11708,18 +11708,20 @@ function renderPartyChips(){
   // v312 (item 4): Edit Party is rendered INSIDE the box and flows/wraps with the chips,
   // so it scales naturally with any number of party slots. Appended at the end below.
   const pg=G.god;const ma=getMaxAllies();const all=[];
+  /* v654: Edit Party moves to the LEFT, stacked under the slot counter — top-right it sat directly
+     beneath 'Continue to Next Battle' and caught mis-taps (playtest) */
   const _epb=document.createElement('button');
   _epb.className='btn';_epb.id='edit-party-btn';_epb.onclick=showEditPartyModal;
-  _epb.style.cssText='font-size:11px;padding:5px 11px;margin-left:auto;align-self:center;flex-shrink:0;order:99';
+  _epb.style.cssText='font-size:11px;padding:5px 11px;flex-shrink:0';
   _epb.textContent='✕ Edit Party';
-  el.appendChild(_epb);
   if(pg)all.push({id:'god_'+pg.id,name:pg.name,icon:pg.icon,element:pg.element,level:getLevel('god_'+pg.id),isPatron:true,isGod:true,baseObj:pg});
   G.deplSel.forEach(sid=>{
     if(sid.startsWith('god_')){const gd=GODS.find(g=>g.id===sid.replace('god_',''));if(gd&&gd.id!==pg?.id)all.push({id:'god_'+gd.id,name:gd.name,icon:gd.icon,element:gd.element,level:getLevel('god_'+gd.id),isPatron:false,isGod:true,baseObj:gd});}
     else{const cu=G.captured.find(c=>c._captureId===sid||c.id===sid);if(cu)all.push({id:cu.id,name:cu.name,icon:cu.icon,element:cu.element,level:getLevel(capKey(cu)),isPatron:false,isGod:false,baseObj:cu});}
   });
   const badge=document.createElement('div');badge.style.cssText='font-size:11px;color:var(--am);padding:4px 8px;background:#2a1a08;border:0.5px solid #6a4a10;border-radius:6px;align-self:center;white-space:nowrap';
-  badge.textContent=`${all.length} / ${ma+1}`;el.appendChild(badge);
+  badge.textContent=`${all.length} / ${ma+1}`;
+  {const _lc=document.createElement('div');_lc.style.cssText='display:flex;flex-direction:column;gap:5px;align-items:stretch;order:-1';_lc.appendChild(badge);_lc.appendChild(_epb);el.appendChild(_lc);} /* v654: counter + Edit Party share a left column */
   all.forEach(u=>{
     const sh=G.shields[u.id]||0;
     // Use persisted armor HP if available (reflects post-battle damage)
