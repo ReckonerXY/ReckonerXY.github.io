@@ -624,11 +624,11 @@ const TREE_NODES=[
   {id:'synergy_unlock_2',label:'Elemental Bond II',desc:'Elemental Synergy peaks: each other patron-element deployed unit grants +20% ATK/MAG/DEF/RES',cost:2750,cat:'gods',req:['synergy_unlock'],tier:2,x:312,y:278},
   {id:'god_special_up',label:'God Health Boost I',desc:'Increase all God HP by 10%',cost:400,cat:'gods',req:['god_stats_1'],tier:2,x:588,y:196},
   {id:'sacred_oblation',label:'Sacred Oblation',desc:'Sacrifice an Ally God at the Altar to bestow their patron ability upon your Patron God — for this run',cost:1000,cat:'gods',req:['god_special_up'],tier:3,x:588,y:114},
-  {id:'god_special_up_2',label:'God Health Boost II',desc:'Increase all God HP by another 15% (total +25%)',cost:1500,cat:'gods',req:['god_special_up'],tier:3,x:450,y:114},
-  {id:'ally_special_up_2',label:'Vassal Health Boost II',desc:'Increase all Vassal HP by another 15% (total +25%)',cost:1300,cat:'allies',req:['ally_special_up'],tier:4,x:458,y:594},
+  {id:'god_special_up_2',label:'God Health Boost II',desc:'Increase all God HP by another 10% (total +20%)',cost:1500,cat:'gods',req:['god_special_up'],tier:3,x:450,y:114},
+  {id:'ally_special_up_2',label:'Vassal Health Boost II',desc:'Increase all Vassal HP by another 10% (total +20%)',cost:1300,cat:'allies',req:['ally_special_up'],tier:4,x:458,y:594},
   {id:'godly_compassion',label:'Godly Compassion',desc:'Enables Sparing vassals at the Sacrifice Altar — release a unit for a small Blood or Cacao reward instead of sacrificing it for Flowers',cost:151,cat:'allies',req:['ally_slot_3'],tier:2,x:550,y:520},
-  {id:'pantheon_boost',label:'Pantheon Boost',desc:'Each additional god in your party boosts all god stats by 1.05×',cost:400,cat:'gods',req:['synergy_unlock'],tier:3,x:357,y:114},
-  {id:'pantheon_boost_2',label:'Pantheon Boost II',desc:'Each additional god boosts all god stats by another 1.05× (stacks with I)',cost:1350,cat:'gods',req:['pantheon_boost'],tier:4,x:357,y:32},
+  {id:'pantheon_boost',label:'Pantheon Boost',desc:'Each additional deployed god grants all gods +2.5% ATK/MAG/DEF/RES',cost:300,cat:'gods',req:['synergy_unlock'],tier:3,x:357,y:114},
+  {id:'pantheon_boost_2',label:'Pantheon Boost II',desc:'Each additional deployed god grants all gods a further +2.5% ATK/MAG/DEF/RES (stacks with I)',cost:1350,cat:'gods',req:['pantheon_boost'],tier:4,x:357,y:32},
   // ═══ SOUTH — ALLIES ═══
   {id:'ally_slot_3',label:'3 Ally Slots',desc:'Unlock 3rd ally deployment slot',cost:2,cat:'allies',req:['hub'],tier:1,x:450,y:442},
   {id:'ally_slot_4',label:'4 Ally Slots',desc:'Unlock a 4th ally slot',cost:125,cat:'allies',req:['ally_slot_3'],tier:2,x:450,y:520},
@@ -655,6 +655,7 @@ const TREE_NODES=[
   {id:'cacao_bonus',label:'Cacao Flow',desc:'+20% Cacao earned from all battles (stacks with Theobroma)',cost:3000,cat:'combat',req:['theobroma'],tier:5,x:835,y:530},
   // ═══ WEST — ECONOMY ═══
   {id:'trade_route',label:'Trade Route',desc:'Unlocks the Pochteca — a wandering merchant who brings Offerings to the Tianguis. (25% chance after every battle)',cost:12,cat:'qol',req:['hub'],tier:1,x:340,y:360},
+  {id:'offering_surplus',label:'Offering Surplus',desc:'Lets you reroll the Pochteca\u2019s wares. First reroll costs 25 Cacao; each further reroll in the same run costs +25 more.',cost:64,cat:'qol',req:['trade_route'],tier:1,x:235,y:450},
   {id:'codex_services',label:'Codex Services',desc:'Unlocks the Tlacuilo — a wandering scribe who records and clones vassals in the Tianguis. (Appears with the Pochteca)',cost:30,cat:'qol',req:['trade_route'],tier:1,x:340,y:450},
   {id:'cost_reduce_1',label:'Cheaper Blood I',desc:'Level-up Blood costs reduced by 10%',cost:25,cat:'qol',req:['trade_route'],tier:1,x:235,y:360},
   {id:'cost_reduce_2',label:'Cheaper Blood II',desc:'Level-up Blood costs reduced by another 15% (total -25%)',cost:500,cat:'qol',req:['cost_reduce_1'],tier:2,x:130,y:294},
@@ -705,7 +706,7 @@ const OFFERINGS={
   new_fire_knife:{name:'New Fire Knife',tier:'rare',icon:'🔪',price:600,priceType:'cacao',flowerPrice:20,desc:'FIRE units gain +30 ATK & +30 MAG while their TP is 40% or less',flavor:"The knife that kindles the New Fire ceremony; it cuts brightest when the flame runs lowest.",eff:{fireKnife:1}},
   // -- v567: NATURE batch + Teōmetl Sap (Mayahuel-patron exclusive) --
   centeotl_cob:{name:'Centeōtl Cob',tier:'common',icon:'🌽',price:100,priceType:'cacao',desc:'NATURE units: TP cost reduced by 10%',flavor:"The maize god's first ear; growth asks less of those who serve the green.",eff:{tpCostMultByElement:{nature:0.90}}},
-  vulture_vessel:{name:'Vulture Vessel',tier:'uncommon',icon:'🏺',price:250,priceType:'cacao',desc:'Enemies slain by NATURE units yield +5% Blood and Cacao',flavor:"The carrion bird wastes nothing; neither shall you.",eff:{vultureVessel:1}},
+  vulture_vessel:{name:'Vulture Vessel',tier:'uncommon',icon:'🏺',price:250,priceType:'cacao',desc:'Enemies slain by NATURE units yield +15% Blood and Cacao',flavor:"The carrion bird wastes nothing; neither shall you.",eff:{vultureVessel:1}},
   huauhtli_bar:{name:'Huāuhtli Bar',tier:'rare',icon:'🍫',price:600,priceType:'cacao',flowerPrice:20,desc:'NATURE units: +30% HP, +20 DEF & +20 RES',flavor:"Amaranth pressed with honey — the warrior's ration, dense as packed earth.",eff:{hpMultByElement:{nature:1.30},flatDefByElement:{nature:20},flatResByElement:{nature:20}}},
   // -- v580: WIND batch --
   kukulkan_statue:{name:"K'uk'ulkan Statue",tier:'rare',icon:'🗿',price:600,priceType:'cacao',flowerPrice:20,desc:'Once per round: after a capture, a random WIND unit gains a bonus action',flavor:'The feathered serpent coils in stone, waiting for the wind to move it.',eff:{kukulkanBonus:1}},
@@ -716,6 +717,7 @@ const OFFERINGS={
   tlaltecuhtli_claw:{name:'Tlaltecuhtli Claw',tier:'uncommon',icon:'🦴',price:250,priceType:'cacao',desc:"EARTH units' strikes apply Wound ×1",flavor:'The earth monster has mouths at every joint. She never stopped being hungry.',eff:{strikeWoundEarth:1}},
   ayotochtli_figurine:{name:'Ayotochtli Figurine',tier:'uncommon',icon:'🦔',price:250,priceType:'cacao',desc:'EARTH units gain +5 ATK & +5 MAG per Teyolia surge level',flavor:'The armadillo — "turtle-rabbit" — carries its house on its back and fears nothing that walks.',eff:{ayotochtli:5}},
   bloody_arrow:{name:'Bloody Arrow',tier:'rare',icon:'🏹',price:600,priceType:'cacao',flowerPrice:20,desc:'Wounded enemies yield +20% Blood when slain',flavor:'The shaft drinks first. What comes back on it is owed to the gods.',eff:{bloodyArrow:0.20}},
+  jumping_beans:{name:'Jumping Beans',tier:'rare',icon:'🎲',price:600,priceType:'cacao',flowerPrice:20,desc:'Patolli Gamble: +25% chance to roll 5 or 6, −25% chance to roll 1 or 2',flavor:'Seeds that twitch and leap of their own accord. The Prince of Flowers never plays a straight game.',eff:{jumpingBeans:1},noStockIf:function(){return !((G.god&&G.god.id==='xochipilli')||(G.party||[]).indexOf('xochipilli')>=0);}},
   teometl_sap:{name:'Teōmetl Sap',tier:'rare',icon:'🌵',price:600,priceType:'cacao',flowerPrice:20,desc:"Your allies' DRUNK stacks cannot be removed by cleanse effects",flavor:"The divine maguey's blood, thick and sweet. What the goddess pours, no rite may undo.",eff:{drunkUncleansable:1},noStockIf:()=>!G.god||G.god.id!=='mayahuel'},
   dog_sculpture:{name:'Dog Sculpture',tier:'common',icon:'🐕',price:100,priceType:'cacao',desc:'THUNDER units +4 ATK & +4 MAG',flavor:"A plump Colima clay dog, guide and guardian, lightning bared in its grin.",eff:{flatAtkByElement:{thunder:4},flatMagByElement:{thunder:4}}},
   cempasuchil_petals:{name:'Cempasúchil Petals',tier:'common',icon:'🏵️',price:100,priceType:'cacao',desc:'NATURE units +4 MAG & +4 DEF',flavor:"Marigolds strewn for the returning dead; their scent marks the path home.",eff:{flatMagByElement:{nature:4},flatDefByElement:{nature:4}}},
@@ -729,8 +731,8 @@ const OFFERINGS={
   greenstone_figurine:{name:'Greenstone Figurine',tier:'common',icon:'🟩',price:100,priceType:'cacao',desc:'Vassals +10% max HP',flavor:'A polished jade celt, cool to the touch — the stone the gods prize above gold.',eff:{vassalHpMult:1.10}},
   rubber_ball:{name:'Rubber Ball (Ōlli)',tier:'common',icon:'⚫',price:100,priceType:'cacao',desc:'HUMANITY units +7 ATK',flavor:'Hardened ōlli from the sacred ballcourt; it remembers every game played for the gods.',eff:{flatAtkByElement:{humanity:7}}},
   wind_jewel:{name:'Ehecacōzcatl (Wind Jewel)',tier:'common',icon:'🌀',price:100,priceType:'cacao',desc:'WIND units +7 MAG',flavor:"Quetzalcoatl's spiral conch-jewel, humming with the breath of the four winds.",eff:{flatMagByElement:{wind:7}}},
-  cacao_effigy:{name:'Cacao Effigy',tier:'common',icon:'🟤',price:100,priceType:'cacao',desc:'+5% Cacao on spoils',flavor:"A small clay statue cradling a cacao pod — the merchants' quiet blessing.",eff:{cacaoMult:1.05}},
-  spondylus_pendant:{name:'Spondylus Pendant',tier:'common',icon:'🐚',price:100,priceType:'cacao',desc:'+5% Blood on spoils',flavor:'Crimson shell traded from distant seas, dearer than jade to the old kings.',eff:{bloodMult:1.05}},
+  cacao_effigy:{name:'Cacao Effigy',tier:'common',icon:'🟤',price:100,priceType:'cacao',desc:'+10% Cacao on spoils',flavor:"A small clay statue cradling a cacao pod — the merchants' quiet blessing.",eff:{cacaoMult:1.10}},
+  spondylus_pendant:{name:'Spondylus Pendant',tier:'common',icon:'🐚',price:100,priceType:'cacao',desc:'+10% Blood on spoils',flavor:'Crimson shell traded from distant seas, dearer than jade to the old kings.',eff:{bloodMult:1.10}},
   copal_brazier:{name:'Copal Brazier',tier:'common',icon:'🔥',price:100,priceType:'cacao',desc:'−2 TP cost',flavor:'Sweet copal smoke curling upward — the gods lean close to listen.',eff:{tpCostFlat:2}},
   yauhtli_flower:{name:'Yauhtli Flower',tier:'common',icon:'🌼',price:100,priceType:'cacao',desc:'Cleanse all allies of ailments at the start of the first round',flavor:"Sacred marigold of Tlaloc, burned to drive sickness from the body.",eff:{roundCleanse:1}},
   // Pochteca — Uncommon (750 Cacao) — v370
@@ -776,7 +778,7 @@ function offeringRewardLine(r){
   return `Your collection is complete at that rarity.<br><em style="color:#e0c060">+${r.amount} ${r.res==='cacao'?'🫘 Cacao':'🌼 Flowers'} instead.</em>`;
 }
 function getOfferingEffects(){
-  const e={atkMult:1,magMult:1,defMult:1,resMult:1,hpMult:1,vassalHpMult:1,tpMult:1,tpCostFlat:0,cacaoMult:1,bloodMult:1,flatAtkByElement:{},flatMagByElement:{},battleStartAtkBuff:false,strikePoison:0,strikeBurnFire:false,strikeParalyzeThunder:false,startChimalliRandom:0,roundRegenPct:0,reviveVassal:0,weakestFlatDefRes:0,mask2r:{atk:1,mag:1,def:1,res:1},strikeLifesteal:0,revivePatron:0,dayStatMult:1,tlaloqueHpMult:1,tlaloqueStatMult:1,tpCostMult:1,flatDefByElement:{},flatResByElement:{},critBonusParty:0,critBonusByElement:{},critMultBonus:0,round1FlatByElement:{},roundRegenPctByElement:{},waterStrikeSplash:0,physAtkMult:1,physRecoilPct:0,tpCostMultByElement:{},hpMultByElement:{},drunkUncleansable:false,dayAtkMult:1,dayExtraRecoil:0,kukulkanBonus:false,windCacaoDiscount:0,ehecatlSpare:false,flayedSkin:0,strikeWoundEarth:0,ayotochtli:0,bloodyArrow:0};
+  const e={atkMult:1,magMult:1,defMult:1,resMult:1,hpMult:1,vassalHpMult:1,tpMult:1,tpCostFlat:0,cacaoMult:1,bloodMult:1,flatAtkByElement:{},flatMagByElement:{},battleStartAtkBuff:false,strikePoison:0,strikeBurnFire:false,strikeParalyzeThunder:false,startChimalliRandom:0,roundRegenPct:0,reviveVassal:0,weakestFlatDefRes:0,mask2r:{atk:1,mag:1,def:1,res:1},strikeLifesteal:0,revivePatron:0,dayStatMult:1,tlaloqueHpMult:1,tlaloqueStatMult:1,tpCostMult:1,flatDefByElement:{},flatResByElement:{},critBonusParty:0,critBonusByElement:{},critMultBonus:0,round1FlatByElement:{},roundRegenPctByElement:{},waterStrikeSplash:0,physAtkMult:1,physRecoilPct:0,tpCostMultByElement:{},hpMultByElement:{},drunkUncleansable:false,dayAtkMult:1,dayExtraRecoil:0,kukulkanBonus:false,jumpingBeans:false,windCacaoDiscount:0,ehecatlSpare:false,flayedSkin:0,strikeWoundEarth:0,ayotochtli:0,bloodyArrow:0};
   (G.offerings||[]).forEach(id=>{const o=OFFERINGS[id];if(!o||!o.eff)return;const f=o.eff;
     if(f.atkMult)e.atkMult*=f.atkMult; if(f.magMult)e.magMult*=f.magMult;
     if(f.defMult)e.defMult*=f.defMult; if(f.resMult)e.resMult*=f.resMult;
@@ -794,6 +796,7 @@ function getOfferingEffects(){
     if(f.dayAtkMult)e.dayAtkMult*=f.dayAtkMult;
     if(f.dayExtraRecoil)e.dayExtraRecoil+=f.dayExtraRecoil;
     if(f.kukulkanBonus)e.kukulkanBonus=true;
+    if(f.jumpingBeans)e.jumpingBeans=true;
     if(f.windCacaoDiscount)e.windCacaoDiscount+=f.windCacaoDiscount;
     if(f.ehecatlSpare)e.ehecatlSpare=true;
     if(f.flayedSkin)e.flayedSkin+=f.flayedSkin;
@@ -961,6 +964,7 @@ function offeringStatLayer(base,element,isGod,type,turquoise,isTlaloqueU,isPatro
     if(f.brazierSurge&&_M('fire'))hit=true;
     if(f.vultureVessel&&element==='nature')hit=true;
     if(f.kukulkanBonus&&_M('wind'))hit=true;
+    if(f.jumpingBeans)hit=true; // already Xochipilli-gated by noStockIf
     if(f.windCacaoDiscount&&_M('wind'))hit=true;
     if(f.ehecatlSpare&&_M('wind'))hit=true;
     if(f.flayedSkin&&element==='earth')hit=true;
@@ -1165,6 +1169,20 @@ function maybeRollPochteca(isFirstRun){
   var guaranteed=!!G._pochtecaGuarantee;G._pochtecaGuarantee=false; // v357: guaranteed right after a miniboss/layer-boss
   G._pochtecaStock=(guaranteed||Math.random()<0.25)?rollPochtecaStock():null;
 }
+// v669: Offering Surplus (DT). Escalates across the WHOLE run, not per stall, so repeat rerolling
+// has a real cost curve instead of resetting free at every shop.
+function offeringRerollCost(){return 25+25*(G.offeringRerolls||0);}
+function rerollPochteca(){
+  if(!getDTEffects().offeringRerollUnlocked)return;
+  var st=G._pochtecaStock;if(!st||!st.length)return;
+  var c=offeringRerollCost();
+  if((G.res.cacao||0)<c){notify('Not enough Cacao!','#e05050');return;}
+  if(!pochtecaPool().length){notify('The Pochteca has nothing else to offer.','#e05050');return;}
+  G.res.cacao-=c;G.offeringRerolls=(G.offeringRerolls||0)+1;
+  G._pochtecaStock=rollPochtecaStock(); // pochtecaPool() already excludes held offerings, so bought wares can't reappear
+  notify('Wares rerolled','#c0e060');
+  renderPochteca();renderRes('rb-shop');
+}
 function buyOffering(i){
   var st=G._pochtecaStock||[];var it=st[i];if(!it||it.sold)return;
   var pt=it.priceType;var eff=Math.round(it.price*offeringPriceMult());if((G.res[pt]||0)<eff){notify('Not enough '+(pt==='flower'?'Flowers':'Cacao')+'!','#e05050');return;}
@@ -1188,7 +1206,14 @@ function renderPochtecaReal(){
         '<div style="font-size:9px;color:var(--td);font-style:italic;line-height:1.3;margin-bottom:6px">'+o.flavor+'</div>'+
         btn+
       '</div>';}).join('')+
-    '</div>';
+    '</div>'+
+    (function(){
+      if(!getDTEffects().offeringRerollUnlocked)return '';
+      var c=offeringRerollCost(),can=(G.res.cacao||0)>=c&&pochtecaPool().length>0;
+      return '<div style="margin-top:10px;text-align:center">'+
+        '<button class="btn btn-ca" '+(can?'':'disabled')+' onclick="rerollPochteca()" style="font-size:11px;padding:5px 14px">\ud83c\udfb2 Reroll Wares \u2014 '+c+' \ud83e\uded8</button>'+
+      '</div>';
+    })();
 }
 function renderPochteca(){
   const el=document.getElementById('pochteca-list');if(!el)return;
@@ -1303,8 +1328,8 @@ function getDTEffects(){
     allySpecialUnlocked:false, // disabled — replaced by Health Boost
     godSpecialCostMult:1,
     allySpecialCostMult:1,
-    godHpMult:(u.has('god_special_up_2')?1.15:1)*(u.has('god_special_up')?1.10:1),
-    vassalHpMult:(u.has('ally_special_up_2')?1.15:1)*(u.has('ally_special_up')?1.10:1),
+    godHpMult:1+(u.has('god_special_up')?0.10:0)+(u.has('god_special_up_2')?0.10:0),
+    vassalHpMult:1+(u.has('ally_special_up')?0.10:0)+(u.has('ally_special_up_2')?0.10:0),
     bloodStartBonus:(u.has('blood_starter_2')?150:0)+(u.has('blood_starter_1')?100:0),
     cacaoStartBonus:(u.has('cacao_starter_2')?100:0)+(u.has('cacao_starter_1')?50:0),
     bloodCostMult:u.has('cost_reduce_2')?0.75:u.has('cost_reduce_1')?0.90:1,
@@ -1316,6 +1341,7 @@ function getDTEffects(){
     synergyUnlocked:u.has('synergy_unlock'),
     synergyUnlocked2:u.has('synergy_unlock_2'),
     pochtecaUnlocked:u.has('trade_route'),
+    offeringRerollUnlocked:u.has('offering_surplus'),
     tlacuiloUnlocked:u.has('codex_services'),
   };
 }
@@ -1899,7 +1925,7 @@ const NATURE_CAPS=[
 ];
 // ── HUMANITY CAPS: Xochipilli escorts ────────────────────────────────────────
 const HUMANITY_CAPS=[
-  {id:'xe1',name:'Tlachtli Champion',icon:'🏐',element:'humanity',type:'PHYS',hp:88,atk:17,mag:0,def:7,res:4,np:22,npCost:10,ability:'Ball Strike',ad:'3-hit multi 0.9×ATK to random enemies + Slow each hit',ak:'ballStrike',acd:10,fv:4},
+  {id:'xe1',name:'Tlachtli Champion',icon:'🏐',element:'humanity',type:'PHYS',hp:88,atk:17,mag:0,def:7,res:4,np:22,npCost:10,ability:'Ball Strike',ad:'5-hit multi 0.55×ATK to random enemies + Slow each hit',ak:'ballStrike',acd:10,fv:4},
   {id:'xe2',name:'Obsidian Sculptor',icon:'🗿',element:'humanity',type:'MAG',hp:75,atk:0,mag:15,def:5,res:6,np:26,npCost:15,ability:'Craft Shard',ad:'1.1×MAG, 4 targets + Burn ×1',ak:'craftShard',acd:10,fv:4},
   {id:'xe3',name:'War Drummer',icon:'🥁',element:'humanity',type:'MIX',hp:80,atk:11,mag:9,def:7,res:6,np:24,npCost:11,ability:'War Rhythm',ad:'1.2×ATK to 1 enemy + ATK/MAG UP ×1 to all allies',ak:'warRhythm',acd:11,fv:3},
   {id:'xe4',name:'Macuahuitl Bearer',icon:'⚔️',element:'humanity',type:'PHYS',hp:115,atk:14,mag:0,def:12,res:5,np:22,npCost:10,ability:'Heavy Cleave',ad:'1.3×ATK + WOUND ×1',ak:'heavyCleave',acd:12,fv:4},
@@ -1996,7 +2022,7 @@ const IXQUIMILLI_BOSS_TPL={id:'boss_ixqui',name:'Ixquimilli',flavor:'Punisher Go
   ability:'Frost Macuahuitl',ad:'1.5×ATK + Wound ×1 + Lethargy ×2',ak:'frostMacuahuitl',
   hp:660,atk:28,mag:0,def:12,res:8,np:50,npCost:20,fv:0};
 // Add Mictlampehecatl capturable stats
-MINIBOSS_CAP_STATS['mictlampehecatl']={hp:200,atk:0,mag:18,def:9,res:10,np:40,npCost:34,fv:6,ability:'Iceburn Storm',ad:'1.2×MAG, 5 targets + Burn ×2 all',ak:'iceburnStorm',type:'MAG',element:'water'};
+MINIBOSS_CAP_STATS['mictlampehecatl']={hp:170,atk:0,mag:18,def:9,res:10,np:40,npCost:34,fv:6,ability:'Iceburn Storm',ad:'1.2×MAG, 5 targets + Burn ×2 all',ak:'iceburnStorm',type:'MAG',element:'water'};
 function layer3Unlocked(){return Object.keys(V).some(k=>k.startsWith('layer3_')&&V[k]);}
 function layer4Unlocked(){return Object.keys(V).some(k=>k.startsWith('layer4_')&&V[k]);}
 
@@ -2158,16 +2184,16 @@ const ALL_CAP_DEFS=[...MICTLAN_CAPS,...TEPEME_CAPS,...OBSIDIAN_CAPS,...NATURE_CA
 function unitDefById(id){if(!id)return null;return ALL_CAP_DEFS.find(c=>c.id===id)||null;}
 
 const AMIMITL_TPL={id:'amimitl',name:'Amimitl',flavor:'Demigod of Lakes & Fishermen',icon:'🏹',isMiniBoss:true,isBoss:false,isAlly:false,element:'water',type:'MAG',ability:'Mystical Shots',ad:'1.2×MAG, 4 targets — destroys Chimalli + Paralyze ×1',ak:'mysticalShots',hp:520,atk:0,mag:24,def:12,res:13,np:50,npCost:26,fv:0};
-const ATLAUA_TPL={id:'atlaua',name:'Atlaua',flavor:'Lord of the Waters & the Atlatl',icon:'🪶',isMiniBoss:true,isBoss:false,isAlly:false,element:'humanity',type:'PHYS',ability:'Atlatl Rush',ad:'1.8×ATK single + Wound ×1 on crit (+25% CRIT)',ak:'atlatlRush',hp:540,atk:26,mag:0,def:14,res:9,np:50,npCost:26,fv:0,_critInnate:0.25};
+const ATLAUA_TPL={id:'atlaua',name:'Atlaua',flavor:'Lord of the Waters & the Atlatl',icon:'🪶',isMiniBoss:true,isBoss:false,isAlly:false,element:'humanity',type:'PHYS',ability:'Atlatl Rush',ad:'1.4×ATK, 2 targets + Wound ×1 (+20% CRIT)',ak:'atlatlRush',hp:540,atk:26,mag:0,def:14,res:9,np:50,npCost:26,fv:0,_critInnate:0.20};
 const ACUECUEYOTL_TPL={id:'acuecueyotl',name:'Acuecueyotl',flavor:'Demigoddess of the Running Wave',icon:'🌊',isMiniBoss:true,isBoss:false,isAlly:false,element:'water',type:'MAG',ability:'Surging Tide',ad:'Heal 23% all allies + Slow ×1 to 4 random foes',ak:'surgingTide',hp:500,atk:0,mag:18,def:12,res:14,np:50,npCost:26,fv:0};
-MINIBOSS_CAP_STATS['amimitl']={hp:220,atk:0,mag:20,def:11,res:12,np:42,npCost:34,fv:6,ability:'Mystical Shots',ad:'1.2×MAG, 4 targets — destroys Chimalli + Paralyze ×1',ak:'mysticalShots'};
-MINIBOSS_CAP_STATS['atlaua']={hp:230,atk:22,mag:0,def:13,res:8,np:44,npCost:32,fv:6,ability:'Atlatl Rush',ad:'1.8×ATK single + Wound ×1 on crit (+25% CRIT)',ak:'atlatlRush',_critInnate:0.25};
-MINIBOSS_CAP_STATS['acuecueyotl']={hp:215,atk:0,mag:16,def:11,res:13,np:44,npCost:36,fv:6,ability:'Surging Tide',ad:'Heal 23% all allies + Slow ×1 to 4 random foes',ak:'surgingTide'};
+MINIBOSS_CAP_STATS['amimitl']={hp:182,atk:0,mag:20,def:11,res:12,np:42,npCost:34,fv:6,ability:'Mystical Shots',ad:'1.2×MAG, 4 targets — destroys Chimalli + Paralyze ×1',ak:'mysticalShots'};
+MINIBOSS_CAP_STATS['atlaua']={hp:188,atk:22,mag:0,def:13,res:8,np:44,npCost:32,fv:6,ability:'Atlatl Rush',ad:'1.4×ATK, 2 targets + Wound ×1 (+20% CRIT)',ak:'atlatlRush',_critInnate:0.20};
+MINIBOSS_CAP_STATS['acuecueyotl']={hp:178,atk:0,mag:16,def:11,res:13,np:44,npCost:36,fv:6,ability:'Surging Tide',ad:'Heal 23% all allies + Slow ×1 to 4 random foes',ak:'surgingTide'};
 const TLACATEOCOTL_TPL={id:'tlacateocotl',name:'Tlacateocotl',flavor:'The Owlman Sorcerer',icon:'🦉',isMiniBoss:true,isBoss:false,isAlly:false,element:'wind',type:'MAG',
   ability:'Death Screech',ad:'1.6×MAG AoE — destroys all Chimalli + Burn ×1 + Wound ×1',ak:'deathScreech',
   hp:540,atk:0,mag:24,def:12,res:14,np:55,npCost:34,fv:0};
-MINIBOSS_CAP_STATS['tlacateocotl']={hp:210,atk:0,mag:20,def:10,res:12,np:44,npCost:36,fv:7,ability:'Death Screech',ad:'1.4×MAG, 3 targets + destroys Chimalli + Burn ×1 + Wound ×1',ak:'deathScreech',type:'MAG',element:'wind'};
-MINIBOSS_CAP_STATS['ometochtli']={hp:230,atk:0,mag:19,def:12,res:12,np:46,npCost:34,fv:7,ability:'Drunken Revel',ad:'0.3×MAG to 6 targets + DRUNK ×2 each + summon 1 Centzon Totochtin',ak:'drunkenRevel',type:'MAG',element:'nature'};
+MINIBOSS_CAP_STATS['tlacateocotl']={hp:175,atk:0,mag:20,def:10,res:12,np:44,npCost:36,fv:7,ability:'Death Screech',ad:'1.4×MAG, 3 targets + destroys Chimalli + Burn ×1 + Wound ×1',ak:'deathScreech',type:'MAG',element:'wind'};
+MINIBOSS_CAP_STATS['ometochtli']={hp:188,atk:0,mag:19,def:12,res:12,np:46,npCost:34,fv:7,ability:'Drunken Revel',ad:'0.3×MAG to 6 targets + DRUNK ×2 each + summon 1 Centzon Totochtin',ak:'drunkenRevel',type:'MAG',element:'nature'};
 
 const MALINALXOCHITL_BOSS_TPL={id:'boss_mal',name:'Malinalxochitl',flavor:'Sorcerer Goddess of the Desert',icon:'🌵',isBoss:true,isAlly:false,element:'fire',type:'MAG',
   ability:'Fiery Stinger',ad:'1.3×MAG to 1 enemy + 0.4×MAG splash + Burn ×2 all targets',ak:'fieryStinger',
@@ -2729,7 +2755,7 @@ const EVENT_GOD_EXCLUSIONS={
   u_tonatiuh:['tonatiuh']
 };
 function isEventExcluded(eventId){
-  if(eventId==='u_xochipilli'&&G.god&&G.god.id==='xochipilli')return true;
+  if(eventId==='u_xochipilli'&&((G.god&&G.god.id==='xochipilli')||(G.party||[]).indexOf('xochipilli')>=0))return true; // v662: match the tonatiuh/patecatl pattern
   if(eventId==='u_tonatiuh'&&G.god&&(G.god.id==='tonatiuh'||G.party.includes('tonatiuh')))return true;
   if(eventId==='u_patecatl'&&G.god&&(G.god.id==='patecatl'||G.party.includes('patecatl')))return true;
   const excl=EVENT_GOD_EXCLUSIONS[eventId];
@@ -2778,7 +2804,7 @@ let G={};
 function initG(){
   const dte=getDTEffects();
   G={res:{blood:(dte.bloodStartBonus||0),cacao:(dte.cacaoStartBonus||0),flower:0},god:null,party:[],deadGods:[],captured:[],deplSel:[],
-    levels:{},surge:{},shields:{},shieldsBought:0,godsBought:0,offeringsBought:0,
+    levels:{},surge:{},shields:{},shieldsBought:0,godsBought:0,offeringsBought:0,offeringRerolls:0,
     layer:1,battleNum:1,chosenDifficulty:null,cachedEasy:null,cachedHard:null,pendingEnemies:null,
     battlesCompleted:0,hardBattles:0,bossesDefeated:[],perfectBattles:0,
     offerings:[], offeringSpent:{}, // v346: persistent run-long offerings (StS-relic model; replaces runBoosts)
@@ -2886,7 +2912,7 @@ function layerTransition(){
 }
 initG();
 
-function showScr(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function showScr(id){relicTipHide();document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');} // v655: hide any orphaned tooltip — a screen torn down under the cursor never fires mouseleave
 function notify(msg,col){const n=document.getElementById('notif');n.textContent=msg;n.style.color=col||'#50c080';n.style.display='block';clearTimeout(n._t);n._t=setTimeout(()=>n.style.display='none',2400);}
 function showMo(icon,title,body,actions){document.getElementById('mo-icon').innerHTML=icon;document.getElementById('mo-title').textContent=title;document.getElementById('mo-body').innerHTML=body.replace(/\n/g,'<br>');const ac=document.getElementById('mo-actions');ac.innerHTML='';actions.forEach(a=>{const b=document.createElement('button');b.className='btn '+(a.cls||'');b.textContent=a.label;b.onclick=()=>{hideMo();a.fn();};ac.appendChild(b);});document.getElementById('mo').classList.add('open');}
 function hideMo(){document.getElementById('mo').classList.remove('open');}
@@ -2935,13 +2961,13 @@ function lvCost(id){
   const lv=getLevel(id);
   const base=Math.round((8+(lv-1)*6+Math.floor((lv-1)/3)*4)*(lv>50?1.25:lv>20?1.10:1)*G.dte.bloodCostMult); // v309: late-game cost scaling
   const godMult=id.startsWith('god_')?1.32:0.90; // gods +10% more (was 1.20), vassals -10%
-  const lv50M=(lv>=60?1.05*1.10:lv>=50?1.05:1); // v577 +5% past Lv50; v579 +10% more past Lv60
+  const lv50M=(lv>=60?1.05*1.10:lv>=50?1.05:1)*(lv>30?0.95:1); // v577 +5% past Lv50; v579 +10% more past Lv60; v657 -5% past Lv30
   return Math.round(base*godMult*lv50M);
 }
 function unitNPCost(u){
   const base=u.npCost||10;
   const lv=getLevel(u._captureId||u.baseId||u.id||'');
-  const highLvMult=(lv>=50?1.30:1)*(lv>35?1.20:1)*(lv>20?1.25:1);
+  const highLvMult=(lv>35?1.20:1)*(lv>20?1.25:1); // v666: 1.30 gate removed (NB: unitNPCost has no callers — dead code)
   return Math.round((base+Math.floor(lv/2)+Math.floor(lv/20))*highLvMult);
 }
 // v309: ALLY growth curve — flat 4% per level. The 5-level milestone bumps are replaced by Soul Surge.
@@ -3043,6 +3069,50 @@ function drunkExempt(u){ // Inebriated Reverie: ally Drunk becomes a buff — no
 // v552: enemy-side Reverie mirror — LAZY scan for a living pk-carrier (Mayahuel boss). No battle-start
 // wiring, no stale flags; the instant she dies the mirror (and misfire exemption) switches off.
 function enemyReverieActive(){return (G.enemies||[]).some(e=>e&&e.currentHp>0&&e.pk==='inebriatedReverie');}
+
+// ─── v656: shared random-status infrastructure (Layer 8 — Ixpuxtequi / Nexoxcho) ───
+// The seven appliers have divergent signatures; this normalises them behind one dispatch.
+// applySlowToUnit is the outlier: it returns nothing, logs itself, and edits the round queue.
+const RANDOM_STATUS_POOL=['burn','poison','paralyze','drunk','wound','lethargy','slow'];
+const STATUS_META={
+  burn:{label:'Burn',icon:'🔥'},      poison:{label:'Poison',icon:'🤢'},
+  paralyze:{label:'Paralyze',icon:'⚡'}, drunk:{label:'Drunk',icon:'🍺'},
+  wound:{label:'Wound',icon:'🩸'},     lethargy:{label:'Lethargy',icon:'🥶'},
+  slow:{label:'Slow',icon:'🐢'}
+};
+function isSlowedUnit(u){ // mirrors slowBadge()'s check — slow has no stack counter
+  if(!u||!G._slowedUnits)return false;
+  const until=G._slowedUnits.get(u.id);
+  return !!until&&G.roundNum<=until;
+}
+function hasAnyStatus(u){ // v656: consumed by Nexoxcho's +50% vs statused targets
+  if(!u)return false;
+  return (u.burnStacks||0)>0||(u.poisonStacks||0)>0||(u.paralyzStacks||0)>0
+       ||(u.drunkStacks||0)>0||(u.woundStacks||0)>0||(u.lethargyStacks||0)>0
+       ||isSlowedUnit(u);
+}
+function applyStatusByKey(target,key,stacks,hadArmorBefore){
+  switch(key){
+    case 'burn':     return applyBurn(target,stacks);
+    case 'poison':   return applyPoison(target,stacks);
+    case 'paralyze': return applyParalyze(target,stacks);
+    case 'drunk':    return applyDrunk(target,stacks,false); // hostile: respects Chimalli, as Ometochtli's Revel does
+    case 'wound':    return applyWound(target,stacks);
+    case 'lethargy': return applyLethargy(target,stacks);
+    case 'slow':     applySlowToUnit(target,hadArmorBefore); return true; // no stacking; applies once; self-logs
+  }
+  return false;
+}
+// Returns {key,label,icon,stacks,selfLogged} on success, or null if blocked (Chimalli) / dead target.
+// Callers gate their log line on a non-null return, and skip it entirely when selfLogged is true.
+function applyRandomStatus(target,stacks,hadArmorBefore){
+  if(!target||target.currentHp<=0)return null;
+  const key=RANDOM_STATUS_POOL[Math.floor(Math.random()*RANDOM_STATUS_POOL.length)];
+  const applied=applyStatusByKey(target,key,stacks,hadArmorBefore);
+  if(!applied)return null;
+  const m=STATUS_META[key];
+  return {key,label:m.label,icon:m.icon,stacks:(key==='slow'?1:stacks),selfLogged:(key==='slow')};
+}
 // v552: Inebriated Reverie stat boost — EXACT, reversible mutation. Base stats are snapshotted into
 // _revBase on the first boosted stack; every stack change recomputes base×(1+0.05×stacks); at 0 stacks
 // the base is restored and the snapshot dropped. Mutation (not a read-time multiplier) keeps strike
@@ -3232,13 +3302,23 @@ function unitBaseFor(key){
   if(String(key).startsWith('god_')){return GODS.find(g=>'god_'+g.id===key)||null;}
   return G.captured.find(c=>capKey(c)===key)||null;
 }
+// v668: SINGLE SOURCE OF TRUTH for the NP-cost level curve. This was duplicated in three places
+// that had silently drifted: the training card used x1.10 past Lv40 where the real cost used x1.05,
+// and omitted the Lv60 x1.05 entirely — so the displayed cost ran ~5% high for Lv41-59 and low at 60+.
+// Callers layer their own modifiers on top (Tecpatl bane for players, LETHARGY for enemies).
+// v334: +10% past Lv20 and past Lv40 to offset Tonalli cost-reduction.
+// v666: the (lv>=50?1.30:1) gate was removed — it fired on the same level as _lvCostMult's
+//       1.25->1.5 step, compounding to +58% in a single level. _lvCostMult now carries Lv50 alone.
+function npLevelCurve(bc,lv){
+  return (bc+Math.floor(lv/2)+Math.floor(lv/20))*(lv>35?1.20:1)*(lv>20?1.25:1)*(lv>20?1.10:1)*(lv>40?1.05:1)*(lv>=60?1.05:1);
+}
 function baseNpCostFromObj(b,lv,isGod){
   const bc=isGod?(b.npCost||14):(b.npCost||9);
-  return Math.round((bc+Math.floor(lv/2)+Math.floor(lv/20))*(getTecpatlEffects().npBaneMult||1)*(lv>=50?1.30:1)*(lv>35?1.20:1)*(lv>20?1.25:1)*(lv>20?1.10:1)*(lv>40?1.05:1)*(lv>=60?1.05:1)); // v334: +10% past lv20, +10% past lv40 to offset Tonalli cost-reduction
+  return Math.round(npLevelCurve(bc,lv)*(getTecpatlEffects().npBaneMult||1));
 }
 function enemyNpCost(u){
   const bc=u.npCost||10,lv=u.enemyLevel||1;
-  return Math.round((bc+Math.floor(lv/2)+Math.floor(lv/20))*(lv>=50?1.30:1)*(lv>35?1.20:1)*(lv>20?1.25:1)*(lv>20?1.10:1)*(lv>40?1.05:1)*(lv>=60?1.05:1)*(1+0.30*(u.lethargyStacks||0)));
+  return Math.round(npLevelCurve(bc,lv)*(1+0.30*(u.lethargyStacks||0))); // v668: no Tecpatl bane — that's a player-side penance
 }
 function baseNpCostFor(key){
   const b=unitBaseFor(key);if(!b)return 10;
@@ -3336,6 +3416,84 @@ function showSurgeModal(key){
     '🔮 <b>Tonalli</b> — force of vigor: <span style="color:#a060e0">'+pn.txt+'</span>',
     [{label:'💪 Ihiyotl',fn:()=>surgePick(key,'ihiyotl')},{label:'🫀 Teyolia',fn:()=>surgePick(key,'teyolia')},{label:'🔮 Tonalli',fn:()=>surgePick(key,'tonalli')}]);
 }
+// ─── v657: BOUNTY ECONOMY ───────────────────────────────────────────────
+// Spoils used to be driven by the enemy's runtime maxHp, which meant any HP tuning
+// (hard mode's x1.25, boss HP multipliers, Tecpatl) silently inflated the payout, and
+// deep-layer level scaling made income exponential. Rewards are now driven by a per-unit
+// BOUNTY WEIGHT that is independent of level, difficulty, and all HP multipliers.
+//
+// _bw is the unit's HP relative to its OWN cohort average, computed once at load. That way a
+// low-layer vassal pulled forward by Vassal Affinity is still "an average enemy" and pays the
+// current layer's rate — its old, smaller template HP no longer shortchanges the player.
+const LAYER_BOUNTY={1:37,2:87,3:131,4:165,5:194,6:380,7:420,8:460,9:500};
+// v658: HARD difficulty is now a per-layer HP curve instead of a flat x1.25, so the gap between
+// easy and hard widens with depth (L1 they're near-identical; by L8 hard is a different game).
+// Safe to tune freely: v657 removed HP from the reward path entirely.
+const HARD_HP_BY_LAYER={1:1.10,2:1.15,3:1.20,4:1.25,5:1.30,6:1.40,7:1.45,8:1.50,9:1.60};
+function hardHpMult(){const L=Math.min(9,Math.max(1,G.layer||1));return HARD_HP_BY_LAYER[L]||1.10;}
+function diffHpMult(diff){return diff==='hard'?hardHpMult():1.10;}      // boss/miniboss fixed rosters
+function hardHpRatio(){return hardHpMult()/1.10;}                        // hard relative to easy
+function hardLvBonus(){return (G.chosenDifficulty==='hard')?1:0;}       // v658: +1 enemy level on hard
+function initBountyWeights(){
+  const cohorts=[MICTLAN_CAPS,TEPEME_CAPS,OBSIDIAN_CAPS,NATURE_CAPS,HUMANITY_CAPS,
+    CEHUYLOAN_WATER_CAPS,CEHUYLOAN_WIND_CAPS,TONATIUH_DAY_CAPS,PANCUET_FIRE_CAPS,
+    PANCUET_WIND_CAPS,TEMIMINA_WATER_CAPS,TEMIMINA_HUMAN_CAPS,TEYOLLO_NATURE_CAPS,TEYOLLO_DAY_CAPS,
+    [XOCHITONAL_TPL,QUINAMETZIN_TPL,XIUHNEL_TPL,MIMICH_TPL,MICTLAMPEHECATL_TPL,
+     TLACATEOCOTL_TPL,AMIMITL_TPL,ATLAUA_TPL,ACUECUEYOTL_TPL,OMETOCHTLI_TPL]];
+  cohorts.forEach(arr=>{
+    if(!arr||!arr.length)return;
+    const avg=arr.reduce((t,u)=>t+(u.hp||0),0)/arr.length;
+    if(avg<=0)return;
+    arr.forEach(u=>{u._bw=(u.hp||0)/avg;});
+  });
+}
+// Bounty for one enemy. Falls back to _bw=1 for anything not in a cohort (bosses, summons),
+// so an unstamped unit pays the layer baseline rather than zero.
+let _bwReady=false;
+function ensureBountyWeights(){if(!_bwReady){initBountyWeights();_bwReady=true;}}
+// v665: captured units store a snapshot of their template, so any later balance change to `ad`,
+// `ability` or `npCost` never reaches units captured beforehand (e.g. Ball Strike still read
+// "3-hit multi 0.9xATK" after v659 made it 5-hit 0.55x). Resolve display text from the live template.
+let _tplById=null;
+function tplById(id){
+  if(!_tplById){
+    ensureBountyWeights();
+    _tplById={};
+    [MICTLAN_CAPS,TEPEME_CAPS,OBSIDIAN_CAPS,NATURE_CAPS,HUMANITY_CAPS,CEHUYLOAN_WATER_CAPS,
+     CEHUYLOAN_WIND_CAPS,TONATIUH_DAY_CAPS,PANCUET_FIRE_CAPS,PANCUET_WIND_CAPS,TEMIMINA_WATER_CAPS,
+     TEMIMINA_HUMAN_CAPS,TEYOLLO_NATURE_CAPS,TEYOLLO_DAY_CAPS,
+     [XOCHITONAL_TPL,QUINAMETZIN_TPL,XIUHNEL_TPL,MIMICH_TPL,MICTLAMPEHECATL_TPL,
+      TLACATEOCOTL_TPL,AMIMITL_TPL,ATLAUA_TPL,ACUECUEYOTL_TPL,OMETOCHTLI_TPL]]
+      .forEach(arr=>{(arr||[]).forEach(t=>{if(t&&t.id)_tplById[t.id]=t;});});
+  }
+  return _tplById[id]||null;
+}
+function liveAd(u){ // live ability description, falling back to the stored copy for gods/mercs/summons
+  if(!u)return '';
+  const t=tplById(u.baseId||u.id);
+  return (t&&t.ad)||u.ad||'';
+}
+// v661: Jumping Beans biases Patolli Gamble. Faces 5-6 weighted x1.25, faces 1-2 weighted x0.75.
+// The adjustments cancel exactly (1.25+1.25+1+1+0.75+0.75 = 6), so no renormalisation is needed:
+// 1,2 -> 12.5% each (from 16.67%) · 3,4 -> 16.67% · 5,6 -> 20.83% each.
+// PLAYER ONLY — the enemy/boss Xochipilli keeps its own unbiased roll.
+const PATOLLI_WEIGHTS=[0.75,0.75,1,1,1.25,1.25];
+function rollPatolli(){
+  if(!getOfferingEffects().jumpingBeans)return Math.floor(Math.random()*6)+1;
+  let r=Math.random()*6,i=0;
+  while(i<5&&r>=PATOLLI_WEIGHTS[i]){r-=PATOLLI_WEIGHTS[i];i++;}
+  return i+1;
+}
+function unitBounty(u){
+  if(!u)return 0;
+  ensureBountyWeights();
+
+  const L=Math.min(9,Math.max(1,G.layer||1));
+  // v659: bosses sit in no cohort (_bw falls back to 1) and minibosses average ~1.0 within their own,
+  // so v657 collapsed both to the layer baseline. Explicit tiers restore their premium.
+  const tier=u.isBoss?2.0:(u.isMiniBoss?1.5:1);
+  return LAYER_BOUNTY[L]*(u._bw||1)*(u.spoilMult||1)*tier;
+}
 function getLayerResMult(){
   // v577: deep-layer squeeze — L5+ yields 10% less blood/cacao
   if((G.layer||1)>=7)return _layerResMultBase()*0.90*0.90; // v579: L7 takes another 10%
@@ -3418,6 +3576,21 @@ function applyAff(units){
       u.def=Math.round(u.def*dtMult);u.res=Math.round((u.res||0)*dtMult);
     });
     addLog(`<span class="log-god">✦ Divine Strength: gods ×${dtMult.toFixed(2)} ATK/MAG/DEF/RES!</span>`);
+  }
+  // v673: Pantheon Boost was DEAD — pantheonBoostTiers was computed in getDTEffects and never read,
+  // so both nodes (400 and 1350 TEOTL) did nothing. Now wired, and scoped to ATK/MAG/DEF/RES only:
+  // God Affinity already covers HP, and neither touches TP.
+  const _pbT=G.dte.pantheonBoostTiers||0;
+  if(_pbT>0){
+    const _pbN=calcAffinity().count;
+    if(_pbN>0){
+      const pbM=1+0.025*_pbT*_pbN; // v675 additive (was compounding, x1.63 at 5 gods); v676 rate halved 5% -> 2.5%
+      units.filter(u=>u.isGod).forEach(u=>{
+        u.atk=Math.round(u.atk*pbM);u.mag=Math.round((u.mag||0)*pbM);
+        u.def=Math.round(u.def*pbM);u.res=Math.round((u.res||0)*pbM);
+      });
+      addLog(`<span class="log-god">\u2726 Pantheon Boost: gods \u00d7${pbM.toFixed(2)} ATK/MAG/DEF/RES!</span>`);
+    }
   }
   if(!G.dte.synergyUnlocked)return;
   const{count,mult}=calcAffinity();
@@ -3750,7 +3923,7 @@ function eAcd(acd,b1){
 }
 function showL5BossChoice(onChoice){
   // Build enemy lists for each boss option at B8 level
-  const lv=eLv(8)+layerLvBonus();
+  const lv=eLv(8)+layerLvBonus()+hardLvBonus();
   function buildBossCard(choice){
     const isMal=choice==='malinalxochitl';
     const tpl=isMal?MALINALXOCHITL_BOSS_TPL:XIUHTECUHTLI_BOSS_TPL;
@@ -3828,11 +4001,11 @@ function buildEnemySet(bn,diff){
   const capPool=isL7?getTeyolloPool():isL6?getTeminamPool().filter(c=>c.id!=='tm1'):isL5?getPANCUETPool():isL4?getCEHUPool():isL3?[...OBSIDIAN_CAPS,...getNatureCaps()]:isL2?[...TEPEME_CAPS,...getNatureCaps()]:getL1BattlePool(); // v328: one event pool per battle
 
   if(bn===5){
-    const lv=eLv(bn)+layerLvBonus();const hs=diff==='hard'?1.25:1.1;
+    const lv=eLv(bn)+layerLvBonus()+hardLvBonus();const hs=diffHpMult(diff);
     const tp5=getTecpatlEffects();const bHpM=tp5.bossHpMult||1.0;
     if(isL7){
       // v554: L7 B5 — Ometochtli + 4 Centzon Totochtin (locked design §5). Bulky leader, self-refilling warren.
-      const lv7=eLvL7(5);
+      const lv7=eLvL7(5)+hardLvBonus();
       const mh7=Math.round(sc(OMETOCHTLI_TPL.hp||0,lv7)*hs*bHpM);const mn7=Math.round(sc(OMETOCHTLI_TPL.np||50,lv7));
       const mb7={...OMETOCHTLI_TPL,id:'ometochtli_5',baseId:'ometochtli',maxHp:mh7,currentHp:mh7,atk:0,mag:Math.round(sc(OMETOCHTLI_TPL.mag||0,lv7)*(diff==='hard'?1.15:1)),def:Math.round(sc(OMETOCHTLI_TPL.def||0,lv7)*0.6),res:Math.round(sc(OMETOCHTLI_TPL.res||0,lv7)*0.6),maxNP:mn7,currentNP:mn7,npCost:OMETOCHTLI_TPL.npCost,enemyLevel:lv7,isGod:false,isAlly:false,poisonStacks:0,burnStacks:0,paralyzStacks:0,defBuff:0,armor:0,slowStacks:0,woundStacks:0,lethargyStacks:0,atkBuffStacks:0,atkBuffRounds:0,defBuffStacks:0,defBuffRounds:0,critBuffStacks:0,critBuffRounds:0,fv:0};
       const rb7=id=>TEYOLLO_DAY_CAPS.find(c=>c.id===id);
@@ -3840,7 +4013,7 @@ function buildEnemySet(bn,diff){
       return[mb7,...escorts7];
     }
     if(isL6){
-      const lv6=eLvL6(5)-2; // v496: midboss trio -2
+      const lv6=eLvL6(5)-2+hardLvBonus(); // v496: midboss trio -2
       const mkD=(tpl,idx)=>{const mh=Math.round(sc(tpl.hp||0,lv6)*hs*bHpM);const mn=Math.round(sc(tpl.np||50,lv6));return{...tpl,id:tpl.id+'_5_'+idx,maxHp:mh,currentHp:mh,atk:Math.round(sc(tpl.atk||0,lv6)*(diff==='hard'?1.15:1)),mag:Math.round(sc(tpl.mag||0,lv6)*(diff==='hard'?1.15:1)),def:Math.round(sc(tpl.def||0,lv6)*0.6),res:Math.round(sc(tpl.res||0,lv6)*0.6),maxNP:mn,currentNP:mn,npCost:tpl.npCost||26,enemyLevel:lv6,isGod:false,isAlly:false,poisonStacks:0,burnStacks:0,paralyzStacks:0,defBuff:0,armor:0,slowStacks:0,woundStacks:0,lethargyStacks:0,atkBuffStacks:0,atkBuffRounds:0,defBuffStacks:0,defBuffRounds:0,critBuffStacks:0,critBuffRounds:0,fv:0};};
       const trio=[mkD(AMIMITL_TPL,0),mkD(ATLAUA_TPL,1),mkD(ACUECUEYOTL_TPL,2)];
       if(diff==='hard'){const pool=getTeminamPool().filter(c=>c.id!=='tm1');const escorts=Array.from({length:2},(_,i)=>mkEnemy(pool[Math.floor(Math.random()*pool.length)],i+3,0.85,lv6));return[...trio,...escorts];}
@@ -3849,8 +4022,8 @@ function buildEnemySet(bn,diff){
     if(isL5){
       // Tlacateocotl midboss (Normal 3 escorts, Hard 4 random L5 escorts) v394 +1 each
       const tl=TLACATEOCOTL_TPL;
-      const lv5=eLv(bn)+layerLvBonus();
-      const tlHp=Math.round(sc(tl.hp,lv5)*(diff==='hard'?1.25:1.1)*bHpM);
+      const lv5=eLv(bn)+layerLvBonus()+hardLvBonus();
+      const tlHp=Math.round(sc(tl.hp,lv5)*(diffHpMult(diff))*bHpM);
       const tlMag=Math.round(sc(tl.mag,lv5)*(diff==='hard'?1.2:1));
       const tlEntry={...tl,id:'tlacateocotl_5_'+Math.random().toString(36).slice(2,5),
         maxHp:tlHp,currentHp:tlHp,
@@ -3871,8 +4044,8 @@ function buildEnemySet(bn,diff){
     if(isL4){
       // Mictlampehecatl solo midboss (Hard: +3 random L4 escorts)
       const mb=MICTLAMPEHECATL_TPL;
-      const lv4=eLv(bn)+layerLvBonus();
-      const mbHp=Math.round(sc(mb.hp,lv4)*(diff==='hard'?1.25:1.1)*bHpM);
+      const lv4=eLv(bn)+layerLvBonus()+hardLvBonus();
+      const mbHp=Math.round(sc(mb.hp,lv4)*(diffHpMult(diff))*bHpM);
       const mbMag=Math.round(sc(mb.mag,lv4)*(diff==='hard'?1.2:1));
       const mictEntry={...mb,id:'mict_5_'+Math.random().toString(36).slice(2,5),
         maxHp:mbHp,currentHp:mbHp,
@@ -3931,8 +4104,8 @@ function buildEnemySet(bn,diff){
       // (locked design §6.4: the family finale — healer + drunk-buffer feed the enemy Reverie mirror)
       if(G.god&&G.god.id==='patecatl'&&!G._patecatlReunionShown){G._patecatlReunionShown=true;
         setTimeout(()=>showMo('🍶','Reunion','<div style="font-size:13px;line-height:1.7;color:var(--td);padding:.25rem 0">Across the clearing, the Maguey Goddess lowers her cup.<br><br><em style="color:#c0e060">"Patecatl. Husband. You came through poison and frost and fire — for me?"</em><br><br><em style="color:#a0d060">"Then show me the strength that carried you here. The four hundred are watching."</em><br><br>The fight must happen. But her eyes are soft.</div>',[{label:'Face Her',fn:()=>{}}]),600);} // v568: Pass 6 reunion (locked §9)
-      const lv7=eLvL7(8);const tp7=getTecpatlEffects();const bHpM7=tp7.bossHpMult||1.0;
-      const bh7=Math.round(sc(MAYAHUEL_BOSS_TPL.hp||0,lv7)*(diff==='hard'?1.25:1.1)*bHpM7);
+      const lv7=eLvL7(8)+hardLvBonus();const tp7=getTecpatlEffects();const bHpM7=tp7.bossHpMult||1.0;
+      const bh7=Math.round(sc(MAYAHUEL_BOSS_TPL.hp||0,lv7)*(diffHpMult(diff))*bHpM7);
       const boss7={...MAYAHUEL_BOSS_TPL,id:'boss_mayahuel_8',maxHp:bh7,currentHp:bh7,atk:0,mag:Math.round(sc(MAYAHUEL_BOSS_TPL.mag||0,lv7)*(diff==='hard'?1.1:1)),def:Math.round(sc(MAYAHUEL_BOSS_TPL.def||0,lv7)*0.6),res:Math.round(sc(MAYAHUEL_BOSS_TPL.res||0,lv7)*0.6),maxNP:Math.round(sc(MAYAHUEL_BOSS_TPL.np||54,lv7)),currentNP:Math.round(sc(MAYAHUEL_BOSS_TPL.np||54,lv7)),npCost:MAYAHUEL_BOSS_TPL.npCost,enemyLevel:lv7,isGod:false,isAlly:false,poisonStacks:0,burnStacks:0,paralyzStacks:0,defBuff:0,armor:0,slowStacks:0,woundStacks:0,lethargyStacks:0,atkBuffStacks:0,atkBuffRounds:0,defBuffStacks:0,defBuffRounds:0,critBuffStacks:0,critBuffRounds:0,fv:0};
       const omT=OMETOCHTLI_TPL;const oh7=Math.round(sc(omT.hp||0,lv7)*0.55*bHpM7);
       const omEsc={...omT,id:'ometochtli_8_1',baseId:'ometochtli',isMiniBoss:false,maxHp:oh7,currentHp:oh7,atk:0,mag:Math.round(sc(omT.mag||0,lv7)*0.9),def:Math.round(sc(omT.def||0,lv7)*0.6),res:Math.round(sc(omT.res||0,lv7)*0.6),maxNP:Math.round(sc(omT.np||50,lv7)),currentNP:Math.round(sc(omT.np||50,lv7)),npCost:omT.npCost,enemyLevel:lv7,isGod:false,isAlly:false,poisonStacks:0,burnStacks:0,paralyzStacks:0,defBuff:0,armor:0,slowStacks:0,woundStacks:0,lethargyStacks:0,atkBuffStacks:0,atkBuffRounds:0,defBuffStacks:0,defBuffRounds:0,critBuffStacks:0,critBuffRounds:0,fv:0};
@@ -3941,8 +4114,8 @@ function buildEnemySet(bn,diff){
       return[boss7,...escorts8];
     }
     if(isL6){
-      const lv6=eLvL6(8);const tp8=getTecpatlEffects();const bHpM8=tp8.bossHpMult||1.0;
-      const bh=Math.round(sc(OPOCHTLI_TPL.hp||0,lv6)*(diff==='hard'?1.25:1.1)*bHpM8);
+      const lv6=eLvL6(8)+hardLvBonus();const tp8=getTecpatlEffects();const bHpM8=tp8.bossHpMult||1.0;
+      const bh=Math.round(sc(OPOCHTLI_TPL.hp||0,lv6)*(diffHpMult(diff))*bHpM8);
       const boss={...OPOCHTLI_TPL,id:'boss_opochtli_8',maxHp:bh,currentHp:bh,atk:Math.round(sc(OPOCHTLI_TPL.atk||0,lv6)*(diff==='hard'?1.1:1)),mag:0,def:Math.round(sc(OPOCHTLI_TPL.def||0,lv6)*0.6),res:Math.round(sc(OPOCHTLI_TPL.res||0,lv6)*0.6),maxNP:Math.round(sc(OPOCHTLI_TPL.np||54,lv6)),currentNP:Math.round(sc(OPOCHTLI_TPL.np||54,lv6)*0.5),npCost:OPOCHTLI_TPL.npCost,enemyLevel:lv6,isGod:false,isAlly:false,poisonStacks:0,burnStacks:0,paralyzStacks:0,defBuff:0,armor:0,slowStacks:0,woundStacks:0,lethargyStacks:0,atkBuffStacks:0,atkBuffRounds:0,defBuffStacks:0,defBuffRounds:0,critBuffStacks:0,critBuffRounds:0,fv:0};
       const mkDE=(tpl,idx,m)=>{const h=Math.round(sc(tpl.hp||0,lv6)*m*bHpM8);return{...tpl,id:tpl.id+'_8_'+idx,isMiniBoss:false,maxHp:h,currentHp:h,atk:Math.round(sc(tpl.atk||0,lv6)*0.9),mag:Math.round(sc(tpl.mag||0,lv6)*0.9),def:Math.round(sc(tpl.def||0,lv6)*0.6),res:Math.round(sc(tpl.res||0,lv6)*0.6),maxNP:Math.round(sc(tpl.np||50,lv6)),currentNP:Math.round(sc(tpl.np||50,lv6)*0.4),npCost:tpl.npCost||26,enemyLevel:lv6,isGod:false,isAlly:false,poisonStacks:0,burnStacks:0,paralyzStacks:0,defBuff:0,armor:0,slowStacks:0,woundStacks:0,lethargyStacks:0,atkBuffStacks:0,atkBuffRounds:0,defBuffStacks:0,defBuffRounds:0,critBuffStacks:0,critBuffRounds:0,fv:0};};
       const capById=id=>getTeminamPool().find(c=>c.id===id);
@@ -4072,9 +4245,31 @@ function buildEnemySet(bn,diff){
   const bc=isL7?eCntL7(bn):isL6?eCntL6(bn):isL5?eCntL5(bn):isL4?eCntL4(bn):isL3?eCntL3(bn):isL2?eCntL2(bn):eCnt(bn),bl=isL7?eLvL7(bn):isL6?eLvL6(bn):eLv(bn)+layerLvBonus();
   let count,lv,hs;
   const maxCnt=(!isL3&&!isL4&&!isL5&&!isL6&&!isL7)?4:((isL3&&bn<5)?4:((isL6||isL7)?6:5)); // v326: L2 capped at 4; v327: L3 pre-midboss capped at 4
-  if(diff==='easy'){count=Math.max(1,bc-1);lv=Math.max(1,bl-1);hs=(0.5+bn*.065)*((isL4||isL5||isL6)?1.25:1);}
-  else{count=Math.min(bc+1,maxCnt);lv=bl+1;hs=(0.65+bn*.08)*((isL4||isL5||isL6)?1.3:1);}
+  // v658: easy gains +1 enemy (was bc-1, now bc) — the old single-enemy L1 opener taught nothing
+  // and paid nothing. Hard's bespoke HP curve is replaced by easy's curve x the per-layer ratio,
+  // so HARD_HP_BY_LAYER is the single source of truth for the difficulty gap.
+  const _ehs=(0.5+bn*.065)*((isL4||isL5||isL6)?1.25:1);
+  if(diff==='easy'){count=Math.max(1,bc);lv=Math.max(1,bl-1);hs=_ehs;}
+  else{count=Math.min(bc+1,maxCnt);lv=bl+1;hs=_ehs*hardHpRatio();}
   let picks=Array.from({length:count},(_,i)=>mkEnemy(capPool[Math.floor(Math.random()*capPool.length)],i,hs,lv));
+  // v671: cross-layer GUEST cohorts (Nature via Chicomecoatl, Day via Tonatiuh) get merged wholesale
+  // into a layer's pool — 8 day units against L4's 10 natives made them 44% of every pick, so a
+  // typical L4 battle averaged ~1.8 day enemies and often ran all-day. Cap guests at 2 per battle.
+  // TEYOLLO_NATURE/DAY are deliberately excluded: they are L7's own natives, not guests.
+  if(bn!==5&&bn!==8){
+    const GUEST_IDS=new Set([...NATURE_CAPS,...TONATIUH_DAY_CAPS].map(c=>c.id));
+    let guests=picks.filter(p=>GUEST_IDS.has(p.baseId)).length;
+    if(guests>2){
+      const natives=capPool.filter(c=>!GUEST_IDS.has(c.id));
+      if(natives.length){
+        for(let i=picks.length-1;i>=0&&guests>2;i--){
+          if(GUEST_IDS.has(picks[i].baseId)){
+            picks[i]=mkEnemy(natives[Math.floor(Math.random()*natives.length)],i,hs,lv);guests--;
+          }
+        }
+      }
+    }
+  }
   // L1 healer cap: at most 1 healer in any normal L1 battle (prevents stall)
   if(!isL2&&!isL3&&!isL4&&!isL5&&!isL6&&bn!==5&&bn!==8){
     const L1_HEALER_IDS=new Set(['me3','mw3','mq2','mf2','mt4']);
@@ -4153,6 +4348,8 @@ function specialDmg(actor,flatBonus,useMag,target){
 
 function mkEnemy(cu,idx,scale,lv){
   if(!cu){console.error('mkEnemy: undefined unit at idx',idx);return null;}
+  ensureBountyWeights(); // v663: templates MUST be stamped before the {...cu} spread below, or _bw is lost
+                         // and the unit silently pays the flat layer baseline for the whole battle.
   const maxNP=Math.round(sc(cu.np||20,lv));
   return{...cu,
     id:'en_'+cu.id+'_'+idx+'_'+Math.random().toString(36).slice(2,5),
@@ -4365,7 +4562,7 @@ function rollEvent(layer,bn){
     // After boss fight is accepted, G.xochipilliGames gets a 4th entry 'boss' — block further appearances
     // Also never show if Xochipilli is the current patron god
     if(id==='u_xochipilli'){
-      if(G.god&&G.god.id==='xochipilli')return false;
+      if(isEventExcluded('u_xochipilli'))return false; // v662: was patron-only. The u_xochipilli branch replaces the generic `else if(...isEventExcluded(id))`, so the party check in EVENT_GOD_EXCLUSIONS was never reached — the Shrine kept appearing with Xochipilli as a recruited ally.
       if(G.eventHistory.includes('u_xochipilli'))return false; // v389: choosing battle (pickDiff adds it) dismisses the gauntlet for the run; entering a game never adds it, so it keeps appearing while engaged
       const games=G.xochipilliGames||[];if(games.length>=4)return false;
     }
@@ -4994,12 +5191,12 @@ function evL3ObsidianPath(el){
 
 // ── L3-2: The Obsidian Forge ─────────────────────────────────────────────────
 function evL3Forge(el){
-  const canBlood=G.res.blood>=300, canCacao=G.res.cacao>=350;
+  const canBlood=G.res.cacao>=350, canCacao=G.res.cacao>=350; // v671: both options now cost Cacao
   const haveOE=hasOffering('obsidian_edge'), haveJB=hasOffering('jade_bead');
   // Option A: 300 Blood -> Obsidian Edge (party +25% ATK)
-  el.appendChild(evOpt('🗡','Forge the Obsidian Edge','(300 Blood) — Party gains +25% ATK for the rest of the run',
-    'The craftsmen temper a blade of black glass.',!canBlood||haveOE,haveOE?'Already forged':'Not enough Blood',()=>{
-      G.res.blood-=300;grantOffering('obsidian_edge');
+  el.appendChild(evOpt('🗡','Forge the Obsidian Edge','(350 Cacao) — Party gains +25% ATK for the rest of the run',
+    'The craftsmen temper a blade of black glass.',!canBlood||haveOE,haveOE?'Already forged':'Not enough Cacao',()=>{
+      G.res.cacao-=350;grantOffering('obsidian_edge');
       const el2=document.getElementById('event-content');
       evResult(el2,'🗡','The Obsidian Edge is yours.<br><em style="color:#c08040">Party +25% ATK for the rest of the run!</em>',afterEvent);
     }));
@@ -5861,7 +6058,7 @@ function startBattle(){
   G.spoils={killed:[],captured:[],allyDeaths:[]};G._spoilIds=new Set();G._deathProcessed=new Set();G.mercPool=null;G._shopRolled=false;
   G.cachedEasy=null;G.cachedHard=null;
   G.battlePhase='idle';G.roundNum=0;G.roundQueue=[];G.qIdx=0;
-  G.actedIds=new Set();G.nextRoundSlowIds=new Set();G.thisRoundSlowTail=[];G.slowedThisRound=new Set();G._serendipityUsed=false;G._serendipityFreeAction=false;G._tlaloqueSpawnedThisBattle=false;G._coyolPending=0;G._curKiller=null;G._huitziAcc=0;G._xoloLast=null;
+  G.actedIds=new Set();G.nextRoundSlowIds=new Set();G.thisRoundSlowTail=[];G.slowedThisRound=new Set();G._serendipityUsed=false;G._serendipityFreeAction=false;G._tlaloqueSpawnedThisBattle=false;G._coyolPending=0;G._curKiller=null;G._huitziAcc=0;G._xoloLast=null;G._kukulkanRound=-1; // v657: was never reset — the statue was silently skipped on the round matching its last firing
   // unitHpPenalty is preserved — applied in mkCap and then cleared per unit by overrideHp logic
   // Reset it AFTER mkCap has consumed penalties (at end of startBattle, not the beginning)
   if(G._tlacuiloVassalPending){delete V['tlacuilo_vassal'];saveV();G._tlacuiloVassalPending=false;}
@@ -6876,7 +7073,21 @@ function fireSerendipityBonus(unitId){
 }
 
 const AOE_CAP={deluge:4,obsidianStorm:5,sinistralMinacachalli:3};
-const AOE_CAP_AB={'Toxic Bloom':3,'Arrow Rain':5,'Net Cast':5,'Mystical Shots':4,'Coil Crush':3,'Tremor':3,'Withering Touch':4,'Shard Breath':4,'Tectonic Slam':5,'Howling Gust':3,'Murk':3,'Magma Burst':3,'Septic Howl':3,'Collapse':5,'Haunt':5,'Solar Crush':2,'Pollen Burst':2,'Craft Shard':4,'Permafrost':2,'Biting Draft':4,'Howling Chill':3,'Ash Surge':5,'Sandblast':5,'Howling Drift':5,'Virulent Gale':5,'Ancient Crush':4,'Thorn Mangle':3,'Iceburn Storm':5,'Death Screech':3,'Solar Pounce':2,'Sun Dive':5,'Toxic Exhaust':4,'Carrion Breath':4,'Five-Rabbit Haze':5};
+const AOE_CAP_AB={'Atlatl Rush':2,'Toxic Bloom':3,'Arrow Rain':5,'Net Cast':5,'Mystical Shots':4,'Coil Crush':3,'Tremor':3,'Withering Touch':4,'Shard Breath':4,'Tectonic Slam':5,'Howling Gust':3,'Murk':3,'Magma Burst':3,'Septic Howl':3,'Collapse':5,'Haunt':5,'Solar Crush':2,'Pollen Burst':2,'Craft Shard':4,'Permafrost':2,'Biting Draft':4,'Howling Chill':3,'Ash Surge':5,'Sandblast':5,'Howling Drift':5,'Virulent Gale':5,'Ancient Crush':4,'Thorn Mangle':3,'Iceburn Storm':5,'Death Screech':3,'Solar Pounce':2,'Sun Dive':5,'Toxic Exhaust':4,'Carrion Breath':4,'Five-Rabbit Haze':5};
+// v664: enemy AoE specials now honour the same per-ability target caps as their player versions
+// (AOE_CAP_AB, from the v419 AoE rework). Enemies had never been capped and still hit the whole party.
+// LAYER BOSSES ARE EXEMPT — they keep hitting everyone.
+// Single-target abilities are untouched: absent from AOE_CAP_AB, so the cap resolves to 0 and the
+// full array is returned. Targets are chosen at random, mirroring the player's free choice without
+// letting the AI always snipe the weakest.
+function enemyAoeTargets(actor,arr){
+  if(!actor||actor.isBoss||!arr)return arr;
+  const cap=AOE_CAP_AB[actor.ability]||0;
+  if(!cap||arr.length<=cap)return arr;
+  const pool=arr.slice();
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=pool[i];pool[i]=pool[j];pool[j]=t;}
+  return pool.slice(0,cap);
+}
 function aoeCapFor(actor){
   if(!actor)return 0;
   // v535: when the patron is firing an oblated special, its AoE cap comes from the OBLATED ability,
@@ -6890,7 +7101,7 @@ function specIsMagic(actor){
   const gd=actor.isGod?GODS.find(g=>g.id===actor.baseGodId):null;
   const ak=gd?gd.ak:'';const ab=actor.ability||'';
   const ATK=new Set(['obsidianStorm','aurumBreak','frostMacuahuitl',
-    'Obsidian Storm','Coil Crush','Withering Touch','Tremor','Shard Breath','Tectonic Slam','Solar Crush','Aurum Break','Frost Macuahuitl']);
+    'Obsidian Storm','Coil Crush','Withering Touch','Tremor','Shard Breath','Tectonic Slam','Solar Crush','Aurum Break','Frost Macuahuitl','Atlatl Rush']);
   const MAG=new Set(['deluge','featherEmbrace','cripplingShock','oldFire',
     'Tlalocan Deluge','Feather Embrace','Crippling Shock','Old Fire',
     'Howling Gust','Murk','Magma Burst','Septic Howl','Pollen Burst','Craft Shard','Collapse','Haunt','Permafrost','Biting Draft','Howling Chill','Ash Surge','Sandblast','Howling Drift','Virulent Gale']);
@@ -6905,7 +7116,7 @@ function isAoeOrAutoSpecial(actor){
   // (e.g. a patron holding Cihuacoatl's kit) no longer forces the AoE/auto path.
   const ak=(actor.isGod&&G._useOblationSpecial&&G._oblationAk)?G._oblationAk:(gd?.ak||'');const ab=actor.ability||'';
   if(actor.isGod)return['deluge','ophidianMother','cripplingShock','obsidianStorm','holyHarvest','patolliGamble','miseryBlizzard','torridTornado','torridTornadoBoss','peyoteConcoction','sinistralMinacachalli','cihuateteoFury'].includes(ak);
-  const aoeOrAuto=new Set(['Howling Gust','Magma Burst','Septic Howl','Murk','Thunder Crash','Collapse','Tremor','Death Bloom','Dark Waters','Earth Bloom','Gust Mend','Storm Mend',
+  const aoeOrAuto=new Set(['Atlatl Rush','Howling Gust','Magma Burst','Septic Howl','Murk','Thunder Crash','Collapse','Tremor','Death Bloom','Dark Waters','Earth Bloom','Gust Mend','Storm Mend',
     'Pollen Burst','Withering Touch','Uapantotli','Coil Crush','Toxic Bloom','Feeding Frenzy','Arrow Rain','Net Cast','Trident Lunge','Healing Rite','Mystical Shots','Surging Tide',
     'Craft Shard','Biting Draft','Permafrost','Iceburn Storm','Howling Chill','Burrow Mend','Ball Strike','Sun Dive','Sacred Arrow','Toxic Exhaust','Prism Volley','Solar Pounce',
     'Obsidian Storm','Shard Breath','Tectonic Slam','Haunt',
@@ -7201,9 +7412,12 @@ function resolveCap(enemyId,doCapture){
       ensureSurge(captureId); // v313: baseline at capture level so later event level-ups can't be swallowed
       if(G.deplSel.length<getMaxAllies())G.deplSel.push(captureId);
     }
-    const mb=mercy?Math.round((base.hp||0)*G.god.pv):0;
-    const bR=Math.round(spoilHp(dead)*0.225*G.dte.bloodBonus*getLayerResMult())+mb;
-    const cR=Math.round(spoilHp(dead)*0.135*G.dte.cacaoBonus*getLayerResMult())+mb;
+    // v657: Divinity Mercy now scales. It used to pay 20% of the unscaled TEMPLATE hp (~24 blood),
+    // not the enemy's real max HP as its description promised — a ~30x shortfall by L7.
+    const _bty=unitBounty(dead);
+    const mb=mercy?Math.round(_bty*G.god.pv):0;
+    const bR=Math.round(_bty*0.5*G.dte.bloodBonus)+mb;
+    const cR=Math.round(_bty*0.5*0.6*G.dte.cacaoBonus)+mb;
     if(!G._spoilIdx)G._spoilIdx=0;
     G.spoils.captured.push({unit:dead,blood:bR,cacao:cR,mercyBonus:mercy&&mb>0,_idx:++G._spoilIdx});
     const label=dead.isMiniBoss?'Mini-boss spoils!':'Captured!';
@@ -7231,9 +7445,9 @@ function resolveCap(enemyId,doCapture){
       addLog(`<span class="log-god">\ud83e\udd31 Cihuacoatl marks ${dead.icon} ${dead.name} for rebirth\u2026</span>`);
     }
     if(!G._spoilIds.has(dead.id)){G._spoilIds.add(dead.id);if(!G._spoilIdx)G._spoilIdx=0;const sidx=++G._spoilIdx;
-      const _vvM=(hasOffering('vulture_vessel')&&dead._killerAlly&&dead._killerElem==='nature')?1.05:1; // v577: 10% -> 5%
+      const _vvM=(hasOffering('vulture_vessel')&&dead._killerAlly&&dead._killerElem==='nature')?1.15:1; // v657: 5% -> 15% (uncommon + conditional, must beat the two commons)
       const _baM=1+(((dead.woundStacks||0)>0)?(getOfferingEffects().bloodyArrow||0):0); // v582: Bloody Arrow — wounded kills bleed more
-      const _gB=Math.round(spoilHp(dead)*0.45*G.dte.bloodBonus*getLayerResMult()*_vvM*_baM),_gC=Math.round(spoilHp(dead)*0.27*G.dte.cacaoBonus*getLayerResMult()*_vvM);
+      const _bty=unitBounty(dead);const _gB=Math.round(_bty*G.dte.bloodBonus*_vvM*_baM),_gC=Math.round(_bty*0.6*G.dte.cacaoBonus*_vvM); // v657: bounty replaces HP-driven spoils
       G.spoils.killed.push({unit:dead,blood:_gB,cacao:_gC,_idx:sidx});
       addLog(`<span class="log-ca">${dead.icon} ${dead.name} slain.</span> <span class="log-gain">+${_gB} 🩸 +${_gC} 🫘</span>`);
       flashResGain(_gB,_gC);renderRes('rb-battle');
@@ -7315,8 +7529,11 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
           G.levels[captureId3]=pickT.enemyLevel||1;
         }
         // Don't auto-deploy feather embrace captures — let player manage at shop
-        const bR=Math.round((pickT.maxHp||0)*0.30*G.dte.bloodBonus*2.2);
-        const cR=Math.round((pickT.maxHp||0)*0.18*G.dte.cacaoBonus*2.2);
+        // v657: bounty-based. Previously omitted getLayerResMult() entirely (paid ~1.54x too much at L7)
+        // and used raw maxHp instead of spoilHp(), ignoring spoilMult.
+        const _bty=unitBounty(pickT);
+        const bR=Math.round(_bty*0.667*G.dte.bloodBonus*2.2);
+        const cR=Math.round(_bty*0.667*0.6*G.dte.cacaoBonus*2.2);
         if(!G._spoilIdx)G._spoilIdx=0;
         G.spoils.captured.push({unit:pickT,blood:bR,cacao:cR,mercyBonus:false,featherBonus:true,_idx:++G._spoilIdx});
         addLog(`<span class="log-cp">🐍 Feather Embrace — <span style="color:#60e0c0">AUTO-CAPTURE! ${pickT.isMiniBoss?'Mini-boss! ':''}2.2× reward!</span></span>`);
@@ -7333,7 +7550,7 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
       }else{
         G._unitStates[pickT.id]='slain';
         if(!G._spoilIdx)G._spoilIdx=0;
-        G.spoils.killed.push({unit:pickT,blood:Math.round((pickT.maxHp||0)*0.6*G.dte.bloodBonus*getLayerResMult()),cacao:Math.round((pickT.maxHp||0)*0.36*G.dte.cacaoBonus*getLayerResMult()),_idx:++G._spoilIdx});
+        G.spoils.killed.push({unit:pickT,blood:Math.round(unitBounty(pickT)*1.333*G.dte.bloodBonus),cacao:Math.round(unitBounty(pickT)*1.333*0.6*G.dte.cacaoBonus),_idx:++G._spoilIdx}); // v657: bounty
         addLog(`<span class="log-ab">🐍 Feather Embrace! ${dmg} — fatal, slain.</span>`);
       }
       animateActor(u.id);animateHit(pickT.id,dmg,false,rollCrit._lc);
@@ -7362,7 +7579,7 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
           G.captureProcessed.add(e.id);
           G._unitStates[e.id]='slain';
           if(!G._spoilIdx)G._spoilIdx=0;
-          G.spoils.killed.push({unit:e,blood:Math.round((e.maxHp||0)*0.6*G.dte.bloodBonus*getLayerResMult()),cacao:Math.round((e.maxHp||0)*0.36*G.dte.cacaoBonus*getLayerResMult()),_idx:++G._spoilIdx});
+          G.spoils.killed.push({unit:e,blood:Math.round(unitBounty(e)*1.333*G.dte.bloodBonus),cacao:Math.round(unitBounty(e)*1.333*0.6*G.dte.cacaoBonus),_idx:++G._spoilIdx}); // v657: bounty
           addLog(`<span class="log-water">🌧 ${e.icon} ${e.name} consumed — transforms into a Tlaloque!</span>`);
           G._tlaloqueSpawnedThisBattle=true;
           if(partyFull){
@@ -7620,7 +7837,7 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
     }
   }
   else if(gd.ak==='patolliGamble'){
-    const roll=Math.floor(Math.random()*6)+1;
+    const roll=rollPatolli();
     const mults=[0,0,1.1,1.3,1.6,1.8,3.0];const hits=[0,0,1,2,3,0,0];
     addLog(`<span class="log-ab">🎭 Patolli Gamble — rolled <strong>${roll}</strong>!</span>`);
     if(roll===1){
@@ -8105,10 +8322,15 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     ae.forEach(e=>{if(e.currentHp<=0)return;const dmg=critify(Math.max(1,Math.round((u.mag||0)*1.2-(e.res||0)*0.4)),u,true);const h=applyArmorDamage(e,dmg,true);if(h>0){e.currentHp=Math.max(0,e.currentHp-h);total+=h;animateHit(e.id,h,false,rollCrit._lc);applyParalyze(e,1);onHitContact(u,e);refreshCaptureTargets();if(e.currentHp<=0)handleDeath(e);}});
     addLog(`<span class="log-ab">🏹 Mystical Shots! shields shattered + 1.2×MAG AoE ${total} + Paralyze ×1!</span>`);return;
   }
-  if(ab==='Atlatl Rush'){
-    if(!t)return;
-    const h=applyArmorDamage(t,critify(Math.max(1,Math.round((u.atk||0)*1.8-(t.def||0)*0.4)),u,false),false);const wc=rollCrit._lc;if(h>0){t.currentHp=Math.max(0,t.currentHp-h);animateHit(t.id,h,false,wc);if(wc)applyWound(t,1);onHitContact(u,t);refreshCaptureTargets();if(t.currentHp<=0)handleDeath(t);}
-    addLog(`<span class="log-ab">🪶 Atlatl Rush! ${h}${wc?' + WOUND ⚡':''}</span>`);return;
+  if(ab==='Atlatl Rush'){ // v667: 1.8x single (Wound on crit) -> 1.4x on 2 targets, Wound guaranteed
+    const _tg=ae.filter(e=>e.currentHp>0);if(!_tg.length)return;
+    let tot=0;
+    _tg.forEach(e=>{
+      const h=applyArmorDamage(e,critify(Math.max(1,Math.round((u.atk||0)*1.4-(e.def||0)*0.4)),u,false),false);
+      if(h>0){e.currentHp=Math.max(0,e.currentHp-h);tot+=h;animateHit(e.id,h,false,rollCrit._lc);onHitContact(u,e);refreshCaptureTargets();if(e.currentHp<=0)handleDeath(e);}
+      applyWound(e,1); // guaranteed — still armour-gated inside applyWound, as every Wound source is
+    });
+    addLog(`<span class="log-ab">🪶 Atlatl Rush! ${tot} + WOUND</span>`);return;
   }
   if(ab==='Surging Tide'){
     aa.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*0.23);a.currentHp=Math.min(a.maxHp,a.currentHp+h);animateHit(a.id,h,true);});
@@ -8489,9 +8711,9 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   if(ab==='Ball Strike'){
     G._multiHitPending=true;let total=0;let h2=0;
     function bsHit(){
-      const live=ae.filter(e=>e.currentHp>0);if(h2>=3||!live.length){G._multiHitPending=false;addLog(`<span class="log-ab">🏐 Ball Strike! ${total} + Slow all hit!</span>`);return;}
+      const live=ae.filter(e=>e.currentHp>0);if(h2>=5||!live.length){G._multiHitPending=false;addLog(`<span class="log-ab">🏐 Ball Strike! ${total} + Slow all hit!</span>`);return;}
       const tgt=live[Math.floor(Math.random()*live.length)];
-      const dmg=Math.max(1,Math.round(bpn(u)*(Math.round((u.atk||0)*0.9)-(tgt.def||0)*0.4)));const paBS=tgt.armor||0;const h=applyArmorDamage(tgt,dmg,false);
+      const dmg=Math.max(1,Math.round(bpn(u)*(Math.round((u.atk||0)*0.55)-(tgt.def||0)*0.4)));const paBS=tgt.armor||0;const h=applyArmorDamage(tgt,dmg,false);
       if(h>0){tgt.currentHp=Math.max(0,tgt.currentHp-h);total+=h;animateHit(tgt.id,h,false,rollCrit._lc);onHitContact(u,tgt);
         applySlowToUnit(tgt,paBS); // v318: explicit pre-hit armor per invariant
         refreshCaptureTargets();if(tgt.currentHp<=0)handleDeath(tgt);}
@@ -8678,6 +8900,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   // aa = player allies (damage targets), ae = enemy allies (heal targets)
   if(!ae)ae=G.enemies.filter(x=>x.currentHp>0&&!G.captureProcessed.has(x.id));
   aa=drunkTwistArr(u,aa,'off');ae=drunkTwistArr(u,ae,'ben'); // v537 DRUNK: per-target misfires for enemy specials
+  aa=enemyAoeTargets(u,aa); // v664: cap AFTER the drunk twist, so the ability still reaches N units even when some were misdirected
   {const _fxT=(aa&&aa.length)?aa.filter(x=>x.currentHp>0).reduce((m,x)=>!m||x.currentHp<m.currentHp?x:m,null):null;fxKickoff(u,_fxT,isAoeOrAutoSpecial(u));} // v556: enemy special kinetics
   // Ixquimilli boss: prioritize healers as target
   let lowestAlly;
@@ -8768,10 +8991,15 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     aa.forEach(a=>{if(a.currentHp<=0)return;const dmg=critify(Math.max(1,Math.round((u.mag||0)*1.2-(a.res||0)*0.4)),u,true);const h=applyArmorDamage(a,dmg,true);if(h>0){a.currentHp=Math.max(0,a.currentHp-h);total+=h;G._animQueue.push({uid:a.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});applyParalyze(a,1);onHitContact(u,a);if(a.currentHp<=0)handleDeath(a);}});
     addLog(`<span class="log-ab">🏹 Mystical Shots! shields shattered + 1.2×MAG AoE ${total} + Paralyze ×1!</span>`);return;
   }
-  if(ak==='atlatlRush'&&aa.length){
-    const live=aa.filter(a=>a.currentHp>0);if(!live.length)return;const t=live[Math.floor(Math.random()*live.length)];
-    const h=applyArmorDamage(t,critify(Math.max(1,Math.round((u.atk||0)*1.8-(t.def||0)*0.4)),u,false),false);const wc=rollCrit._lc;if(h>0){t.currentHp=Math.max(0,t.currentHp-h);G._animQueue.push({uid:t.id,dmg:h,isHeal:false,isCrit:wc});if(wc)applyWound(t,1);onHitContact(u,t);if(t.currentHp<=0)handleDeath(t);}
-    addLog(`<span class="log-ab">🪶 Atlatl Rush! ${h}${wc?' + WOUND ⚡':''}</span>`);return;
+  if(ak==='atlatlRush'&&aa.length){ // v667: mirrors the player version. aa is pre-capped to 2 by enemyAoeTargets (v664)
+    const live=aa.filter(a=>a.currentHp>0);if(!live.length)return;
+    let tot=0;
+    live.forEach(a=>{
+      const h=applyArmorDamage(a,critify(Math.max(1,Math.round((u.atk||0)*1.4-(a.def||0)*0.4)),u,false),false);
+      if(h>0){a.currentHp=Math.max(0,a.currentHp-h);tot+=h;G._animQueue.push({uid:a.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,a);if(a.currentHp<=0)handleDeath(a);}
+      applyWound(a,1);
+    });
+    addLog(`<span class="log-ab">🪶 Atlatl Rush! ${tot} + WOUND</span>`);return;
   }
   if(ak==='surgingTide'&&ae.length){
     ae.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*0.23);a.currentHp=Math.min(a.maxHp,a.currentHp+h);G._animQueue.push({uid:a.id,dmg:h,isHeal:true,isCrit:false});});
@@ -9293,9 +9521,9 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   }
   if(ab==='Ball Strike'&&aa.length){
     let tot=0;const hitTargets=new Set();const preArmorMapB=new Map(aa.map(a=>[a.id,a.armor||0]));
-    for(let i=0;i<3;i++){const live=aa.filter(a=>a.currentHp>0);if(!live.length)break;const tgt=live[Math.floor(Math.random()*live.length)];const d=applyArmorDamage(tgt,critify(Math.max(1,Math.round(u.atk*1.25-(tgt.def||0)*0.4)),u,true),true);if(d>0){tgt.currentHp=Math.max(0,tgt.currentHp-d);tot+=d;G._animQueue.push({uid:tgt.id,dmg:d,isHeal:false,isCrit:rollCrit._lc});hitTargets.add(tgt.id);onHitContact(u,tgt);if(tgt.currentHp<=0)handleDeath(tgt);}}
+    for(let i=0;i<5;i++){const live=aa.filter(a=>a.currentHp>0);if(!live.length)break;const tgt=live[Math.floor(Math.random()*live.length)];const d=applyArmorDamage(tgt,critify(Math.max(1,Math.round(u.atk*0.55-(tgt.def||0)*0.4)),u,true),true);if(d>0){tgt.currentHp=Math.max(0,tgt.currentHp-d);tot+=d;G._animQueue.push({uid:tgt.id,dmg:d,isHeal:false,isCrit:rollCrit._lc});hitTargets.add(tgt.id);onHitContact(u,tgt);if(tgt.currentHp<=0)handleDeath(tgt);}}
     hitTargets.forEach(id=>{const a=aa.find(x=>x.id===id&&x.currentHp>0);if(a)applySlowToUnit(a,preArmorMapB.get(id)||0);});
-    addLog(`<span class="log-ab">🏐 Ball Strike! 3-hit ${tot} + Slow each</span>`);return;
+    addLog(`<span class="log-ab">🏐 Ball Strike! 5-hit ${tot} + Slow each</span>`);return;
   }
   if(ab==='Craft Shard'&&aa.length){
     let tot=0;aa.forEach(a=>{const d=applyArmorDamage(a,critify(Math.max(1,Math.round(u.mag*1.1-(a.res||0)*0.4)),u,true),true);if(d>0){a.currentHp=Math.max(0,a.currentHp-d);tot+=d;G._animQueue.push({uid:a.id,dmg:d,isHeal:false,isCrit:rollCrit._lc});applyBurn(a,1);onHitContact(u,a);if(a.currentHp<=0)handleDeath(a);}});
@@ -9691,6 +9919,7 @@ function triggerPatronTurnPassive(actor){
 // ─── ARMOR / DAMAGE HELPERS ───────────────────────────────────
 function mkGodOrCap(cu,idx,lv){
   // Builds a live battle unit from a cap template at given level
+  ensureBountyWeights(); // v663: see mkEnemy
   const maxNP=Math.round(scA(cu.np||20,lv));
   return{...cu,id:'day_'+cu.id+'_'+Math.random().toString(36).slice(2,5),
     baseId:cu.id,_captureId:'day_'+cu.id+'_summon',
@@ -9939,7 +10168,12 @@ function cleanseUnit(u){
   if(G.slowedThisRound)G.slowedThisRound.delete(uid);
   if(G.nextRoundSlowIds)G.nextRoundSlowIds.delete(uid);
   if(G._slowedUnits)G._slowedUnits.delete(uid);
-  if(G.thisRoundSlowTail)G.thisRoundSlowTail=G.thisRoundSlowTail.filter(s=>s.unit&&s.unit.id!==uid);
+  // v660: ONLY strip an ally from the slow tail. Player tail slots are anonymous, so a cleansed ally
+  // simply re-enters the normal pool. Enemy tail slots are NAMED — removing one deletes that enemy's
+  // only remaining turn for the round, with no pool to fall back into. cleanseUnit can reach an enemy
+  // via drunkTwistArr misfire (a DRUNK caster's beneficial AoE can redirect onto the opposing side),
+  // which silently ate the enemy's action.
+  if(G.thisRoundSlowTail&&u.isAlly)G.thisRoundSlowTail=G.thisRoundSlowTail.filter(s=>s.unit&&s.unit.id!==uid);
   void _revertSlow; // v407: forced de-slow promotion removed — splicing an extra early player slot per cleansed unit made a mass heal+cleanse flood the player with turns before the enemy acted. Status is still cleared above; the unit acts in its existing slot (slots==players ⇒ no turn lost/duplicated).
   // NOTE: Do NOT rebuild roundQueue here. Player slots are anonymous — processCurrentSlot
   // checks normalUnacted/slowedUnacted dynamically, so a cleansed unit naturally moves
@@ -11753,7 +11987,21 @@ function showUnitTooltip(u){
   const typeLabel=bo.type==='MAG'?'Magical':bo.type==='MIX'?'MIX':'Physical';
   const _isTl=u._isTlaloque||isTlaloqueUnit(u);const _ol=offeringStatLayer({hp,atk,mag,def,res,tp:np},u.element,u.isGod,bo.type,u._turquoise||0,_isTl,!!u.isPatron);const T=_ol.total; /* v639: azure-aware */
   // v642: Elemental Synergy joins the modal math — same +max(1,round(stat×pct)) bump the battle build applies, in the same order (after offerings, before buffs)
+  // v672: gods carry two HP multipliers the generic stat layer never saw — the DT node (applied inside
+  // mkGod, before Soul Surge) and God Affinity (applied by applyAff, 1.1^n per other deployed god).
+  // Without these the modal showed base HP while Temazcal and battle showed a value up to ~1.8x higher.
+  const _affInfo=(()=>{const a=calcAffinity();return (u.isGod&&G.dte&&G.dte.synergyUnlocked&&a.count>0)?a:null;})();
+  const _pbInfo=(()=>{const t=(G.dte&&G.dte.pantheonBoostTiers)||0;const n=calcAffinity().count;
+    return (u.isGod&&t>0&&n>0)?{tiers:t,count:n,mult:1+0.025*t*n}:null;})();
+  if(_pbInfo){const m=_pbInfo.mult;T.atk=Math.round(T.atk*m);T.mag=Math.round(T.mag*m);T.def=Math.round(T.def*m);T.res=Math.round(T.res*m);}
+  if(u.isGod){
+    const _ghm=(G.dte&&G.dte.godHpMult)||1;
+    if(_ghm!==1)T.hp=Math.round((hp-sb.hp)*_ghm)+sb.hp; // DT multiplies the level-scaled base only, not Soul Surge
+    if(_affInfo)T.hp=Math.round(T.hp*_affInfo.mult);
+  }
   const _synInfo=(()=>{const cs=calcSynergy();const _m=G.god&&(u.element===G.god.element||(hasPassive('azureZephyr')&&(u.element==='fire'||u.element==='wind')));if(!_m||!cs.count)return null;const _b=v=>Math.max(1,Math.round((v||0)*cs.pct));T.atk+=_b(T.atk);T.mag+=_b(T.mag);T.def+=_b(T.def);T.res+=_b(T.res);return cs;})();
+  const _affLine=_affInfo?('<div style="margin-top:6px;font-size:11px;color:#c0a0e0">\ud83d\udd2e God Affinity: <strong>\u00d7'+_affInfo.mult.toFixed(2)+' HP</strong> ('+_affInfo.count+' other god'+(_affInfo.count>1?'s':'')+' deployed)</div>'):'';
+  const _pbLine=_pbInfo?('<div style="margin-top:6px;font-size:11px;color:#c0a0e0">\u2726 Pantheon Boost: <strong>\u00d7'+_pbInfo.mult.toFixed(2)+' ATK/MAG/DEF/RES</strong> ('+_pbInfo.count+' other god'+(_pbInfo.count>1?'s':'')+' deployed)</div>'):'';
   const _abS=u.atkBuffStacks||0,_dbS=u.defBuffStacks||0,_cbS=u.critBuffStacks||0;
   const _abM=1+0.10*_abS,_dbM=1+0.10*_dbS;
   if(_abM>1){T.atk=Math.round(T.atk*_abM);T.mag=Math.round(T.mag*_abM);}
@@ -11812,7 +12060,7 @@ function showUnitTooltip(u){
     +patronLine
     +abilLine
     +oblLine
-    +(_synInfo?('<div style="font-size:11px;color:#d4af37;margin-top:4px">🔗 Elemental Synergy: +'+Math.round(_synInfo.pct*100)+'% ATK/MAG/DEF/RES ('+_synInfo.count+' bond'+(_synInfo.count>1?'s':'')+')</div>'):'')
+    +(_synInfo?('<div style="font-size:11px;color:#d4af37;margin-top:4px">🔗 Elemental Synergy: +'+Math.round(_synInfo.pct*100)+'% ATK/MAG/DEF/RES ('+_synInfo.count+' bond'+(_synInfo.count>1?'s':'')+')</div>'):'')+_affLine+_pbLine
     +offSec
     +buffSec
     +'</div>';
@@ -11925,7 +12173,10 @@ function renderTraining(){
   }
   // v612: patron first, then everyone marching into battle, then benched reserves
   // v628: ally gods now split by deployment too — recruited-but-benched gods were parked in 'Deployed Party'
-  const _isDep=(cu)=>G.deplSel.includes(cu.id)||(cu._captureId&&G.deplSel.includes(cu._captureId));
+  // v665: was `deplSel.includes(cu.id) || ...`. A Tlacuilo clone keeps the ORIGINAL's `.id`
+  // (only _captureId is fresh), so the first clause matched both copies and marked them all deployed.
+  // capKey() is the canonical identity for captured units — see also the badge below.
+  const _isDep=(cu)=>G.deplSel.includes(capKey(cu));
   const capsDep=caps.filter(_isDep),capsRes=caps.filter(c=>!_isDep(c));
   const godsDep=allyGods.filter(_isDep),godsRes=allyGods.filter(g=>!_isDep(g));
   const sections=[
@@ -11955,14 +12206,14 @@ function renderTraining(){
     const lv2=lv+1;
     const calcBattleNpCost=(level)=>{
       const bc=u.isGod?(GODS.find(g=>'god_'+g.id===uk||g.id===uk.replace('god_',''))?.npCost||14):(u.npCost||9);
-      return Math.round((bc+Math.floor(level/2)+Math.floor(level/20))*(getTecpatlEffects().npBaneMult||1)*(level>=50?1.30:1)*(level>35?1.20:1)*(level>20?1.25:1)*(level>20?1.10:1)*(level>40?1.10:1)); // v343: now matches baseNpCostFor exactly (added the two v334 +10% ramps it was missing)
+      return Math.round(npLevelCurve(bc,level)*(getTecpatlEffects().npBaneMult||1)); // v668: shares baseNpCostFromObj's curve — the v343 hand-copy had drifted
     };
     const _lvCostMult=(L)=>L>=50?1.5:L>=40?1.25:1.0; // v343: mirror effectiveNpCost's level multiplier
     const npCostNow=Math.ceil(Math.max(1,calcBattleNpCost(lv)-sbT.cost)*_lvCostMult(lv)); // v343: equals actual battle cost (effectiveNpCost)
     const npCostNext=Math.ceil(Math.max(1,calcBattleNpCost(lv2)-sbT.cost)*_lvCostMult(lv2));
     const shKey=u.isGod?u.id:capKey(u);const sh=G.shields[shKey]||0,shHp=G.unitArmor[shKey]!==undefined?G.unitArmor[shKey]:sh*G.dte.chimaArmorPerStack;
     const cfp=!u.isGod?sacFPAtLv(u,lv):0,nfp=!u.isGod?sacFPAtLv(u,lv+1):0;
-    const isDeployed=G.deplSel.includes(u.id)||(u._captureId&&G.deplSel.includes(u._captureId));
+    const isDeployed=G.deplSel.includes(capKey(u)); // v665: see _isDep — clones share .id with their original
     G._tcModal=G._tcModal||{};G._tcModal[uk]={id:uk,name:u.name,icon:u.icon,element:u.element,level:lv,isPatron:!!isPatronRow,isGod:!!u.isGod,_captureId:u._captureId,_isHiredMerc:u._isHiredMerc,baseObj:u.isGod?(GODS.find(g=>'god_'+g.id===uk)||u):u}; // v643: modal payload for the art click
     // v312: ▲ now means "what your last Soul Surge pick actually added" (flashes ~6s), per design feedback.
     const fl=(G._surgeFlash&&G._surgeFlash.key===uk)?G._surgeFlash.deltas:null;
@@ -12012,9 +12263,9 @@ function renderTraining(){
     if(_F.tonalli.lv)_fParts.push('<span>🔮 Tonalli L'+_F.tonalli.lv+'</span>');
     const forcesRow=_fParts.length?('<div class="tc-forces">'+_fParts.join(' · ')+'</div>'):'';
     const costFlash=(fl&&fl.cost>0)?('<span class="stat-up-glow"> ▼−'+fl.cost+'</span>'):((lvf&&lvf.cost>0)?('<span class="stat-up-glow-red"> +'+lvf.cost+'</span>'):'');
-    const specBlock=u.ability?('<div class="tc-spec"><span class="tc-spec-name">🔮 '+u.ability+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(u.ad)+'</span></span>'
+    const specBlock=u.ability?('<div class="tc-spec"><span class="tc-spec-name">🔮 '+u.ability+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(liveAd(u))+'</span></span>'
       +'<span class="tc-cost" '+statAttrs('cost')+'>✨ Cost: <span data-stat="cost">'+npCostNow+costFlash+'</span></span></div>'
-      +'<div class="tc-desc">'+u.ad+'</div>'):'';
+      +'<div class="tc-desc">'+liveAd(u)+'</div>'):'';
     const statMid=u.type==='MIX'
       ?('<span data-stat="atk" '+statAttrs('atk')+'>🗡️ <b>ATK</b> '+sg(scA(u.atk||0,lv)+sbT.atk,scA(u.atk||0,lv+1)+sbT.atk,'atk')+'</span><span data-stat="mag" '+statAttrs('mag')+'>🪄 <b>MAG</b> '+sg(scA(u.mag||0,lv)+sbT.mag,scA(u.mag||0,lv+1)+sbT.mag,'mag')+'</span>')
       :('<span data-stat="'+(isPrim?'mag':'atk')+'" '+statAttrs(isPrim?'mag':'atk')+'>'+primEmoji+' <b>'+(isPrim?'MAG':'ATK')+'</b> '+sg(cp,np_,isPrim?'mag':'atk')+'</span>');
