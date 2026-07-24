@@ -234,6 +234,7 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 @keyframes hpTipFlash{0%,100%{opacity:.5}50%{opacity:1}}
 .uc.capturable-glow{border-color:#2a7a3a;animation:gl .7s infinite alternate}
 @keyframes btnPulse{0%{box-shadow:0 0 0 0 #d4af3766;border-color:#8a6a20}50%{box-shadow:0 0 0 6px #d4af3700;border-color:#ffd24d}100%{box-shadow:0 0 0 0 #d4af3700;border-color:#8a6a20}}
+.btn-ghost{opacity:.45;border-color:#5a4a10!important;box-shadow:none!important} /* v711: FTUE gate — looks disabled but stays clickable so it can route to the pending step */
 .btn-pulse{animation:ftueGlow 1.1s ease-in-out infinite;border-color:#ffd24d!important} /* v592 · v608: same pulsate as the patron FTUE glow, per playtest — class only ever applied to the continue button */
 .uc.ftue-glow{animation:ftueGlow 1.1s ease-in-out infinite;border-color:#ffd24d!important;z-index:2} /* v604: first-run B1 — point at the patron */
 @keyframes ftueGlow{0%,100%{box-shadow:0 0 0 0 #ffd24d99,0 0 10px #d4af3760;transform:scale(1)}50%{box-shadow:0 0 0 7px #ffd24d00,0 0 22px #ffd24daa;transform:scale(1.035)}}
@@ -562,7 +563,7 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
   <div class="res-bar emph-blood" id="rb-shop"></div><!-- v622: training tab is the default → blood emphasized -->
   <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">
     <h2 style="margin-bottom:.15rem;font-size:17px">Sacred Tianguis</h2>
-    <button id="continue-btn" class="btn" onclick="G._pulseContinue=false;this.classList.remove('btn-pulse');G._contFn?G._contFn():maybeWarnTemazcal()">Continue to Next Battle</button>
+    <button id="continue-btn" class="btn" onclick="if(ftueGateBlocked()){ftueJumpToStep();return;}G._pulseContinue=false;this.classList.remove('btn-pulse');G._contFn?G._contFn():maybeWarnTemazcal()">Continue to Next Battle</button>
   </div>
   <div id="tecpatl-panel-shop"></div>
   <div class="relic-bar" id="relic-bar-shop"></div>
@@ -1632,7 +1633,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v709'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v711'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -3828,7 +3829,13 @@ const GOD_PORTRAITS={
   opochtli:{src:'data:image/png;base64,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',smooth:false,blend:false},
   cihuacoatl:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEE0lEQVR42u2aTXKcMBCFdYCcIEsukAv4ClllkwO5KgtfM4scIKtsSCDTk8fjdSOBJJiJKXdhMzBWf+o/tUhpxzHOP//xcQUAn98+jijdAfSAwEqijL++LqQrhBnAn3/aWmFWkhU+xQJMeZOaym8pWQroYQC8vHwav//8MapziRUoaRL8eCAtAeDvOQqzZVSFYABsMCUATBl1bS+AHMuobgE8EFbKU/7blw+z2P18LRKEUeoC1SDw7JcCsEGbwtPZrt2+Q4oCURoUq0A4AoDdxoDY8+AeIYitwNil8tsLwJ7FfK++ywPCrkD39St9jwDgiG/imTTfc48Dt0rUpAuEWhYwKW9is6xmNQKCij8UAE59ke97QFDp0wHs+cdqdnODICt9ugvsBXBX4JYRtkDgtVOCYG3zZxNe5HL4LBGoRDP/cAHQi+KecM5Xs98VwpEiCGfSUwStgSEoC3gYAAjh7fV1ToF2XlR4GQASKd7VFVRK2vsdUWW3lSpPswLPjEv6iOzjCIGVFNbmZoLmAFB5FZj2WgBWhArA9LkCcEor2oNAsxg+zzHgYQCowgUBTCYNymSXwegGBCHhukEURudZQAQgcovcgGfPioJnEQMuYQGYxw0ApC2p+HwPB0UKrjj7ylVOcwNnEZOiym3VvfGqP4orLAzpEgC4YcoAZPsqA8DiXjyTFV4KAFdu45D+So7yDMGeFQAQwmUAWByQPm/KFMhijcDWcJYVlKwFuNAplbvfBwCwwdoNwFbqQlAKgors0bVVbAggNAehBqtWY6rLg3+jotG1HDdQ2+unAZANTOGzqvPL7e9FJtmIAwpCExC5/usp5kHxrkkLIAjdYkBUoXGgU+kqguJdwzY4A/CANzf9ragdAcixGA9A9P+axoBIOVaU7/P8Wj27tT3mWZ4HoRoIXK5Oa3hvFu0zz0pWFR5ViZ5l5Lodj7vKewK8JR21tPEenJWV8mwBBGHOLEOSNYLXSW62MIoAyI3KCMCQ/BeehiStAEtiD37T1WEEYDL5SWoDcNcDQuGjHepdAGxACIA3PqoAcGKDCpJdAViwwwHitaMxgIOlqhf43NUNIpHKDykrC3ifqzdE1Nsjc0+ixXtCu+sAUw4UiZ7d6gtgKls0YnqUw8WVIM8wKZNdIwz/Uhy+7qZmustSOKcocc08+ttxB6/AUePrYgVjsC93T4W5CgezPok3jkjR5guie+//dl5siCCA0ll3zP4IhKogVpsfAQDZDS6IB7lj2lKy+oJIKa1+lxGd8jzGClzv3/YAUymELgGwBMAqGKo87wAohdAlC5S2tGUF6BQ93PE5AuFyxyImOEHRqwmeDoRyBdwpjlpqT2UN7ity4m2Tp1E+F8xTmv+elzCezvz3WkR6P96P5sdv2xlLRibNZdoAAAAASUVORK5CYII='},
   mq_tlaloque:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAByklEQVR42u2aQW4CMQxFZ0FPxqW6Rr1yF4gFRVUj0S8sfycZJ0y+JS9gJhn7wTi2k23rLB+n8/1ZP2/fTYrzbbPL4QGgQWhY+Xza7r9q3c8qzsPaIQB7OV4MQi3Xvy7Xf2rdzyrOx9ohAFkA8C+IhlrXLfXGWa+IAGQD8Ax8WPBSLRDRcWywFIBhAIoUJ/7EBUCOE4BRAKwHmo6A0ACccd4PIgCjUuJoatsrdZ6mKFoGAJsgsSlsdBzr+LAi6fAAMGh5hnopdHQcPpe1TwCylsdo2Rwd7zmUFiyXBxBdHmvL4WjQS2+YCAAGHyhji5R2Nwp+b80jAO8GAB1g1RrfK0UXgN5FDutIVGsdqX2F1gXANhzYZQyDWTVAspEiAKMBRFtjrFjzeiAEYFQQLMCsV4B1GO/3WmbWdQGIAmhNgHBbnHXAAojb5OyBDKu4EoCsMhhBeMundbCCdcQLjgKQ3R7vnVKz5ezwKlAAGg9FsU3R2saMAGS/AtEND+97AZgVwF4NldYglr59vjwANjFpvX96WRZAqyNvD0IABEAAumxvT3ccTgAai6LW7W0BmB1Ar4MJww84CMBOjZBeAKYDsTyAaBmcNY8AkPIDHU1PRZ77Qy8AAAAASUVORK5CYII='}, // v520: Tlaloque vassal sprite — matched via u.baseId (v521)
+  tlazolteotl:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAHlBMVEUAAAA0CEn79P/no1b/AAATAgLdujIpaaUAAAAAAADBNWYhAAAAAXRSTlMAQObYZgAABA5JREFUeNqVls9z00YUxz+7UiBAwSs7A7RMU0VMf0zTwAZDLx3AzOTGgfTgnnrI39UTvTaHui1cIS3TTg8Yq3WG4QCKmrRM6eBo0wxgkLXbg+1gHF/6dHg7q6/2+13t9z0J/kcIBUHQz3shR8ZBgFhaUgTBZIBQQs3AFaFGlxBvEOyFM8OR/5qgn0r9NAHgxu7s16DeuPZpCMaezMYoRGBKwtSgDT1hSmIoc0+DU07fafOUK7h1xASR0C4Wble5PdNbXJskskrhtapQ7eiY6t60N8jlbqafPM9PCjj+66G88yIwYysI96PTuolqep55y6j9FKZkKAIlghi34/Zr8MSzeuxlxmW6qF9Teh+ggAZUoQo5xBO2mavh5r9zavJZaGh1wBsxwYgGdhZjxMV1RVEpMVED/Kb8mjgKIxrkqJ0OfBkXxL+sjBpsAAiqCq+F6FB0VuhoRDUYbh+AQxufbRzL/K0jf/197MH7a0+mz9/te0vJoXmaiGAFPv8CDgSK5tBPPostA3hOOVgmZxkwylyOAVHpSbxFBRSaZzvXYQp4VbqG17+vkS5mDmAdzh7ur/v1LlwEKFMYSQcgK3XOzno71wFelfTmbmsnA2ghoBI+MmIOV8YaAwgRsqHYNuKcbSEBO4fLsn/BM0EQBE7De1lmKKeD05Qok5UBde4ecFoAagMRYsEHiwVR6ZEKFwHOWflHLTOkYQoSEaVyDhY0s44ULGYTrw3l0EYKH5hFBn77aSQTIpAJEb0FtxayGYJAnEsiKxOckOHgiG1qFFEaJtEj41O2BokMbUvYvfZRCS0hLp1rSdhwKYQAVa96YGWptjTwgTXbAz9sW0g3qAxddGU4A3h0u5ArW0qZfvvxicfpP4/fuWfIjTqWQrfbr83pzGRdjjx/9bJXP3iypR/QPZiZLnT7dSHqsIrQhVd8yp3arq+MqsM3Zljdxz9avR+9eCnTE/fT02d+8k9svPz45/vzH8R7ps3ry8wxKze5epMF3abMVL0x4uqbfI9UkpCpZTy0CDnF1VHb5yGEqbU0cuK4kCAb+5v5CMXkbv+aYmRypPxlkyZfARDtB6QhRCR1YDUCsGMUZ4B+VQzizzHAVgJY8gb5UgokF8cAszqFrfkpcrgE1m+PAMR83pBYrIZlbuCnpOi88YMaACpeoNK0mmzd81a5UePupWSpKESgFwGJCJaB2ZBAy6TagKb2A7w2MBUoJJX6gCqCiPnaoFdqgPoiks7DWwm7ltRiSaEgJi6IL5M8vNXCg93n3a7eLKnNo6eSOXdYNs+vXWh3L6xvd7sfPkCAcDMaYk3hQTEDrNXo+dD7VhkkODqWdJyiIL6NGbwo93vyrp7dRCYha15Ts9D27zQ/Ma8/i8HEv4EM4D/kwKgnmDZjtAAAAABJRU5ErkJggg=='}, // v710: L8 layer boss portrait (64×64, Piskel ABGR export)
 };
+/* v710: bosses built by mkEnemy (the debug custom battle) get id 'en_boss_<x>_<i>_<rnd>' and
+   baseId 'boss_<x>', neither of which matches the bare portrait key that the live boss path
+   produces ('boss_mayahuel_8' strips to 'mayahuel'). Alias every portrait under 'boss_<key>'
+   so a boss shows its art in BOTH paths instead of falling back to its emoji. */
+Object.keys(GOD_PORTRAITS).forEach(function(k){if(!GOD_PORTRAITS['boss_'+k])GOD_PORTRAITS['boss_'+k]=GOD_PORTRAITS[k];});
 // Preload all portrait images into browser cache to eliminate flash on re-render
 const _portraitImgCache={};
 (function preloadPortraits(){
@@ -12125,6 +12132,40 @@ function ftueAutoChecks(){
   }
   if(!G._ftueDidTemazcal&&(G.res.cacao||0)<temazcalCost())G._ftueDidTemazcal=true;
 }
+/* v711: which FTUE step is still outstanding, in the order the tutorial teaches them.
+   Returns null when the gate is inactive or already satisfied. */
+function ftuePendingStep(){
+  if(!ftueGateActive())return null;
+  ftueAutoChecks();
+  if(!G._ftueDidTrain)return 'train';
+  if(!G._ftueDidTemazcal)return 'temazcal';
+  if(!G._ftueDidMerc)return 'merc';
+  if(G._ftueNeedsParty&&!G._ftueDidParty)return 'party';
+  return null;
+}
+function ftueGateBlocked(){return !!ftuePendingStep();}
+/* Clicking the greyed Continue button takes the player to the step it is waiting on.
+   switchTab() re-renders the panel, which is what re-applies the guiding tab-pulse to that
+   step's own button (patron Level Up / Restore / Hire -- all pre-existing since v312/v652). */
+function ftueJumpToStep(){
+  const st=ftuePendingStep(); if(!st)return;
+  if(st==='party'){
+    const b=document.getElementById('edit-party-btn');
+    if(b){b.classList.add('tab-pulse');try{b.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){}}
+    notify('\u{1F4A1} Put your new hire into the party first','#d4af37');return;
+  }
+  const tab=(st==='train')?'training':'mercs';
+  switchTab(tab);
+  ftueGateUpdate();
+  notify({train:'\u{1F4A1} Level up your patron first',
+          temazcal:'\u{1F4A1} Restore your patron at the Temazcal',
+          merc:'\u{1F4A1} Hire a mercenary to continue'}[st],'#d4af37');
+  setTimeout(function(){
+    const pane=document.getElementById('panel-'+tab); if(!pane)return;
+    const glow=pane.querySelector('.tab-pulse');
+    if(glow){try{glow.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){}}
+  },80);
+}
 function ftueGateUpdate(){
   // v641 debloat: Temazcal tab appears only after the patron has been trained (first run);
   // the 'Level up allies' tip hides while the patron-weak tip is on stage, then returns gendered.
@@ -12139,18 +12180,21 @@ function ftueGateUpdate(){
   ['ftue-tip-training','ftue-tip-mercs','ftue-gate-hint'].forEach(i=>{const e=document.getElementById(i);if(e)e.remove();});
   ['training','mercs'].forEach(x=>{const tb=document.getElementById('tab-'+x);if(tb)tb.classList.remove('tab-pulse');});
   const epBtn=document.getElementById('edit-party-btn');if(epBtn)epBtn.classList.remove('tab-pulse');
-  if(!ftueGateActive()){if(cont){cont.disabled=false;cont.style.display='';cont.classList.toggle('btn-pulse',!!G._pulseContinue);}return;} // v593: gate cleared → honor the pulse flag
+  if(!ftueGateActive()){if(cont){cont.disabled=false;cont.style.display='';cont.classList.remove('btn-ghost');cont.removeAttribute('title');cont.classList.toggle('btn-pulse',!!G._pulseContinue);}return;} // v593: gate cleared → honor the pulse flag
   ftueAutoChecks();
   const s1=!!G._ftueDidTrain,s2=!!G._ftueDidTemazcal,s3=!!G._ftueDidMerc;
   const s4=!G._ftueNeedsParty||!!G._ftueDidParty; // v306: only required if a hire couldn't deploy
   if(s1&&s2&&s3&&s4){
     markV('ftue_shop_done');
     G._pulseContinue=true; // v595: armed HERE — the gate clearing IS the moment to point at Continue
-    if(cont){cont.disabled=false;cont.style.display='';cont.classList.add('lv-burst');setTimeout(()=>{cont.classList.remove('lv-burst');if(G._pulseContinue&&!cont.disabled)cont.classList.add('btn-pulse');},700);}
+    if(cont){cont.disabled=false;cont.style.display='';cont.classList.remove('btn-ghost');cont.removeAttribute('title');cont.classList.add('lv-burst');setTimeout(()=>{cont.classList.remove('lv-burst');if(G._pulseContinue&&!cont.disabled)cont.classList.add('btn-pulse');},700);}
     notify('⚔ The gods are satisfied — battle awaits!','#d4af37');
     return;
   }
-  if(cont){cont.disabled=true;cont.style.display='none';cont.classList.remove('btn-pulse');} // v593: never pulse a disabled button · v603: hidden while FTUE gate pending — a greyed ghost next to the checklist was redundant and mispositioned the header flex row
+  // v711: visible but greyed while the gate is pending (v603 hid it; a missing button read as a broken
+  // game to playtesters). Deliberately NOT `disabled` -- a disabled button swallows the click, and the
+  // click is what routes the player to the outstanding step.
+  if(cont){cont.disabled=false;cont.style.display='';cont.classList.remove('btn-pulse');cont.classList.add('btn-ghost');cont.title='Complete the highlighted step to continue';}
   const pT=document.getElementById('panel-training');
   if(pT&&!s1){const d=document.createElement('div');d.id='ftue-tip-training';d.className='ftue-tip';d.innerHTML='💡 Your patron is weak — level them up with 🩸 Blood before fighting';pT.prepend(d);}
   const pM=document.getElementById('panel-mercs');
