@@ -363,6 +363,14 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
       <div style="font-size:11px;color:#a070c0;font-weight:500;margin-bottom:4px">⚔️ Custom Battle</div>
       <button class="btn btn-debug" onclick="debugCustomBattle()" style="font-size:11px;padding:4px 10px">⚔️ Launch Custom Battle…</button>
     </div>
+    <div style="border-top:1px solid #4a2a6a;margin-top:6px;padding-top:8px">
+      <div style="font-size:11px;color:#a070c0;font-weight:500;margin-bottom:4px">🔒 God Unlocks</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-debug" onclick="dbgRelockGod('tlazolteotl')" style="font-size:11px;padding:4px 10px">🌺 Re-lock Tlazoltéotl</button>
+        <button class="btn btn-debug" onclick="dbgRelockGod('mayahuel')" style="font-size:11px;padding:4px 10px">🌵 Re-lock Mayahuel</button>
+      </div>
+      <div style="font-size:10px;color:#7a6a9a;margin-top:3px">Clears that layer's conquest flags so the unlock sequence fires again.</div>
+    </div>
     <!-- Tlacuilo / State Inspector -->
     <div style="border-top:1px solid #4a2a6a;margin-top:6px;padding-top:8px">
       <div style="font-size:11px;color:#d4af37;font-weight:500;margin-bottom:4px">🐸 Tlacuilo & State Inspector</div>
@@ -1041,7 +1049,11 @@ function relicTip(e,id){const o=OFFERINGS[id];if(!o)return;const tt=document.get
 // · lethargy +30%/st TP cost · drunk 5%/st misfire · slow: no stacking.
 // NOTE: Burn deals NO damage — never describe it as damage-over-time.
 const STATUS_INFO={
-  poison:{icon:'🤢',name:'Poison',color:'#90d030',base:'Loses <strong>5% of max HP per stack</strong> after it acts (4 max).',fn:n=>`Loses <strong>${5*n}% of max HP</strong> after it acts (${n} stack${n>1?'s':''}).`},
+  poison:{icon:'🤢',name:'Poison',color:'#90d030',base:'Loses <strong>5% of max HP per stack</strong> after it acts (4 max).',
+    /* v714: Unclean Purification inverts the tick for allies, so the pip must read as a heal there. */
+    fn:(n,ally)=>(ally&&typeof hasPassive==='function'&&hasPassive('uncleanPurification'))
+      ?`Heals <strong>${5*n}% of max HP</strong> after it acts (${n} stack${n>1?'s':''}).`
+      :`Loses <strong>${5*n}% of max HP</strong> after it acts (${n} stack${n>1?'s':''}).`},
   burn:{icon:'🔥',name:'Burn',color:'#ff8040',base:'Deals <strong>15% less damage per stack</strong> (4 max).',fn:n=>`Deals <strong>${15*n}% less damage</strong> (${n} stack${n>1?'s':''}).`},
   paralyze:{icon:'⚡',name:'Paralyze',color:'#ffe860',base:'<strong>10% chance per stack</strong> to lose its turn entirely (4 max).',fn:n=>`<strong>${10*n}% chance</strong> to lose its turn entirely (${n} stack${n>1?'s':''}).`},
   wound:{icon:'🩸',name:'Wound',color:'#ff6060',base:'Receives <strong>10% more damage per stack</strong> from every hit (4 max).',fn:n=>`Receives <strong>${10*n}% more damage</strong> from every hit (${n} stack${n>1?'s':''}).`},
@@ -1053,25 +1065,25 @@ const STATUS_INFO={
   defup:{icon:'⬆',name:'DEF/RES UP',color:'#80c0ff',base:'<strong>+10% DEF & RES per stack</strong>.',fn:n=>`<strong>+${10*n}% DEF & RES</strong> — takes less physical and magical damage (${n} stack${n>1?'s':''}).`},
   critup:{icon:'⬆',name:'CRIT UP',color:'#ffd24d',base:'<strong>+5% critical chance per stack</strong>.',fn:n=>`<strong>+${5*n}% critical hit chance</strong> (${n} stack${n>1?'s':''}).`},
 };
-function statusTip(e,kind,stacks){
+function statusTip(e,kind,stacks,ally){
   const s=STATUS_INFO[kind];if(!s)return;
   const tt=document.getElementById('relic-tooltip');if(!tt)return;
   const n=Math.max(1,Math.min(4,parseInt(stacks,10)||1));
-  tt.innerHTML=`<strong style="color:${s.color}">${s.icon} ${s.name}</strong><br><span style="color:var(--td)">${s.fn(n)}</span>`;
+  tt.innerHTML=`<strong style="color:${s.color}">${s.icon} ${s.name}</strong><br><span style="color:var(--td)">${s.fn(n,!!ally)}</span>`;
   tt.style.display='block';
   const x=(e.clientX!==undefined?e.clientX:(e.touches&&e.touches[0]?e.touches[0].clientX:0));
   const y=(e.clientY!==undefined?e.clientY:(e.touches&&e.touches[0]?e.touches[0].clientY:0));
   tt.style.left=Math.min(x+12,window.innerWidth-216)+'px';
   tt.style.top=Math.min(y+14,window.innerHeight-96)+'px';
 }
-function statusTipTap(e,kind,stacks){ // touch: tap to show, tap anywhere to dismiss
+function statusTipTap(e,kind,stacks,ally){ // touch: tap to show, tap anywhere to dismiss
   if(e&&e.stopPropagation)e.stopPropagation();
-  statusTip(e,kind,stacks);
+  statusTip(e,kind,stacks,ally);
   setTimeout(()=>{document.addEventListener('click',relicTipHide,{once:true});},50);
 }
-function pipAttrs(kind,stacks){ // shared handlers for every status pip — stacks drive the computed text
-  const n=stacks||1;
-  return `style="cursor:help" onmouseenter="statusTip(event,'${kind}',${n})" onmousemove="statusTip(event,'${kind}',${n})" onmouseleave="relicTipHide()" ontouchstart="statusTipTap(event,'${kind}',${n})" onclick="event.stopPropagation();statusTipTap(event,'${kind}',${n})"`;
+function pipAttrs(kind,stacks,ally){ // shared handlers for every status pip — stacks drive the computed text
+  const n=stacks||1;const a=ally?1:0; // v714: ally flag so Poison can read as a heal under Unclean Purification
+  return `style="cursor:help" onmouseenter="statusTip(event,'${kind}',${n},${a})" onmousemove="statusTip(event,'${kind}',${n},${a})" onmouseleave="relicTipHide()" ontouchstart="statusTipTap(event,'${kind}',${n},${a})" onclick="event.stopPropagation();statusTipTap(event,'${kind}',${n},${a})"`;
 }
 function relicTipHide(){const tt=document.getElementById('relic-tooltip');if(tt)tt.style.display='none';}
 // v615: stat tooltips on training cards — same hover/tap behavior as status pips, same #relic-tooltip
@@ -1633,7 +1645,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v711'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v731'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -1650,7 +1662,7 @@ const MICTLAN_LAYERS=[
   {num:5,name:'Pancuetlacaloyán',   sub:'Place Where People Flap Like Flags',     icon:'🔥', element:'Fire · Wind',                           boss:'Malinalxochitl / Xiuhtecuhtli',available:true},
   {num:6,name:'Temiminayólan',      sub:'The Place Where Arrows Rain',            icon:'🏹', element:'Water · Human',                         boss:'Opochtli',       available:true},
   {num:7,name:'Teyōllōcuālōyān',    sub:'The Place Where Hearts Are Devoured',    icon:'🫀', element:'Nature · Day',                        boss:'Mayahuel',      available:true},
-  {num:8,name:'Apanohualóyan',      sub:'The Place of Crossing the Black Waters', icon:'🌊', element:'Water · Thunder · Human',               boss:'Xbalanque',      available:false},
+  {num:8,name:'Apanohualóyan',      sub:'The Place of Crossing the Black Waters', icon:'🌊', element:'Night · Thunder',                          boss:'Tlazoltéotl',    available:true},
   {num:9,name:'Chiconahualoyán',    sub:'The Nine Deserts — Realm of the Dead',   icon:'💀', element:'Cosmos · Night · Day · Fire',           boss:'Mictlantecuhtli',available:false},
 ];
 // nextAction is called when the Continue button is pressed
@@ -1769,11 +1781,15 @@ const GODS=[
   {id:'opochtli',name:'Opochtli',flavor:'Swift God of Fishing',element:'water',icon:'🎣',
     type:'PHYS',hp:150,atk:19,mag:0,def:11,res:8,np:38,npCost:23,
     passive:'Ueyiatl Tactics: at battle start, Opochtli and all allies gain +15% CRIT for this battle.',pk:'ueyiatlTactics',pv:.15,
-    ability:'Sinistral Minacachalli',ad:'1.2×ATK AoE (3 targets), +15% CRIT; on any crit grant ATK/MAG UP ×1 to all allies',ak:'sinistralMinacachalli',locked:true,unlockCriteria:'Conquer Temiminayólan'},
+    ability:'Sinistral Minacachalli',ad:'1.2×ATK (3 targets), +15% CRIT; on any crit grant ATK/MAG UP ×1 to all allies',ak:'sinistralMinacachalli',locked:true,unlockCriteria:'Conquer Temiminayólan'},
   {id:'mayahuel',name:'Mayahuel',flavor:'Maguey Goddess of Pulque',element:'nature',icon:'🌵',
     type:'MAG',hp:165,atk:0,mag:16,def:8,res:12,np:42,npCost:23,
     passive:'Inebriated Reverie: DRUNK on allies causes no misfires — instead each stack grants +5% ATK/MAG/DEF/RES.',pk:'inebriatedReverie',
     ability:'Octli Drench',ad:'1.5×MAG to 1 target + 10% splash to others + DRUNK ×1 to ALL enemies — as Patron, also DRUNK ×1 to ALL allies',ak:'octliDrench',locked:true,unlockCriteria:'Conquer Teyōllōcuālōyān'},
+  {id:'tlazolteotl',name:'Tlazoltéotl',flavor:'Forgiving Goddess of Filth and Lust',element:'night',icon:'🌺',
+    type:'MAG',hp:168,atk:0,mag:17,def:9,res:13,np:42,npCost:23,
+    passive:'Unclean Purification: Poison ticks HEAL your allies instead of harming them. Ally Poison can never be cleansed.',pk:'uncleanPurification',
+    ability:'She Who Eats Filth',ad:'Heal all allies 25% + cleanse + Poison ×1 to ALL enemies — as Patron, also Poison ×1 to ALL allies',ak:'sheWhoEatsFilth',locked:true,unlockCriteria:'Conquer Apanohualóyan'},
   {id:'patecatl',name:'Patecatl',flavor:'Apothecary God of Medicine',element:'humanity',icon:'🍶',
     type:'MAG',hp:160,atk:0,mag:15,def:8,res:12,np:40,npCost:22,
     passive:'Potent Treatment: All ally healing specials are +10% more effective and buffs last 1 round longer.',
@@ -2033,7 +2049,7 @@ const OBSIDIAN_EARTH_CAPS=OBSIDIAN_CAPS.filter(c=>c.element==='earth');
 const OBSIDIAN_NIGHT_CAPS=OBSIDIAN_CAPS.filter(c=>c.element==='night');
 const XIUHNEL_TPL={id:'xiuhnel',name:'Xiuhnel',flavor:'The Cloud Serpent Who Drank',icon:'🐊',isMiniBoss:true,isBoss:false,isAlly:false,element:'night',type:'PHYS',ability:'Blood Drink',ad:'1.8×ATK single + heals Xiuhnel for all damage dealt',ak:'bloodDrink',hp:330,atk:24,mag:0,def:14,res:6,np:40,npCost:29,fv:0};
 const MIMICH_TPL={id:'mimich',name:'Mimich',flavor:'The Cloud Serpent Who Ran',icon:'🐍',isMiniBoss:true,isBoss:false,isAlly:false,element:'earth',type:'PHYS',ability:'Thorn Mangle',ad:'1.5×ATK AoE + WOUND ×1 all + 15 HP Chimalli to self & Xiuhnel',ak:'thornMangle',hp:290,atk:19,mag:0,def:11,res:5,np:40,npCost:29,fv:0};
-const OPOCHTLI_TPL={id:'boss_opochtli',name:'Opochtli',flavor:'Swift God of Fishing',icon:'🎣',isBoss:true,isAlly:false,element:'water',type:'PHYS',ability:'Sinistral Minacachalli',ad:'1.2×ATK AoE (3 targets), +15% CRIT; on any crit grant ATK/MAG UP ×1 to allies',ak:'sinistralMinacachalli',hp:760,atk:31,mag:0,def:17,res:13,np:54,npCost:23,fv:0};
+const OPOCHTLI_TPL={id:'boss_opochtli',name:'Opochtli',flavor:'Swift God of Fishing',icon:'🎣',isBoss:true,isAlly:false,element:'water',type:'PHYS',ability:'Sinistral Minacachalli',ad:'1.2×ATK (3 targets), +15% CRIT; on any crit grant ATK/MAG UP ×1 to allies',ak:'sinistralMinacachalli',hp:760,atk:31,mag:0,def:17,res:13,np:54,npCost:23,fv:0};
 const ITZPAPALOTL_TPL={id:'boss_itzpap',name:'Itzpapalotl',flavor:'Warrior Goddess of Obsidian',icon:'🦋',isBoss:true,isAlly:false,element:'night',type:'MIX',magStrike:true,ability:'Obsidian Storm',ad:'1.4\xd7ATK AoE + 20% CRIT per hit',ak:'obsidianStorm',hp:620,atk:22,mag:26,def:12,res:10,np:50,npCost:22,fv:0};
 // v547 L7 MINIBOSS — bulky by design: an annoyance that snowballs (self-refilling warren) if unfocused
 const OMETOCHTLI_TPL={id:'ometochtli',name:'Ometochtli',flavor:'Leader of the Centzon Totochtin',icon:'🐇',isMiniBoss:true,isBoss:false,isAlly:false,element:'nature',type:'MAG',ability:'Drunken Revel',ad:'0.3×MAG to 6 targets + DRUNK ×2 each + summon 1 Centzon Totochtin',ak:'drunkenRevel',hp:620,atk:0,mag:26,def:14,res:13,np:50,npCost:26,fv:0};
@@ -2041,16 +2057,16 @@ const OMETOCHTLI_TPL={id:'ometochtli',name:'Ometochtli',flavor:'Leader of the Ce
 /* v708: L8 layer bosses (B5). Battle templates + specials only -- the playable god entries,
    the patron abilities (Unclean Purification / Nullifidian Rage) and Xbalanque's scripted
    round-1 replacement are all deferred until L8 scaffolding exists. Debug-testable now. */
-const TLAZOLTEOTL_BOSS_TPL={id:'boss_tlazolteotl',name:'Tlazolt\u00e9otl',flavor:'She Who Eats Filth',icon:'\u{1F33A}',isBoss:true,isAlly:false,element:'night',type:'MAG',pk:'uncleanPurification',ability:'She Who Eats Filth',ad:'Heal all allies 25% + cleanse + Poison \u00d71 to all enemies',ak:'sheWhoEatsFilth',hp:860,atk:0,mag:34,def:16,res:18,np:56,npCost:24,fv:0};
+const TLAZOLTEOTL_BOSS_TPL={id:'boss_tlazolteotl',name:'Tlazolt\u00e9otl',flavor:'Forgiving Goddess of Filth and Lust',icon:'\u{1F33A}',isBoss:true,isAlly:false,element:'night',type:'MAG',pk:'uncleanPurification',ability:'She Who Eats Filth',ad:'Heal all allies 25% + cleanse + Poison \u00d71 to all enemies \u2014 also Poison \u00d71 to her own side, where it heals instead',ak:'sheWhoEatsFilth',hp:860,atk:0,mag:34,def:16,res:18,np:56,npCost:24,fv:0};
 const XBALANQUE_BOSS_TPL={id:'boss_xbalanque',name:'Xbalanque',flavor:'Twin Jaguar God Killer',icon:'\u{1F406}',isBoss:true,isAlly:false,element:'humanity',type:'PHYS',pk:'nullifidianRage',ability:'Godbane Blowgun',ad:'0.5\u00d7ATK, 5 hits to random targets \u2014 2\u00d7 against GODS',ak:'godbaneBlowgun',hp:1020,atk:36,mag:0,def:20,res:14,np:58,npCost:25,fv:0};
 const MAYAHUEL_BOSS_TPL={id:'boss_mayahuel',name:'Mayahuel',flavor:'Maguey Goddess of Pulque',icon:'🌵',isBoss:true,isAlly:false,element:'nature',type:'MAG',pk:'inebriatedReverie',ability:'Octli Drench',ad:'1.5×MAG + 10% splash + DRUNK ×1 to ALL — her own host drinks too',ak:'octliDrench',hp:800,atk:0,mag:32,def:15,res:14,np:54,npCost:24,fv:0};
-const MICTLAMPEHECATL_TPL={id:'mictlampehecatl',name:'Mictlampehecatl',flavor:'Spirit of the Northern Wind',icon:'🌪️',isMiniBoss:true,isBoss:false,isAlly:false,element:'water',type:'MAG',ability:'Iceburn Storm',ad:'1.3×MAG AoE + Burn ×2 all',ak:'iceburnStorm',hp:480,atk:0,mag:22,def:10,res:12,np:50,npCost:29,fv:0};
+const MICTLAMPEHECATL_TPL={id:'mictlampehecatl',name:'Mictlampehecatl',flavor:'Spirit of the Northern Wind',icon:'🌪️',isMiniBoss:true,isBoss:false,isAlly:false,element:'water',type:'MAG',ability:'Iceburn Storm',ad:'1.1×MAG, 5 targets + Burn ×2 each',ak:'iceburnStorm',hp:480,atk:0,mag:22,def:10,res:12,np:50,npCost:29,fv:0};
 function ixquimilliUnlocked(){return layer4Unlocked();}
 const IXQUIMILLI_BOSS_TPL={id:'boss_ixqui',name:'Ixquimilli',flavor:'Punisher God of Ice',icon:'🧊',isBoss:true,isAlly:false,element:'water',type:'PHYS',
   ability:'Frost Macuahuitl',ad:'1.5×ATK + Wound ×1 + Lethargy ×2',ak:'frostMacuahuitl',
   hp:660,atk:28,mag:0,def:12,res:8,np:50,npCost:20,fv:0};
 // Add Mictlampehecatl capturable stats
-MINIBOSS_CAP_STATS['mictlampehecatl']={hp:170,atk:0,mag:18,def:9,res:10,np:40,npCost:34,fv:6,ability:'Iceburn Storm',ad:'1.2×MAG, 5 targets + Burn ×2 all',ak:'iceburnStorm',type:'MAG',element:'water'};
+MINIBOSS_CAP_STATS['mictlampehecatl']={hp:170,atk:0,mag:18,def:9,res:10,np:40,npCost:34,fv:6,ability:'Iceburn Storm',ad:'1.1×MAG, 5 targets + Burn ×2 each',ak:'iceburnStorm',type:'MAG',element:'water'};
 function layer3Unlocked(){return Object.keys(V).some(k=>k.startsWith('layer3_')&&V[k]);}
 function layer4Unlocked(){return Object.keys(V).some(k=>k.startsWith('layer4_')&&V[k]);}
 
@@ -2201,6 +2217,7 @@ const APANO_THUNDER_CAPS=[
   {id:'at4',name:'Tlahuilmichin',icon:'\u{1F4A1}',element:'thunder',type:'MAG',hp:120,atk:0,mag:20,def:11,res:15,np:30,npCost:17,ability:'Bioluminescent Chorus',ad:'ATK/MAG UP \u00d71 + heal 20% \u2014 all allies',ak:'bioluminescentChorus',acd:17,fv:8},
   {id:'at5',name:'Tlapetlanmichin',icon:'\u26A1',element:'thunder',type:'MAG',hp:130,atk:0,mag:24,def:12,res:12,np:29,npCost:17,ability:'Voltaic Discharge',ad:'1.5\u00d7MAG, 2 targets + Paralyze \u00d72 each',ak:'voltaicDischarge',acd:17,fv:8}
 ];
+function getApanoPool(){return[...APANO_NIGHT_CAPS,...APANO_THUNDER_CAPS];} // v715: L8 battle pool
 function getTeyolloPool(){return[...TEYOLLO_NATURE_CAPS,...TEYOLLO_DAY_CAPS];} // v554: L7 battle pool — v683: APANO_NIGHT removed (B2 accidentally injected L8 units into L7 via the shared spread edit)
 const TEMIMINA_WATER_CAPS=[
   {id:'tm1',name:'Tonina',icon:'🐬',element:'water',type:'PHYS',hp:90,atk:17,mag:0,def:7,res:6,np:22,npCost:13,ability:'Dolphin Dash',ad:'1.2×ATK to 1 + CRIT UP ×1 all allies',ak:'dolphinDash',acd:10,fv:5},
@@ -2249,10 +2266,10 @@ const IXPUXTEQUI_TPL={id:'ixpuxtequi',name:'Ixpuxtequi',flavor:'The Eagle-Footed
   ability:'Descent from the Trees',ad:'1.5\u00d7MAG to 1 target + 10% splash to all others + random status \u00d72 each',ak:'descentFromTrees',
   hp:420,atk:0,mag:27,def:16,res:11,np:52,npCost:27,fv:0};
 const NEXOXCHO_TPL={id:'nexoxcho',name:'Nexoxcho',flavor:'The Jestress Who Sows Nightmares',icon:'\u{1F0CF}',isMiniBoss:true,isBoss:false,isAlly:false,element:'thunder',type:'MAG',
-  ability:'Jestress Nightmare',ad:'1.1\u00d7MAG drain, 5 targets (+50% vs statused) \u2014 heals 20% of damage to self + Ixpuxtequi',ak:'jestressNightmare',
+  ability:'Jestress Nightmare',ad:'1.1\u00d7MAG drain, 5 targets (+50% vs statused) \u2014 heals 40% of damage to self + Ixpuxtequi',ak:'jestressNightmare',
   hp:360,atk:0,mag:29,def:10,res:15,np:52,npCost:34,fv:0}; // v707: npCost 26→34
 MINIBOSS_CAP_STATS['ixpuxtequi']={hp:245,atk:0,mag:21,def:14,res:11,np:48,npCost:34,fv:8,ability:'Descent from the Trees',ad:'1.5\u00d7MAG to 1 target + 10% splash to all others + random status \u00d72 each',ak:'descentFromTrees',type:'MAG',element:'night'};
-MINIBOSS_CAP_STATS['nexoxcho']={hp:225,atk:0,mag:22,def:10,res:14,np:48,npCost:33,fv:8,ability:'Jestress Nightmare',ad:'1.1\u00d7MAG drain, 5 targets (+50% vs statused) \u2014 heals 20% of damage to self + Ixpuxtequi',ak:'jestressNightmare',type:'MAG',element:'thunder'};
+MINIBOSS_CAP_STATS['nexoxcho']={hp:225,atk:0,mag:22,def:10,res:14,np:48,npCost:33,fv:8,ability:'Jestress Nightmare',ad:'1.1\u00d7MAG drain, 5 targets (+50% vs statused) \u2014 heals 40% of damage to self + Ixpuxtequi',ak:'jestressNightmare',type:'MAG',element:'thunder'};
 MINIBOSS_CAP_STATS['tlacateocotl']={hp:175,atk:0,mag:20,def:10,res:12,np:44,npCost:36,fv:7,ability:'Death Screech',ad:'1.4×MAG, 3 targets + destroys Chimalli + Burn ×1 + Wound ×1',ak:'deathScreech',type:'MAG',element:'wind'};
 MINIBOSS_CAP_STATS['ometochtli']={hp:188,atk:0,mag:19,def:12,res:12,np:46,npCost:34,fv:7,ability:'Drunken Revel',ad:'0.3×MAG to 6 targets + DRUNK ×2 each + summon 1 Centzon Totochtin',ak:'drunkenRevel',type:'MAG',element:'nature'};
 
@@ -2268,6 +2285,7 @@ function xiuhtecuhtliUnlocked(){return Object.keys(V).some(k=>k.startsWith('laye
 function layer5Unlocked(){return Object.keys(V).some(k=>k.startsWith('layer5_')&&V[k]);}
 function layer6Unlocked(){return Object.keys(V).some(k=>k.startsWith('layer6_')&&V[k]);}
 function layer7Unlocked(){return Object.keys(V).some(k=>k.startsWith('layer7_')&&V[k]);}
+function layer8Unlocked(){return Object.keys(V).some(k=>k.startsWith('layer8_')&&V[k]);} // v715
 // Tecpatl Penance unlocks after clearing the deepest layer. Bump TECPATL_UNLOCK_LAYER by 1 each time a
 // new layer ships (L6→6, L7→7, … capped at 9). Relies on the layerN_<god> completion-flag convention.
 const TECPATL_UNLOCK_LAYER=5;
@@ -2294,6 +2312,13 @@ const STORY_LINES_L7=[
   "A woman waits at the forest's heart, crowned in maguey leaves, a cup in her hand.",
   "Mayahuel, mother of the four hundred rabbits, raises it to you — and drinks.",
 ];
+const GOD_ENDINGS_L8={
+  _default:["Tlazoltéotl opens her arms and the black water goes still.",
+    "\"Give it here,\" she says. \"All of it. The rot you carried down eight hells.\"",
+    "She eats it, and does not flinch, and is not diminished.",
+    "The <strong class='teotl'>TEOTL</strong> of the filth-eater settles into you \u2014 not a weight, but the absence of one.",
+    "Eight layers crossed. The black water carries you up, and Mictlan lets you go."]
+};
 const GOD_ENDINGS_L7={
   tonatiuh:["Mayahuel lowers her cup and looks at the Fifth Sun a long moment. \"You. Still walking. Still searching.\"","\"I know what you hunt,\" she says. \"The one who will carry the light after you. You will not find them in a hell. You will find them in someone who chooses to walk out.\"","Tonatiuh is quiet. Then, softly: \"Then I will keep walking until they do.\"","The <strong class='teotl'>TEOTL</strong> of the drunkards’ heaven warms in his chest. The search for the <strong class='teotl'>SIXTH SUN</strong> goes on."],
   _default:["Mayahuel lowers her cup and studies you a long moment. \"You fought through seven hells to reach my forest. Most only wanted out.\"","She presses a gourd into your hands. \"There is a pulque worth brewing — the perfect one. But its ingredients are scattered through Mictlan's deepest places, and I cannot walk there anymore.\"","The <strong class='teotl'>TEOTL</strong> of the maguey goddess flows into you, sweet and binding — a pact, not a prize. Bring her obsidian honey, frost-agave, ember-salt, and the sap of the drowned maguey.","Seven layers conquered, and a quest begun. The heart-eaters go hungry tonight; the perfect pulque waits to be poured."],
@@ -2378,7 +2403,8 @@ function affinityMaxNativeLayer(){
   if(layer5Unlocked())m=Math.max(m,5);
   if(layer6Unlocked())m=Math.max(m,6); // v573
   if(layer7Unlocked())m=Math.max(m,7); // v573
-  return Math.min(7,m);
+  if(layer8Unlocked())m=Math.max(m,8); // v715
+  return Math.min(8,m);
 }
 function affinityElemPool(elem){
   const maxNL=affinityMaxNativeLayer();
@@ -2500,6 +2526,22 @@ function dbgSetupTestRun(lv){
   });
   GODS.forEach(function(g){markV(g.id);markV('layer2_'+g.id);markV('layer3_'+g.id);markV('layer4_'+g.id);markV('layer6_'+g.id);});
   G.dte=getDTEffects();smartAutoSel();
+}
+/* v715: wipe a god's unlock so the "New Patron Unlocked!" sequence can be re-tested.
+   The unlock predicates (layer7Unlocked / layer8Unlocked) scan for ANY layerN_<god> flag,
+   so every flag for that layer has to go, plus the god's own presence flag. */
+const RELOCK_MAP={tlazolteotl:{layer:8,label:'Tlazoltéotl'},mayahuel:{layer:7,label:'Mayahuel'}};
+function dbgRelockGod(id){
+  const m=RELOCK_MAP[id];
+  if(!m){notify('Unknown god: '+id,'#e05050');return;}
+  const pre='layer'+m.layer+'_';
+  const killed=Object.keys(V).filter(k=>k.startsWith(pre)||k===id);
+  if(!killed.length){notify(m.label+' is already locked','#e0a040');return;}
+  killed.forEach(k=>{delete V[k];});
+  saveV();
+  if(G&&G._preRunV)m.layer&&Object.keys(G._preRunV).filter(k=>k.startsWith(pre)).forEach(k=>{delete G._preRunV[k];});
+  notify('🔒 '+m.label+' re-locked ('+killed.length+' flags cleared)','#a070c0');
+  if(typeof renderGods==='function'&&document.getElementById('god-grid'))renderGods();
 }
 function debugCustomBattle(){
   if(!G.god){var _tl=G._dbgPartyLv||20;dbgSetupTestRun(_tl);G._dbgBattleList=[];G._dbgBattleLv=20;notify('🧪 Test party ready: Lv'+_tl+', all units unlocked','#a070c0');}
@@ -2930,7 +2972,7 @@ function initG(){
 // saved; resuming lands at the start of the current battle. Meta (DT/V) is separate.
 const RUN_SAVE_VERSION=1;
 const RUN_SKIP=new Set(['units','enemies','log','battlePhase','roundNum','roundQueue','qIdx',
-  'actedIds','nextRoundSlowIds','thisRoundSlowTail','slowedThisRound','tecpatl','tecpatl_mods',
+  'actedIds','nextRoundSlowIds','thisRoundSlowTail','slowedThisRound',
   '_tecpatlSeen','_contFn','currentEvent','_xochipilliEventFight','_slowedUnits','selectedActorId',
   'pendingAction','captureTargets','captureQueue','capActive','_capturePending','_actingEnemy',
   '_targetedAllyId','_animQueue','_unitStates','captureProcessed','spoils',
@@ -3072,6 +3114,9 @@ function offeringPriceMult(){
 function capKey(cu){return cu._captureId||cu.id;}
 // Checks if a patron passive is active — covers both native and oblated
 function hasPassive(pk){return (G.god&&G.god.pk===pk)||(G._oblationPk===pk);}
+/* v729: enemy-side patron passives. Boss templates carry a pk (e.g. Tlazolteotl's
+   uncleanPurification); hasPassive is player-only, so this is the mirror. */
+function bossHasPassive(pk){return (G.enemies||[]).some(e=>e&&e.currentHp>0&&e.pk===pk);}
 // Returns effective patron passive key — may be overridden by Sacred Oblation
 function effectivePk(){return G._oblationPk||G.god?.pk||'';}
 function effectivePv(){return G._oblationPk?G._oblationPv:(G.god?.pv||0);}
@@ -3560,7 +3605,16 @@ function tplById(id){
 }
 function liveAd(u){ // live ability description, falling back to the stored copy for gods/mercs/summons
   if(!u)return '';
-  const t=tplById(u.baseId||u.id);
+  const bid=u.baseId||u.id;
+  /* v718: a CAPTURED miniboss is rebalanced through MINIBOSS_CAP_STATS, but tplById() returns its
+     BOSS-fight template -- so the roster card was quoting the boss numbers (Mictlampehecatl read
+     "1.3xMAG AoE ... all" while actually casting 1.2xMAG at 5 targets). Prefer the capture copy.
+     Guarded on !isMiniBoss/!isBoss so the live boss card still shows its own text. */
+  if(typeof MINIBOSS_CAP_STATS!=='undefined'&&!u.isMiniBoss&&!u.isBoss){
+    const cs=MINIBOSS_CAP_STATS[bid];
+    if(cs&&cs.ad)return cs.ad;
+  }
+  const t=tplById(bid);
   return (t&&t.ad)||u.ad||'';
 }
 // v661: Jumping Beans biases Patolli Gamble. Faces 5-6 weighted x1.25, faces 1-2 weighted x0.75.
@@ -3770,9 +3824,9 @@ function runStory(overrideLines){
   const subEl=document.getElementById('story-subtitle');
   const iconEl=document.getElementById('story-icon');
   const btnEl=document.getElementById('story-btn');
-  if(codexEl)codexEl.textContent=G.layer===7?'CODEX VII: TEYŌLLŌCUĀLŌYĀN':G.layer===6?'CODEX VI: TEMIMINAYÓLAN':isL5?'CODEX V: PANCUETLACALOYÁN':isL4?'CODEX IV: CEHUÉLŌYĀN':isL3?'CODEX III: ITZTÉPETL':isL2?'CODEX II: TEPEME MONAMICTLAN':'CODEX I: MICTLAN'; // v579: L6/L7 fell through to L1
-  if(titleEl)titleEl.textContent=G.layer===7?'Teyōllōcuālōyān':G.layer===6?'Temiminayólan':isL5?'Pancuetlacaloyán':isL4?'Cehuélōyān':isL3?'Itztépetl':isL2?'Tepeme Monamictlan':'Itzucuintlan'; // v579
-  if(subEl)subEl.textContent=isL5?'"Place Where People Flap Like Flags"':G.layer===7?'"The Place Where Hearts Are Devoured"':G.layer===6?'"The Place Where Arrows Rain"':isL4?'"Place with a Lot of Snow"':isL3?'"The Obsidian Mountain"':isL2?'"The Place Where the Mountains Clash"':'"The Place Where the Dog Lives"';
+  if(codexEl)codexEl.textContent=G.layer===8?'CODEX VIII: APANOHUALÓYAN':G.layer===7?'CODEX VII: TEYŌLLŌCUĀLŌYĀN':G.layer===6?'CODEX VI: TEMIMINAYÓLAN':isL5?'CODEX V: PANCUETLACALOYÁN':isL4?'CODEX IV: CEHUÉLŌYĀN':isL3?'CODEX III: ITZTÉPETL':isL2?'CODEX II: TEPEME MONAMICTLAN':'CODEX I: MICTLAN'; // v579: L6/L7 fell through to L1
+  if(titleEl)titleEl.textContent=G.layer===8?'Apanohualóyan':G.layer===7?'Teyōllōcuālōyān':G.layer===6?'Temiminayólan':isL5?'Pancuetlacaloyán':isL4?'Cehuélōyān':isL3?'Itztépetl':isL2?'Tepeme Monamictlan':'Itzucuintlan'; // v579
+  if(subEl)subEl.textContent=isL5?'"Place Where People Flap Like Flags"':G.layer===8?'"The Place of Crossing the Black Waters"':G.layer===7?'"The Place Where Hearts Are Devoured"':G.layer===6?'"The Place Where Arrows Rain"':isL4?'"Place with a Lot of Snow"':isL3?'"The Obsidian Mountain"':isL2?'"The Place Where the Mountains Clash"':'"The Place Where the Dog Lives"';
   if(iconEl)iconEl.textContent=isL4?'🧊':isL3?'🦋':isL2?'⛰':'🌒';
   if(btnEl){btnEl.disabled=true;btnEl.textContent=isL4?'Enter Cehuélōyān →':isL3?'Enter Itztépetl →':isL2?'Enter the Mountain →':'Enter Itzucuintlan →';}
   // Animate text on first ever run; show all at once on repeats
@@ -3790,7 +3844,7 @@ function runStory(overrideLines){
 // Simplified ability descriptions for god selection screen (no damage formulas)
 const GOD_SELECT_DESC={
   quetzalcoatl:{passive:'Divinity Mercy: All captures grant +20% bonus resources',ability:'Feather Embrace',ad:'1.5×MAG to 1 target — if fatal, auto-captures with 2.2× resources'},
-  opochtli:{passive:'Ueyiatl Tactics: Opochtli & all allies +15% CRIT at battle start',ability:'Sinistral Minacachalli',ad:'1.2×ATK AoE (3 targets), +15% CRIT; on any crit grant ATK/MAG UP ×1 to all allies'},
+  opochtli:{passive:'Ueyiatl Tactics: Opochtli & all allies +15% CRIT at battle start',ability:'Sinistral Minacachalli',ad:'1.2×ATK (3 targets), +15% CRIT; on any crit grant ATK/MAG UP ×1 to all allies'},
   mayahuel:{passive:'Inebriated Reverie: ally DRUNK never misfires — each stack grants +5% ATK/MAG/DEF/RES',ability:'Octli Drench',ad:'1.5×MAG to 1 + 10% splash + DRUNK ×1 to ALL enemies — as Patron, also ALL allies'},
   tlaloc:{passive:"Endless Torrent: All <span class='elem-badge elem-water'>💧 Water</span> units in party +15% ATK/MAG at battle start",ability:'Tlalocan Deluge',ad:'1.35×MAG, hits up to 4 targets — first kill rises a Tlaloque ally'},
   coatlicue:{passive:'Snake Skirt: The lowest HP ally gains 20 HP Chimalli shield at battle start',ability:'Ophidian Mother',ad:'Heal all allies 25% HP + Cleanse +10 HP Chimalli to lowest HP ally'},
@@ -3903,11 +3957,11 @@ function renderGods(){
     }else{tlacuiloBanner.style.display='none';}
   }
   // Progressive locked god reveal: show 2 on fresh save, +1 per god unlocked (beyond first 4)
-  const unlockedCount=GODS.filter(gd=>!((gd.id==='xolotl'&&gd.locked&&!xolUnlocked())||(gd.id==='tepeyollotl'&&gd.locked&&!layer2Unlocked())||(gd.id==='itzpapalotl'&&gd.locked&&!layer3Unlocked())||(gd.id==='chicomecoatl'&&gd.locked&&!chicomecoatlUnlocked())||(gd.id==='mixcoatl'&&gd.locked&&!mixcoatlUnlocked())||(gd.id==='xochipilli'&&gd.locked&&!xochipilliUnlocked())||(gd.id==='ixquimilli'&&gd.locked&&!ixquimilliUnlocked())||(gd.id==='tonatiuh'&&gd.locked&&!tonatiuhUnlocked())||(gd.id==='malinalxochitl'&&gd.locked&&!malinalxochitlUnlocked())||(gd.id==='xiuhtecuhtli'&&gd.locked&&!xiuhtecuhtliUnlocked())||(gd.id==='patecatl'&&gd.locked&&!patecatlUnlocked())||(gd.id==='cihuacoatl'&&gd.locked&&!cihuacoatlUnlocked())||(gd.id==='opochtli'&&gd.locked&&!layer6Unlocked())||(gd.id==='mayahuel'&&gd.locked&&!layer7Unlocked()))).length;
+  const unlockedCount=GODS.filter(gd=>!((gd.id==='xolotl'&&gd.locked&&!xolUnlocked())||(gd.id==='tepeyollotl'&&gd.locked&&!layer2Unlocked())||(gd.id==='itzpapalotl'&&gd.locked&&!layer3Unlocked())||(gd.id==='chicomecoatl'&&gd.locked&&!chicomecoatlUnlocked())||(gd.id==='mixcoatl'&&gd.locked&&!mixcoatlUnlocked())||(gd.id==='xochipilli'&&gd.locked&&!xochipilliUnlocked())||(gd.id==='ixquimilli'&&gd.locked&&!ixquimilliUnlocked())||(gd.id==='tonatiuh'&&gd.locked&&!tonatiuhUnlocked())||(gd.id==='malinalxochitl'&&gd.locked&&!malinalxochitlUnlocked())||(gd.id==='xiuhtecuhtli'&&gd.locked&&!xiuhtecuhtliUnlocked())||(gd.id==='patecatl'&&gd.locked&&!patecatlUnlocked())||(gd.id==='cihuacoatl'&&gd.locked&&!cihuacoatlUnlocked())||(gd.id==='opochtli'&&gd.locked&&!layer6Unlocked())||(gd.id==='mayahuel'&&gd.locked&&!layer7Unlocked())||(gd.id==='tlazolteotl'&&gd.locked&&!layer8Unlocked()))).length; // v716: grid had its own chain — Tlazolteotl was missing
   const maxLockedVisible=Math.min(8,2+Math.max(0,unlockedCount-4));
   let lockedShown=0;
   GODS.forEach(gd=>{
-    const locked=(gd.id==='xolotl'&&gd.locked&&!xolUnlocked())||(gd.id==='tepeyollotl'&&gd.locked&&!layer2Unlocked())||(gd.id==='itzpapalotl'&&gd.locked&&!layer3Unlocked())||(gd.id==='chicomecoatl'&&gd.locked&&!chicomecoatlUnlocked())||(gd.id==='mixcoatl'&&gd.locked&&!mixcoatlUnlocked())||(gd.id==='xochipilli'&&gd.locked&&!xochipilliUnlocked())||(gd.id==='ixquimilli'&&gd.locked&&!ixquimilliUnlocked())||(gd.id==='tonatiuh'&&gd.locked&&!tonatiuhUnlocked())||(gd.id==='malinalxochitl'&&gd.locked&&!malinalxochitlUnlocked())||(gd.id==='xiuhtecuhtli'&&gd.locked&&!xiuhtecuhtliUnlocked())||(gd.id==='patecatl'&&gd.locked&&!patecatlUnlocked())||(gd.id==='cihuacoatl'&&gd.locked&&!cihuacoatlUnlocked())||(gd.id==='opochtli'&&gd.locked&&!layer6Unlocked())||(gd.id==='mayahuel'&&gd.locked&&!layer7Unlocked());
+    const locked=(gd.id==='xolotl'&&gd.locked&&!xolUnlocked())||(gd.id==='tepeyollotl'&&gd.locked&&!layer2Unlocked())||(gd.id==='itzpapalotl'&&gd.locked&&!layer3Unlocked())||(gd.id==='chicomecoatl'&&gd.locked&&!chicomecoatlUnlocked())||(gd.id==='mixcoatl'&&gd.locked&&!mixcoatlUnlocked())||(gd.id==='xochipilli'&&gd.locked&&!xochipilliUnlocked())||(gd.id==='ixquimilli'&&gd.locked&&!ixquimilliUnlocked())||(gd.id==='tonatiuh'&&gd.locked&&!tonatiuhUnlocked())||(gd.id==='malinalxochitl'&&gd.locked&&!malinalxochitlUnlocked())||(gd.id==='xiuhtecuhtli'&&gd.locked&&!xiuhtecuhtliUnlocked())||(gd.id==='patecatl'&&gd.locked&&!patecatlUnlocked())||(gd.id==='cihuacoatl'&&gd.locked&&!cihuacoatlUnlocked())||(gd.id==='opochtli'&&gd.locked&&!layer6Unlocked())||(gd.id==='mayahuel'&&gd.locked&&!layer7Unlocked())||(gd.id==='tlazolteotl'&&gd.locked&&!layer8Unlocked()); // v716
     const chosen=G.god&&G.god.id===gd.id;
     const d=document.createElement('div');
     d.className='god-card'+(chosen?' chosen':'')+(locked?' locked':'');
@@ -4077,14 +4131,16 @@ function eCntL4(bn){return eCntL3(bn);} // same count, difficulty from higher st
 function eCntL5(bn){if(bn<3)return 4;return eCntL3(bn);} // v496: B1-2 base 4 (Hard 5)
 function eCntL6(bn){return eCntL3(bn)+1;} // v496: +1 across L6 regulars (B1-2:4,B3-4:5,B6-7:6)
 function eLvL6(bn){var T={1:48,2:49,3:50,4:51,5:55,6:56,7:58,8:60};return (T[bn]||48)+(getTecpatlEffects().enemyLvBonus||0);} // L6 explicit per-battle level table + Tecpatl
+function eLvL8(bn){var T={1:76,2:77,3:78,4:79,5:83,6:84,7:86,8:88};return (T[bn]||76)+(getTecpatlEffects().enemyLvBonus||0);} // v715: L8 table, +14 over L7 (matches the L6->L7 step)
+function eCntL8(bn){return eCntL7(bn)+1;} // v725: +1 enemy across all L8 regulars (was = L6/L7 schedule)
 function eCntL7(bn){return eCntL6(bn);} // v554: L7 reuses the L6 count schedule (B1-2:4,B3-4:5,B6-7:6)
 function eLvL7(bn){var T={1:62,2:63,3:64,4:65,5:69,6:70,7:72,8:74};return (T[bn]||62)+(getTecpatlEffects().enemyLvBonus||0);} // v554: L7 per-battle level table (locked design) + Tecpatl
 function layerLvBonus(){
-  const isL2=G.layer===2,isL3=G.layer===3,isL4=G.layer===4,isL5=G.layer===5,isL6=G.layer===6,isL7=G.layer===7,post=G.battleNum>5;
+  const isL2=G.layer===2,isL3=G.layer===3,isL4=G.layer===4,isL5=G.layer===5,isL6=G.layer===6,isL7=G.layer===7,isL8=G.layer===8,post=G.battleNum>5; // v721: isL8
   const tp=getTecpatlEffects();
   // v340 balance pass: gentler late-layer curve. Per-layer base +9/+18/+26/+35; +1 post-midboss.
   // Resulting start / miniboss(B5) / boss(B8): L1 1/5/10 · L2 10/14/19 · L3 19/23/28 · L4 27/31/36 · L5 36/40/45.
-  return (isL2?9:0)+(isL3?18:0)+(isL4?26:0)+(isL5?35:0)+(isL6?44:0)+(isL7?53:0)+(post?1:0)+(G.layer>=3?1:0)+(G.layer>=4?2:0)+(tp.enemyLvBonus||0); // v387: +1 past L2, +2 more past L3 (stacked)
+  return (isL2?9:0)+(isL3?18:0)+(isL4?26:0)+(isL5?35:0)+(isL6?44:0)+(isL7?53:0)+(isL8?67:0)+(post?1:0)+(G.layer>=3?1:0)+(G.layer>=4?2:0)+(tp.enemyLvBonus||0); // v387: +1 past L2, +2 more past L3 (stacked)
 }
 
 function buildEnemySet(bn,diff){
@@ -4094,11 +4150,26 @@ function buildEnemySet(bn,diff){
   const isL5=G.layer===5;
   const isL6=G.layer===6;
   const isL7=G.layer===7;
-  const capPool=isL7?getTeyolloPool():isL6?getTeminamPool().filter(c=>c.id!=='tm1'):isL5?getPANCUETPool():isL4?getCEHUPool():isL3?[...OBSIDIAN_CAPS,...getNatureCaps()]:isL2?[...TEPEME_CAPS,...getNatureCaps()]:getL1BattlePool(); // v328: one event pool per battle
+  const isL8=G.layer===8; // v715
+  const capPool=isL8?getApanoPool():isL7?getTeyolloPool():isL6?getTeminamPool().filter(c=>c.id!=='tm1'):isL5?getPANCUETPool():isL4?getCEHUPool():isL3?[...OBSIDIAN_CAPS,...getNatureCaps()]:isL2?[...TEPEME_CAPS,...getNatureCaps()]:getL1BattlePool(); // v328: one event pool per battle
 
   if(bn===5){
     const lv=eLv(bn)+layerLvBonus()+hardLvBonus();const hs=diffHpMult(diff);
     const tp5=getTecpatlEffects();const bHpM=tp5.bossHpMult||1.0;
+    if(isL8){
+      // v715: L8 B5 -- the duo. Ixpuxtequi blankets statuses, Nexoxcho converts them to sustain.
+      const lv8=eLvL8(5)+hardLvBonus();
+      const mk8=(tpl,idx,hpM)=>{const mh=Math.round(sc(tpl.hp||0,lv8)*hs*bHpM*(hpM||1));const mn=Math.round(sc(tpl.np||50,lv8));
+        return{...tpl,id:tpl.id+'_5_'+idx,baseId:tpl.id,maxHp:mh,currentHp:mh,
+          atk:Math.round(sc(tpl.atk||0,lv8)*(diff==='hard'?1.1:1)),mag:Math.round(sc(tpl.mag||0,lv8)*(diff==='hard'?1.1:1)),
+          def:Math.round(sc(tpl.def||0,lv8)),res:Math.round(sc(tpl.res||0,lv8)),
+          maxNP:mn,currentNP:mn,enemyLevel:lv8,isAlly:false};};
+      const duo=[mk8(IXPUXTEQUI_TPL,0),mk8(NEXOXCHO_TPL,1)];
+      const escPool=getApanoPool();
+      const esc=[];
+      for(let i=0;i<3;i++){const c=escPool[Math.floor(Math.random()*escPool.length)];esc.push(mkEnemy(c,i+2,0.9,lv8));}
+      return[...duo,...esc.filter(Boolean)];
+    }
     if(isL7){
       // v554: L7 B5 — Ometochtli + 4 Centzon Totochtin (locked design §5). Bulky leader, self-refilling warren.
       const lv7=eLvL7(5)+hardLvBonus();
@@ -4195,6 +4266,20 @@ function buildEnemySet(bn,diff){
   }
   if(bn===8){
     const lv=eLv(bn)+layerLvBonus();
+    if(isL8){
+      // v715: L8 B8 -- Tlazolteotl + a NIGHT/THUNDER honour guard. Xbalanque's scripted
+      // round-1 replacement is NOT wired yet (deferred: highest-risk item in the layer).
+      const lv8=eLvL8(8)+hardLvBonus();const tp8=getTecpatlEffects();const bHpM8=tp8.bossHpMult||1.0;
+      const bh8=Math.round(sc(TLAZOLTEOTL_BOSS_TPL.hp||0,lv8)*diffHpMult(diff)*bHpM8);
+      const bn8=Math.round(sc(TLAZOLTEOTL_BOSS_TPL.np||56,lv8));
+      const boss8={...TLAZOLTEOTL_BOSS_TPL,id:'boss_tlazolteotl_8',maxHp:bh8,currentHp:bh8,
+        atk:0,mag:Math.round(sc(TLAZOLTEOTL_BOSS_TPL.mag||0,lv8)*(diff==='hard'?1.1:1)),
+        def:Math.round(sc(TLAZOLTEOTL_BOSS_TPL.def||0,lv8)),res:Math.round(sc(TLAZOLTEOTL_BOSS_TPL.res||0,lv8)),
+        maxNP:bn8,currentNP:bn8,enemyLevel:lv8,isAlly:false};
+      const gp=getApanoPool();const guard=[];
+      for(let i=0;i<7;i++){const c=gp[Math.floor(Math.random()*gp.length)];guard.push(mkEnemy(c,i+1,0.95,lv8));} // v728: 4->7 honour guard
+      return[boss8,...guard.filter(Boolean)];
+    }
     if(isL7){
       // v554: L7 B8 — Mayahuel + escort-scaled Ometochtli + Tepoztecatl + Tezcatzoncatl + Colhuatzincatl
       // (locked design §6.4: the family finale — healer + drunk-buffer feed the enemy Reverie mirror)
@@ -4338,9 +4423,9 @@ function buildEnemySet(bn,diff){
         mkEnemy(_mt1,3,1.1,lv)]; // v341: escort HP ×1.2→1.1
     }
   }
-  const bc=isL7?eCntL7(bn):isL6?eCntL6(bn):isL5?eCntL5(bn):isL4?eCntL4(bn):isL3?eCntL3(bn):isL2?eCntL2(bn):eCnt(bn),bl=isL7?eLvL7(bn):isL6?eLvL6(bn):eLv(bn)+layerLvBonus();
+  const bc=isL8?eCntL8(bn):isL7?eCntL7(bn):isL6?eCntL6(bn):isL5?eCntL5(bn):isL4?eCntL4(bn):isL3?eCntL3(bn):isL2?eCntL2(bn):eCnt(bn),bl=isL8?eLvL8(bn):isL7?eLvL7(bn):isL6?eLvL6(bn):eLv(bn)+layerLvBonus();
   let count,lv,hs;
-  const maxCnt=(!isL3&&!isL4&&!isL5&&!isL6&&!isL7)?4:((isL3&&bn<5)?4:((isL6||isL7)?6:5)); // v326: L2 capped at 4; v327: L3 pre-midboss capped at 4
+  const maxCnt=(!isL3&&!isL4&&!isL5&&!isL6&&!isL7&&!isL8)?4:((isL3&&bn<5)?4:(isL8?7:(isL6||isL7)?6:5)); // v326: L2 capped at 4; v327: L3 pre-midboss capped at 4; v725: L8 cap 6->7
   // v658: easy gains +1 enemy (was bc-1, now bc) — the old single-enemy L1 opener taught nothing
   // and paid nothing. Hard's bespoke HP curve is replaced by easy's curve x the per-layer ratio,
   // so HARD_HP_BY_LAYER is the single source of truth for the difficulty gap.
@@ -4526,17 +4611,17 @@ function renderDeploy(){
   const isL2=G.layer===2;
   const isL3=G.layer===3;
   const isL4=G.layer===4;
-  const layerName=G.layer===7?'Teyōllōcuālōyān':G.layer===6?'Temiminayólan':G.layer===5?'Pancuetlacaloyán':isL4?'Cehuélōyān':isL3?'Itztépetl':isL2?'Tepeme Monamictlan':'Itzucuintlan'; // v692: L5 case was missing — fell through to Itzucuintlan
+  const layerName=G.layer===8?'Apanohualóyan':G.layer===7?'Teyōllōcuālōyān':G.layer===6?'Temiminayólan':G.layer===5?'Pancuetlacaloyán':isL4?'Cehuélōyān':isL3?'Itztépetl':isL2?'Tepeme Monamictlan':'Itzucuintlan'; // v692: L5 case was missing — fell through to Itzucuintlan
   const isL5=G.layer===5;
   const chosenBossName=isL5?(G.l5BossChoice==='xiuhtecuhtli'?'Xiuhtecuhtli':'Malinalxochitl'):'?';
-  const bossName=isL5?(G.l5BossChoice?chosenBossName+' Awaits':'Make your choice'):G.layer===7?'Mayahuel Awaits':G.layer===6?'Opochtli Awaits':isL4?'Ixquimilli Awaits':isL3?'Itzpapalotl Awaits':isL2?'Tepeyollotl Awaits':'Xolotl Awaits'; // v342: don't name a boss before the player picks
-  const mbName=isL5?'Battle 5 — Tlacateocotl Approaches':G.layer===7?'Battle 5 — Ometochtli & the Warren':G.layer===6?'Battle 5 — Demigods of the Shore':isL4?'Battle 5 — Mictlampehecatl':isL3?'Battle 5 — Xiuhnel & Mimich':isL2?'Battle 5 — Quinametzin Stirs':'Battle 5 — Xochitonal Approaches';
+  const bossName=isL5?(G.l5BossChoice?chosenBossName+' Awaits':'Make your choice'):G.layer===8?'Tlazoltéotl Awaits':G.layer===7?'Mayahuel Awaits':G.layer===6?'Opochtli Awaits':isL4?'Ixquimilli Awaits':isL3?'Itzpapalotl Awaits':isL2?'Tepeyollotl Awaits':'Xolotl Awaits'; // v342: don't name a boss before the player picks
+  const mbName=isL5?'Battle 5 — Tlacateocotl Approaches':G.layer===8?'Battle 5 — Ixpuxtequi & Nexoxcho':G.layer===7?'Battle 5 — Ometochtli & the Warren':G.layer===6?'Battle 5 — Demigods of the Shore':isL4?'Battle 5 — Mictlampehecatl':isL3?'Battle 5 — Xiuhnel & Mimich':isL2?'Battle 5 — Quinametzin Stirs':'Battle 5 — Xochitonal Approaches';
   let title=`Battle ${G.battleNum}`;
   if(G.battleNum===8)title=`Final Battle — ${bossName}`;
   else if(G.battleNum===5)title=mbName;
   document.getElementById('deploy-title').textContent=title;
   const subEl=document.querySelector('#screen-deploy p');
-  const layerSub=isL5?'"Place Where People Flap Like Flags"':G.layer===7?'"The Place Where Hearts Are Devoured"':G.layer===6?'"The Place Where Arrows Rain"':isL4?'"Place with a Lot of Snow"':isL3?"The Obsidian Mountain":isL2?"Place Where the Mountains Clash":"Place Where the Dog Lives";
+  const layerSub=isL5?'"Place Where People Flap Like Flags"':G.layer===8?'"The Place of Crossing the Black Waters"':G.layer===7?'"The Place Where Hearts Are Devoured"':G.layer===6?'"The Place Where Arrows Rain"':isL4?'"Place with a Lot of Snow"':isL3?"The Obsidian Mountain":isL2?"Place Where the Mountains Clash":"Place Where the Dog Lives";
   if(subEl)subEl.textContent=`${layerName} · ${layerSub}`;
   if(G.battleNum===8){
     if(isL5&&!G.l5BossChoice){
@@ -5487,6 +5572,7 @@ function evUPochteca(el){
     if(g.id==='cihuacoatl'&&g.locked&&!cihuacoatlUnlocked())return false;
     if(g.id==='opochtli'&&g.locked&&!layer6Unlocked())return false;
     if(g.id==='mayahuel'&&g.locked&&!layer7Unlocked())return false;
+    if(g.id==='tlazolteotl'&&g.locked&&!layer8Unlocked())return false; // v715
     return true;
   });
   const noOffer=partyFull||!canCacao||!eligible.length;
@@ -6904,13 +6990,20 @@ function animateBuff(unitId,label){
 
 function resolveStatusAfterAction(unit){
   if(unit.currentHp<=0)return;
-  // POISON — 10% per stack
+  // POISON — 5% of maxHP per stack (the '10%' in the old comment and the tutorial blurb are stale)
   if((unit.poisonStacks||0)>0){
-    const dmg=Math.round(unit.maxHp*0.05*unit.poisonStacks);
-    unit.currentHp=Math.max(0,unit.currentHp-dmg);
-    animateStatusPop(unit.id,'☠ −'+dmg,'#70c040'); // v318: visible tick — paralysis+poison no longer reads as sudden death
-    addLog(`<span class="log-poison">☠ ${unit.icon} ${unit.name}: Poison ×${unit.poisonStacks} → -${dmg} HP</span>`);
-    if(unit.currentHp<=0){handleDeath(unit);return;}
+    const amt=Math.round(unit.maxHp*0.05*unit.poisonStacks);
+    if(unit.isAlly?hasPassive('uncleanPurification'):bossHasPassive('uncleanPurification')){ // v712/v729: Unclean Purification — the tick heals instead (either side)
+      const _b=unit.currentHp;unit.currentHp=Math.min(unit.maxHp,unit.currentHp+amt);
+      const _g=unit.currentHp-_b;
+      if(_g>0){animateStatusPop(unit.id,'🌺 +'+_g,'#50e090'); // v714: was pink — read as damage
+        addLog(`<span class="log-heal">🌺 ${unit.icon} ${unit.name}: Poison ×${unit.poisonStacks} → +${_g} HP</span>`);}
+    }else{
+      unit.currentHp=Math.max(0,unit.currentHp-amt);
+      animateStatusPop(unit.id,'☠ −'+amt,'#70c040'); // v318: visible tick — paralysis+poison no longer reads as sudden death
+      addLog(`<span class="log-poison">☠ ${unit.icon} ${unit.name}: Poison ×${unit.poisonStacks} → -${amt} HP</span>`);
+      if(unit.currentHp<=0){handleDeath(unit);return;}
+    }
   }
   // BURN — ATK penalty only (handled in strikeDmg via burnStacks); no HP tick
   // burn stacks reduce damage dealt but don't cause HP loss directly
@@ -7230,7 +7323,7 @@ function isAoeOrAutoSpecial(actor){
   // v535: oblated specials route on the oblated ak, so a single-target oblated special
   // (e.g. a patron holding Cihuacoatl's kit) no longer forces the AoE/auto path.
   const ak=(actor.isGod&&G._useOblationSpecial&&G._oblationAk)?G._oblationAk:(gd?.ak||'');const ab=actor.ability||'';
-  if(actor.isGod)return['deluge','ophidianMother','cripplingShock','obsidianStorm','holyHarvest','patolliGamble','miseryBlizzard','torridTornado','torridTornadoBoss','peyoteConcoction','sinistralMinacachalli','cihuateteoFury'].includes(ak);
+  if(actor.isGod)return['deluge','ophidianMother','cripplingShock','obsidianStorm','holyHarvest','patolliGamble','miseryBlizzard','torridTornado','torridTornadoBoss','peyoteConcoction','sheWhoEatsFilth','sinistralMinacachalli','cihuateteoFury'].includes(ak); // v713: sheWhoEatsFilth is a party heal — it was falling through to the targeted path
   const aoeOrAuto=new Set(['Searing Stings','Writhing Bloom','Filthwater Plume','Drowning Grasp','Chitin Shell','Colony Sting','Voltaic Discharge','Bioluminescent Chorus','Jestress Nightmare','Atlatl Rush','Howling Gust','Magma Burst','Septic Howl','Murk','Thunder Crash','Collapse','Tremor','Death Bloom','Dark Waters','Earth Bloom','Gust Mend','Storm Mend',
     'Pollen Burst','Withering Touch','Uapantotli','Coil Crush','Toxic Bloom','Feeding Frenzy','Arrow Rain','Net Cast','Trident Lunge','Healing Rite','Mystical Shots','Surging Tide',
     'Craft Shard','Biting Draft','Permafrost','Iceburn Storm','Howling Chill','Burrow Mend','Ball Strike','Sun Dive','Sacred Arrow','Toxic Exhaust','Prism Volley','Solar Pounce',
@@ -7504,7 +7597,7 @@ function resolveCap(enemyId,doCapture){
   const dead=G.enemies.find(u=>u.id===enemyId);
   document.getElementById('cap-area').innerHTML='';
   const allCaps=[...MICTLAN_CAPS,...TEPEME_CAPS,...OBSIDIAN_CAPS,...NATURE_CAPS,...HUMANITY_CAPS,...CEHUYLOAN_WATER_CAPS,...CEHUYLOAN_WIND_CAPS,...TONATIUH_DAY_CAPS,...PANCUET_FIRE_CAPS,...PANCUET_WIND_CAPS,...TEMIMINA_WATER_CAPS,...TEMIMINA_HUMAN_CAPS,...TEYOLLO_NATURE_CAPS,...TEYOLLO_DAY_CAPS,...APANO_NIGHT_CAPS,...APANO_THUNDER_CAPS];
-  const minibossTemplates=[XOCHITONAL_TPL,QUINAMETZIN_TPL,XIUHNEL_TPL,MIMICH_TPL,MICTLAMPEHECATL_TPL,TLACATEOCOTL_TPL,AMIMITL_TPL,ATLAUA_TPL,ACUECUEYOTL_TPL,OMETOCHTLI_TPL]; // v579: Ometochtli capture base (split list — see v548)
+  const minibossTemplates=[XOCHITONAL_TPL,QUINAMETZIN_TPL,XIUHNEL_TPL,MIMICH_TPL,MICTLAMPEHECATL_TPL,TLACATEOCOTL_TPL,AMIMITL_TPL,ATLAUA_TPL,ACUECUEYOTL_TPL,OMETOCHTLI_TPL,IXPUXTEQUI_TPL,NEXOXCHO_TPL]; // v723: added L8 duo (split list — see v548)
   const base=dead?(allCaps.find(c=>c.name===dead.name)||minibossTemplates.find(t=>t.name===dead.name)):null;
   const mercy=hasPassive('divinityMercy');
   if(doCapture&&base&&dead){
@@ -7754,11 +7847,25 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
       addLog(`<span class="log-ab">🌵 Octli Drench! ${h} + 10% splash + DRUNK ×1 to ALL 🍺</span>`);
     }
   }
+  else if(gd.ak==='sheWhoEatsFilth'){
+    const healPct=0.25+healBonusPP(u);
+    let totF=0;
+    aa.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*healPct);a.currentHp=Math.min(a.maxHp,a.currentHp+h);totF+=h;cleanseUnit(a);animateHit(a.id,h,true);});
+    let pzF=0;
+    ae.forEach(e=>{if(e.currentHp>0&&applyPoison(e,1))pzF++;});
+    /* As Patron/oblation the allies are poisoned too. Under Unclean Purification that is a BENEFIT,
+       so it bypasses Chimalli by direct assignment -- same friendly-application intent as Octli
+       Drench's applyDrunk(a,1,true) (v566/v575). Applied AFTER the cleanse above, or it would be
+       wiped by her own heal. */
+    let selfF=0;
+    if(hasPassive('uncleanPurification'))aa.forEach(a=>{if(a.currentHp>0){a.poisonStacks=Math.min(4,(a.poisonStacks||0)+1);selfF++;}});
+    addLog(`<span class="log-heal">\u{1F33A} She Who Eats Filth! +${Math.round(healPct*100)}% HP + cleanse all \u2014 \u{1F922} Poison \u00d71 to ${pzF} ${pzF===1?'enemy':'enemies'}${selfF?` and ${selfF} ${selfF===1?'ally':'allies'}`:''}</span>`);
+  }
   else if(gd.ak==='sinistralMinacachalli'){
     let total=0,anyCrit=false;
     ae.forEach(e=>{if(e.currentHp<=0)return;let raw=Math.max(1,Math.round(bpn(u)*(((u.atk||0)*1.2-(e.def||0)*0.4)*(G.dte.specialBoostMult||1))));const c=rollCrit(0.15,false,u);if(c){raw=Math.round(raw*(u._critMult||2));anyCrit=true;addLog(`<span style="color:#ffd700;font-size:10px">⚡ Critical!</span>`);}const dmg=applyArmorDamage(e,raw,false);if(dmg>0){e.currentHp=Math.max(0,e.currentHp-dmg);total+=dmg;animateHit(e.id,dmg,false,c);onHitContact(u,e);refreshCaptureTargets();if(e.currentHp<=0&&!G.captureProcessed.has(e.id))handleDeath(e);}});
     if(anyCrit){aa.forEach(a=>{if(a.currentHp>0)applyAtkBuff(a,1);});}
-    addLog(`<span class="log-ab">🎣 Sinistral Minacachalli! 1.2×ATK AoE ${total}${anyCrit?' — CRIT! ⬆ ATK/MAG UP ×1 all allies':''}</span>`);
+    addLog(`<span class="log-ab">🎣 Sinistral Minacachalli! 1.2×ATK ${total}${anyCrit?' — CRIT! ⬆ ATK/MAG UP ×1 all allies':''}</span>`);
   }
   else if(gd.ak==='peyoteConcoction'){
     const healPct=0.25+healBonusPP(u);
@@ -8073,9 +8180,9 @@ function checkFlayedSkin(attacker,target){
 }
 
 function spawnReinforcement(){
-  const pool=G.layer===7?getTeyolloPool():G.layer===6?getTeminamPool().filter(c=>c.id!=='tm1'):G.layer===5?getPANCUETPool():G.layer===4?[...CEHUYLOAN_WATER_CAPS,...CEHUYLOAN_WIND_CAPS,...TONATIUH_DAY_CAPS]:G.layer===3?OBSIDIAN_CAPS:G.layer===2?TEPEME_CAPS:getL1Pool();
+  const pool=G.layer===8?getApanoPool():G.layer===7?getTeyolloPool():G.layer===6?getTeminamPool().filter(c=>c.id!=='tm1'):G.layer===5?getPANCUETPool():G.layer===4?[...CEHUYLOAN_WATER_CAPS,...CEHUYLOAN_WIND_CAPS,...TONATIUH_DAY_CAPS]:G.layer===3?OBSIDIAN_CAPS:G.layer===2?TEPEME_CAPS:getL1Pool();
   if(!pool.length)return;
-  const lv=G.layer===7?eLvL7(G.battleNum):G.layer===6?eLvL6(G.battleNum):eLv(G.battleNum)+layerLvBonus();
+  const lv=G.layer===8?eLvL8(G.battleNum):G.layer===7?eLvL7(G.battleNum):G.layer===6?eLvL6(G.battleNum):eLv(G.battleNum)+layerLvBonus();
   const tpl=pool[Math.floor(Math.random()*pool.length)];
   const e=mkEnemy(tpl,G.enemies.length,1.0,lv);
   e.id=e.id+'_reinf_'+Date.now();
@@ -8547,7 +8654,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     // L4
     'Diving Gust':  {mult:1.6, phys:true, wound:2},
     'Permafrost':   {mult:1.6, mag:true,  aoe:true, burn:1, slowAll:1},
-    'Iceburn Storm': {mult:1.2, mag:true, aoe:true, burn:2},
+    'Iceburn Storm': {mult:1.1, mag:true, aoe:true, burn:2}, // v719: 1.2→1.1
     'Venom Coil':   {mult:1.5, phys:true, poison:2, wound:1},
     'Tainted Draught':{mult:1.2, mag:true,  poison:2},
     // Fallback
@@ -8923,7 +9030,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
       const h=applyArmorDamage(e,critify(dmg,u,true),false);
       if(h>0){e.currentHp=Math.max(0,e.currentHp-h);totJN+=h;animateHit(e.id,h,false,rollCrit._lc);onHitContact(u,e);refreshCaptureTargets();if(e.currentHp<=0)handleDeath(e);}
     });
-    const healJN=Math.round(totJN*0.2); // v705: 50%->20% -- the 50% loop tripled effective duo HP
+    const healJN=Math.round(totJN*0.4); // v722: 20%->40% per Genaro (note: applies to BOTH duo members)
     const drained=[];
     if(healJN>0){
       [u,...aa.filter(a=>a!==u&&a.currentHp>0&&(a.baseId==='ixpuxtequi'||a.id==='ixpuxtequi'))].forEach(a=>{
@@ -9232,7 +9339,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     const targets=aa.filter(a=>a.currentHp>0).sort(()=>Math.random()-0.5).slice(0,3);
     targets.forEach(a=>{let raw=Math.max(1,Math.round(bpn(u)*((u.atk||0)*1.2-(a.def||0)*0.4)));const c=rollCrit(0.15,false,u);if(c){raw=Math.round(raw*(u._critMult||2));anyCrit=true;}const dmg=applyArmorDamage(a,raw,false);if(dmg>0){a.currentHp=Math.max(0,a.currentHp-dmg);total+=dmg;G._animQueue.push({uid:a.id,dmg:dmg,isHeal:false,isCrit:c});onHitContact(u,a);if(a.currentHp<=0)handleDeath(a);}});
     if(anyCrit){ae.forEach(x=>{if(x.currentHp>0)applyAtkBuff(x,1);});}
-    addLog(`<span class="log-ab">🎣 Sinistral Minacachalli! 1.2×ATK AoE ${total}${anyCrit?' — CRIT! ⬆ ATK/MAG UP ×1 allies':''}</span>`);return;
+    addLog(`<span class="log-ab">🎣 Sinistral Minacachalli! 1.2×ATK ${total}${anyCrit?' — CRIT! ⬆ ATK/MAG UP ×1 allies':''}</span>`);return;
   }
   // BOSS specials
   if(ak==='shock'||ak==='cripplingShock'){
@@ -9879,7 +9986,12 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     });
     let pz=0;
     aa.filter(a=>a.currentHp>0).forEach(a=>{ if(applyPoison(a,1))pz++; });
-    addLog(`<span class="log-heal">\u{1F33A} She Who Eats Filth! +${totHeal} HP + cleanse to her host \u2014 \u{1F922} Poison \u00d71 to ${pz}</span>`);return;
+    /* v729: she poisons her OWN side too. Under her Unclean Purification that Poison is a
+       benefit, so it bypasses armor by direct assignment -- mirrors the player-side patron
+       block. Applied AFTER the cleanse above, or her own heal would wipe it. */
+    let selfP=0;
+    ae.filter(e=>e.currentHp>0).forEach(e=>{e.poisonStacks=Math.min(4,(e.poisonStacks||0)+1);selfP++;});
+    addLog(`<span class="log-heal">\u{1F33A} She Who Eats Filth! +${totHeal} HP + cleanse to her host \u2014 \u{1F922} Poison \u00d71 to ${pz}${selfP?` and ${selfP} of her own`:''}</span>`);return;
   }
   if(ak==='godbaneBlowgun'&&aa.length){ /* v708: 5 random hits, doubled against gods */
     let tot=0,godHits=0,hits=0;
@@ -9924,7 +10036,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
       const h=applyArmorDamage(a,dmg,true);onHitContact(u,a);
       if(h>0){a.currentHp=Math.max(0,a.currentHp-h);totJN+=h;G._animQueue.push({uid:a.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});if(a.currentHp<=0)handleDeath(a);}
     });
-    const healJN=Math.round(totJN*0.2); // v705: 50%->20% -- the 50% loop tripled effective duo HP
+    const healJN=Math.round(totJN*0.4); // v722: 20%->40% per Genaro (note: applies to BOTH duo members)
     const drained=[];
     if(healJN>0){
       [u,...ae.filter(e=>e!==u&&e.currentHp>0&&(e.baseId==='ixpuxtequi'||e.id==='ixpuxtequi'||String(e.id).indexOf('ixpuxtequi')===0))].forEach(e=>{
@@ -10083,8 +10195,8 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   }
   if(ak==='iceburnStorm'&&aa.length){
     let total=0;
-    aa.forEach(a=>{if(a.currentHp<=0)return;const dmg=critify(Math.max(1,Math.round((u.mag||0)*1.2-(a.res||0)*0.4)),u,true);const h=applyArmorDamage(a,dmg,true);if(h>0){a.currentHp=Math.max(0,a.currentHp-h);total+=h;G._animQueue.push({uid:a.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});applyBurn(a,2);onHitContact(u,a);if(a.currentHp<=0)handleDeath(a);}});
-    addLog(`<span class="log-ab">🌪️ Iceburn Storm: 1.2×MAG AoE ${total} + Burn ×2 all!</span>`);return;
+    aa.forEach(a=>{if(a.currentHp<=0)return;const dmg=critify(Math.max(1,Math.round((u.mag||0)*1.1-(a.res||0)*0.4)),u,true);const h=applyArmorDamage(a,dmg,true);if(h>0){a.currentHp=Math.max(0,a.currentHp-h);total+=h;G._animQueue.push({uid:a.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});applyBurn(a,2);onHitContact(u,a);if(a.currentHp<=0)handleDeath(a);}});
+    addLog(`<span class="log-ab">🌪️ Iceburn Storm: 1.1×MAG ${total} + Burn ×2 each!</span>`);return;
   }
   if(ak==='bitingDraft'&&aa.length){
     let total=0;
@@ -10472,6 +10584,8 @@ function applyArmorDamage(target,dmg,isEnemyAttacking){
 }
 
 function cleanseUnit(u){
+  // v712: Unclean Purification — ally Poison is a benefit, so nothing may strip it (incl. her own heal).
+  const _upKeep=(u.isAlly?hasPassive('uncleanPurification'):bossHasPassive('uncleanPurification'))?(u.poisonStacks||0):null; // v729: same exemption on the boss side
   // Scalding Miasma: if active, only remove 1 poison stack from the opposing side instead of clearing all
   if(G._scaldingMiasmaActive){
     const targetIsOpposing=(hasPassive('scaldingMiasma'))?(!u.isAlly):u.isAlly;
@@ -10486,6 +10600,7 @@ function cleanseUnit(u){
     u.poisonStacks=0;
     u.burnStacks=0;
   }
+  if(_upKeep!==null)u.poisonStacks=_upKeep; // v712: restore the exempt ally Poison
   u.paralyzStacks=0;u.woundStacks=0;u.lethargyStacks=0;
   if(!(u.isAlly&&getOfferingEffects().drunkUncleansable))u.drunkStacks=0; // v537: Drunk cleansable; Teometl Sap offering (Pass 7) sets drunkUncleansable
   reverieRecalc(u); // v552: drop the Reverie stat boost when stacks are cleansed
@@ -10795,14 +10910,14 @@ function processNextCap(){
     G.capActive=false;processNextCap();return;
   }
   const allCaps=[...MICTLAN_CAPS,...TEPEME_CAPS,...OBSIDIAN_CAPS,...NATURE_CAPS,...HUMANITY_CAPS,...CEHUYLOAN_WATER_CAPS,...CEHUYLOAN_WIND_CAPS,...TONATIUH_DAY_CAPS,...PANCUET_FIRE_CAPS,...PANCUET_WIND_CAPS,...TEMIMINA_WATER_CAPS,...TEMIMINA_HUMAN_CAPS,...TEYOLLO_NATURE_CAPS,...TEYOLLO_DAY_CAPS,...APANO_NIGHT_CAPS,...APANO_THUNDER_CAPS];
-  const minibossTemplates=[XOCHITONAL_TPL,QUINAMETZIN_TPL,XIUHNEL_TPL,MIMICH_TPL,MICTLAMPEHECATL_TPL,TLACATEOCOTL_TPL,AMIMITL_TPL,ATLAUA_TPL,ACUECUEYOTL_TPL,OMETOCHTLI_TPL]; // v579: Ometochtli capture base (split list — see v548)
+  const minibossTemplates=[XOCHITONAL_TPL,QUINAMETZIN_TPL,XIUHNEL_TPL,MIMICH_TPL,MICTLAMPEHECATL_TPL,TLACATEOCOTL_TPL,AMIMITL_TPL,ATLAUA_TPL,ACUECUEYOTL_TPL,OMETOCHTLI_TPL,IXPUXTEQUI_TPL,NEXOXCHO_TPL]; // v723: added L8 duo (split list — see v548)
   const base=allCaps.find(c=>c.name===dead.name)||minibossTemplates.find(t=>t.name===dead.name);
   triggerCaptureWindow(dead,base,null);
 }
 
 // ─── RENDER ───────────────────────────────────────────────────
 function npBar(cur,mx){const pct=mx>0?Math.round(cur/mx*100):0;return`<div class="np-wrap"><div class="np-bar" style="transform:scaleX(${pct/100})"></div></div><div style="font-size:9px;color:#9050c0;margin-top:1px">✨ ${Math.round(cur)}/${mx}</div>`;}
-function pPips(stacks){if(!stacks)return'';return`<div style="margin-top:2px" ${pipAttrs('poison',stacks)}><span class="burn-pip" style="color:#90d030;border-color:#3a6010;background:#081400">🤢×${stacks}</span></div>`;}
+function pPips(stacks,ally){if(!stacks)return'';return`<div style="margin-top:2px" ${pipAttrs('poison',stacks,ally)}><span class="burn-pip" style="color:#90d030;border-color:#3a6010;background:#081400">🤢×${stacks}</span></div>`;}
 function woundBadge(stacks){if(!stacks)return'';return`<div style="margin-top:2px" ${pipAttrs('wound',stacks)}><span class="burn-pip" style="color:#ff6060;border-color:#8a1010;background:#1a0000">🩸×${stacks}</span></div>`;}
 function lethargyBadge(stacks){if(!stacks)return'';return`<div style="margin-top:2px" ${pipAttrs('lethargy',stacks)}><span class="burn-pip" style="color:#c080ff;border-color:#6a3aaa;background:#0d001a">🥶×${stacks} LTH</span></div>`;}
 function drunkBadge(stacks){if(!stacks)return'';return`<div style="margin-top:2px" ${pipAttrs('drunk',stacks)}><span class="burn-pip" style="color:#e0a040;border-color:#8a5010;background:#1a0e00">🍺×${stacks}</span></div>`;}
@@ -10879,7 +10994,7 @@ function mkUnitCard(u){
     <div class="uc-name" style="color:${u.isGod?'#c8a050':'var(--tx)'}">${u.name} <span class="unit-lv" style="font-size:9px;color:var(--td)">Lv${lv}</span>${typeTag}</div>
     <div class="bar-row"><span class="bar-icon">❤️</span><div class="bar-wrap${(u.armor||0)>0?' has-shield':''}"><div class="bar-fill" style="width:${pct}%;background:var(--hp)"></div><div class="bar-armor" style="width:${_armPct}%${(u.armor||0)>0?'':';display:none'}"></div><div class="bar-lbl">${fmtN(u.currentHp)}/${fmtN(u.maxHp)}</div><div class="bar-shield-badge"${(u.armor||0)>0?'':' style="display:none"'}>🛡 ${Math.round(u.armor||0)}</div></div></div>
     <div class="bar-row"><span class="bar-icon">✨</span><div class="bar-wrap" style="background:#110820"><div class="bar-fill" style="width:${npPct}%;background:linear-gradient(90deg,#5a208a,#9050c0)"></div><div class="bar-lbl">${Math.round(curNP)}/${maxNP}${lthTagCard}</div></div></div>
-    <div class="status-row">${pPips(u.poisonStacks)}${bPips(u.burnStacks)}${paraPips(u.paralyzStacks||0)}${slowBadge(u.id)}${woundBadge(u.woundStacks||0)}${lethargyBadge(u.lethargyStacks||0)}${drunkBadge(u.drunkStacks||0)}${atkBuffBadge(u.atkBuffStacks||0,u.atkBuffRounds||0)}${defBuffBadge(u.defBuffStacks||0,u.defBuffRounds||0)}${critBuffBadge(u.critBuffStacks||0,u.critBuffRounds||0)}${turquoiseBadge(u._turquoise||0)}</div>
+    <div class="status-row">${pPips(u.poisonStacks,true)}${bPips(u.burnStacks)}${paraPips(u.paralyzStacks||0)}${slowBadge(u.id)}${woundBadge(u.woundStacks||0)}${lethargyBadge(u.lethargyStacks||0)}${drunkBadge(u.drunkStacks||0)}${atkBuffBadge(u.atkBuffStacks||0,u.atkBuffRounds||0)}${defBuffBadge(u.defBuffStacks||0,u.defBuffRounds||0)}${critBuffBadge(u.critBuffStacks||0,u.critBuffRounds||0)}${turquoiseBadge(u._turquoise||0)}</div>
     ${isTargetedByEnemy?'<div style="font-size:10px;color:#e07070;margin-top:2px">⚠ Targeted!</div>':isSlowWaiting?'<div style="font-size:10px;color:#5080a0;margin-top:2px">🐢 Waiting (Slowed)</div>':acted?'<div style="font-size:10px;color:#4a3a10;margin-top:2px">✓ Acted</div>':''} <!-- v611: 'Tap to select' removed — footer isn't reconciled by the in-place patcher, so it showed stale/inconsistently --></div>`;
   setCardIconBtn(d,u); // v353: icon = detail button (only while selected)
   return d;
@@ -10912,7 +11027,7 @@ function renderBattle(){
   if(_tutEl&&G.roundNum>=3)_tutEl.innerHTML='';
   renderRes('rb-battle');
   const isL2=G.layer===2;const isL3=G.layer===3;const isL4=G.layer===4;
-  const layerName=G.layer===7?'Teyōllōcuālōyān':G.layer===6?'Temiminayólan':G.layer===5?'Pancuetlacaloyán':isL4?'Cehuélōyān':isL3?'Itztépetl':isL2?'Tepeme Monamictlan':'Itzucuintlan'; // v692: L5 case was missing — fell through to Itzucuintlan
+  const layerName=G.layer===8?'Apanohualóyan':G.layer===7?'Teyōllōcuālōyān':G.layer===6?'Temiminayólan':G.layer===5?'Pancuetlacaloyán':isL4?'Cehuélōyān':isL3?'Itztépetl':isL2?'Tepeme Monamictlan':'Itzucuintlan'; // v692: L5 case was missing — fell through to Itzucuintlan
   const bt=G.battleNum===8?(G.layer===5?(G.l5BossChoice==='xiuhtecuhtli'?'BOSS — Xiuhtecuhtli':'BOSS — Malinalxochitl'):G.layer===7?'BOSS — Mayahuel':G.layer===6?'BOSS — Opochtli':isL4?'BOSS — Ixquimilli':isL3?'BOSS — Itzpapalotl':isL2?'BOSS — Tepeyollotl':'BOSS — Xolotl'):G.battleNum===5?(G.layer===5?'Tlacateocotl rises!':G.layer===7?'Ometochtli rises!':G.layer===6?'The Shore Demigods rise!':isL4?'Mictlampehecatl!':isL3?'Xiuhnel & Mimich rise!':isL2?'Quinametzin rises!':'Xochitonal rises!'):`${layerName} · Battle ${G.battleNum}${G.chosenDifficulty==='hard'?' [Hard]':''}`;
   document.getElementById('phase-ban').textContent=bt;
   const _isL5=G.layer===5;
@@ -11005,7 +11120,7 @@ function renderBattle(){
       const _np=u.currentNP||0,_mnp=u.maxNP||1,_npPct=Math.round(_np/_mnp*100);
       const existing=_psOldCards.get(u.id);
       if(existing&&!existing.classList.contains('fallen-ally')&&u.currentHp>0){
-        patchBarsOnEl(existing,_pct,`${Math.round(u.currentHp)}/${u.maxHp}`,_npPct,`${Math.round(_np)}/${_mnp}`,pPips(u.poisonStacks)+bPips(u.burnStacks)+paraPips(u.paralyzStacks||0)+slowBadge(u.id)+woundBadge(u.woundStacks||0)+lethargyBadge(u.lethargyStacks||0)+drunkBadge(u.drunkStacks||0)+atkBuffBadge(u.atkBuffStacks||0,u.atkBuffRounds||0)+defBuffBadge(u.defBuffStacks||0,u.defBuffRounds||0)+critBuffBadge(u.critBuffStacks||0,u.critBuffRounds||0)+turquoiseBadge(u._turquoise||0),u.armor||0,u.maxHp);
+        patchBarsOnEl(existing,_pct,`${Math.round(u.currentHp)}/${u.maxHp}`,_npPct,`${Math.round(_np)}/${_mnp}`,pPips(u.poisonStacks,true)+bPips(u.burnStacks)+paraPips(u.paralyzStacks||0)+slowBadge(u.id)+woundBadge(u.woundStacks||0)+lethargyBadge(u.lethargyStacks||0)+drunkBadge(u.drunkStacks||0)+atkBuffBadge(u.atkBuffStacks||0,u.atkBuffRounds||0)+defBuffBadge(u.defBuffStacks||0,u.defBuffRounds||0)+critBuffBadge(u.critBuffStacks||0,u.critBuffRounds||0)+turquoiseBadge(u._turquoise||0),u.armor||0,u.maxHp);
         const isSel=u.id===G.selectedActorId;
         const isAct=G.actedIds.has(u.id);
         const isAllyTarget=G.battlePhase==='player_ally_targeting'&&u.isAlly&&u.currentHp>0;
@@ -11237,7 +11352,7 @@ function renderActionPanel(){
     const godSpecFlat={'seismicRoar':8,'ophidianMother':0,'deluge':0,'tlalocanDeluge':0,'featherEmbrace':0,'oldFire':20,'cripplingShock':0,'riverJudge':0,'obsidianStorm':14,'holyHarvest':0,'zappingStrike':0,'aurumBreak':0,'frostMacuahuitl':0};
     const godSpecMult={'deluge':1.35,'tlalocanDeluge':1.35,'obsidianStorm':1.25,'aurumBreak':1.5,'frostMacuahuitl':1.5};
     // Vassal ability mult overrides (for abilities that use a mult formula instead of base+flat)
-    const vassalSpecMult={'Rain Drop':1.3,'Soul Drain':1.3,'Life Siphon':1.35,'Coil Crush':1.4,'Wail':1.5,'Thorn Lash':1.5,'Vine Grasp':1.3,'Blood Drink':1.8,'Glass Cut':1.6,'Pollen Burst':1.1,'Ball Strike':0.55,'War Rhythm':1.2,'Heavy Cleave':1.3,'Razor Dive':1.3,'Haunt':1.3,'Venom Shade':1.3,'Thorn Mangle':1.5,'Ancient Crush':1.4,'Iceburn Storm':1.2,'Death Screech':1.4,'Shard Breath':1.2,'Tremor':1.3,'Withering Touch':1.25,'Tectonic Slam':1.05,'Howling Gust':1.4,'Murk':1.2,'Magma Burst':1.2,'Septic Howl':1.25,'Collapse':1.2,'Haunt':1.1,'Frost Macuahuitl':1.5,'Solar Crush':1.6,'Craft Shard':1.1,'Permafrost':1.6,'Biting Draft':1.2,'Howling Chill':1.05,'Ash Surge':1.1,'Sandblast':1.1,'Howling Drift':1.1,'Virulent Gale':1.1,'Obsidian Blade':2.0,'Sun Dive':1.25,'Solar Pounce':1.6,'Sacred Arrow':0.7,'Toxic Exhaust':1.2,'Prism Volley':0.6,'Filthwater Plume':0.75,'Drowning Grasp':1.5,'Writhing Bloom':1.2,'Colony Sting':0.9,'Voltaic Discharge':1.5,'Gnaw the Fallen':1.9,'Abyssal Lure':1.3,'Fang Flash':1.3,'Descent from the Trees':1.5,'Jestress Nightmare':1.1};
+    const vassalSpecMult={'Rain Drop':1.3,'Soul Drain':1.3,'Life Siphon':1.35,'Coil Crush':1.4,'Wail':1.5,'Thorn Lash':1.5,'Vine Grasp':1.3,'Blood Drink':1.8,'Glass Cut':1.6,'Pollen Burst':1.1,'Ball Strike':0.55,'War Rhythm':1.2,'Heavy Cleave':1.3,'Razor Dive':1.3,'Haunt':1.3,'Venom Shade':1.3,'Thorn Mangle':1.5,'Ancient Crush':1.4,'Iceburn Storm':1.1,'Death Screech':1.4,'Shard Breath':1.2,'Tremor':1.3,'Withering Touch':1.25,'Tectonic Slam':1.05,'Howling Gust':1.4,'Murk':1.2,'Magma Burst':1.2,'Septic Howl':1.25,'Collapse':1.2,'Haunt':1.1,'Frost Macuahuitl':1.5,'Solar Crush':1.6,'Craft Shard':1.1,'Permafrost':1.6,'Biting Draft':1.2,'Howling Chill':1.05,'Ash Surge':1.1,'Sandblast':1.1,'Howling Drift':1.1,'Virulent Gale':1.1,'Obsidian Blade':2.0,'Sun Dive':1.25,'Solar Pounce':1.6,'Sacred Arrow':0.7,'Toxic Exhaust':1.2,'Prism Volley':0.6,'Filthwater Plume':0.75,'Drowning Grasp':1.5,'Writhing Bloom':1.2,'Colony Sting':0.9,'Voltaic Discharge':1.5,'Gnaw the Fallen':1.9,'Abyssal Lure':1.3,'Fang Flash':1.3,'Descent from the Trees':1.5,'Jestress Nightmare':1.1};
     // v579: 5-target vassal AoEs capped at 0.9x — wide coverage shouldn't also carry full power
     Object.keys(AOE_CAP_AB).forEach(function(_ab){if(AOE_CAP_AB[_ab]>=5&&vassalSpecMult[_ab]!==undefined&&vassalSpecMult[_ab]>0.9)vassalSpecMult[_ab]=0.9;});
     let flatBonus=singleDmgRef[specLabel]??5;
@@ -11406,6 +11521,7 @@ function endBattle(win){
       // Mark victory for appropriate layer
       if(G.layer===2)markV('layer2_'+G.god.id);
       else if(G.layer===6)markV('layer6_'+G.god.id);
+      else if(G.layer===8)markV('layer8_'+G.god.id); // v715: unlocks Tlazoltéotl (layer8Unlocked)
       else if(G.layer===7)markV('layer7_'+G.god.id); // v554: unlocks Mayahuel (layer7Unlocked)
       else markV(G.god.id);
     }
@@ -11590,14 +11706,15 @@ function showEnding(){
   const isL4=_eLayer===4;const isL5=_eLayer===5;
   const isL6=_eLayer===6; // v572: snapshot
   const isMalBoss=G.l5BossChoice!=='xiuhtecuhtli'; // default to Malinalxochitl if not set
+  const isL8=_eLayer===8; // v715
   const isL7=_eLayer===7; // v569/v572: from the frozen cleared-layer snapshot — v564 hoisted it BELOW this line (TDZ crash on every layer completion)
-  const endings=isL7?(GOD_ENDINGS_L7[gd.id]||GOD_ENDINGS_L7._default):isL6?(GOD_ENDINGS_L6[gd.id]||["Opochtli's arrows fall still — the rain of shafts finds nothing left to strike.","The <strong class='teotl'>TEOTL</strong> of the fisher-god floods into you.","Six layers drowned. You wade on into the black water."]):isL5?(isMalBoss?(GOD_ENDINGS_L5_MAL[gd.id]||["Malinalxochitl falls.","The desert of flags grows silent.","You walk out."]):(GOD_ENDINGS_L5_XIU[gd.id]||["Xiuhtecuhtli falls.","The heat wind dies.","You walk out."])):
+  const endings=isL8?(GOD_ENDINGS_L8[gd.id]||GOD_ENDINGS_L8._default):isL7?(GOD_ENDINGS_L7[gd.id]||GOD_ENDINGS_L7._default):isL6?(GOD_ENDINGS_L6[gd.id]||["Opochtli's arrows fall still — the rain of shafts finds nothing left to strike.","The <strong class='teotl'>TEOTL</strong> of the fisher-god floods into you.","Six layers drowned. You wade on into the black water."]):isL5?(isMalBoss?(GOD_ENDINGS_L5_MAL[gd.id]||["Malinalxochitl falls.","The desert of flags grows silent.","You walk out."]):(GOD_ENDINGS_L5_XIU[gd.id]||["Xiuhtecuhtli falls.","The heat wind dies.","You walk out."])):
     isL4?(GOD_ENDINGS_L4[gd.id]||["Ixquimilli falls.","The frozen peaks grow silent.","You walk out of the blizzard."]):    isL3?(GOD_ENDINGS_L3[gd.id]||["Itzpapalotl falls.","The obsidian mountain is silent.","You press on."]):    isL2?(GOD_ENDINGS_L2[gd.id]||["Tepeyollotl falls.","The mountain is silent.","You press on."]):    (GOD_ENDINGS[gd.id]||["Itzucuintlan falls.","The <strong class='teotl'>TEOTL</strong> returns.","Teotlan remembers."]);
-  const title=isL7?'Teyōllōcuālōyān Conquered':isL6?'Temiminayólan Conquered':isL5?'Pancuetlacaloyán Conquered':isL4?'Cehuélōyān Conquered':isL3?'Itztépetl Conquered':isL2?'Tepeme Monamictlan Conquered':'Itzucuintlan Conquered';
+  const title=isL8?'Apanohualóyan Conquered':isL7?'Teyōllōcuālōyān Conquered':isL6?'Temiminayólan Conquered':isL5?'Pancuetlacaloyán Conquered':isL4?'Cehuélōyān Conquered':isL3?'Itztépetl Conquered':isL2?'Tepeme Monamictlan Conquered':'Itzucuintlan Conquered';
   // v318: the unlock used to live ONLY in handleDeath — a CAPTURED L1 boss skips death entirely
   // and the flags were never set. The ending screen is the canonical "L1 beaten" moment: set
   // them idempotently here (before the banner computes), and fire the popup if it never showed.
-  if(!isL2&&!isL3&&!isL4&&!isL5&&!isL6&&!isL7){
+  if(!isL2&&!isL3&&!isL4&&!isL5&&!isL6&&!isL7&&!isL8){
     V['layer1_'+G.god.id]=true;
     const _justXol=!xolUnlocked();
     if(_justXol)V['xol_unlocked']=true;
@@ -11614,7 +11731,7 @@ function showEnding(){
   const actEl=document.getElementById('ending-actions');actEl.innerHTML='';
 
   // L2/L3/L4/L5: just god lines; L1: prepend transition lines
-  const allLines=(isL2||isL3||isL4||isL5||isL6||isL7)?endings:[...L1_TRANSITION_LINES,...endings]; // v679: isL7 was omitted, so L7 clears wrongly prepended the L1->L2 transition text
+  const allLines=(isL2||isL3||isL4||isL5||isL6||isL7||isL8)?endings:[...L1_TRANSITION_LINES,...endings]; // v679: isL7 was omitted, so L7 clears wrongly prepended the L1->L2 transition text; v730: isL8 same bug
   let i=0;
   function next(){
     if(i>=allLines.length){
@@ -11629,7 +11746,7 @@ function showEnding(){
           newUnlockBan+=`<div style="font-size:12px;color:#b090ff;margin-bottom:1rem;padding:.5rem;background:#0d0d1a;border:0.5px solid #4a3a8a;border-radius:8px">🦋 Itzpapalotl has been unlocked!</div>`;
         if(isL4&&layer4Unlocked()&&gd.id!=='ixquimilli'&&!ixquimilliUnlocked())
           newUnlockBan+=`<div style="font-size:12px;color:#80c8ff;margin-bottom:1rem;padding:.5rem;background:#0a1428;border:0.5px solid #2a5a8a;border-radius:8px">🧊 Ixquimilli has been unlocked!</div>`;
-        if(!isL2&&!isL3&&!isL4&&!isL5&&!isL6&&!isL7){
+        if(!isL2&&!isL3&&!isL4&&!isL5&&!isL6&&!isL7&&!isL8){
           actEl.innerHTML=`${newUnlockBan}<button class="btn" onclick="enterLayer2()" style="padding:10px 24px;background:#0e2a14;border-color:#2a6a3a;color:#50e090">Enter Layer 2 →</button>`;
         }else if(isL2){
           actEl.innerHTML=`${newUnlockBan}<button class="btn" onclick="enterLayer3()" style="padding:10px 24px;background:#0d0d1a;border-color:#4a3a8a;color:#b090ff">Enter Layer 3 →</button>`;
@@ -11645,7 +11762,8 @@ function showEnding(){
           if(!wasOpoPrev&&gd.id!=='opochtli')newUnlockBan+=`<div style="font-size:12px;color:#60b8d8;margin-bottom:1rem;padding:.5rem;background:#06141e;border:0.5px solid #2a6a8a;border-radius:8px">🎣 <strong>New Patron Unlocked</strong> — Opochtli, Swift God of Fishing joins the pantheon!</div>`;
           G._scaldingMiasmaActive=false;
           actEl.innerHTML=`${newUnlockBan}<button class="btn" onclick="enterLayer7()" style="padding:10px 24px;background:#0a1a08;border-color:#3a6a18;color:#a0d060">Enter Layer 7 →</button>`;
-        }else if(isL7){
+         }else if(isL7){
+           // v715: L7 no longer ends the run — descend to Apanohualóyan.
           // v554: L7 = run complete: grant TEOTL (also fixes the old 'Layer 5 Complete' header typo)
           const wasMayaPrev=G._preRunV&&Object.keys(G._preRunV).some(k=>k.startsWith('layer7_')&&G._preRunV[k]);
           if(!wasMayaPrev&&gd.id!=='mayahuel'){
@@ -11658,6 +11776,14 @@ function showEnding(){
             G.levels['god_mayahuel']=Math.max(G.levels['god_mayahuel']||1,getLevel('god_patecatl')||1);
             newUnlockBan+=`<div style="font-size:12px;color:#c0e060;margin-bottom:1rem;padding:.5rem;background:#0c1406;border:0.5px solid #4a6a18;border-radius:8px">🍶🌵 <strong>Reunited</strong> — Mayahuel joins Patecatl's party as a free vassal (Lv ${G.levels['god_mayahuel']}). The four hundred sing.</div>`;
           }
+           actEl.innerHTML=`${newUnlockBan}<button class="btn" onclick="enterLayer8()" style="padding:10px 24px;background:#06141e;border-color:#2a5a8a;color:#60b8d8">Enter Layer 8 →</button>`;
+         }else if(isL8){
+           // v715: L8 = run complete. Tlazoltéotl unlocks here (layer8_ flag set in endBattle).
+           const wasTlazPrev=G._preRunV&&Object.keys(G._preRunV).some(k=>k.startsWith('layer8_')&&G._preRunV[k]);
+           if(!wasTlazPrev&&gd.id!=='tlazolteotl'){
+             newUnlockBan+=`<div style="font-size:12px;color:#e070b0;margin-bottom:1rem;padding:.5rem;background:#1a0a14;border:0.5px solid #6a2a4a;border-radius:8px">🌺 <strong>Tlazoltéotl</strong> has been unlocked as a patron!</div>`;
+             setTimeout(()=>showMo('🌺','New Patron Unlocked!',`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'tlazolteotl',icon:'🌺',name:'Tlazoltéotl',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#e070b0;margin:.5rem 0 .25rem">Tlazoltéotl</div><div style="font-size:12px;color:#b05a88;margin-bottom:.75rem">Forgiving Goddess of Filth and Lust</div><div style="font-size:12px;color:var(--td);line-height:1.6">She can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs.</div></div>`,[{label:'Give It Here',fn:()=>{}}]),900); // v731: match the Xolotl/Mayahuel unlock layout
+           }
           const earned=calcTeotlEarned();
           let teotlBan='';
           if(earned.total>0){
@@ -11695,6 +11821,25 @@ function showEnding(){
     setTimeout(()=>p.style.opacity='1',30);setTimeout(next,1100);
   }
   clearRun();showScr('screen-ending');next();
+}
+const STORY_LINES_L8=[
+  "The forest thins. The ground softens, then gives, then is not ground at all.",
+  "Black water, wide as memory, moving without a sound.",
+  "Things drift in it that were once people, and things swim under it that never were.",
+  "APANOHUAL\u00d3YAN \u2014 the crossing. Every soul that ever fell must swim it.",
+  "Something vast turns beneath the surface, and the water tastes of rot and flowers."
+];
+function enterLayer8(){
+  layerTransition();G.layer=8;G.mercPool=null;
+  G._contFn=()=>{
+    G._contFn=null;
+    const goToStory=()=>{showScr('screen-story');runStory(STORY_LINES_L8);};
+    if(G.tecpatl>0)showMictlanMap(()=>showPenancePick(goToStory));
+    else showMictlanMap(goToStory);
+  };
+  showShop();
+  const cont=document.getElementById('continue-btn');
+  if(cont)cont.textContent='Enter Layer 8 \u2192';
 }
 function enterLayer7(){
   layerTransition();G.layer=7;G.mercPool=null;
@@ -11958,7 +12103,7 @@ function renderTecpatlBanner(containerId){
 
 function getMercPool(){
   if(G.mercPool!==null&&G.mercPool!==undefined)return G.mercPool; // already generated this run — even if empty
-  const allCaps=G.layer===7?getTeyolloPool():G.layer===6?getTeminamPool():G.layer===5?getPANCUETPool():G.layer===4?[...CEHUYLOAN_WATER_CAPS,...CEHUYLOAN_WIND_CAPS,...(tonatiuhUnlocked()?TONATIUH_DAY_CAPS:[])]:G.layer===3?OBSIDIAN_CAPS:G.layer===2?TEPEME_CAPS:getL1Pool();
+  const allCaps=G.layer===8?getApanoPool():G.layer===7?getTeyolloPool():G.layer===6?getTeminamPool():G.layer===5?getPANCUETPool():G.layer===4?[...CEHUYLOAN_WATER_CAPS,...CEHUYLOAN_WIND_CAPS,...(tonatiuhUnlocked()?TONATIUH_DAY_CAPS:[])]:G.layer===3?OBSIDIAN_CAPS:G.layer===2?TEPEME_CAPS:getL1Pool();
   const avail=allCaps.filter(u=>!G.captured.find(c=>c.id===u.id||c.baseId===u.id));
   const shuffled=[...avail].sort(()=>Math.random()-0.5);
   const pool=shuffled.slice(0,Math.min(3,shuffled.length)).map(u=>({...u})); // v397: clone so we never stamp _tier onto shared cap templates
@@ -11988,6 +12133,7 @@ function buildAltarGodPool(){
     if(g.id==='cihuacoatl'&&g.locked&&!cihuacoatlUnlocked())return false;
     if(g.id==='opochtli'&&g.locked&&!layer6Unlocked())return false;
     if(g.id==='mayahuel'&&g.locked&&!layer7Unlocked())return false;
+    if(g.id==='tlazolteotl'&&g.locked&&!layer8Unlocked())return false; // v715
     return !G.party.includes(g.id)&&!G.deadGods.includes(g.id)&&g.id!==G.god.id;
   });
   const shuffled=[...available].sort(()=>Math.random()-.5);
@@ -12416,7 +12562,11 @@ function showUnitTooltip(u){
   {const _revAllySide=u.isAlly||u.isGod||!u.enemyLevel; const _revOn=(u.drunkStacks||0)>0&&(_revAllySide?hasPassive('inebriatedReverie'):enemyReverieActive()); if(_revOn)_buffs.push(`✦ Inebriated Reverie <span style="color:#3a8050">+${5*Math.min(4,u.drunkStacks)}% ATK/MAG/DEF/RES (🍺×${Math.min(4,u.drunkStacks)})</span>`);} // v572: patron card has no isAlly flag
   if(u.isAlly&&azHas(u,'fire')&&typeof hasOffering==='function'&&hasOffering('new_fire_knife')&&(u.maxNP||0)>0&&(u.currentNP||0)/(u.maxNP)<=0.40)_buffs.push(`🔪 New Fire Knife <span style="color:#3a8050">+30 ATK & +30 MAG (TP ≤ 40%)</span>`);
   const buffSec=_buffs.length?`<div style="margin-top:8px;border-top:0.5px solid var(--br);padding-top:6px"><div style="font-size:10px;color:var(--td);text-transform:uppercase;letter-spacing:.5px">⬆ Buffs affecting this unit</div>${_buffs.map(b=>`<div style="font-size:11px;color:#ffd24d;margin-top:2px">${b}</div>`).join('')}</div>`:'';
-  const gs=(b,t)=>t>b?`<span style="color:#60d080;font-weight:600">${t}</span><span style="color:#3a8050;font-size:10px"> (+${t-b})</span>`:`${b}`;
+  // v717: three-way. A net PENALTY now shows the real (lower) value in red with (−N);
+  // previously any t<=b fell through to `${b}` and silently displayed the un-reduced base.
+  const gs=(b,t)=>t>b?`<span style="color:#60d080;font-weight:600">${t}</span><span style="color:#3a8050;font-size:10px"> (+${t-b})</span>`
+    :t<b?`<span style="color:#e08080;font-weight:600">${t}</span><span style="color:#a05050;font-size:10px"> (−${b-t})</span>`
+    :`${b}`;
   // v619: the modal IS the training card now (Genaro's annotated mock): CRIT joins the stat box,
   // the patron passive sits between stats and the 🔮 special, boosts/offerings stack below in-frame.
   const _tEmoji=bo.type==='MAG'?'🪄':bo.type==='MIX'?'🗡️🪄':'🗡️';
@@ -13161,9 +13311,40 @@ function proceedShop(){G._contFn=null;G.pendingEvent=null;G._pendingEventRolled=
 // ═══════════════════════════════════════════════════════════════
 // SAVE FILES SYSTEM
 // ═══════════════════════════════════════════════════════════════
-function _utf8ToB64(str){const b=new TextEncoder().encode(str);let s='';for(let i=0;i<b.length;i++)s+=String.fromCharCode(b[i]);return btoa(s);}
-function _b64ToUtf8(b64){const bin=atob(b64);const b=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)b[i]=bin.charCodeAt(i);return new TextDecoder().decode(b);}
-function openSaveFiles(){
+/* v713: save codes are deflated before base64. The v block is ~80% of the payload and is
+   highly repetitive (layer7_tlaloc, layer6_tlaloc, ...), so DEFLATE cuts a 7,044-char code to
+   ~1,540 and the ratio IMPROVES as more layers are added. No schema change: the JSON is
+   untouched, so there is no flag registry to keep in sync (which is why the smaller
+   bitfield option was rejected). Falls back to plain base64 if CompressionStream is absent. */
+async function _utf8ToB64(str){
+  const bytes=new TextEncoder().encode(str);
+  let out=bytes;
+  if(typeof CompressionStream!=='undefined'){
+    try{
+      const cs=new CompressionStream('deflate-raw');
+      const w=cs.writable.getWriter();w.write(bytes).catch(function(){});w.close().catch(function(){}); // v713: writer promises reject separately — swallow or they escape as unhandled
+      out=new Uint8Array(await new Response(cs.readable).arrayBuffer());
+    }catch(e){out=bytes;}
+  }
+  let s='';for(let i=0;i<out.length;i++)s+=String.fromCharCode(out[i]);
+  return btoa(s);
+}
+async function _b64ToUtf8(b64){
+  const bin=atob(b64);const b=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)b[i]=bin.charCodeAt(i);
+  const plain=new TextDecoder().decode(b);
+  if(plain.charAt(0)==='{')return plain; // pre-v713 code: already plain JSON
+  if(typeof DecompressionStream!=='undefined'){
+    try{
+      const ds=new DecompressionStream('deflate-raw');
+      const w=ds.writable.getWriter();w.write(b).catch(function(){});w.close().catch(function(){}); // v713: same — a plain (non-deflated) code rejects here
+      const t=new TextDecoder().decode(await new Response(ds.readable).arrayBuffer());
+      if(t.charAt(0)==='{')return t;
+    }catch(e){/* not deflated — fall through */}
+  }
+  return plain; // let the caller's JSON.parse raise the usual "Invalid save code"
+}
+async function openSaveFiles(){
   showScr('screen-savefiles');
   // Generate export code
   const saveObj={
@@ -13178,7 +13359,7 @@ function openSaveFiles(){
     version:291
   };
   try{
-    const code=_utf8ToB64(JSON.stringify(saveObj));
+    const code=await _utf8ToB64(JSON.stringify(saveObj));
     const el=document.getElementById('save-export-area');
     if(el)el.value=code;
   }catch(e){
@@ -13198,11 +13379,11 @@ function fallbackCopy(el){
   el.select();try{document.execCommand('copy');notify('Save code copied!','#50e090');}catch(e){notify('Copy failed — select and copy manually','#e07070');}
 }
 
-function loadSaveCode(){
+async function loadSaveCode(){
   const el=document.getElementById('save-import-area');
   if(!el||!el.value.trim()){notify('Paste a save code first','#e07070');return;}
   let parsed;
-  try{parsed=JSON.parse(_b64ToUtf8(el.value.trim()));}
+  try{parsed=JSON.parse(await _b64ToUtf8(el.value.trim()));}
   catch(e){notify('Invalid save code','#e07070');return;}
   // Build summary for confirmation
   const dtIn=parsed.dt||{};
