@@ -1645,7 +1645,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v731'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v735'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -2077,7 +2077,7 @@ const TONATIUH_DAY_CAPS=[
   {id:'dy4',name:'Solar Drummer',icon:'🥁',element:'day',type:'PHYS',hp:105,atk:14,mag:0,def:11,res:8,np:55,npCost:35,ability:'Call of the Sun',ad:'Summon 1 random Day escort to battle · 5% recoil',ak:'callOfSun',acd:14,fv:5},
   {id:'dy5',name:'Dawn Archer',icon:'🏹',element:'day',type:'PHYS',hp:90,atk:18,mag:0,def:8,res:6,np:50,npCost:14,ability:'Sacred Arrow',ad:'Multi 4-hit 0.7×ATK to random enemies + Slow · 5% recoil',ak:'sacredArrow',acd:13,fv:5},
   {id:'dy6',name:'Jaguar Knight',icon:'🐆',element:'day',type:'PHYS',hp:115,atk:16,mag:0,def:13,res:8,np:26,npCost:10,ability:'Solar Pounce',ad:'1.6×ATK to 2 enemies + Burn ×1 + Lethargy ×1 · 5% recoil',ak:'solarPounce',acd:12,fv:5},
-  {id:'dy7',name:'Temazcal Steamer',icon:'🔆',element:'day',type:'MAG',hp:82,atk:0,mag:15,def:6,res:9,np:26,npCost:14,ability:'Toxic Exhaust',ad:'1.2×MAG to 4 enemies + Poison ×1 + Slow ×1 · 5% recoil',ak:'radiantFlare',acd:12,fv:4},
+  {id:'dy7',name:'Temazcal Midwife',icon:'🔆',element:'day',type:'MAG',hp:82,atk:0,mag:15,def:6,res:9,np:26,npCost:14,ability:'Cleansing Steam',ad:'Heal all allies 30% HP + cleanse · 5% recoil',ak:'cleansingSteam',acd:12,fv:4},
   {id:'dy8',name:'Sunray Oracle',icon:'🌞',element:'day',type:'MAG',hp:78,atk:0,mag:16,def:5,res:10,np:24,npCost:13,ability:'Prism Volley',ad:'Multi 5-hit 0.6×MAG to random enemies · 5% recoil',ak:'prismVolley',acd:11,fv:4},
 ];
 function tonatiuhUnlocked(){return !!V['tonatiuh_unlocked'];}
@@ -7281,7 +7281,7 @@ function fireSerendipityBonus(unitId){
 }
 
 const AOE_CAP={deluge:4,obsidianStorm:5,sinistralMinacachalli:3};
-const AOE_CAP_AB={'Searing Stings':4,'Writhing Bloom':4,'Filthwater Plume':5,'Drowning Grasp':2,'Colony Sting':5,'Voltaic Discharge':2,'Jestress Nightmare':5,'Atlatl Rush':2,'Toxic Bloom':3,'Arrow Rain':5,'Net Cast':5,'Mystical Shots':4,'Coil Crush':3,'Tremor':3,'Withering Touch':4,'Shard Breath':4,'Tectonic Slam':5,'Howling Gust':3,'Murk':3,'Magma Burst':3,'Septic Howl':3,'Collapse':5,'Haunt':5,'Solar Crush':2,'Pollen Burst':2,'Craft Shard':4,'Permafrost':2,'Biting Draft':4,'Howling Chill':3,'Ash Surge':5,'Sandblast':5,'Howling Drift':5,'Virulent Gale':5,'Ancient Crush':4,'Thorn Mangle':3,'Iceburn Storm':5,'Death Screech':3,'Solar Pounce':2,'Sun Dive':5,'Toxic Exhaust':4,'Carrion Breath':4,'Five-Rabbit Haze':5};
+const AOE_CAP_AB={'Searing Stings':4,'Writhing Bloom':4,'Filthwater Plume':5,'Drowning Grasp':2,'Colony Sting':5,'Voltaic Discharge':2,'Jestress Nightmare':5,'Atlatl Rush':2,'Toxic Bloom':3,'Arrow Rain':5,'Net Cast':5,'Mystical Shots':4,'Coil Crush':3,'Tremor':3,'Withering Touch':4,'Shard Breath':4,'Tectonic Slam':5,'Howling Gust':3,'Murk':3,'Magma Burst':3,'Septic Howl':3,'Collapse':5,'Haunt':5,'Solar Crush':2,'Pollen Burst':2,'Craft Shard':4,'Permafrost':2,'Biting Draft':4,'Howling Chill':3,'Ash Surge':5,'Sandblast':5,'Howling Drift':5,'Virulent Gale':5,'Ancient Crush':4,'Thorn Mangle':3,'Iceburn Storm':5,'Death Screech':3,'Solar Pounce':2,'Sun Dive':5,'Carrion Breath':4,'Five-Rabbit Haze':5};
 // v664: enemy AoE specials now honour the same per-ability target caps as their player versions
 // (AOE_CAP_AB, from the v419 AoE rework). Enemies had never been capped and still hit the whole party.
 // LAYER BOSSES ARE EXEMPT — they keep hitting everyone.
@@ -7326,7 +7326,7 @@ function isAoeOrAutoSpecial(actor){
   if(actor.isGod)return['deluge','ophidianMother','cripplingShock','obsidianStorm','holyHarvest','patolliGamble','miseryBlizzard','torridTornado','torridTornadoBoss','peyoteConcoction','sheWhoEatsFilth','sinistralMinacachalli','cihuateteoFury'].includes(ak); // v713: sheWhoEatsFilth is a party heal — it was falling through to the targeted path
   const aoeOrAuto=new Set(['Searing Stings','Writhing Bloom','Filthwater Plume','Drowning Grasp','Chitin Shell','Colony Sting','Voltaic Discharge','Bioluminescent Chorus','Jestress Nightmare','Atlatl Rush','Howling Gust','Magma Burst','Septic Howl','Murk','Thunder Crash','Collapse','Tremor','Death Bloom','Dark Waters','Earth Bloom','Gust Mend','Storm Mend',
     'Pollen Burst','Withering Touch','Uapantotli','Coil Crush','Toxic Bloom','Feeding Frenzy','Arrow Rain','Net Cast','Trident Lunge','Healing Rite','Mystical Shots','Surging Tide',
-    'Craft Shard','Biting Draft','Permafrost','Iceburn Storm','Howling Chill','Burrow Mend','Ball Strike','Sun Dive','Sacred Arrow','Toxic Exhaust','Prism Volley','Solar Pounce',
+    'Craft Shard','Biting Draft','Permafrost','Iceburn Storm','Howling Chill','Burrow Mend','Ball Strike','Sun Dive','Sacred Arrow','Cleansing Steam','Prism Volley','Solar Pounce',
     'Obsidian Storm','Shard Breath','Tectonic Slam','Haunt',
     // L4/L5 AoE abilities
     'Ash Surge','Solar Crush','Sandblast','Howling Drift','Virulent Gale','Death Screech','Fuming Wall','Wind Rush',
@@ -7449,7 +7449,13 @@ function doPlayerAllyTarget(allyId){
   if(!actor||!target)return;
   G.pendingAction=null;G.battlePhase='idle';
   target=drunkSwapBen(actor,target); // v537 DRUNK: benefit misfire — heal/shield lands on a random enemy
-  const ab=actor.ability;const spLv=getSpecialLevel(actor);const sp2=Math.floor(spLv/2);
+  /* v735: captured vassals freeze `ability` at capture time, so a rename left already-captured
+     units dispatching on a name with no handler -- the special fired, spent TP, and did nothing.
+     v690 fixed the same stale-snapshot class for `ad` by preferring the live template; this is
+     that fix applied to the dispatch name. Gods keep their own ability; falls back to the stored
+     value whenever the template can't be resolved. */
+  const _abTpl=actor.isGod?null:unitDefById((actor.baseObj&&actor.baseObj.id)||actor.baseId||actor.id);
+  const ab=(_abTpl&&_abTpl.ability)||actor.ability;const spLv=getSpecialLevel(actor);const sp2=Math.floor(spLv/2);
   if(ab==='Stone Protection'||ab==='Stone Mend'){
     const pct=0.35+spLv*0.02;
     const h=Math.round(target.maxHp*pct);target.currentHp=Math.min(target.maxHp,target.currentHp+h);
@@ -8864,17 +8870,17 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     addLog(`<span class="log-wound">🐆 Solar Pounce! ${totalSP} to ${tgts.length} — Burn ×1 + Lethargy ×1 each!</span>`);
     applyDayRecoil(u);return;
   }
-  if(ab==='Toxic Exhaust'){
-    // v534: 1.3×MAG to up to 4 enemies + Poison ×2 each · recoil
-    let totalRF=0;
-    ae.filter(e=>e.currentHp>0).slice(0,4).forEach(tgt=>{
-      const preA=tgt.armor||0;
-      const dmg=Math.max(1,Math.round(bpn(u)*(Math.round((u.mag||0)*1.2-(tgt.res||0)*0.4)*(G.dte.specialBoostMult||1)))); // v688: 1.3->1.2
-      const h=applyArmorDamage(tgt,dmg,false);
-      if(h>0){tgt.currentHp=Math.max(0,tgt.currentHp-h);totalRF+=h;animateHit(tgt.id,h,false,rollCrit._lc);}
-      applyPoison(tgt,1);applySlowToUnit(tgt,preA);onHitContact(u,tgt);refreshCaptureTargets();if(tgt.currentHp<=0)handleDeath(tgt);
-    });
-    addLog(`<span class="log-ab">🔆 Toxic Exhaust! ${totalRF} + Poison ×1 + Slow each!</span>`);
+  if(ab==='Cleansing Steam'){
+    /* v734: Temazcal Midwife -- AoE heal + cleanse. 30% sits above the 18-20% that other
+       heal-all+cleanse specials pay (Storm Mend, Gust Mend) because day specials carry 5%
+       recoil. Flat %, no spLv scaling -- mirrors Solar Bloom. Guarded on currentHp>0 so a
+       downed ally is never healed back up. */
+    let totCS=0;
+    aa.forEach(a=>{if(a.currentHp<=0)return;
+      const h=Math.round(a.maxHp*0.30);const b=a.currentHp;
+      a.currentHp=Math.min(a.maxHp,a.currentHp+h);totCS+=a.currentHp-b;
+      cleanseUnit(a);animateHit(a.id,h,true);});
+    addLog(`<span class="log-heal">🔆 Cleansing Steam! All allies +30% HP + cleanse \u2014 ${totCS} restored</span>`);
     applyDayRecoil(u);return;
   }
   if(ab==='Prism Volley'){
@@ -9598,17 +9604,15 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     addLog(`<span class="log-wound">🐆 Solar Pounce! ${totalSP} to ${tgtsSP.length} — Burn + Lethargy each!</span>`);
     applyDayRecoil(u);return;
   }
-  if(ak==='radiantFlare'&&aa.length){
-    // v528: 1.1×MAG to up to 4 player units + Poison ×1 each · recoil
-    let totalRF=0;
-    aa.filter(a=>a.currentHp>0).slice(0,4).forEach(tgt=>{
-      const preA=tgt.armor||0;
-      const dmg=critify(Math.max(1,Math.round((u.mag||0)*1.2-(tgt.res||0)*0.4)),u,true); // v688: 1.3->1.2
-      const h=applyArmorDamage(tgt,dmg,true);
-      if(h>0){tgt.currentHp=Math.max(0,tgt.currentHp-h);totalRF+=h;G._animQueue.push({uid:tgt.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});}
-      applyPoison(tgt,1);applySlowToUnit(tgt,preA);onHitContact(u,tgt);if(tgt.currentHp<=0)handleDeath(tgt);
-    });
-    addLog(`<span class="log-ab">🔆 Toxic Exhaust! ${totalRF} + Poison ×1 + Slow each!</span>`);
+  if(ak==='cleansingSteam'&&ae.length){
+    /* v734: enemy mirror -- heals + cleanses her OWN side (ae), not the party. */
+    let totCS=0;
+    ae.filter(e=>e.currentHp>0).forEach(e=>{
+      const h=Math.round(e.maxHp*0.30);const b=e.currentHp;
+      e.currentHp=Math.min(e.maxHp,e.currentHp+h);const g=e.currentHp-b;
+      if(g>0){totCS+=g;G._animQueue.push({uid:e.id,dmg:g,isHeal:true});}
+      cleanseUnit(e);});
+    addLog(`<span class="log-heal">🔆 Cleansing Steam! +${totCS} HP + cleanse to her side</span>`);
     applyDayRecoil(u);return;
   }
   if(ak==='prismVolley'&&aa.length){
@@ -11352,7 +11356,7 @@ function renderActionPanel(){
     const godSpecFlat={'seismicRoar':8,'ophidianMother':0,'deluge':0,'tlalocanDeluge':0,'featherEmbrace':0,'oldFire':20,'cripplingShock':0,'riverJudge':0,'obsidianStorm':14,'holyHarvest':0,'zappingStrike':0,'aurumBreak':0,'frostMacuahuitl':0};
     const godSpecMult={'deluge':1.35,'tlalocanDeluge':1.35,'obsidianStorm':1.25,'aurumBreak':1.5,'frostMacuahuitl':1.5};
     // Vassal ability mult overrides (for abilities that use a mult formula instead of base+flat)
-    const vassalSpecMult={'Rain Drop':1.3,'Soul Drain':1.3,'Life Siphon':1.35,'Coil Crush':1.4,'Wail':1.5,'Thorn Lash':1.5,'Vine Grasp':1.3,'Blood Drink':1.8,'Glass Cut':1.6,'Pollen Burst':1.1,'Ball Strike':0.55,'War Rhythm':1.2,'Heavy Cleave':1.3,'Razor Dive':1.3,'Haunt':1.3,'Venom Shade':1.3,'Thorn Mangle':1.5,'Ancient Crush':1.4,'Iceburn Storm':1.1,'Death Screech':1.4,'Shard Breath':1.2,'Tremor':1.3,'Withering Touch':1.25,'Tectonic Slam':1.05,'Howling Gust':1.4,'Murk':1.2,'Magma Burst':1.2,'Septic Howl':1.25,'Collapse':1.2,'Haunt':1.1,'Frost Macuahuitl':1.5,'Solar Crush':1.6,'Craft Shard':1.1,'Permafrost':1.6,'Biting Draft':1.2,'Howling Chill':1.05,'Ash Surge':1.1,'Sandblast':1.1,'Howling Drift':1.1,'Virulent Gale':1.1,'Obsidian Blade':2.0,'Sun Dive':1.25,'Solar Pounce':1.6,'Sacred Arrow':0.7,'Toxic Exhaust':1.2,'Prism Volley':0.6,'Filthwater Plume':0.75,'Drowning Grasp':1.5,'Writhing Bloom':1.2,'Colony Sting':0.9,'Voltaic Discharge':1.5,'Gnaw the Fallen':1.9,'Abyssal Lure':1.3,'Fang Flash':1.3,'Descent from the Trees':1.5,'Jestress Nightmare':1.1};
+    const vassalSpecMult={'Rain Drop':1.3,'Soul Drain':1.3,'Life Siphon':1.35,'Coil Crush':1.4,'Wail':1.5,'Thorn Lash':1.5,'Vine Grasp':1.3,'Blood Drink':1.8,'Glass Cut':1.6,'Pollen Burst':1.1,'Ball Strike':0.55,'War Rhythm':1.2,'Heavy Cleave':1.3,'Razor Dive':1.3,'Haunt':1.3,'Venom Shade':1.3,'Thorn Mangle':1.5,'Ancient Crush':1.4,'Iceburn Storm':1.1,'Death Screech':1.4,'Shard Breath':1.2,'Tremor':1.3,'Withering Touch':1.25,'Tectonic Slam':1.05,'Howling Gust':1.4,'Murk':1.2,'Magma Burst':1.2,'Septic Howl':1.25,'Collapse':1.2,'Haunt':1.1,'Frost Macuahuitl':1.5,'Solar Crush':1.6,'Craft Shard':1.1,'Permafrost':1.6,'Biting Draft':1.2,'Howling Chill':1.05,'Ash Surge':1.1,'Sandblast':1.1,'Howling Drift':1.1,'Virulent Gale':1.1,'Obsidian Blade':2.0,'Sun Dive':1.25,'Solar Pounce':1.6,'Sacred Arrow':0.7,'Prism Volley':0.6,'Filthwater Plume':0.75,'Drowning Grasp':1.5,'Writhing Bloom':1.2,'Colony Sting':0.9,'Voltaic Discharge':1.5,'Gnaw the Fallen':1.9,'Abyssal Lure':1.3,'Fang Flash':1.3,'Descent from the Trees':1.5,'Jestress Nightmare':1.1};
     // v579: 5-target vassal AoEs capped at 0.9x — wide coverage shouldn't also carry full power
     Object.keys(AOE_CAP_AB).forEach(function(_ab){if(AOE_CAP_AB[_ab]>=5&&vassalSpecMult[_ab]!==undefined&&vassalSpecMult[_ab]>0.9)vassalSpecMult[_ab]=0.9;});
     let flatBonus=singleDmgRef[specLabel]??5;
@@ -12532,8 +12536,20 @@ function showUnitTooltip(u){
     if(_ghm!==1)T.hp=Math.round((hp-sb.hp)*_ghm)+sb.hp; // DT multiplies the level-scaled base only, not Soul Surge
     if(_affInfo)T.hp=Math.round(T.hp*_affInfo.mult);
   }
+  else if(u.isAlly||!u.enemyLevel){ // v732: vassal side -- modal omitted vassalHpMult, so vassal HP read up to 20% low vs battle/Temazcal
+    const _vhm=(G.dte&&G.dte.vassalHpMult)||1;
+    if(_vhm!==1)T.hp=Math.round((T.hp-sb.hp)*_vhm)+sb.hp; // multiply the offering-layered value, not the raw base
+  }
   const _synInfo=(()=>{const cs=calcSynergy();const _m=G.god&&(u.element===G.god.element||(hasPassive('azureZephyr')&&(u.element==='fire'||u.element==='wind')));if(!_m||!cs.count)return null;const _b=v=>Math.max(1,Math.round((v||0)*cs.pct));T.atk+=_b(T.atk);T.mag+=_b(T.mag);T.def+=_b(T.def);T.res+=_b(T.res);return cs;})();
   const _affLine=_affInfo?('<div style="margin-top:6px;font-size:11px;color:#c0a0e0">\ud83d\udd2e God Affinity: <strong>\u00d7'+_affInfo.mult.toFixed(2)+' HP</strong> ('+_affInfo.count+' other god'+(_affInfo.count>1?'s':'')+' deployed)</div>'):'';
+  const _ghLine=(()=>{const _ghm2=(G.dte&&G.dte.godHpMult)||1;
+    if(!u.isGod||_ghm2===1)return '';
+    const _g=[];if(DT&&DT.unlocked&&DT.unlocked.has('god_special_up'))_g.push('I');if(DT&&DT.unlocked&&DT.unlocked.has('god_special_up_2'))_g.push('II');
+    return '<div style="margin-top:6px;font-size:11px;color:#c0a0e0">\u2726 God Health Boost'+(_g.length?' '+_g.join('+'):'')+': <strong>\u00d7'+_ghm2.toFixed(2)+' HP</strong></div>';})(); // v733: gods had the boost applied but never attributed
+  const _vhLine=(()=>{const _vhm=(G.dte&&G.dte.vassalHpMult)||1;
+    if(u.isGod||(u.enemyLevel&&!u.isAlly)||_vhm===1)return '';
+    const _t=[];if(DT&&DT.unlocked&&DT.unlocked.has('ally_special_up'))_t.push('I');if(DT&&DT.unlocked&&DT.unlocked.has('ally_special_up_2'))_t.push('II');
+    return '<div style="margin-top:6px;font-size:11px;color:#c0a0e0">\u2726 Vassal Health Boost'+(_t.length?' '+_t.join('+'):'')+': <strong>\u00d7'+_vhm.toFixed(2)+' HP</strong></div>';})(); // v732
   const _pbLine=_pbInfo?('<div style="margin-top:6px;font-size:11px;color:#c0a0e0">\u2726 Pantheon Boost: <strong>\u00d7'+_pbInfo.mult.toFixed(2)+' ATK/MAG/DEF/RES</strong> ('+_pbInfo.count+' other god'+(_pbInfo.count>1?'s':'')+' deployed)</div>'):'';
   const _abS=u.atkBuffStacks||0,_dbS=u.defBuffStacks||0,_cbS=u.critBuffStacks||0;
   const _abM=1+0.10*_abS,_dbM=1+0.10*_dbS;
@@ -12597,7 +12613,7 @@ function showUnitTooltip(u){
     +patronLine
     +abilLine
     +oblLine
-    +(_synInfo?('<div style="font-size:11px;color:#d4af37;margin-top:4px">🔗 Elemental Synergy: +'+Math.round(_synInfo.pct*100)+'% ATK/MAG/DEF/RES ('+_synInfo.count+' bond'+(_synInfo.count>1?'s':'')+')</div>'):'')+_affLine+_pbLine
+    +(_synInfo?('<div style="font-size:11px;color:#d4af37;margin-top:4px">🔗 Elemental Synergy: +'+Math.round(_synInfo.pct*100)+'% ATK/MAG/DEF/RES ('+_synInfo.count+' bond'+(_synInfo.count>1?'s':'')+')</div>'):'')+_affLine+_pbLine+_vhLine+_ghLine
     +offSec
     +buffSec
     +'</div>';
