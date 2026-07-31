@@ -773,7 +773,11 @@ const OFFERINGS={
   // -- v580: WIND batch --
   kukulkan_statue:{name:"K'uk'ulkan Statue",tier:'rare',icon:'🗿',price:600,priceType:'cacao',flowerPrice:20,desc:'Once per round: after a capture, a random WIND unit gains a bonus action',flavor:'The feathered serpent coils in stone, waiting for the wind to move it.',eff:{kukulkanBonus:1}},
   gold_serpent_ornament:{name:'Gold Serpent Ornament',tier:'uncommon',icon:'🐍',price:250,priceType:'cacao',desc:'Cacao prices in the Sacred Tianguis are 5% cheaper per deployed WIND unit',flavor:'Traders wear it at the throat; the merchants of Mictlan know its weight.',eff:{windCacaoDiscount:0.05}},
-  ehecatl_mask:{name:'Ehecatl Mask',tier:'uncommon',icon:'😷',price:250,priceType:'cacao',desc:'Every 4 units SPARED at the Altar, a random deployed WIND unit gains a free Soul Surge',flavor:'The wind god wears a beak to blow the roads clean. Mercy travels on his breath.',eff:{ehecatlSpare:3}},
+  ehecatl_mask:{name:'Ehecatl Mask',tier:'uncommon',icon:'😷',price:250,priceType:'cacao',desc:'Every 4 units SPARED at the Altar, a random deployed WIND unit gains a free Soul Surge',flavor:'The wind god wears a beak to blow the roads clean. Mercy travels on his breath.',eff:{ehecatlSpare:3},
+    /* v841: Sparing is itself gated behind Godly Compassion, so without that node this offering
+       has no way to ever trigger -- it was purchasable dead weight. noStockIf keeps it out of
+       both the Pochteca pool and the random-grant path, which share this hook. */
+    noStockIf:function(){return !(DT.unlocked&&DT.unlocked.has('godly_compassion'));}},
   // -- v582: EARTH batch + WOUND synergy --
   flayed_skin:{name:'Flayed Skin',tier:'rare',icon:'🥩',price:600,priceType:'cacao',flowerPrice:20,desc:'When an EARTH unit is hit by a strike or special, the attacker loses 10% of its max HP',flavor:'Xipe Totec wore the skin of the sacrificed for twenty days. What strikes it, sickens.',eff:{flayedSkin:0.10}},
   tlaltecuhtli_claw:{name:'Tlaltecuhtli Claw',tier:'uncommon',icon:'🦴',price:250,priceType:'cacao',desc:"EARTH units' strikes apply Wound ×1",flavor:'The earth monster has mouths at every joint. She never stopped being hungry.',eff:{strikeWoundEarth:1}},
@@ -1850,13 +1854,46 @@ function getTecpatlEffects(){
   };
 }
 
+/* v838: one table for boss TEOTL, replacing the inline chain that stopped at Layer 7 -- so
+   Tlazolteotl and Mictlantecuhtli paid nothing, and the base barely moved across the last two
+   layers of the game. The same table now also derives how many LAYERS were conquered, which
+   drives the additive run bonus below; deriving both from one source means they can never
+   disagree about what counts as clearing a layer.
+   OPTIONAL bosses paid nothing at all before this -- Xochipilli, Mixcoatl, Chicomecoatl,
+   Tonatiuh, Cihuacoatl, Patecatl and Xbalanque were worth zero however hard they were. They now
+   pay, but do NOT count toward the layer multiplier: they are side content, not depth. */
+const LAYER_BOSS_TEOTL=[
+  {layer:1,teotl:5, test:id=>id==='boss'||id.indexOf('boss_xolotl')===0},
+  {layer:2,teotl:10,test:id=>id.indexOf('boss_tepy')===0},
+  {layer:3,teotl:15,test:id=>id.indexOf('boss_itzpap')===0},
+  {layer:4,teotl:20,test:id=>id.indexOf('boss_ixqui')===0},
+  {layer:5,teotl:20,test:id=>id.indexOf('boss_mal')===0||id.indexOf('boss_xiu')===0},
+  {layer:6,teotl:25,test:id=>id.indexOf('boss_opochtli')===0},
+  {layer:7,teotl:30,test:id=>id.indexOf('boss_mayahuel')===0},
+  {layer:8,teotl:35,test:id=>id.indexOf('boss_tlazolteotl')===0},
+  /* L9 is credited to Mictlantecuhtli only -- Cipactli's five parts also land in bossesDefeated
+     and would otherwise pay five times over for one fight. */
+  {layer:9,teotl:50,test:id=>id.indexOf('boss_mictlantecuhtli')===0} /* v839: 40 -> 50 */
+];
+const OPTIONAL_BOSS_TEOTL=[
+  {teotl:20,test:id=>id.indexOf('boss_xochi')===0},
+  {teotl:20,test:id=>id.indexOf('boss_mixcoatl')===0},
+  {teotl:20,test:id=>id.indexOf('boss_chicomecoatl')===0},
+  {teotl:25,test:id=>id.indexOf('boss_tonatiuh')===0},
+  {teotl:25,test:id=>id.indexOf('boss_cihuacoatl')===0},
+  {teotl:25,test:id=>id.indexOf('boss_patecatl')===0},
+  {teotl:30,test:id=>id.indexOf('boss_xbalanque')===0}
+];
 function calcTeotlEarned(){
   // v45: increased base from 1.5 to 2 per battle
   const battleTeotl=Math.floor(G.battlesCompleted*2);
   const hardTeotl=Math.round(G.hardBattles*1.25); // v679: +25% hard-path TEOTL
   const perfectTeotl=G.perfectBattles||0;
   // v590: the list stopped at L5 — Opochtli and Mayahuel kills were worth 0 TEOTL
-  const bossTeotl=(G.bossesDefeated.includes('boss')?5:0)+(G.bossesDefeated.some(id=>id.startsWith('boss_tepy'))?10:0)+(G.bossesDefeated.some(id=>id.startsWith('boss_itzpap'))?15:0)+(G.bossesDefeated.some(id=>id.startsWith('boss_ixqui'))?20:0)+(G.bossesDefeated.some(id=>id.startsWith('boss_mal')||id.startsWith('boss_xiu'))?20:0)+(G.bossesDefeated.some(id=>id.startsWith('boss_opochtli'))?25:0)+(G.bossesDefeated.some(id=>id.startsWith('boss_mayahuel'))?30:0);
+  const _bd=G.bossesDefeated||[];
+  let bossTeotl=0,layersConquered=0;
+  LAYER_BOSS_TEOTL.forEach(e=>{if(_bd.some(id=>e.test(String(id)))){bossTeotl+=e.teotl;layersConquered++;}});
+  OPTIONAL_BOSS_TEOTL.forEach(e=>{if(_bd.some(id=>e.test(String(id))))bossTeotl+=e.teotl;});
   const tp_t=getTecpatlEffects();
   const bossTeotlBonus=Math.round(bossTeotl*1.5); // v679: bosses worth +50% TEOTL
   const baseTot=battleTeotl+hardTeotl+perfectTeotl+bossTeotlBonus;
@@ -1866,8 +1903,12 @@ function calcTeotlEarned(){
      Tecpatl's teotlMult rather than replacing it. */
   const conquered=!!(G._cipactliPhase&&G.layer===9);
   const conquestMult=conquered?2:1;
-  const total=Math.floor(baseTot*(tp_t.teotlMult||1.0)*conquestMult);
-  return{battleTeotl,hardTeotl,perfectTeotl,bossTeotl:bossTeotlBonus,teotlMult:tp_t.teotlMult||1.0,conquered,conquestMult,total}; // v679: expose bonused value so the breakdown rows sum to the total
+  /* v838: +10% per layer conquered, ADDITIVE rather than compounding (ruled) -- 1+0.1n. At nine
+     layers that is x1.90, against x2.36 had it compounded. Stacks multiplicatively with the
+     Tecpatl penance and the full-Mictlan x2. */
+  const layerMult=1+0.10*layersConquered;
+  const total=Math.floor(baseTot*(tp_t.teotlMult||1.0)*layerMult*conquestMult);
+  return{battleTeotl,hardTeotl,perfectTeotl,bossTeotl:bossTeotlBonus,teotlMult:tp_t.teotlMult||1.0,conquered,conquestMult,layersConquered,layerMult,total}; // v679: expose bonused value so the breakdown rows sum to the total
 }
 
 // ============================================================
@@ -1891,7 +1932,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v836'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v841'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -2637,10 +2678,22 @@ function layer6Unlocked(){return Object.keys(V).some(k=>k.startsWith('layer6_')&
 function layer7Unlocked(){return Object.keys(V).some(k=>k.startsWith('layer7_')&&V[k]);}
 function layer9Unlocked(){return Object.keys(V).some(k=>k.indexOf('layer9_')===0&&V[k]);} // v788: a full Mictlan clear on this account
 function layer8Unlocked(){return Object.keys(V).some(k=>k.startsWith('layer8_')&&V[k]);} // v715
-// Tecpatl Penance unlocks after clearing the deepest layer. Bump TECPATL_UNLOCK_LAYER by 1 each time a
-// new layer ships (L6→6, L7→7, … capped at 9). Relies on the layerN_<god> completion-flag convention.
-const TECPATL_UNLOCK_LAYER=5;
-function tecpatlPenanceUnlocked(){return Object.keys(V).some(k=>k.startsWith('layer'+TECPATL_UNLOCK_LAYER+'_')&&V[k]);}
+/* Tecpatl Penance unlocks after clearing the deepest layer.
+   v840: this was a hand-maintained constant with an instruction to bump it as each layer shipped
+   -- and it never was, so it sat at 5 from Layer 5 onward. Anyone who had ever cleared L5 got the
+   unlock, which is why it fired after a Layer 6 defeat. Derived from MICTLAN_LAYERS now, so it
+   tracks the deepest playable layer automatically and cannot go stale again.
+   Still relies on the layerN_<god> completion-flag convention. */
+function tecpatlUnlockLayer(){
+  try{
+    const av=(MICTLAN_LAYERS||[]).filter(l=>l&&l.available!==false).map(l=>l.num);
+    return av.length?Math.max(...av):1;
+  }catch(e){return 9;}
+}
+function tecpatlPenanceUnlocked(){
+  const n=tecpatlUnlockLayer();
+  return Object.keys(V).some(k=>k.indexOf('layer'+n+'_')===0&&V[k]);
+}
 
 const STORY_LINES_L5=[
   "The ground stopped mattering miles back.",
@@ -3874,13 +3927,36 @@ function surgeRefundLv(key){
   const s=G.surge&&G.surge[key];if(!s)return 0;
   return Math.max(0,surgeTotalLv(key)-(s.bonusSpent||0));
 }
+/* v837: accepts either a key or a unit. Given a unit it tries every key that unit could have
+   been filed under -- _captureId, id, and the god form -- because the caller cannot always know
+   which one the surge record used, and a mismatch silently rendered nothing.
+   Also tolerates a record with no `forces` block, which previously threw on F.ihiyotl.lv. */
+function surgeKeysFor(u){
+  if(!u)return[];
+  if(typeof u==='string')return[u];
+  const k=[];
+  if(u.isGod){
+    if(u.id&&u.id.indexOf('god_')===0)k.push(u.id);
+    if(u.baseGodId)k.push('god_'+u.baseGodId);
+    if(G.god&&G.god.id)k.push('god_'+G.god.id);
+  }
+  if(u._captureId)k.push(u._captureId);
+  if(u.id)k.push(u.id);
+  if(u.baseId)k.push(u.baseId);
+  return [...new Set(k.filter(Boolean))];
+}
 function surgeForceBadge(key){
   // v326: levels only — accumulated totals removed per playtest (UI bloat)
-  const s=G.surge&&G.surge[key];if(!s)return'';
+  let s=null;
+  if(key&&typeof key==='object'){
+    for(const k of surgeKeysFor(key)){const c=G.surge&&G.surge[k];if(c&&c.forces&&((c.forces.ihiyotl||{}).lv||(c.forces.teyolia||{}).lv||(c.forces.tonalli||{}).lv)){s=c;break;}}
+    if(!s)for(const k of surgeKeysFor(key)){if(G.surge&&G.surge[k]){s=G.surge[k];break;}}
+  }else s=G.surge&&G.surge[key];
+  if(!s||!s.forces)return'';
   const parts=[];const F=s.forces;
-  if(F.ihiyotl.lv)parts.push('💪 Ihiyotl L'+F.ihiyotl.lv);
-  if(F.teyolia.lv)parts.push('🫀 Teyolia L'+F.teyolia.lv);
-  if(F.tonalli.lv)parts.push('🔮 Tonalli L'+F.tonalli.lv);
+  if((F.ihiyotl||{}).lv)parts.push('💪 Ihiyotl L'+F.ihiyotl.lv);
+  if((F.teyolia||{}).lv)parts.push('🫀 Teyolia L'+F.teyolia.lv);
+  if((F.tonalli||{}).lv)parts.push('🔮 Tonalli L'+F.tonalli.lv);
   return parts.length?'<div style="font-size:10px;color:#c8a040;margin-bottom:3px">'+parts.join(' · ')+'</div>':'';
 }
 function unitBaseFor(key){
@@ -4531,7 +4607,7 @@ function confirmGod(){
   if(penanceAvailable&&!hasV('penance_intro_seen')){
     markV('penance_intro_seen');
     setTimeout(()=>showMo('🗡️','Tecpatl Penance Unlocked!',
-      `<div style="font-size:13px;line-height:1.7;color:var(--td)">You have conquered all four layers of Mictlan.<br><br>
+      `<div style="font-size:13px;line-height:1.7;color:var(--td)">You have conquered the whole of Mictlan \u2014 all nine layers.<br><br>
 You may now invoke <strong style="color:#c03030">Tecpatl Penance</strong> — a self-imposed curse that makes each run harder in exchange for greater glory.<br><br>
 Choose your penance level before each run. Set it to <strong>0</strong> to play a normal run at any time.</div>`,
       [{label:'OK',fn:()=>showPenanceLevel(afterPenance)}]),100);
@@ -13152,6 +13228,12 @@ function runTeotlReveal(earned,opts){
   if(earned.bossTeotl)items.push({icon:'💀',label:'Bosses slain',val:earned.bossTeotl,col:'#e06060'});
   /* v804: show the conquest doubling as its own row, or the total will not reconcile with the
      rows above it -- the same reason v679 exposed the bonused boss value. */
+  /* v838: the layer bonus needs its own row for the same reason the conquest x2 does -- the
+     breakdown must sum to the printed total. */
+  if(earned.layersConquered>0&&earned.layerMult>1){
+    const _pre=earned.battleTeotl+earned.hardTeotl+earned.perfectTeotl+earned.bossTeotl;
+    items.push({icon:'\u26f0',label:'Layers conquered \u00d7'+earned.layersConquered+' \u2014 \u00d7'+earned.layerMult.toFixed(2),val:Math.round(_pre*(earned.layerMult-1)*(earned.teotlMult||1)),col:'#80c0ff'});
+  }
   if(earned.conquered)items.push({icon:'\u2726',label:'Mictlan conquered \u2014 \u00d72',val:Math.floor(earned.total/2),col:'#d4af37'});
   let i=0,running=0;
   const nextRow=()=>{
@@ -14102,7 +14184,7 @@ function showUnitTooltip(u){
   const typeLabel=bo.type==='MAG'?'Magical':bo.type==='MIX'?'MIX':'Physical';
   /* v822: surgeForceBadge() existed since v326 but was never called from anywhere -- which is why
      Teyolia, Ihiyotl and Tonalli levels were invisible outside the surge picker itself. */
-  const _surgeBadge=(typeof surgeForceBadge==='function')?surgeForceBadge(_sk):'';
+  const _surgeBadge=(typeof surgeForceBadge==='function')?surgeForceBadge(u):''; /* v837: pass the unit, not one guessed key */
   /* v826: _sk passes the surge key (v822). Written as a block comment -- the v822 edit used a
      trailing // here, which swallowed `const T=_ol.total;` and threw ReferenceError: T is not
      defined on every stat-modal open. */
