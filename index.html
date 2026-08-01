@@ -48,6 +48,31 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .armor-shard{position:fixed;width:7px;height:7px;border-radius:1px;pointer-events:none;z-index:9999;background:linear-gradient(135deg,#cdf3ff,#3fb8d8);box-shadow:0 0 5px #6fd8f0;animation:shardFly .55s ease-out forwards}
 @keyframes armorFlash{0%{opacity:.9;transform:scale(.85)}100%{opacity:0;transform:scale(1.25)}}
 .armor-flash{position:fixed;border-radius:5px;pointer-events:none;z-index:9998;background:radial-gradient(ellipse,rgba(180,240,255,.85),rgba(80,200,230,0) 70%);animation:armorFlash .35s ease-out forwards}
+/* v846: sacrifice blood spill. All three live on document.body at position:fixed (the armor-shard
+   pattern) so they outlive the renderAltar() that tears the card out from under them. */
+@keyframes bloodFall{0%{opacity:0;transform:translate(0,-4px) scaleY(.6)}15%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scaleY(1.9)}}
+.blood-drop{position:fixed;width:5px;height:9px;border-radius:50% 50% 45% 45%;pointer-events:none;z-index:9999;background:linear-gradient(180deg,#e0304a,#8a0d1c 60%,#4a0410);box-shadow:0 0 5px rgba(200,20,40,.65);animation:bloodFall var(--dur,.85s) cubic-bezier(.35,.05,.6,1) forwards}
+@keyframes bloodPool{0%{opacity:0;transform:translate(-50%,0) scale(.15)}30%{opacity:.85}100%{opacity:0;transform:translate(-50%,0) scale(1.5)}}
+.blood-pool{position:fixed;width:70px;height:15px;border-radius:50%;pointer-events:none;z-index:9997;background:radial-gradient(ellipse,rgba(150,12,28,.95),rgba(90,6,16,.35) 55%,rgba(60,0,10,0) 78%);animation:bloodPool 1.1s ease-out forwards}
+@keyframes sacFlash{0%{opacity:.85;transform:scale(.9)}100%{opacity:0;transform:scale(1.3)}}
+.sac-flash{position:fixed;border-radius:8px;pointer-events:none;z-index:9998;background:radial-gradient(ellipse,rgba(230,50,70,.75),rgba(140,10,25,0) 70%);animation:sacFlash .4s ease-out forwards}
+/* v848: enemy slain burst. Sprays outward from the card centre rather than falling, so it reads
+   as a killing blow instead of the altar's downward drain. */
+@keyframes bloodSpray{0%{opacity:0;transform:translate(0,0) scale(.5)}12%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.25)}}
+.blood-spray{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:9999;background:radial-gradient(circle at 35% 30%,#f04a5e,#9a0f20 60%,#4a0410);box-shadow:0 0 6px rgba(220,30,50,.7);animation:bloodSpray var(--dur,.7s) cubic-bezier(.2,.7,.4,1) forwards}
+@keyframes bloodStain{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}25%{opacity:.7}100%{opacity:0;transform:translate(-50%,-50%) scale(1.35)}}
+.blood-stain{position:fixed;border-radius:50%;pointer-events:none;z-index:9997;background:radial-gradient(circle,rgba(150,10,26,.85),rgba(90,5,15,.3) 55%,rgba(60,0,10,0) 75%);animation:bloodStain .95s ease-out forwards}
+/* v849: capture binding. The inverse of the slain burst -- motes travel INWARD and a ring
+   contracts onto the card, so a capture reads as something being bound rather than broken.
+   Gold/jade palette, no red anywhere. */
+@keyframes bindMote{0%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.15)}20%{opacity:1}100%{opacity:0;transform:translate(0,0) scale(.25)}}
+.bind-mote{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:9999;background:radial-gradient(circle at 35% 30%,#fff2c0,#f0c850 55%,#a8791a);box-shadow:0 0 8px rgba(240,200,90,.9);animation:bindMote var(--dur,.72s) cubic-bezier(.3,.1,.25,1) forwards}
+@keyframes bindRing{0%{opacity:0;transform:translate(-50%,-50%) scale(1.7) rotate(0)}25%{opacity:.95}100%{opacity:0;transform:translate(-50%,-50%) scale(.5) rotate(150deg)}}
+.bind-ring{position:fixed;border-radius:50%;pointer-events:none;z-index:9998;border:2px solid rgba(240,205,100,.9);box-shadow:0 0 14px rgba(240,205,100,.55),inset 0 0 12px rgba(240,205,100,.35);animation:bindRing .85s ease-out forwards}
+@keyframes bindGlow{0%{opacity:0;transform:scale(.7)}40%{opacity:.85}100%{opacity:0;transform:scale(1.2)}}
+.bind-glow{position:fixed;border-radius:10px;pointer-events:none;z-index:9997;background:radial-gradient(ellipse,rgba(255,230,150,.75),rgba(180,140,40,0) 70%);animation:bindGlow .9s ease-out forwards}
+@keyframes resCountGlow{0%{text-shadow:0 0 0 rgba(212,175,55,0)}35%{text-shadow:0 0 12px rgba(212,175,55,.9)}100%{text-shadow:0 0 0 rgba(212,175,55,0)}}
+.res-counting{animation:resCountGlow 1s ease-out}
 /* v400: card-frame look */
 .uc-art{position:relative;display:flex;align-items:center;justify-content:center;padding:8px 3px 6px;min-height:60px;background:radial-gradient(ellipse at 50% 36%,#2c2110 0%,#1a1208 66%,#120c05 100%);border-bottom:1px solid rgba(212,175,55,.22)}
 .uc-body{padding:5px 7px 7px;background:linear-gradient(180deg,#241a0b,#170f06)}
@@ -1278,7 +1303,23 @@ function specTip(e,name,ad){ // v635: hover a special's name for its full detail
   tt.style.left=Math.min(x+12,window.innerWidth-216)+'px';tt.style.top=Math.min(y+14,window.innerHeight-96)+'px';
 }
 function specTipTap(e,n,a){if(e&&e.stopPropagation)e.stopPropagation();specTip(e,n,a);setTimeout(()=>{document.addEventListener('click',relicTipHide,{once:true});},50);}
-function specAttrs(name,ad){const n=String(name).replace(/'/g,'&#39;').replace(/"/g,'&quot;'),a=String(ad).replace(/'/g,'&#39;').replace(/"/g,'&quot;');return 'style="cursor:help" onmouseenter="specTip(event,\''+n+'\',\''+a+'\')" onmouseleave="relicTipHide()" ontouchstart="specTipTap(event,\''+n+'\',\''+a+'\')" onclick="event.stopPropagation();specTipTap(event,\''+n+'\',\''+a+'\')"';}
+/* v852: the old escaper turned ' into &#39;, which is right for HTML TEXT but wrong for a JS
+   string sitting inside an HTML attribute. The browser entity-decodes the attribute value
+   FIRST and only then parses it as JS, so &#39; reached the parser as a bare quote and closed
+   the string early. Reveler's Flurry (Toltecatl -- the only ability name in the game with an
+   apostrophe) produced specTip(event,'Reveler's Flurry',...) and threw
+   SyntaxError: missing ) after argument list, killing that card's tooltip handlers.
+   Correct order: JS-escape first (a backslash survives entity decoding intact), then
+   HTML-escape only what would break out of the attribute itself. */
+function _specEsc(v){
+  return String(v)
+    .replace(/\\/g,'\\\\')
+    .replace(/&/g,'&amp;')
+    .replace(/'/g,"\\'")
+    .replace(/"/g,'&quot;')
+    .replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function specAttrs(name,ad){const n=_specEsc(name),a=_specEsc(ad);return 'style="cursor:help" onmouseenter="specTip(event,\''+n+'\',\''+a+'\')" onmouseleave="relicTipHide()" ontouchstart="specTipTap(event,\''+n+'\',\''+a+'\')" onclick="event.stopPropagation();specTipTap(event,\''+n+'\',\''+a+'\')"';}
 function unitTypeTip(e,tcode,heal){ // v621: top-right type badge tooltip — strike typing + whether the 🔮 special heals
   const tt=document.getElementById('relic-tooltip');if(!tt)return;
   const core=tcode==='MAG'?'This unit’s strikes are purely magical — 🪄 MAG, reduced by the target’s 🔯 RES.'
@@ -1932,7 +1973,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v841'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v857'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -3494,6 +3535,40 @@ function hasRunSave(){
     const o=JSON.parse(raw); return !!(o&&o.v===RUN_SAVE_VERSION&&o.g);}catch(e){return false;}
 }
 function clearRun(){try{localStorage.removeItem('teotlan_run');}catch(e){}}
+/* v844: one-time repair for minibosses captured through the pre-v843 Feather Embrace path.
+   Those entries carry baseId = the BATTLE INSTANCE id ('tlacateocotl_5_ab3'), which missed the
+   MINIBOSS_CAP_STATS lookup at capture time -- so they were frozen with the {hp:150, mag:<enemy
+   scaled mag>} fallback and the boss template's ability text. v843 stops new ones being created;
+   this rebuilds any already sitting in a save.
+   Identity is preserved deliberately: id and _captureId are carried over untouched, so G.levels,
+   G.unitHpRatio / G.unitHpOverride, the surge table and deplSel all stay keyed correctly
+   (capKey(cu) = cu._captureId || cu.id). Only the stat block, ability and baseId are rewritten.
+   Sound entries are skipped -- a correctly captured miniboss already has a baseId that resolves
+   in MINIBOSS_CAP_STATS, and a regular vassal never matches a miniboss template by name. */
+function repairMinibossCaptures(){
+  if(typeof G==='undefined'||!G||!Array.isArray(G.captured))return 0;
+  const tpls=[XOCHITONAL_TPL,QUINAMETZIN_TPL,XIUHNEL_TPL,MIMICH_TPL,MICTLAMPEHECATL_TPL,TLACATEOCOTL_TPL,AMIMITL_TPL,ATLAUA_TPL,ACUECUEYOTL_TPL,OMETOCHTLI_TPL,IXPUXTEQUI_TPL,NEXOXCHO_TPL]; // SPLIT-LIST: mirrors renderSpoils + the Feather Embrace path
+  const KEEP=['_captureId','_tlacuiloRecord','_clone','_isHiredMerc'];
+  const names=[];
+  try{
+    G.captured=G.captured.map(function(c){
+      if(!c||c.isGod)return c;
+      if(c.baseId&&MINIBOSS_CAP_STATS[c.baseId])return c;   /* already sound */
+      const tpl=tpls.find(function(t){return t.name===c.name;});
+      if(!tpl)return c;                                      /* not a miniboss */
+      const cs=MINIBOSS_CAP_STATS[tpl.id];
+      if(!cs)return c;
+      const keep={};KEEP.forEach(function(k){if(c[k]!==undefined)keep[k]=c[k];});
+      names.push(c.name);
+      return Object.assign({},tpl,cs,{id:c.id,baseId:tpl.id,isMiniBoss:false,isBoss:false,isAlly:false},keep);
+    });
+  }catch(e){console.warn('miniboss repair failed',e);return 0;}
+  if(names.length){
+    console.log('v844 repaired minibosses:',names.join(', '));
+    if(typeof notify==='function')setTimeout(function(){notify('\u{1F527} Rebalanced '+names.join(', ')+' \u2014 corrupted mini-boss stats repaired','#d4af37');},600);
+  }
+  return names.length;
+}
 function resumeRun(){
   let o; try{o=JSON.parse(localStorage.getItem('teotlan_run'));}catch(e){o=null;}
   if(!o||o.v!==RUN_SAVE_VERSION||!o.g){clearRun();if(typeof notify==='function')notify('No resumable run found.','#e8a050');return;}
@@ -3501,6 +3576,7 @@ function resumeRun(){
   initG();                                  // clean transient defaults
   Object.assign(G,prog);                    // overlay saved progression
   if(G.god&&G.god.id){const gg=GODS.find(x=>x.id===G.god.id); if(gg)G.god=gg;} // relink patron to canonical object
+  if(repairMinibossCaptures()>0){try{saveRun();}catch(e){}} // v844: repair pre-v843 Feather Embrace miniboss captures, then persist so it only runs once
   G.dte=getDTEffects();
   loadV();
   if(!hasV('ftue_shop_done'))markV('ftue_shop_done'); // v641: band-aid — resuming a run ends the tutorial; a mid-tutorial quit could soft-lock the gate (per playtest)
@@ -4619,6 +4695,15 @@ Choose your penance level before each run. Set it to <strong>0</strong> to play 
 }
 
 function buildB1(){
+  /* v851: buildB1 is a hand-rolled opener with explicit branches for L2/L3/L4 only -- every other
+     layer fell through to the L1 tutorial pair at the bottom. L1 is correct; L5-L9 were not, so
+     the EASY path on battle 1 of five separate layers served Hollow Warrior + Hollow Breath at the
+     L1 scale-1.0 curve with layerLvBonus() bolted on (hence Lv57 next to a Lv63 hard path). The
+     hard path was always right because it goes through buildEnemySet, which resolves capPool per
+     layer. Delegate the late layers to that same builder rather than hand-rolling five more cases:
+     it already owns the pool, count, level and HP curve for each. SPLIT-LIST: any new layer needs
+     either a branch here or coverage by this guard. */
+  if(G.layer>=5)return buildEnemySet(1,'easy');
   if(G.layer===4){
     const pool=getCEHUPool();
     const src=[...pool];const picks=[];
@@ -5567,20 +5652,22 @@ function evL6ArrowRain(el){
   el.appendChild(hdr);
   const allKeys=()=>{const ks=[];G.party.forEach(gid=>{const gd=GODS.find(g=>g.id===gid);if(gd)ks.push({k:'god_'+gid,base:gd.hp||140,mult:G.dte.godHpMult||1});});G.captured.forEach(cu=>ks.push({k:capKey(cu),base:cu.hp||50,mult:G.dte.vassalHpMult||1}));return ks;};
   // Brace behind shields
-  el.appendChild(evOpt('🛡','Brace behind shields','Next battle: all allies start with +50 HP Chimalli, but −40% TP','Shields up against the rain.',false,'',()=>{
+  el.appendChild(evOpt('🛡','Brace behind shields','Next battle: all allies start with +100 HP Chimalli, but −40% TP','Shields up against the rain.',false,'',()=>{
     G.unitArmor=G.unitArmor||{};
-    allKeys().forEach(o=>{G.unitArmor[o.k]=50;});
+    /* v845 buff: 50 -> 100. NOTE this ASSIGNS rather than adds, so it still overwrites any
+       Chimalli already queued for the next battle instead of stacking with it. */
+    allKeys().forEach(o=>{G.unitArmor[o.k]=100;});
     evDrainNPAll(0.40);renderRes('rb-event');
     const el2=document.getElementById('event-content');
-    evResult(el2,'🛡',`Your party locks shields against the volley.<br><em style="color:#80c0ff">All allies +50 HP Chimalli · −40% TP next battle.</em>`,afterEvent);
+    evResult(el2,'🛡',`Your party locks shields against the volley.<br><em style="color:#80c0ff">All allies +100 HP Chimalli · −40% TP next battle.</em>`,afterEvent);
   }));
   // Run the gauntlet
-  el.appendChild(evOpt('🏃','Run the gauntlet','All allies start next battle at 40% HP · +1800 Blood + a random Common offering','Sprint through the arrows.',false,'',()=>{
+  el.appendChild(evOpt('🏃','Run the gauntlet','All allies start next battle at 40% HP · +3600 Blood + a random Common offering','Sprint through the arrows.',false,'',()=>{
     G.unitHpOverride=G.unitHpOverride||{};
     allKeys().forEach(o=>{const mhp=allyMaxHpFor(o.k,o.base,o.mult);G.unitHpOverride[o.k]=Math.max(1,Math.round(mhp*0.40));});
-    G.res.blood+=1800;const r=grantRandomOffering('common');renderRes('rb-event');
+    G.res.blood+=3600;const r=grantRandomOffering('common');renderRes('rb-event'); /* v845 buff: 1800 -> 3600 */
     const el2=document.getElementById('event-content');
-    evResult(el2,'🏃',`You sprint through the arrows — bloodied, but richer.<br><em style="color:#e07070">All allies → 40% HP next battle.</em><br><em style="color:#e05050">+1800 🩸 Blood</em><br>${offeringRewardLine(r)}`,afterEvent);
+    evResult(el2,'🏃',`You sprint through the arrows — bloodied, but richer.<br><em style="color:#e07070">All allies → 40% HP next battle.</em><br><em style="color:#e05050">+3600 🩸 Blood</em><br>${offeringRewardLine(r)}`,afterEvent);
   }));
   // Tempt his aim (free 50/50)
   el.appendChild(evOpt('🎯','Tempt his aim','A 50/50 gamble — Opochtli either favors or scorns your boldness','Stand tall and dare the volley.',false,'',()=>{
@@ -7288,7 +7375,7 @@ function buildRoundQueue(){
     }
   }
   /* v761: enemies never enter actedIds, so own-side turn order needs its own counter. */
-  G.qIdx=0;G.actedIds=new Set();G._enemyActedCount=0;G._enemyActedIds=new Set();G.roundNum++;
+  G.qIdx=0;G.actedIds=new Set();G._enemyActedCount=0;G._enemyActedIds=new Set();G._bonusActedRestoreId=null;G._kukulkanPending=false;G.roundNum++; /* v853/v856: markers are round-scoped, like actedIds */
   /* v806: Sak Tahn Waax Calendar. The count is a RUN counter, not a battle counter -- it
      deliberately carries across fights, so a player can walk into a boss room with it nearly
      primed and land the pulse on round 1. Ruled intended in the L8 design; watch it in playtest.
@@ -7662,10 +7749,17 @@ function advanceTurn(actorId){
     G._serendipityFreeAction=false;
     G._serendipityUsed=true; // v332: commit the once-per-round use only now that the bonus action has fired
     G._serendipityTargetId=null;
+    G._bonusActedRestoreId=null; /* v853: fired, not cancelled -- advanceTurn re-adds idToMark to actedIds above */
     // Serendipity free bonus action — never consume a queue slot (robust to capture/reselect clearing _serendipityTargetId)
   }else{
     G.qIdx++;
   }
+  /* v856: a Feather Embrace auto-capture happens MID-ACTION, before the actor is in actedIds and
+     before the qIdx decision above. Firing the statue there would (a) find the caster ineligible
+     under the v854 acted-check and (b) risk the caster's own turn taking the free-action branch
+     and never consuming its queue slot. Deferring to here puts it at exactly the point the manual
+     capture path reaches it: actor committed to actedIds, slot already accounted for. */
+  if(G._kukulkanPending){G._kukulkanPending=false;tryKukulkanBonus();}
   G.selectedActorId=null;
   // Belic Rush: if the actor was patron Mixcoatl, cascade unacted Thunder allies
   if(idToMark&&hasPassive('belicRush')){
@@ -7874,7 +7968,11 @@ function selectActor(unitId){
     setTimeout(advanceTurn,700);return;
   }
   G.selectedActorId=unitId;G.battlePhase='player_selected';
-  if(G._serendipityFreeAction&&unitId!==G._serendipityTargetId){G._serendipityFreeAction=false;G._serendipityTargetId=null;} // v332: switching away cancels an un-fired Serendipity bonus (refunds the use)
+  /* v332: switching away cancels an un-fired bonus (refunds the use).
+     v853: the cancel now also restores actedIds, and _bonusActedRestoreId is checked alongside
+     _serendipityTargetId -- the line below nulls the target the moment the granted unit is
+     selected, so on a re-click of that SAME unit the old test cancelled its own bonus. */
+  if(G._serendipityFreeAction&&unitId!==G._serendipityTargetId&&unitId!==G._bonusActedRestoreId)cancelBonusAction();
   if(G._serendipityTargetId===unitId)G._serendipityTargetId=null;
   renderBattle();
 }
@@ -8087,12 +8185,65 @@ function openSerendipityPicker(){
   let btns=eligible.map(u=>`<button class="btn" onclick="fireSerendipityBonus('${u.id}')" style="width:100%;margin-bottom:.4rem;text-align:left;padding:6px 10px;font-size:12px">${u.icon} <strong>${u.name}</strong> <span style="font-size:10px;color:var(--td)">${u.element} · Lv${getLevel(capKey(u))}</span></button>`).join('');
   el.innerHTML=`<div class="act-panel" style="border-color:#8040b0"><div class="act-panel-title" style="color:#c080ff">🎭 Serendipity — Choose a Humanity ally for a bonus action</div><div style="margin-top:.5rem">${btns}</div><button class="btn" onclick="G.battlePhase='player_choose';renderBattle();" style="font-size:11px;margin-top:4px">↩ Cancel</button></div>`;
 }
+/* v853: BOTH bonus-action grants (K'uk'ulkan Statue, Serendipity) make their unit selectable by
+   deleting it from actedIds, and rely on G._serendipityFreeAction to stop the follow-up action
+   consuming a real queue slot. selectActor cleared that flag when the player clicked a different
+   unit -- but never put the unit BACK into actedIds. The bonus then degraded into a fully normal
+   extra turn: the unit acted again on a real player slot, and since the round has exactly one
+   player slot per living ally, the last ally in the queue silently lost their turn.
+   That is the reported Coatlicue skip. _bonusActedRestoreId remembers whose acted-state was
+   cleared so a cancelled bonus can hand it straight back. */
+function cancelBonusAction(){
+  G._serendipityFreeAction=false;
+  G._serendipityTargetId=null;
+  if(G._bonusActedRestoreId){G.actedIds.add(G._bonusActedRestoreId);G._bonusActedRestoreId=null;}
+}
+/* v580: K'uk'ulkan Statue -- once per round, a capture grants a random living WIND ally a bonus
+   action. v856: this was inline in resolveCap, so it only ever fired for MANUAL captures. The
+   Feather Embrace auto-capture never reaches resolveCap (same split-list that hid the capture FX
+   until v849), so a Quetzalcoatl run -- the one build most likely to own this offering -- could
+   not proc the statue at all. Extracted here and called from both paths.
+   v854: eligibility requires actedIds. A unit that has not taken its turn yet gains nothing from
+   a "bonus" -- it would simply take its normal turn with _serendipityFreeAction set, skipping the
+   qIdx++ and handing the party more actions than it has queue slots. If no wind ally has acted,
+   the statue does not fire and _kukulkanRound stays unset, so it can still proc later this round. */
+/* v857: a bonus action is deliberately FREE -- advanceTurn skips the qIdx++ for it -- which means
+   it can only ever be taken if an unconsumed player slot still exists. When the capture that
+   triggers the statue happens on the LAST player action of the round, none does: the queue runs
+   straight on through the remaining enemy slots, buildRoundQueue clears _serendipityFreeAction,
+   and the bonus evaporates without the player ever being offered it.
+   Inserting a slot AT qIdx gives the bonus its beat immediately, ahead of the pending enemy
+   turns, which matches how it behaves mid-round. The slot is only added when none remains, so
+   the normal case is untouched. If the bonus then goes unused, processCurrentSlot's
+   "all players acted" branch steps over the spare slot harmlessly. */
+function ensureBonusSlot(){
+  for(let i=G.qIdx;i<(G.roundQueue||[]).length;i++){if(G.roundQueue[i]&&G.roundQueue[i].side==='player')return false;}
+  if(!G.roundQueue)return false;
+  G.roundQueue.splice(G.qIdx,0,{side:'player'});
+  return true;
+}
+function tryKukulkanBonus(){
+  if(!getOfferingEffects().kukulkanBonus)return false;
+  if(G._kukulkanRound===G.roundNum)return false;
+  const wind=G.units.filter(x=>x.currentHp>0&&x.element==='wind'&&G.actedIds.has(x.id));
+  if(!wind.length)return false;
+  const w=wind[Math.floor(Math.random()*wind.length)];
+  G._kukulkanRound=G.roundNum;
+  G._serendipityFreeAction=true;G._serendipityTargetId=w.id;
+  G._bonusActedRestoreId=G.actedIds.has(w.id)?w.id:null; /* v853 */
+  G.actedIds.delete(w.id);
+  ensureBonusSlot(); /* v857: guarantee the bonus actually gets a turn, even on the round's last action */
+  addLog(`<span class="log-ab">\u{1F5FF} K'uk'ulkan Statue! ${w.icon} <strong>${w.name}</strong> rides the wind \u2014 bonus action!</span>`);
+  animateStatusPop(w.id,'\u{1F5FF} Bonus Action!','#a0e8d8');
+  return true;
+}
 function fireSerendipityBonus(unitId){
   const u=G.units.find(x=>x.id===unitId);
   if(!u||u.currentHp<=0)return;
   G._serendipityFreeAction=true;
   G._serendipityTargetId=unitId; // v332: _serendipityUsed committed only when the bonus actually fires (advanceTurn)
   // Remove from actedIds so it can act again
+  G._bonusActedRestoreId=G.actedIds.has(unitId)?unitId:null; /* v853: remember, so a cancel can undo it */
   G.actedIds.delete(unitId);
   addLog(`<span class="log-ab">🎭 Serendipity! ${u.icon} <strong>${u.name}</strong> acts again!</span>`);
   // Don't increment qIdx or touch the queue — just select this unit directly
@@ -8123,6 +8274,17 @@ function aoeCapFor(actor){
   if(actor.isGod&&G._useOblationSpecial&&G._oblationAk)return AOE_CAP[G._oblationAk]||0;
   if(actor.isGod){const gd=GODS.find(g=>g.id===actor.baseGodId);return (gd&&AOE_CAP[gd.ak])||0;}
   return AOE_CAP_AB[actor.ability]||0;
+}
+/* v855: support/heal specials -- these deal NO damage, so they use neither ATK nor MAG and must
+   never pay the Cuauhtemoc Macuahuitl's physical recoil. Holds both ak keys and display names
+   because the two call sites resolve the ability differently. SPLIT-LIST: a new non-damaging
+   special has to be added here or it will start charging recoil on PHYS/MIX casters. */
+const HEAL_ABILITIES=new Set(['ophidianMother','holyHarvest','peyoteConcoction','Chitin Shell','Bioluminescent Chorus','Gust Mend','Death Bloom','Dark Waters','Storm Mend','Stone Mend','Stone Protection','Earth Bloom','Ancestral Storm','Uapantotli']);
+function specIsSupport(actor){
+  if(!actor)return false;
+  if(G._useOblationSpecial&&G._oblationAk)return HEAL_ABILITIES.has(G._oblationAk)||HEAL_ABILITIES.has(G._oblationAbility);
+  const gd=actor.isGod?GODS.find(g=>g.id===actor.baseGodId):null;
+  return HEAL_ABILITIES.has(gd?gd.ak:'')||HEAL_ABILITIES.has(actor.ability||'');
 }
 function specIsMagic(actor){
   if(!actor)return false;
@@ -8234,7 +8396,7 @@ function doPlayerSpecial(useOblation){
     reverieRecalc(actor); // v563: New Fire Knife TP threshold check on spend
     const ae=drunkTwistArr(actor,G.enemies.filter(u=>u.currentHp>0&&!G.captureProcessed.has(u.id)),'off'); // v537 DRUNK
     const aa=drunkTwistArr(actor,G.units.filter(u=>u.currentHp>0),'ben'); // v537 DRUNK
-    beginAllyAction(actor); // v377: snapshot for kill-attribution offerings
+    beginAllyAction(actor,true); // v377: snapshot for kill-attribution offerings · v850: special
     fxKickoff(actor,null,true); // v556
     if(actor.isGod)fireGodSpecial(actor,ae,aa,null);
     else fireUnitSpecial(actor,ae,aa,null);
@@ -8323,7 +8485,7 @@ function doPlayerAoeTarget(enemyId){
   actor.currentNP-=G._useOblationSpecial?oblationNpCost(actor):effectiveNpCost(actor);
   reverieRecalc(actor); // v563: New Fire Knife TP threshold check on spend
   const aa=drunkTwistArr(actor,G.units.filter(u=>u.currentHp>0),'ben'); // v537 DRUNK
-  beginAllyAction(actor);
+  beginAllyAction(actor,true); // v850: special
   fxKickoff(actor,null,true); // v556
   if(actor.isGod)fireGodSpecial(actor,targets,aa,null);
   else fireUnitSpecial(actor,targets,aa,null);
@@ -8363,7 +8525,7 @@ function doPlayerTarget(enemyId){
     reverieRecalc(actor); // v563: New Fire Knife TP threshold check on spend
     const ae=drunkTwistArr(actor,G.enemies.filter(u=>u.currentHp>0&&!G.captureProcessed.has(u.id)),'off'); // v537 DRUNK: splash portions roll per target
     const aa=drunkTwistArr(actor,G.units.filter(u=>u.currentHp>0),'ben'); // v537 DRUNK: heal/Chimalli recipients roll per target
-    beginAllyAction(actor); // v377: snapshot for kill-attribution offerings
+    beginAllyAction(actor,true); // v377: snapshot for kill-attribution offerings · v850: special
     fxKickoff(actor,target,false); // v556
     if(actor.isGod)fireGodSpecial(actor,ae,aa,target);
     else fireUnitSpecial(actor,ae,aa,target);
@@ -8428,6 +8590,7 @@ function resolveCap(enemyId,doCapture){
   const base=dead?(allCaps.find(c=>c.name===dead.name)||minibossTemplates.find(t=>t.name===dead.name)):null;
   const mercy=hasPassive('divinityMercy');
   if(doCapture&&base&&dead){
+    captureBindFx(dead.id); /* v849: before the re-render swaps the card for the 'Captured' one */
     G._unitStates[dead.id]='captured';
     // Generate unique captureId for this instance
     const captureId=`${base.id}_${Date.now()}_${Math.random().toString(36).slice(2,5)}`;
@@ -8460,19 +8623,10 @@ function resolveCap(enemyId,doCapture){
     addLog(`<span class="log-cp">${dead.icon} ${dead.name} — ${label}${mercy?' (+Mercy)':''}</span> <span class="log-gain">+${bR} 🩸 +${cR} 🫘</span>`);
     flashResGain(bR,cR);renderRes('rb-battle');
     if(!hasV('first_capture_seen')){markV('first_capture_seen');notify('Captured units join your roster after battle','#50c080');}
-    // v580: K'uk'ulkan Statue — once per round, a capture grants a random living WIND ally a bonus action
-    if(getOfferingEffects().kukulkanBonus&&G._kukulkanRound!==G.roundNum){
-      const _wind=G.units.filter(x=>x.currentHp>0&&x.element==='wind');
-      if(_wind.length){
-        const _w=_wind[Math.floor(Math.random()*_wind.length)];
-        G._kukulkanRound=G.roundNum;
-        G._serendipityFreeAction=true;G._serendipityTargetId=_w.id;G.actedIds.delete(_w.id);
-        addLog(`<span class="log-ab">🗿 K'uk'ulkan Statue! ${_w.icon} <strong>${_w.name}</strong> rides the wind — bonus action!</span>`);
-        animateStatusPop(_w.id,'🗿 Bonus Action!','#a0e8d8');
-      }
-    }
+    tryKukulkanBonus(); // v580 · v856: extracted, so the Feather Embrace path can fire it too
     notify(`⚔ ${dead.name} ${label}`,'#50c080');
   }else if(dead){
+    if(G._unitStates[dead.id]!=='captured')enemySlainFx(dead.id); /* v848: before the re-render swaps the card */
     G._unitStates[dead.id]=(G._unitStates[dead.id]==='captured')?'captured':'slain'; // v560: upgrade 'defeated' → 'slain' on slay resolve
     /* v813: Undead Forces belongs HERE, on the slay branch. It was hooked into
        creditEnemyDefeat, which runs the moment an enemy hits 0 HP -- i.e. while the capture
@@ -8556,10 +8710,23 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
       G.captureProcessed.add(pickT.id);
       // Minibosses can also be captured by Feather Embrace
       const allCaps=[...MICTLAN_CAPS,...TEPEME_CAPS,...OBSIDIAN_CAPS,...NATURE_CAPS,...HUMANITY_CAPS,...CEHUYLOAN_WATER_CAPS,...CEHUYLOAN_WIND_CAPS,...TONATIUH_DAY_CAPS,...PANCUET_FIRE_CAPS,...PANCUET_WIND_CAPS,...TEMIMINA_WATER_CAPS,...TEMIMINA_HUMAN_CAPS,...TEYOLLO_NATURE_CAPS,...TEYOLLO_DAY_CAPS,...APANO_NIGHT_CAPS,...APANO_THUNDER_CAPS];
+      /* v843: allCaps has never contained the miniboss templates (the normal capture path in
+         renderSpoils appends them explicitly -- SPLIT-LIST). A Feather Embrace auto-capture of a
+         miniboss therefore always fell through to the object literal below, whose trailing
+         ...pickT spread overwrites id with the BATTLE INSTANCE id ('tlacateocotl_5_ab3').
+         That instance id then poisoned everything downstream:
+           - MINIBOSS_CAP_STATS[base.id] missed -> the {hp:150,mag:base.mag} fallback applied, and
+             base.mag was pickT's ALREADY-ENEMY-SCALED mag, which scA() then scaled a second time;
+           - baseId was set to the instance id, so liveAd()'s cap-stats lookup missed too and the
+             roster card quoted the BOSS ad text (1.6xMAG AoE) instead of the vassal's 3-target one.
+         Resolving the real template fixes stats and description together. */
+      const minibossTemplates=[XOCHITONAL_TPL,QUINAMETZIN_TPL,XIUHNEL_TPL,MIMICH_TPL,MICTLAMPEHECATL_TPL,TLACATEOCOTL_TPL,AMIMITL_TPL,ATLAUA_TPL,ACUECUEYOTL_TPL,OMETOCHTLI_TPL,IXPUXTEQUI_TPL,NEXOXCHO_TPL]; // SPLIT-LIST: mirrors the array in renderSpoils
       const base=allCaps.find(c=>c.name===pickT.name)
+        ||minibossTemplates.find(t=>t.name===pickT.name)
         ||(pickT.isMiniBoss?{id:pickT.id,name:pickT.name,hp:pickT.maxHp,fv:0,...pickT}:null);
       const already=base?G.captured.find(c=>c.id===base.id&&!G.capturedDiedThisBattle.includes(c.id)):null;
       if(base){
+        captureBindFx(pickT.id); /* v849: Feather Embrace auto-capture never reaches resolveCap */
         G._unitStates[pickT.id]='captured';
         const captureId3=`${base.id}_${Date.now()}_${Math.random().toString(36).slice(2,5)}`;
         if(pickT.isMiniBoss){
@@ -8578,6 +8745,7 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
         const cR=Math.round(_bty*0.667*0.6*G.dte.cacaoBonus*2.2);
         if(!G._spoilIdx)G._spoilIdx=0;
         G.spoils.captured.push({unit:pickT,blood:bR,cacao:cR,mercyBonus:false,featherBonus:true,_idx:++G._spoilIdx});
+        G._kukulkanPending=true; /* v856: deferred to advanceTurn -- see the note there */
         addLog(`<span class="log-cp">🐍 Feather Embrace — <span style="color:#60e0c0">AUTO-CAPTURE! ${pickT.isMiniBoss?'Mini-boss! ':''}2.2× reward!</span></span>`);
         notify(`🐍 Auto-captured ${pickT.name}! 2.2× reward!`,'#60e0c0');
       }else if(pickT.isBoss){
@@ -11678,6 +11846,132 @@ function animateArmorHit(uid,dmg){
     document.body.appendChild(el);setTimeout(()=>el.remove(),900);
   },30);
 }
+/* v846: blood spill for a sacrificed unit. Takes the capKey, reads the altar card's rect BEFORE
+   the caller re-renders, and spawns everything on document.body so the effect survives the card
+   being destroyed by renderAltar(). Silently no-ops if the card isn't on screen. */
+function sacrificeFx(ck,fv,delay){
+  const card=document.querySelector('[data-sacck="'+(ck||'').replace(/"/g,'')+'"]');
+  if(!card)return;
+  const r=card.getBoundingClientRect();
+  const cx=r.left+r.width/2, cy=r.top+r.height*0.42;
+  setTimeout(function(){
+    const fl=document.createElement('div');fl.className='sac-flash';
+    fl.style.cssText='left:'+(r.left+r.width*0.15)+'px;top:'+(r.top+r.height*0.15)+'px;width:'+(r.width*0.7)+'px;height:'+(r.height*0.6)+'px;';
+    document.body.appendChild(fl);setTimeout(function(){fl.remove();},450);
+    const n=14;
+    for(let i=0;i<n;i++){
+      const d=document.createElement('div');d.className='blood-drop';
+      const dx=(Math.random()*2-1)*(r.width*0.42);
+      const dy=r.height*0.45+Math.random()*46;
+      const dur=(0.62+Math.random()*0.42).toFixed(2)+'s';
+      d.style.cssText='left:'+(cx+(Math.random()*2-1)*(r.width*0.22))+'px;top:'+(cy+Math.random()*10)+'px;'
+        +'--dx:'+dx.toFixed(1)+'px;--dy:'+dy.toFixed(1)+'px;--dur:'+dur+';animation-delay:'+(Math.random()*0.18).toFixed(2)+'s;';
+      document.body.appendChild(d);setTimeout(function(){d.remove();},1400);
+    }
+    const pool=document.createElement('div');pool.className='blood-pool';
+    pool.style.cssText='left:'+cx+'px;top:'+(r.bottom-10)+'px;';
+    document.body.appendChild(pool);setTimeout(function(){pool.remove();},1200);
+    if(fv){
+      const lbl=document.createElement('div');lbl.className='dmg-pop';
+      lbl.textContent='+'+fv+' \u273f';
+      lbl.style.cssText='color:#d4af37;font-weight:800;font-size:17px;left:'+(cx-18)+'px;top:'+(r.top+8)+'px;text-shadow:0 0 9px #8a6a10,0 1px 3px #000;';
+      document.body.appendChild(lbl);setTimeout(function(){lbl.remove();},1100);
+    }
+  },delay||0);
+}
+/* v846: tween a resource number in a res-bar from -> to. renderRes() has already painted the FINAL
+   value by the time this runs, so this only overwrites textContent during the tween and lands back
+   on the true number. Matches by the label text rather than nth-child because the Flowers cell is
+   conditionally rendered (hidden on a first run until the altar exists). */
+function animateResGain(barId,label,from,to,ms){
+  if(from===to)return;
+  const bar=document.getElementById(barId);if(!bar)return;
+  let node=null;
+  bar.querySelectorAll('.res').forEach(function(cell){
+    if(node)return;
+    if((cell.textContent||'').indexOf(label)>=0)node=cell.querySelector('.res-val');
+  });
+  if(!node)return;
+  const tok=(node._cuTok||0)+1;node._cuTok=tok;      /* a newer tween cancels an older one */
+  const dur=ms||900, t0=(typeof performance!=='undefined'?performance.now():Date.now());
+  node.classList.remove('res-counting');void node.offsetWidth;node.classList.add('res-counting');
+  function step(now){
+    if(node._cuTok!==tok)return;                     /* superseded */
+    const p=Math.min(1,((now||Date.now())-t0)/dur);
+    const e=1-Math.pow(1-p,3);                       /* easeOutCubic */
+    node.textContent=Math.round(from+(to-from)*e);
+    if(p<1)requestAnimationFrame(step);
+    else{node.textContent=to;setTimeout(function(){node.classList.remove('res-counting');},60);}
+  }
+  requestAnimationFrame(step);
+}
+/* v848: blood burst for a slain enemy. Same body-anchored approach as sacrificeFx -- the rect is
+   read synchronously, everything spawns on document.body at position:fixed, so the re-render that
+   swaps the living card for the shrunken 'Slain' card can't kill the animation mid-flight.
+   Deliberately NOT fired for captures: a capture is a binding, not a kill. */
+function enemySlainFx(uid){
+  const card=document.querySelector('[data-uid="'+String(uid||'').replace(/"/g,'')+'"]');
+  if(!card)return;
+  const r=card.getBoundingClientRect();
+  if(!r.width||!r.height)return;
+  const cx=r.left+r.width/2, cy=r.top+r.height*0.45;
+  const flash=document.createElement('div');flash.className='sac-flash';
+  flash.style.cssText='left:'+(r.left+r.width*0.12)+'px;top:'+(r.top+r.height*0.12)+'px;width:'+(r.width*0.76)+'px;height:'+(r.height*0.66)+'px;';
+  document.body.appendChild(flash);setTimeout(function(){flash.remove();},450);
+  const stain=document.createElement('div');stain.className='blood-stain';
+  stain.style.cssText='left:'+cx+'px;top:'+cy+'px;width:'+Math.max(48,r.width*0.85)+'px;height:'+Math.max(48,r.width*0.85)+'px;';
+  document.body.appendChild(stain);setTimeout(function(){stain.remove();},1050);
+  const n=18, spread=Math.max(46,r.width*0.75);
+  for(let i=0;i<n;i++){
+    const ang=(Math.PI*2*i)/n+(Math.random()*0.5-0.25);
+    const mag=spread*(0.45+Math.random()*0.75);
+    const d=document.createElement('div');d.className='blood-spray';
+    d.style.cssText='left:'+(cx+(Math.random()*2-1)*5)+'px;top:'+(cy+(Math.random()*2-1)*5)+'px;'
+      +'--dx:'+(Math.cos(ang)*mag).toFixed(1)+'px;'
+      +'--dy:'+(Math.sin(ang)*mag*0.72+mag*0.42).toFixed(1)+'px;'   /* biased downward: gravity */
+      +'--dur:'+(0.55+Math.random()*0.4).toFixed(2)+'s;animation-delay:'+(Math.random()*0.1).toFixed(2)+'s;';
+    document.body.appendChild(d);setTimeout(function(){d.remove();},1250);
+  }
+  const sk=document.createElement('div');sk.className='dmg-pop';
+  sk.textContent='\u{1F480}';
+  sk.style.cssText='font-size:22px;left:'+(cx-11)+'px;top:'+(r.top+4)+'px;text-shadow:0 0 10px #8a0d1c,0 1px 3px #000;';
+  document.body.appendChild(sk);setTimeout(function(){sk.remove();},1100);
+}
+/* v849: capture binding effect. Mirrors enemySlainFx structurally (rect read synchronously,
+   everything spawned body-level at position:fixed so the re-render can't interrupt it) but runs
+   the motion INWARD and swaps the palette to gold. */
+function captureBindFx(uid){
+  const card=document.querySelector('[data-uid="'+String(uid||'').replace(/"/g,'')+'"]');
+  if(!card)return;
+  const r=card.getBoundingClientRect();
+  if(!r.width||!r.height)return;
+  const cx=r.left+r.width/2, cy=r.top+r.height*0.45;
+  const glow=document.createElement('div');glow.className='bind-glow';
+  glow.style.cssText='left:'+(r.left+r.width*0.08)+'px;top:'+(r.top+r.height*0.08)+'px;width:'+(r.width*0.84)+'px;height:'+(r.height*0.72)+'px;';
+  document.body.appendChild(glow);setTimeout(function(){glow.remove();},950);
+  const size=Math.max(64,r.width*1.05);
+  const ring=document.createElement('div');ring.className='bind-ring';
+  ring.style.cssText='left:'+cx+'px;top:'+cy+'px;width:'+size+'px;height:'+size+'px;';
+  document.body.appendChild(ring);setTimeout(function(){ring.remove();},900);
+  const ring2=document.createElement('div');ring2.className='bind-ring';
+  ring2.style.cssText='left:'+cx+'px;top:'+cy+'px;width:'+(size*0.62)+'px;height:'+(size*0.62)+'px;animation-delay:.14s;';
+  document.body.appendChild(ring2);setTimeout(function(){ring2.remove();},1080);
+  const n=16, reach=Math.max(52,r.width*0.9);
+  for(let i=0;i<n;i++){
+    const ang=(Math.PI*2*i)/n+(Math.random()*0.4-0.2);
+    const mag=reach*(0.6+Math.random()*0.55);
+    const m=document.createElement('div');m.className='bind-mote';
+    m.style.cssText='left:'+cx+'px;top:'+cy+'px;'
+      +'--dx:'+(Math.cos(ang)*mag).toFixed(1)+'px;'
+      +'--dy:'+(Math.sin(ang)*mag).toFixed(1)+'px;'
+      +'--dur:'+(0.6+Math.random()*0.35).toFixed(2)+'s;animation-delay:'+(Math.random()*0.16).toFixed(2)+'s;';
+    document.body.appendChild(m);setTimeout(function(){m.remove();},1250);
+  }
+  const lbl=document.createElement('div');lbl.className='dmg-pop';
+  lbl.textContent='\u2726 BOUND';
+  lbl.style.cssText='color:#ffe08a;font-weight:800;font-size:15px;left:'+(cx-34)+'px;top:'+(r.top+2)+'px;text-shadow:0 0 10px #a8791a,0 1px 3px #000;';
+  document.body.appendChild(lbl);setTimeout(function(){lbl.remove();},1100);
+}
 function animateArmorBreak(uid){
   setTimeout(()=>{
     const card=document.querySelector('[data-uid="'+uid+'"]');if(!card)return;
@@ -11882,13 +12176,38 @@ function flashResGain(b,c){
   document.body.appendChild(el);
   setTimeout(()=>el.remove(),950);
 }
-function beginAllyAction(actor){
+/* v850: does the move about to fire bill as magic for Macuahuitl purposes? Wraps specIsMagic and
+   adds the Sacred Oblation case, which specIsMagic misses -- it reads the base god's ak, so an
+   oblated ability would be judged by the ability it replaced. Kept separate rather than folded
+   into specIsMagic itself, whose other callers are tooltip glyphs that deliberately describe the
+   unit's native special. */
+function moveIsMagicForRecoil(actor){
+  if(!actor)return false;
+  if(G._useOblationSpecial&&G._oblationAk){
+    const ATK_OB=new Set(['obsidianStorm','aurumBreak','frostMacuahuitl']);
+    if(ATK_OB.has(G._oblationAk))return false;
+    const MAG_OB=new Set(['deluge','tlalocanDeluge','featherEmbrace','cripplingShock','oldFire']);
+    if(MAG_OB.has(G._oblationAk))return true;
+  }
+  return specIsMagic(actor);
+}
+/* v850: isSpecial tells beginAllyAction which kind of move is being paid for. Defaults to false so
+   any call site added later behaves like a strike (charges recoil) rather than silently exempting. */
+function beginAllyAction(actor,isSpecial){
   // v377: snapshot enemy HP + record killer so handleDeath can credit Huitzi/Coyolxauhqui on defeat
   if(!actor||!actor.isAlly){G._curKiller=null;return;}
   G._curKiller=actor;G._huitziAcc=0;G._paPre={};
   (G.enemies||[]).forEach(function(e){if(e.currentHp>0&&!G.captureProcessed.has(e.id))G._paPre[e.id]=e.currentHp;});
-  // v478: Cuauhtémoc Macuahuitl — PHYS/MIX units pay 10% maxHP recoil on every move (can be lethal)
-  if((actor.type==='PHYS'||actor.type==='MIX')&&actor.currentHp>0){const _rc=getOfferingEffects().physRecoilPct;if(_rc>0){const _rd=Math.round((actor.maxHp||0)*_rc);if(_rd>0){actor.currentHp=Math.max(0,actor.currentHp-_rd);animateHit(actor.id,_rd,false);addLog(`<span class="log-bl">\u2694\ufe0f Macuahuitl: ${actor.name} \u2212${_rd} HP recoil</span>`);if(actor.currentHp<=0)handleDeath(actor);}}}
+  /* v478: Cuauhtémoc Macuahuitl — PHYS/MIX units pay 10% maxHP recoil on physical moves (can be lethal).
+     v850: the type test alone charged a MIX unit for its MAGIC special too. The offering's +40% ATK is
+     baked onto u.atk and a magic special reads u.mag, so that was pure cost with no matching upside --
+     Quetzalcoatl (MIX) was bleeding 10% max HP every Feather Embrace for nothing. A MIX unit's basic
+     Strike still resolves through primStat on ATK, so strikes keep paying. */
+  /* v855: v850 exempted MAGIC specials, but judged everything else by unit type -- so Coatlicue
+     (PHYS) paid 10% max HP to cast Ophidian Mother, a pure heal/cleanse/Chimalli move that deals
+     no damage and reads neither ATK nor MAG. A support special is exempt regardless of typing. */
+  const _magMove=isSpecial&&(moveIsMagicForRecoil(actor)||specIsSupport(actor));
+  if(!_magMove&&(actor.type==='PHYS'||actor.type==='MIX')&&actor.currentHp>0){const _rc=getOfferingEffects().physRecoilPct;if(_rc>0){const _rd=Math.round((actor.maxHp||0)*_rc);if(_rd>0){actor.currentHp=Math.max(0,actor.currentHp-_rd);animateHit(actor.id,_rd,false);addLog(`<span class="log-bl">\u2694\ufe0f Macuahuitl: ${actor.name} \u2212${_rd} HP recoil</span>`);if(actor.currentHp<=0)handleDeath(actor);}}}
 }
 /* v810: UNDEAD FORCES (player patron passive). The first enemy slain in a battle rises as a
    temporary ally. Design rulings: it does NOT consume a party slot, so the first kill always
@@ -12170,6 +12489,7 @@ function handleDeath(dead){
   if(dead.isBoss){
     if(G._deathProcessed.has(dead.id))return;
     G._deathProcessed.add(dead.id);
+    enemySlainFx(dead.id); /* v848: bosses never reach resolveCap, so they need their own call */
     G._unitStates[dead.id]='slain';
     if(!G._spoilIdx)G._spoilIdx=0;
     const _feM=dead._featherBonus||1; // v319: Feather Embrace fatal on a boss routes here with 2.5×
@@ -12733,7 +13053,7 @@ function renderActionPanel(){
     const godLvForSpec=actor.isGod?getLevel('god_'+(actor.baseGodId||actor.id)):null;
     // Detect if special is a heal/buff rather than damage
     const specAbility=gd?gd.ak:actor.ability;
-    const healAbilities=new Set(['ophidianMother','holyHarvest','peyoteConcoction','Chitin Shell','Bioluminescent Chorus','Gust Mend','Death Bloom','Dark Waters','Storm Mend','Stone Mend','Stone Protection','Earth Bloom','Ancestral Storm','Uapantotli']);
+    const healAbilities=HEAL_ABILITIES; /* v855: hoisted to a shared const so the Macuahuitl recoil gate reads the same list */
     const buffAbilities=new Set([]);
     const isHealSpec=healAbilities.has(specAbility)||healAbilities.has(specLabel);
     const isBuffSpec=buffAbilities.has(specAbility)||buffAbilities.has(specLabel);
@@ -14564,9 +14884,13 @@ function doHireMerc(baseId){
       const _firstNotice=!G._ftueNeedsParty;
       G._ftueNeedsParty=true;
       // v308: hard-to-miss popup instead of relying on the bottom checklist alone
+      /* v842: 'Later' (and the X / backdrop dismiss, which route through onDismiss) now CLEAR the
+         FTUE party step. Before this, only showEditPartyModal() set _ftueDidParty, so dismissing the
+         popup left step s4 pending and Continue stuck in its greyed gate state with no visible cause. */
+      const _ftuePartyLater=()=>{if(!G._ftueDidParty){G._ftueDidParty=true;ftueGateUpdate();}};
       if(_firstNotice)setTimeout(()=>showMo('⚔','Party Full',
         `${u.icon} <b>${u.name}</b> joined your roster — but your party is already full!<br><br>Open <b>Edit Party</b> to swap them in if you want them in the next battle.`,
-        [{label:'⚔ Edit Party',fn:()=>showEditPartyModal()},{label:'Later',fn:()=>{}}]),50);
+        [{label:'⚔ Edit Party',fn:()=>showEditPartyModal()},{label:'Later',fn:_ftuePartyLater}],_ftuePartyLater),50);
     }
     G._ftueDidMerc=true;
     ftueGateUpdate();
@@ -14667,6 +14991,8 @@ function doSacrifice(capId){
   const cu=G.captured.find(c=>(c._captureId||c.id)===capId);if(!cu)return;const fv=sacFP(cu);
   const _sLv=surgeRefundLv(capId),_sB=_sLv*50,_sC=_sLv*25; // v327: Soul Surge investment refund (v526: paid levels only)
   showMo('🗡','Confirm Sacrifice',`Remove ${cu.name} permanently for ${fv} Flowers?${_sLv?`<br><span style="font-size:11px;color:#d4af37">⚡ Soul Surge refund: +${_sB} 🩸 +${_sC} 🫘 (${_sLv} force level${_sLv>1?'s':''})</span>`:''}`,[{label:'Sacrifice',cls:'btn-sac',fn:()=>{
+    const _flBefore=G.res.flower;              /* v846: tween start value, read before the grant */
+    sacrificeFx(capId,fv);                     /* v846: must run BEFORE renderAltar() destroys the card */
     G.captured=G.captured.filter(c=>(c._captureId||c.id)!==capId);
     G.deplSel=G.deplSel.filter(x=>x!==capId);
     delete G.levels[capId];delete G.shields[capId];G.res.flower+=fv;
@@ -14681,6 +15007,7 @@ function doSacrifice(capId){
     // v315: auto-refill REMOVED — sacrificing a deployed... benched unit must never silently change
     // the player's party. The freed slot stays empty until the player fills it via Edit Party.
     renderRes('rb-shop');renderPartyChips();renderAltar();
+    animateResGain('rb-shop','Flowers',_flBefore,G.res.flower); /* v846 */
     // Do NOT call renderTraining/renderMercs — sacrifice should not refresh tabs
     // Do NOT call renderMercs — sacrifice should not refresh the mercenary shop
   }},{label:'Keep',fn:()=>{}}]);
@@ -14695,6 +15022,8 @@ function doSacrificeSelected(){
   const _sLvT=units.reduce((s,cu)=>s+surgeRefundLv(capKey(cu)),0),_sBT=_sLvT*50,_sCT=_sLvT*25; // v327 (v526: paid levels only)
   const names=units.map(cu=>cu.name).join(', ');
   showMo('🗡','Sacrifice Selected',`Remove ${units.length} unit${units.length>1?'s':''} (${names}) for ${totalFP} Flowers total?`,[{label:`Sacrifice All (✿ ${totalFP})`,cls:'btn-sac',fn:()=>{
+    const _flBeforeT=G.res.flower;             /* v846 */
+    units.forEach((cu,_i)=>{sacrificeFx(capKey(cu),fpMap.get(capKey(cu)),_i*110);}); /* v846: stagger so a batch reads as a sequence, not one blob */
     units.forEach(cu=>{
       const ck=capKey(cu);
       G.captured=G.captured.filter(c=>(c._captureId||c.id)!==ck);G.deplSel=G.deplSel.filter(x=>x!==ck);
@@ -14709,6 +15038,7 @@ function doSacrificeSelected(){
     if(_sLvT){G.res.blood+=_sBT;G.res.cacao+=_sCT;}
     notify(`+${totalFP} Flowers!`+(_sLvT?` +${_sBT} 🩸 +${_sCT} 🫘`:''),'#d4af37');
     renderRes('rb-shop');renderPartyChips();renderAltar();renderTraining();
+    animateResGain('rb-shop','Flowers',_flBeforeT,G.res.flower,900+units.length*110); /* v846: tween spans the stagger */
   }},{label:'Cancel',fn:()=>{}}]);
 }
 function toggleSacSel(capId){
@@ -14919,7 +15249,7 @@ function renderAltar(){
       const mercy=hasPassive('divinityMercy');
       const isHired=!!cu._isHiredMerc;
       const canSpare=spareEnabled&&!isHired;
-      const card=document.createElement('div');card.className='train-card sac-card'+(isSel?' sel':'');
+      const card=document.createElement('div');card.className='train-card sac-card'+(isSel?' sel':'');card.dataset.sacck=ck; /* v846: lets sacrificeFx locate this card's rect before it is torn down */
       const checkEl='<div style="width:18px;height:18px;border-radius:4px;border:1px solid '+(isSel?'#c060c0':'var(--br)')+';background:'+(isSel?'#8a208a':'transparent')+';flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px">'+(isSel?'✓':'')+'</div>';
       card.innerHTML='<div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="toggleSacSel(\''+ck+'\')">'+checkEl
         +'<div class="tc-name" style="flex:1">'+cu.name+' <span style="color:var(--am);font-size:12px">Lv'+getLevel(ck)+'</span></div></div>'
