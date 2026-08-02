@@ -71,6 +71,48 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .bind-ring{position:fixed;border-radius:50%;pointer-events:none;z-index:9998;border:2px solid rgba(240,205,100,.9);box-shadow:0 0 14px rgba(240,205,100,.55),inset 0 0 12px rgba(240,205,100,.35);animation:bindRing .85s ease-out forwards}
 @keyframes bindGlow{0%{opacity:0;transform:scale(.7)}40%{opacity:.85}100%{opacity:0;transform:scale(1.2)}}
 .bind-glow{position:fixed;border-radius:10px;pointer-events:none;z-index:9997;background:radial-gradient(ellipse,rgba(255,230,150,.75),rgba(180,140,40,0) 70%);animation:bindGlow .9s ease-out forwards}
+/* v858: Sak Tahn Waax completion pulse -- a gold long-count wheel expanding over the board. */
+@keyframes sakWheel{0%{opacity:0;transform:translate(-50%,-50%) scale(.2) rotate(0)}20%{opacity:.95}100%{opacity:0;transform:translate(-50%,-50%) scale(2.1) rotate(190deg)}}
+.sak-wheel{position:fixed;border-radius:50%;pointer-events:none;z-index:9998;border:3px double rgba(240,205,100,.95);box-shadow:0 0 26px rgba(240,205,100,.6),inset 0 0 22px rgba(240,205,100,.3);animation:sakWheel 1.15s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes sakGlyph{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.4)}}
+.sak-glyph{position:fixed;pointer-events:none;z-index:9999;font-size:46px;text-shadow:0 0 18px #d4af37,0 2px 6px #000;animation:sakGlyph 1.15s ease-out forwards}
+/* v866: Temazcal restoration -- jade steam rising, the opposite motion to the altar's blood fall. */
+@keyframes steamRise{0%{opacity:0;transform:translate(0,0) scale(.5)}20%{opacity:.9}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.5)}}
+.tz-steam{position:fixed;width:9px;height:9px;border-radius:50%;pointer-events:none;z-index:9999;background:radial-gradient(circle at 35% 30%,#d8fff0,#60d0a0 55%,#1e7a58);box-shadow:0 0 10px rgba(90,220,170,.75);animation:steamRise var(--dur,1s) cubic-bezier(.3,.6,.4,1) forwards}
+@keyframes tzWash{0%{opacity:0;transform:scale(.85)}30%{opacity:.8}100%{opacity:0;transform:scale(1.12)}}
+.tz-wash{position:fixed;border-radius:10px;pointer-events:none;z-index:9997;background:linear-gradient(0deg,rgba(80,220,160,.55),rgba(80,220,160,0) 75%);animation:tzWash .95s ease-out forwards}
+/* v866: level-up ascension -- gold light climbing the card, plus a rising chevron. */
+@keyframes lvColumn{0%{opacity:0;transform:scaleY(.2)}25%{opacity:.85}100%{opacity:0;transform:scaleY(1.25)}}
+.lv-column{position:fixed;border-radius:12px;pointer-events:none;z-index:9997;transform-origin:50% 100%;background:linear-gradient(0deg,rgba(240,200,90,.6),rgba(240,200,90,.12) 60%,rgba(240,200,90,0));animation:lvColumn .9s ease-out forwards}
+@keyframes lvSpark{0%{opacity:0;transform:translate(0,0) scale(.4)}20%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.1)}}
+.lv-spark{position:fixed;width:6px;height:6px;pointer-events:none;z-index:9999;background:radial-gradient(circle at 35% 30%,#fff6d0,#f0c850 55%,#a8791a);box-shadow:0 0 9px rgba(240,200,90,.9);border-radius:50%;animation:lvSpark var(--dur,.85s) cubic-bezier(.3,.5,.4,1) forwards}
+/* v873: Soul Surge channel -- energy converging INWARD on the unit, then a ring snapping out.
+   Colour is set per force via --sc so Ihiyotl/Teyolia/Tonalli each read differently. */
+@keyframes surgeDraw{0%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.1)}20%{opacity:1}100%{opacity:0;transform:translate(0,0) scale(.2)}}
+.sg-mote{position:fixed;width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:9999;background:var(--sc,#d4af37);box-shadow:0 0 10px var(--sc,#d4af37);animation:surgeDraw var(--dur,.6s) cubic-bezier(.4,.05,.3,1) forwards}
+@keyframes surgeBurst{0%{opacity:0;transform:translate(-50%,-50%) scale(.25)}35%{opacity:.95}100%{opacity:0;transform:translate(-50%,-50%) scale(1.9)}}
+.sg-ring{position:fixed;border-radius:50%;pointer-events:none;z-index:9998;border:2px solid var(--sc,#d4af37);box-shadow:0 0 16px var(--sc,#d4af37);animation:surgeBurst .8s ease-out .35s forwards;opacity:0}
+/* v873: Continue -- the board pushes forward. A sweep across the button and a chevron trail. */
+/* v877: same problem, same fix -- this fires on a screen change too. .6s/.65s -> .26s/.3s. */
+@keyframes contSweep{0%{opacity:0;transform:translateX(-60%)}30%{opacity:.55}100%{opacity:0;transform:translateX(120%)}}
+.cont-sweep{position:fixed;pointer-events:none;z-index:9998;background:linear-gradient(90deg,rgba(240,205,100,0),rgba(240,205,100,.35),rgba(240,205,100,0));animation:contSweep .18s ease-out forwards} /* v879: .26s -> .18s */
+@keyframes contChev{0%{opacity:0;transform:translateX(0) scale(.8)}25%{opacity:.75}100%{opacity:0;transform:translateX(var(--dx)) scale(1.05)}}
+.cont-chev{position:fixed;pointer-events:none;z-index:9999;font-size:16px;color:#ffe08a;text-shadow:0 0 7px #a8791a,0 1px 3px #000;animation:contChev var(--dur,.22s) ease-out forwards} /* v879: .3s -> .22s */
+/* v875: click feedback. Ripple grows from the pointer, edge-flash traces the control. */
+@keyframes btnRipple{0%{opacity:.75;transform:translate(-50%,-50%) scale(0)}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+.btn-ripple{position:fixed;border-radius:50%;pointer-events:none;z-index:9998;background:radial-gradient(circle,var(--rc,#d4af37) 0%,rgba(0,0,0,0) 68%);animation:btnRipple .26s ease-out forwards} /* v879: .45s -> .26s */
+@keyframes btnEdge{0%{opacity:0;transform:scale(.97)}25%{opacity:.9}100%{opacity:0;transform:scale(1.05)}}
+.btn-edge{position:fixed;pointer-events:none;z-index:9997;border:1.5px solid var(--rc,#d4af37);box-shadow:0 0 12px var(--rc,#d4af37);animation:btnEdge .24s ease-out forwards} /* v879: .42s -> .24s */
+@keyframes ucPick{0%{opacity:0;transform:scale(.9)}30%{opacity:.85}100%{opacity:0;transform:scale(1.08)}}
+.uc-pick{position:fixed;border-radius:8px;pointer-events:none;z-index:9997;border:2px solid #ffd76a;box-shadow:0 0 16px rgba(255,215,106,.6),inset 0 0 14px rgba(255,215,106,.2);animation:ucPick .28s ease-out forwards} /* v879: .5s -> .28s */
+/* v876: the spoils Continue is the beat between battles -- it earns more weight than a stock .btn. */
+.btn-spoils-cont{font-size:17px;padding:14px 44px;border-radius:10px;font-weight:600;letter-spacing:.3px;border-color:#8a6a20;color:#ffe08a;background:#2a1e08}
+.btn-spoils-cont:hover{background:#3a2a0c;border-color:#d4af37}
+/* v877: was .75s at scale 2.4 with a full spark rise -- long enough that it was still playing on
+   the NEXT screen. A transition effect has to finish inside the transition. Now .28s, a smaller
+   throw, and roughly half the opacity. */
+@keyframes spoilsPulse{0%{opacity:0;transform:translate(-50%,-50%) scale(.75)}25%{opacity:.5}100%{opacity:0;transform:translate(-50%,-50%) scale(1.35)}}
+.spoils-pulse{position:fixed;border-radius:12px;pointer-events:none;z-index:9998;border:1.5px solid rgba(240,205,100,.7);box-shadow:0 0 12px rgba(240,205,100,.3);animation:spoilsPulse .2s ease-out forwards} /* v879: .28s -> .2s */
 @keyframes resCountGlow{0%{text-shadow:0 0 0 rgba(212,175,55,0)}35%{text-shadow:0 0 12px rgba(212,175,55,.9)}100%{text-shadow:0 0 0 rgba(212,175,55,0)}}
 .res-counting{animation:resCountGlow 1s ease-out}
 /* v400: card-frame look */
@@ -625,14 +667,17 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
   <p style="font-size:12px;color:var(--td);margin-bottom:.75rem" id="spoils-subtitle"></p>
   <div id="spoils-list"></div>
   <div id="spoils-total" style="display:none;gap:20px;justify-content:center;margin:1rem 0;flex-wrap:wrap"></div>
-  <div id="spoils-cont" style="display:none"><button class="btn" onclick="afterSpoils()">Continue</button></div>
+  <!-- v876: was a bare left-aligned button. Centring lives on an INNER wrapper because three
+       separate call sites set #spoils-cont.style.display directly ('block'/'none'), which would
+       fight a flex layout on the element itself. -->
+  <div id="spoils-cont" style="display:none"><div style="text-align:center;margin-top:1rem"><button class="btn btn-spoils-cont" onclick="spoilsContinueFx(this);afterSpoils()">Continue</button></div></div>
 </div>
 
 <div id="screen-shop" class="screen">
   <div class="res-bar emph-blood" id="rb-shop"></div><!-- v622: training tab is the default → blood emphasized -->
   <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">
     <h2 style="margin-bottom:.15rem;font-size:17px">Sacred Tianguis</h2>
-    <button id="continue-btn" class="btn" onclick="if(ftueGateBlocked()){ftueJumpToStep();return;}G._pulseContinue=false;this.classList.remove('btn-pulse');G._contFn?G._contFn():maybeWarnTemazcal()">Continue to Next Battle</button>
+    <button id="continue-btn" class="btn" onclick="if(ftueGateBlocked()){ftueJumpToStep();return;}G._pulseContinue=false;this.classList.remove('btn-pulse');continueFx(this);G._contFn?G._contFn():maybeWarnTemazcal()">Continue to Next Battle</button>
   </div>
   <div id="tecpatl-panel-shop"></div>
   <div class="relic-bar" id="relic-bar-shop"></div>
@@ -741,7 +786,7 @@ const TREE_NODES=[
   {id:'offering_surplus',label:'Offering Surplus',desc:'Lets you reroll the Pochteca\u2019s wares. First reroll costs 25 Cacao; each further reroll in the same run costs +25 more.',cost:64,cat:'qol',req:['trade_route'],tier:1,x:235,y:450},
   {id:'codex_services',label:'Codex Services',desc:'Unlocks the Tlacuilo — a wandering scribe who records and clones vassals in the Tianguis. (Appears with the Pochteca)',cost:30,cat:'qol',req:['trade_route'],tier:1,x:340,y:450},
   {id:'cost_reduce_1',label:'Cheaper Blood I',desc:'Level-up Blood costs reduced by 10%',cost:25,cat:'qol',req:['trade_route'],tier:1,x:235,y:360},
-  {id:'cost_reduce_2',label:'Cheaper Blood II',desc:'Level-up Blood costs reduced by another 15% (total -25%)',cost:600,cat:'qol',req:['cost_reduce_1'],tier:2,x:130,y:294},
+  {id:'cost_reduce_2',label:'Cheaper Blood II',desc:'Level-up Blood costs reduced by another 15% (total -25%)',cost:550, /* v871: 600 -> 550 */cat:'qol',req:['cost_reduce_1'],tier:2,x:130,y:294},
   {id:'flower_reduce',label:'Flower Discount',desc:'God recruit and Chimalli cost reduced by 15%',cost:450,cat:'qol',req:['cost_reduce_1'],tier:2,x:130,y:430},
   {id:'chima_1',label:'Chimalli Armor I',desc:'Chimalli armor grants 30 HP per stack (up to 60 HP total)',cost:1800,cat:'qol',req:['flower_reduce'],tier:3,x:25,y:430},
   {id:'chima_2',label:'Chimalli Armor II',desc:'[Merged into base Chimalli — all shields now grant status immunity on break]',cost:0,cat:'qol',req:['chima_1'],tier:4,x:25,y:426,hidden:true},
@@ -850,13 +895,26 @@ const OFFERINGS={
   llorona_tear:{name:'Llorona Tear',tier:'common',icon:'\u{1F622}',price:100,priceType:'cacao',desc:'Lowest-level vassal in the party: +25% max HP',flavor:'She weeps for children she cannot name. The weakest of yours she keeps.',eff:{weakestHpMult:1.25}},
   snake_scale:{name:'Snake Scale',tier:'common',icon:'\u{1F40D}',price:100,priceType:'cacao',desc:'Lowest-level vassal in the party: +1 DEF/RES UP at battle start',flavor:"A single scale from Coatlicue's skirt, hard as a promise.",eff:{weakestDefBuff:true}},
   reed_raft_fragment:{name:'Reed Raft Fragment',tier:'uncommon',icon:'\u{1FAB5}',price:250,priceType:'cacao',desc:'The first hit taken each battle deals 50% less damage',flavor:'Bound reeds from a raft that crossed once and never came back.',eff:{firstHitReduction:0.50}},
-  bioluminescent_vial:{name:'Bioluminescent Vial',tier:'uncommon',icon:'\u{1F4A1}',price:250,priceType:'cacao',desc:'THUNDER & NIGHT units: +7 ATK and +7 MAG \u2014 first 3 rounds only',flavor:'Cave-water that glows when shaken. It does not glow for long.',eff:{vialElements:['thunder','night'],vialAmount:7,vialRounds:3}},
+  /* v881: five new commons. Day had NO common at all and Humanity had none above 100 cacao;
+     Night was thin at every tier. Elements referenced here reuse existing element keys. */
+  cipactonal_amate:{name:'Cipactonal Amate',tier:'common',icon:'\u{1F4DC}',price:100,priceType:'cacao',desc:'DAY units gain +1 ATK & MAG each round (starts at +1, caps at +10)',flavor:'The first day-keeper drew the count on bark paper, and the count has been running ever since.',eff:{elemRamp:{element:'day',per:1,max:10}}},
+  tlamatlquiticitl:{name:'Tlamatlquiticitl Remedy',tier:'common',icon:'\u2695\uFE0F',price:100,priceType:'cacao',desc:'+20 DEF & RES to the weakest DAY unit \u2014 needs 2+ DAY units deployed',flavor:'The midwife-healer works only where there is someone to hold the light for her.',eff:{weakestElemDefRes:{element:'day',amount:20,minCount:2}}},
+  coatepec_ball:{name:'Coatepec Ball',tier:'common',icon:'\u{1F3D0}',price:100,priceType:'cacao',desc:'DAY & EARTH units: +7 ATK and +7 MAG \u2014 first 2 rounds only',flavor:'Struck down the slope of the serpent hill, it has not stopped rolling.',eff:{vialElements:['day','earth'],vialAmount:7,vialRounds:2}},
+  tecciztecatl_conch:{name:'Tecciztecatl Conch',tier:'common',icon:'\u{1F41A}',price:100,priceType:'cacao',desc:'All NIGHT units start battle with 5 HP Chimalli',flavor:'He hesitated at the fire and became the moon. The shell remembers the flinching.',eff:{startChimalliByElement:{night:5}}},
+  hueypachtli_dough:{name:'Hueypachtli Dough',tier:'common',icon:'\u{1FAD3}',price:100,priceType:'cacao',desc:'HUMANITY units +7 MAG',flavor:'Amaranth and honey, pressed into the shape of a god so the people could eat it.',eff:{flatMagByElement:{humanity:7}}},
+  turkey_bones:{name:'Turkey Bones',tier:'common',icon:'\u{1F983}',price:100,priceType:'cacao',desc:'THUNDER units +10% max HP',flavor:'Totolin bones, cracked for the marrow and kept for the luck.',eff:{hpMultByElement:{thunder:1.10}}},
+  huehuecoyotl_ayotl:{name:"Huehuecoyotl Ayotl",tier:'uncommon',icon:'\u{1F422}',price:250,priceType:'cacao',desc:'HUMANITY units deal +20% special damage while casting specials on consecutive turns',flavor:'The old coyote keeps the beat on a turtle shell. Miss one and the dance is over.',eff:{coyotlChain:0.20}},
+  yopaat_flint:{name:'Yopaat Flint',tier:'rare',icon:'\u{1FAA8}',price:600,priceType:'cacao',desc:'THUNDER units take 35% less damage from PARALYZED attackers',flavor:'Struck from the storm-god\u2019s own axe. What twitches cannot aim.',eff:{yopaatFlint:0.35}},
+  nappatecuhtli_reed:{name:'Nappatecuhtli Reed',tier:'rare',icon:'\u{1F33E}',price:600,priceType:'cacao',desc:'Paralyzed enemies take +25% damage from every source',flavor:'The reed-lord binds what thrashes. What is bound does not turn the blow aside.',eff:{paralyzeAmp:0.25}},
+  chalchiuhtlicue_hem:{name:"Chalchiuhtlicue's Hem",tier:'rare',icon:'\u{1F30A}',price:600,priceType:'cacao',desc:'WATER units\u2019 multi-target specials strike one additional enemy',flavor:'Her skirt of jade spreads until it touches one more shore than you meant.',eff:{waterExtraTarget:1}},
+  ixtab_rope:{name:'Ixtab Rope',tier:'uncommon',icon:'\u{1FAA2}',price:250,priceType:'cacao',desc:'NIGHT units deal +15% damage with strikes and specials, but lose 10% max HP after acting',flavor:'The rope-goddess takes the hanged into her own heaven. She does not ask them to come down.',eff:{ixtabDmg:0.15,ixtabRecoil:0.10}},
+  bioluminescent_vial:{name:'Bioluminescent Vial',tier:'common',icon:'\u{1F4A1}',price:100,priceType:'cacao',desc:'THUNDER & NIGHT units: +7 ATK and +7 MAG \u2014 first 2 rounds only' /* v883: uncommon/250 -> common/100, window 3 -> 2 rounds */,flavor:'Cave-water that glows when shaken. It does not glow for long.',eff:{vialElements:['thunder','night'],vialAmount:7,vialRounds:2}},
   obsidian_fishhook:{name:'Obsidian Fishhook',tier:'uncommon',icon:'\u{1FA9D}',price:250,priceType:'cacao',desc:'The first enemy killed each battle yields +50% Blood',flavor:'Barbed glass on a twist of maguey line. It only needs to catch once.',eff:{firstKillBloodBonus:0.50}},
   axolotl_charm:{name:'Axolotl Charm',tier:'uncommon',icon:'\u{1F98E}',price:250,priceType:'cacao',desc:'Once per battle, the first vassal to fall below 25% HP heals 30%',flavor:'The salamander that refuses to finish becoming anything else. It simply grows the piece back.',eff:{axolotlHeal:0.30}},
   /* v806: the three Layer 8 rares from the L8 design doc, none of which had been built. */
   ball_game_ring:{name:'Ball Game Ring',tier:'rare',icon:'\u{1F3C0}',price:600,priceType:'cacao',flowerPrice:20,desc:'+2 Flowers per enemy defeated by a HUMANITY ally',flavor:'The stone hoop of the tlachtli court \u2014 every sinking of the ball was a sun set right.'},
   tzompantli_skull:{name:'Tzompantli Skull',tier:'rare',icon:'\u{1F480}',price:600,priceType:'cacao',flowerPrice:20,desc:'+1 ATK/MAG per enemy sacrificed at the Altar (max 50)',flavor:'A rack of skulls, each one a debt the sun no longer has to collect.'},
-  sak_tahn_waax:{name:'Sak Tahn Waax Calendar',tier:'rare',icon:'\u{1F4C5}',price:600,priceType:'cacao',flowerPrice:20,desc:'Every 12 rounds, deal 10% of max HP to all enemies \u2014 the count carries between battles',flavor:'A Maya long-count wheel, patient as erosion. It does not care which fight you are in.'},
+  sak_tahn_waax:{name:'Sak Tahn Waax Calendar',tier:'rare',icon:'\u{1F4C5}',price:600,priceType:'cacao',flowerPrice:20,desc:'Every 12 rounds, deal 15% of max HP to all enemies \u2014 the count carries between battles',flavor:'A Maya long-count wheel, patient as erosion. It does not care which fight you are in.'},
   // Event-exclusive — Patecatl's Apothecary (migrated from runBoosts)
   sacred_atole:{name:'Sacred Atole',tier:'event',icon:'🌽',desc:'Party +25% max HP',flavor:'Warmth settles into your bones.',eff:{hpMult:1.25}},
   tecuitlatl_cake:{name:'Tecuitlatl Cake',tier:'event',icon:'🍵',desc:'+20% max TP, −5 TP cost',flavor:'Your spirit quickens.',eff:{tpMult:1.20,tpCostFlat:5}},
@@ -881,7 +939,7 @@ function offeringRewardLine(r){
   return `Your collection is complete at that rarity.<br><em style="color:#e0c060">+${r.amount} ${r.res==='cacao'?'🫘 Cacao':'🌼 Flowers'} instead.</em>`;
 }
 function getOfferingEffects(){
-  const e={atkMult:1,magMult:1,defMult:1,resMult:1,hpMult:1,vassalHpMult:1,tpMult:1,tpCostFlat:0,cacaoMult:1,bloodMult:1,tpFlat:0,weakestHpMult:1,weakestDefBuff:false,firstHitReduction:0,vialElements:null,vialAmount:0,vialRounds:0,firstKillBloodBonus:0,axolotlHeal:0,flatAtkByElement:{},flatMagByElement:{},battleStartAtkBuff:false,strikePoison:0,strikeBurnFire:false,strikeParalyzeThunder:false,startChimalliRandom:0,roundRegenPct:0,reviveVassal:0,weakestFlatDefRes:0,mask2r:{atk:1,mag:1,def:1,res:1},strikeLifesteal:0,revivePatron:0,dayStatMult:1,tlaloqueHpMult:1,tlaloqueStatMult:1,tpCostMult:1,flatDefByElement:{},flatResByElement:{},critBonusParty:0,critBonusByElement:{},critMultBonus:0,round1FlatByElement:{},roundRegenPctByElement:{},waterStrikeSplash:0,physAtkMult:1,physRecoilPct:0,tpCostMultByElement:{},hpMultByElement:{},drunkUncleansable:false,dayAtkMult:1,dayExtraRecoil:0,kukulkanBonus:false,jumpingBeans:false,windCacaoDiscount:0,ehecatlSpare:false,flayedSkin:0,strikeWoundEarth:0,ayotochtli:0,bloodyArrow:0};
+  const e={atkMult:1,magMult:1,defMult:1,resMult:1,hpMult:1,vassalHpMult:1,tpMult:1,tpCostFlat:0,cacaoMult:1,bloodMult:1,tpFlat:0,weakestHpMult:1,weakestDefBuff:false,firstHitReduction:0,vials:[],startChimalliByElement:{},weakestElemDefRes:[],elemRamp:[],coyotlChain:0,paralyzeAmp:0,waterExtraTarget:0,yopaatFlint:0,ixtabDmg:0,ixtabRecoil:0,vialElements:null,vialAmount:0,vialRounds:0,firstKillBloodBonus:0,axolotlHeal:0,flatAtkByElement:{},flatMagByElement:{},battleStartAtkBuff:false,strikePoison:0,strikeBurnFire:false,strikeParalyzeThunder:false,startChimalliRandom:0,roundRegenPct:0,reviveVassal:0,weakestFlatDefRes:0,mask2r:{atk:1,mag:1,def:1,res:1},strikeLifesteal:0,revivePatron:0,dayStatMult:1,tlaloqueHpMult:1,tlaloqueStatMult:1,tpCostMult:1,flatDefByElement:{},flatResByElement:{},critBonusParty:0,critBonusByElement:{},critMultBonus:0,round1FlatByElement:{},roundRegenPctByElement:{},waterStrikeSplash:0,physAtkMult:1,physRecoilPct:0,tpCostMultByElement:{},hpMultByElement:{},drunkUncleansable:false,dayAtkMult:1,dayExtraRecoil:0,kukulkanBonus:false,jumpingBeans:false,windCacaoDiscount:0,ehecatlSpare:false,flayedSkin:0,strikeWoundEarth:0,ayotochtli:0,bloodyArrow:0};
   (G.offerings||[]).forEach(id=>{const o=OFFERINGS[id];if(!o||!o.eff)return;const f=o.eff;
     if(f.atkMult)e.atkMult*=f.atkMult; if(f.magMult)e.magMult*=f.magMult;
     if(f.defMult)e.defMult*=f.defMult; if(f.resMult)e.resMult*=f.resMult;
@@ -896,7 +954,18 @@ function getOfferingEffects(){
     if(f.weakestHpMult)e.weakestHpMult*=f.weakestHpMult;
     if(f.weakestDefBuff)e.weakestDefBuff=true;
     if(f.firstHitReduction)e.firstHitReduction=Math.max(e.firstHitReduction,f.firstHitReduction);
-    if(f.vialElements){e.vialElements=f.vialElements;e.vialAmount=f.vialAmount||0;e.vialRounds=f.vialRounds||0;}
+    /* v881: was an ASSIGNMENT, so holding two timed elemental buffs silently discarded the first.
+       Collected into a list now -- Bioluminescent Vial and Coatepec Ball both apply independently. */
+    if(f.vialElements)e.vials.push({elements:f.vialElements,amount:f.vialAmount||0,rounds:f.vialRounds||0,label:o.name||'Offering'});
+    if(f.startChimalliByElement)Object.keys(f.startChimalliByElement).forEach(el=>e.startChimalliByElement[el]=(e.startChimalliByElement[el]||0)+f.startChimalliByElement[el]);
+    if(f.weakestElemDefRes)e.weakestElemDefRes.push(f.weakestElemDefRes);
+    if(f.elemRamp)e.elemRamp.push(f.elemRamp);
+    if(f.coyotlChain)e.coyotlChain=Math.max(e.coyotlChain,f.coyotlChain);
+    if(f.paralyzeAmp)e.paralyzeAmp+=f.paralyzeAmp;
+    if(f.yopaatFlint)e.yopaatFlint=Math.max(e.yopaatFlint,f.yopaatFlint);
+    if(f.ixtabDmg)e.ixtabDmg+=f.ixtabDmg;
+    if(f.ixtabRecoil)e.ixtabRecoil+=f.ixtabRecoil;
+    if(f.waterExtraTarget)e.waterExtraTarget+=f.waterExtraTarget;
     if(f.firstKillBloodBonus)e.firstKillBloodBonus+=f.firstKillBloodBonus;
     if(f.axolotlHeal)e.axolotlHeal=Math.max(e.axolotlHeal,f.axolotlHeal);
     if(f.strikePoison)e.strikePoison+=f.strikePoison;
@@ -1023,15 +1092,34 @@ function applyOfferings(){
   /* v807: Bioluminescent Vial. A flat buff with a 3-round life. Applied here and stripped by
      buildRoundQueue once the window closes; _vialApplied records exactly what was granted so the
      removal subtracts the same amount rather than recomputing it against modified stats. */
-  if(oe.vialElements&&oe.vialAmount>0){
-    G._vialApplied=[];
+  /* v881: one record per (unit, buff) so each timed buff expires on its own clock. */
+  G._vialApplied=[];
+  (G.units||[]).forEach(u=>{if(u)u._elemRamp=0;}); /* v881: ramp is per-battle; clear any banked value */
+  (oe.vials||[]).forEach(v=>{
+    if(!(v.amount>0))return;
+    let n=0;
     (G.units||[]).forEach(u=>{
-      if(!u||!u.isAlly||oe.vialElements.indexOf(u.element)<0)return;
-      u.atk=(u.atk||0)+oe.vialAmount;u.mag=(u.mag||0)+oe.vialAmount;
-      G._vialApplied.push(u.id);
+      if(!u||!u.isAlly||v.elements.indexOf(u.element)<0)return;
+      u.atk=(u.atk||0)+v.amount;u.mag=(u.mag||0)+v.amount;
+      G._vialApplied.push({uid:u.id,amt:v.amount,rounds:v.rounds});n++;
     });
-    if(G._vialApplied.length)addLog(`<span class="log-ab">\u{1F4A1} Bioluminescent Vial: +${oe.vialAmount} ATK/MAG to ${G._vialApplied.length} for ${oe.vialRounds} rounds</span>`);
-  }
+    if(n)addLog(`<span class="log-ab">\u{1F4A1} ${v.label}: +${v.amount} ATK/MAG to ${n} for ${v.rounds} rounds</span>`);
+  });
+  /* v881: Tecciztecatl Conch — Chimalli to EVERY unit of an element (Moctezuma Shield picks one at random). */
+  Object.keys(oe.startChimalliByElement||{}).forEach(el=>{
+    const amt=oe.startChimalliByElement[el];if(!(amt>0))return;
+    const hit=(G.units||[]).filter(u=>u&&u.isAlly&&u.currentHp>0&&u.element===el);
+    hit.forEach(u=>{u.armor=(u.armor||0)+amt;});
+    if(hit.length)addLog(`<span class="log-sh">\u{1F41A} Tecciztecatl Conch: ${hit.length} ${el.toUpperCase()} unit${hit.length>1?'s':''} +${amt} HP Chimalli</span>`);
+  });
+  /* v881: Tlamatlquiticitl Remedy — weakest unit OF AN ELEMENT, and only above a deployment threshold. */
+  (oe.weakestElemDefRes||[]).forEach(w=>{
+    const pool=(G.units||[]).filter(u=>u&&u.isAlly&&u.currentHp>0&&u.element===w.element);
+    if(pool.length<(w.minCount||1))return;
+    const t=pool.reduce((a,b)=>((a.def||0)+(a.res||0))<=((b.def||0)+(b.res||0))?a:b);
+    t.def=(t.def||0)+w.amount;t.res=(t.res||0)+w.amount;
+    addLog(`<span class="log-sh">\u2695\uFE0F Tlamatlquiticitl Remedy: ${t.icon} ${t.name} +${w.amount} DEF & RES</span>`);
+  });
   // v370: Moctezuma Shield — one random living ally gets +10 Chimalli (independent of Snake Skirt; can stack)
   if(oe.startChimalliRandom>0){
     const _msA=(G.units||[]).filter(u=>u.isAlly&&u.currentHp>0);
@@ -1227,7 +1315,7 @@ const STATUS_INFO={
       :`Loses <strong>${5*n}% of max HP</strong> after it acts (${n} stack${n>1?'s':''}).`},
   burn:{icon:'🔥',name:'Burn',color:'#ff8040',base:'Deals <strong>15% less damage per stack</strong> (4 max).',fn:n=>`Deals <strong>${15*n}% less damage</strong> (${n} stack${n>1?'s':''}).`},
   paralyze:{icon:'⚡',name:'Paralyze',color:'#ffe860',base:'<strong>10% chance per stack</strong> to lose its turn entirely (4 max).',fn:n=>`<strong>${10*n}% chance</strong> to lose its turn entirely (${n} stack${n>1?'s':''}).`},
-  wound:{icon:'🩸',name:'Wound',color:'#ff6060',base:'Receives <strong>10% more damage per stack</strong> from every hit (4 max).',fn:n=>`Receives <strong>${10*n}% more damage</strong> from every hit (${n} stack${n>1?'s':''}).`},
+  wound:{icon:'🩸',name:'Wound',color:'#ff6060',base:'Receives <strong>10% more damage per stack</strong> from every hit (4 max), and <strong>all healing on it is halved</strong>.',fn:n=>`Receives <strong>${10*n}% more damage</strong> from every hit (${n} stack${n>1?'s':''}), and <strong>all healing on it is halved</strong>.`},
   lethargy:{icon:'🥶',name:'Lethargy',color:'#c080ff',base:'Special abilities cost <strong>30% more TP per stack</strong> (4 max).',fn:n=>`Special abilities cost <strong>${30*n}% more TP</strong> (${n} stack${n>1?'s':''}).`},
   drunk:{icon:'🍺',name:'Drunk',color:'#e0a040',base:'<strong>5% chance per stack</strong> an action hits the wrong target — its own side, itself included (4 max).',fn:n=>`<strong>${5*n}% chance</strong> an action hits the wrong target — its own side, itself included (${n} stack${n>1?'s':''}).`},
   slow:{icon:'🐢',name:'Slowed',color:'#7ec8e3',base:'Acts last this round. <em>(Cannot stack.)</em>',fn:n=>`Acts last this round. <em>(Cannot stack.)</em>`},
@@ -1252,9 +1340,25 @@ function statusTipTap(e,kind,stacks,ally){ // touch: tap to show, tap anywhere t
   statusTip(e,kind,stacks,ally);
   setTimeout(()=>{document.addEventListener('click',relicTipHide,{once:true});},50);
 }
+/* v880: the pip's onclick used to call event.stopPropagation() unconditionally, so any click that
+   landed on a status pip never reached the card underneath. On an enemy card during targeting that
+   meant the lower half of the card -- exactly where the pips stack up -- silently ate the click and
+   no attack fired, while the artwork at the top worked. The card is meant to behave as one button.
+   pipTap now checks whether the enclosing card is actionable: if it is, the click is allowed
+   through untouched and no tooltip opens (hover still shows it on desktop). Only on a card with no
+   click behaviour does the pip claim the event for its own tooltip, which is what tapping a pip is
+   for on mobile in the first place. */
+function pipTap(e,kind,stacks,ally){
+  try{
+    const card=e&&e.target&&e.target.closest?e.target.closest('.uc'):null;
+    if(card&&card.onclick)return; // actionable card -> let the click reach it
+  }catch(err){}
+  if(e&&e.stopPropagation)e.stopPropagation();
+  statusTipTap(e,kind,stacks,ally);
+}
 function pipAttrs(kind,stacks,ally){ // shared handlers for every status pip — stacks drive the computed text
   const n=stacks||1;const a=ally?1:0; // v714: ally flag so Poison can read as a heal under Unclean Purification
-  return `style="cursor:help" onmouseenter="statusTip(event,'${kind}',${n},${a})" onmousemove="statusTip(event,'${kind}',${n},${a})" onmouseleave="relicTipHide()" ontouchstart="statusTipTap(event,'${kind}',${n},${a})" onclick="event.stopPropagation();statusTipTap(event,'${kind}',${n},${a})"`;
+  return `style="cursor:help" onmouseenter="statusTip(event,'${kind}',${n},${a})" onmousemove="statusTip(event,'${kind}',${n},${a})" onmouseleave="relicTipHide()" ontouchstart="statusTipTap(event,'${kind}',${n},${a})" onclick="pipTap(event,'${kind}',${n},${a})"`;
 }
 function relicTipHide(){const tt=document.getElementById('relic-tooltip');if(tt)tt.style.display='none';}
 // v615: stat tooltips on training cards — same hover/tap behavior as status pips, same #relic-tooltip
@@ -1333,7 +1437,16 @@ function unitTypeTip(e,tcode,heal){ // v621: top-right type badge tooltip — st
   tt.style.left=Math.min(x+12,window.innerWidth-216)+'px';tt.style.top=Math.min(y+14,window.innerHeight-96)+'px';
 }
 function unitTypeTipTap(e,t,h){if(e&&e.stopPropagation)e.stopPropagation();unitTypeTip(e,t,h);setTimeout(()=>{document.addEventListener('click',relicTipHide,{once:true});},50);}
-function typeAttrs(tcode,heal){return 'style="cursor:help" onmouseenter="unitTypeTip(event,\''+tcode+'\','+(heal?1:0)+')" onmousemove="unitTypeTip(event,\''+tcode+'\','+(heal?1:0)+')" onmouseleave="relicTipHide()" ontouchstart="unitTypeTipTap(event,\''+tcode+'\','+(heal?1:0)+')" onclick="event.stopPropagation();unitTypeTipTap(event,\''+tcode+'\','+(heal?1:0)+')"';}
+/* v880: same swallow as the status pips -- unitTypeTipTap() calls stopPropagation, and the
+   element badge sits inside the card name row. Routed through the same actionable-card check. */
+function typeTapGuard(e,tcode,heal){
+  try{
+    const card=e&&e.target&&e.target.closest?e.target.closest('.uc'):null;
+    if(card&&card.onclick)return;
+  }catch(err){}
+  unitTypeTipTap(e,tcode,heal);
+}
+function typeAttrs(tcode,heal){return 'style="cursor:help" onmouseenter="unitTypeTip(event,\''+tcode+'\','+(heal?1:0)+')" onmousemove="unitTypeTip(event,\''+tcode+'\','+(heal?1:0)+')" onmouseleave="relicTipHide()" ontouchstart="typeTapGuard(event,\''+tcode+'\','+(heal?1:0)+')" onclick="event.stopPropagation();typeTapGuard(event,\''+tcode+'\','+(heal?1:0)+')"';}
 function statAttrs(key){return 'style="cursor:help" onmouseenter="statTip(event,\''+key+'\')" onmousemove="statTip(event,\''+key+'\')" onmouseleave="relicTipHide()" ontouchstart="statTipTap(event,\''+key+'\')" onclick="event.stopPropagation();statTipTap(event,\''+key+'\')"';}
 function showOfferingInfo(id){const o=OFFERINGS[id];if(!o)return;
   const _n=offeringStatusNote(id);
@@ -1973,7 +2086,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v857'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v884'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -2148,7 +2261,7 @@ const GODS=[
     passive:'Inebriated Reverie: DRUNK on allies causes no misfires — instead each stack grants +5% ATK/MAG/DEF/RES.',pk:'inebriatedReverie',
     ability:'Octli Drench',ad:'1.5×MAG to 1 target + 10% splash to others + DRUNK ×1 to ALL enemies — as Patron, also DRUNK ×1 to ALL allies',ak:'octliDrench',locked:true,unlockCriteria:'Conquer Teyōllōcuālōyān'},
   {id:'tlazolteotl',name:'Tlazoltéotl',flavor:'Forgiving Goddess of Filth and Lust',element:'night',icon:'🌺',
-    type:'MAG',hp:168,atk:0,mag:17,def:9,res:13,np:42,npCost:23,
+    type:'MAG',hp:168,atk:0,mag:17,def:9,res:13,np:42,npCost:25, /* v864: 23 -> 25 (cost/pool 0.55 -> 0.60) */
     passive:'Unclean Purification: Poison ticks HEAL your allies instead of harming them. Ally Poison can never be cleansed.',pk:'uncleanPurification',
     ability:'She Who Eats Filth',ad:'Heal all allies 25% + cleanse + Poison ×1 to ALL enemies — as Patron, also Poison ×1 to ALL allies',ak:'sheWhoEatsFilth',locked:true,unlockCriteria:'Conquer Apanohualóyan'},
   {id:'patecatl',name:'Patecatl',flavor:'Apothecary God of Medicine',element:'humanity',icon:'🍶',
@@ -2173,6 +2286,15 @@ const GODS=[
 ];
 
 const GOD_ENDINGS={
+  /* v874: Tlazolteotl's arc -- she walks down collecting the sins and desires of every
+     layer, building toward a purification rite she intends to perform on Mictlantecuhtli
+     himself, with or without his consent. Continues in GOD_ENDINGS_L9. */
+  tlazolteotl:[
+    "Xolotl fades, and the dog-god's last breath leaves him as a confession. She takes it without comment.",
+    "The <strong class='teotl'>TEOTL</strong> of the first layer returns, and with it the first mouthful of filth this place had to offer.",
+    "One layer. Every soul down here is carrying something it never said aloud.",
+    "Tlazoltéotl walks deeper, already counting what Mictlan owes her."
+  ],
   tonatiuh:["Xolotl falls, and the Fifth Sun looks down at the drowned dog with something close to pity \u2014 one more creature the age will outlast.","Tonatiuh has burned since the gods threw themselves into the fire at Teotihuacan to make him rise. He knows the cost of a sun. Every age ends; his will too.","He walks the black river not to conquer it, but to search it \u2014 for the one soul strong enough to carry the <strong class='teotl'>SIXTH SUN</strong> when his own light finally gutters.","The <strong class='teotl'>TEOTL</strong> of the drowned settles into him like ash after a fire. Not yet, he thinks. Not this vessel. He walks on."],
   mayahuel:["Itzucuintlan falls, and Mayahuel tips a little pulque onto the wet ground for the drowned dogs.","\"They ferried the dead across. The least I can offer is a drink.\"","The <strong class='teotl'>TEOTL</strong> of the first layer soaks into her maguey like rain into thirsty root.","One ingredient found: <em>river-silt salt</em>. The perfect pulque needs more. She walks on."],
 
@@ -2195,6 +2317,15 @@ const GOD_ENDINGS={
   mictlantecuhtli:["Xolotl goes down, and the dog does not seem surprised at who is standing over him.","“You do not walk your own house, lord. You sit in it.”","“I am walking it now,” Mictlantecuhtli says. “Something has been moving through my layers that I did not put there.”","The <strong class='teotl'>TEOTL</strong> of the guide of the dead returns to its owner.","One layer inspected. No usurper. And no sign of her."],
 };
 const GOD_ENDINGS_L2={
+  /* v874: Tlazolteotl's arc -- she walks down collecting the sins and desires of every
+     layer, building toward a purification rite she intends to perform on Mictlantecuhtli
+     himself, with or without his consent. Continues in GOD_ENDINGS_L9. */
+  tlazolteotl:[
+    "The mountains still. In the silence between them she can hear what the crushed things were confessing as they died.",
+    "She gathers it the way another goddess would gather stone-flower — carefully, and without disgust.",
+    "The <strong class='teotl'>TEOTL</strong> of the clashing peaks pours into her, grinding and unclean.",
+    "Two. The rite she is building will need every hell's worth of sin, and Mictlan has nine."
+  ],
 tonatiuh:["Tepeyollotl's heart goes quiet, and the mountains stop grinding for the first time in an age.","The Fifth Sun weighs the jaguar-god’s stubborn strength. \"A soul that holds the earth still — could it hold the sky?\" He decides not. Too rooted. A sun must be willing to fall.","He climbs down through the broken peaks, still searching for the vessel of the <strong class='teotl'>SIXTH SUN</strong>.","The <strong class='teotl'>TEOTL</strong> of the earthquake settles into him, heavy as stone. He walks on."],
   mayahuel:["The mountains still, and the goddess kneels in the rubble, digging with her bare hands.","\"Stone-flower. It grows only where the peaks have crushed something.\" She smiles. \"Bitter. Necessary.\"","The <strong class='teotl'>TEOTL</strong> of the clashing mountains pours into her gourd, dark as pressed obsidian.","Two ingredients now. The perfect pulque is closer, and so is the bottom of the world."],
 
@@ -2428,7 +2559,7 @@ const OMETOCHTLI_TPL={id:'ometochtli',name:'Ometochtli',flavor:'Leader of the Ce
 /* v708: L8 layer bosses (B5). Battle templates + specials only -- the playable god entries,
    the patron abilities (Unclean Purification / Nullifidian Rage) and Xbalanque's scripted
    round-1 replacement are all deferred until L8 scaffolding exists. Debug-testable now. */
-const TLAZOLTEOTL_BOSS_TPL={id:'boss_tlazolteotl',name:'Tlazolt\u00e9otl',flavor:'Forgiving Goddess of Filth and Lust',icon:'\u{1F33A}',isBoss:true,isAlly:false,element:'night',type:'MAG',pk:'uncleanPurification',ability:'She Who Eats Filth',ad:'Heal all allies 25% + cleanse + Poison \u00d71 to all enemies \u2014 also Poison \u00d71 to her own side, where it heals instead',ak:'sheWhoEatsFilth',hp:860,atk:0,mag:34,def:16,res:18,np:56,npCost:24,fv:0};
+const TLAZOLTEOTL_BOSS_TPL={id:'boss_tlazolteotl',name:'Tlazolt\u00e9otl',flavor:'Forgiving Goddess of Filth and Lust',icon:'\u{1F33A}',isBoss:true,isAlly:false,element:'night',type:'MAG',pk:'uncleanPurification',ability:'She Who Eats Filth',ad:'Heal all allies 25% + cleanse + Poison \u00d71 to all enemies \u2014 also Poison \u00d71 to her own side, where it heals instead',ak:'sheWhoEatsFilth',hp:860,atk:0,mag:34,def:16,res:18,np:56,npCost:36,fv:0}; /* v864: 24 -> 30. v865: -> 36. Her boss form had the cheapest cost/pool ratio of ANY healer in the game (0.43 vs 0.50-0.89), and the gap widens at level because pool and cost scale on different curves. */
 const XBALANQUE_BOSS_TPL={id:'boss_xbalanque',name:'Xbalanque',flavor:'Twin Jaguar God Killer',icon:'\u{1F406}',isBoss:true,isAlly:false,element:'humanity',type:'PHYS',pk:'nullifidianRage',ability:'Godbane Blowgun',ad:'0.5\u00d7ATK, 5 hits to random targets \u2014 2\u00d7 against GODS',ak:'godbaneBlowgun',hp:1020,atk:36,mag:0,def:20,res:14,np:58,npCost:25,fv:0};
 /* v748: Mictlantecuhtli — Layer 9 boss, PHASE 1. Design doc v0_6 section 7.2.
    Deliberately partial this build: only the Mictlan Clasp damage exists. Undead Forces
@@ -2558,6 +2689,15 @@ const STORY_LINES_L3=[
   "She is already walking toward you.",
 ];
 const GOD_ENDINGS_L3={
+  /* v874: Tlazolteotl's arc -- she walks down collecting the sins and desires of every
+     layer, building toward a purification rite she intends to perform on Mictlantecuhtli
+     himself, with or without his consent. Continues in GOD_ENDINGS_L9. */
+  tlazolteotl:[
+    "Itzpapalotl falls, and the obsidian mountain rings once, like struck glass.",
+    "The Obsidian Butterfly's hungers are old and sharp and were never once spoken aloud. Tlazoltéotl swallows them anyway.",
+    "The <strong class='teotl'>TEOTL</strong> of the glass hell settles into her, cutting on the way down.",
+    "Three. She does not flinch. Nothing she has eaten yet is worse than what she was made to eat."
+  ],
 tonatiuh:["Itzpapalotl falls, and the obsidian mountain rings once like struck glass before it stills.","The Fifth Sun studies the Obsidian Butterfly’s razor grace. \"Beautiful. Merciless. But a sun must warm, not only cut.\" Not this one either.","He walks on through the black glass, hunting the soul that will carry the <strong class='teotl'>SIXTH SUN</strong> when his fire gutters.","The <strong class='teotl'>TEOTL</strong> of the obsidian mountain settles into him, sharp and cold. He does not slow."],
   mayahuel:["Itzpapalotl falls. The obsidian mountain rings once, like struck glass, then is silent.","Mayahuel gathers the shards. \"Obsidian honey — you scrape it from the wounds the glass leaves. Sweetest thing in Mictlan.\"","The <strong class='teotl'>TEOTL</strong> of the Obsidian Butterfly settles into the gourd, sharp-edged and sweet.","Three ingredients. The pulque is beginning to taste like something worth dying for."],
 
@@ -2589,6 +2729,15 @@ const STORY_LINES_L4=[
   "Press on. The frozen peaks cannot hold you forever.",
 ];
 const GOD_ENDINGS_L4={
+  /* v874: Tlazolteotl's arc -- she walks down collecting the sins and desires of every
+     layer, building toward a purification rite she intends to perform on Mictlantecuhtli
+     himself, with or without his consent. Continues in GOD_ENDINGS_L9. */
+  tlazolteotl:[
+    "The frost breaks. Ixquimilli's blindfold comes away, and behind it is a want he has kept for an age.",
+    "\"You judged everyone but yourself,\" she says, not unkindly, and takes that from him too.",
+    "The <strong class='teotl'>TEOTL</strong> of the cold hell enters her, clean-tasting for a moment and then not.",
+    "Four. What she is carrying has begun to show in how she walks."
+  ],
 tonatiuh:["Ixquimilli falls without a sound, and the blizzard finally exhausts itself.","The Fifth Sun looks at the blind god’s patience — a soul that waited a hundred winters. \"Endurance. But the Sixth must burn bright, not merely last.\" He shakes his head.","Through the thawing peaks he goes, still seeking the vessel worthy of the <strong class='teotl'>SIXTH SUN</strong>.","The <strong class='teotl'>TEOTL</strong> of the frozen dark settles into him. Somewhere ahead, the right soul waits. He walks on."],
   mayahuel:["The frost breaks. Mayahuel cuts a frozen agave from the ice and holds it up, breathing on it.","\"Frost-agave. It sleeps a hundred years and wakes tasting of every winter it slept through.\"","The <strong class='teotl'>TEOTL</strong> of the cold place slides into the gourd like a swallow of clean snow.","Four. She is patient. She has been patient since the Tzitzimime tore her apart."],
 
@@ -2784,6 +2933,15 @@ const GOD_ENDINGS_L9={
   _default:["Cipactli comes apart, limb from limb, and the God King of the Dead kneels at last.","The <strong class='teotl'>TEOTL</strong> of Mictlantecuhtli himself passes into you.","Nine layers. Nine rivers, all of them behind you now.","The smoke thins. You have crossed the whole of Mictlan — and you are still standing.","Every river forded, every god unmade, every death carried back up — all of it settled into you on the way down. You are not what began this descent.","The dead have no more to teach you. Mictlan is behind you, and above it the thirteen heavens turn.","Somewhere in the highest of them, <strong class='teotl'>OMETEOTL</strong> is waiting to see what you have become."],
 };
 const GOD_ENDINGS_L8={
+  /* v874: Tlazolteotl's arc -- she walks down collecting the sins and desires of every
+     layer, building toward a purification rite she intends to perform on Mictlantecuhtli
+     himself, with or without his consent. Continues in GOD_ENDINGS_L9. */
+  tlazolteotl:[
+    "The black water goes still. The thing she has been fighting wears her own face, and it is the one filth in all of Mictlan she has never eaten.",
+    "She takes it. It is the worst of them and it goes down easiest, because she has spent an age forgiving everyone except herself.",
+    "The <strong class='teotl'>TEOTL</strong> of the crossing settles into a body that is now almost entirely other people's sins.",
+    "Eight. One hell left. Mictlantecuhtli has never once asked to be cleansed — and she was never going to wait to be asked."
+  ],
   _default:["Tlazoltéotl opens her arms and the black water goes still.",
     "\"Give it here,\" she says. \"All of it. The rot you carried down eight hells.\"",
     "She eats it, and does not flinch, and is not diminished.",
@@ -2792,6 +2950,15 @@ const GOD_ENDINGS_L8={
   mictlantecuhtli:["Tlazoltéotl kneels in the black water and eats the filth of the crossing, as she always does.","“You are almost there, lord. Ask me the question.”","“Is she below me?” — “Everything is below you. That is what being God King means. It is also the problem.”","The <strong class='teotl'>TEOTL</strong> of the eater of filth settles in him, heavy as silt.","Eight layers. One left — and the thing on his throne is in it. So, he is nearly certain, is she."],
 };
 const GOD_ENDINGS_L7={
+  /* v874: Tlazolteotl's arc -- she walks down collecting the sins and desires of every
+     layer, building toward a purification rite she intends to perform on Mictlantecuhtli
+     himself, with or without his consent. Continues in GOD_ENDINGS_L9. */
+  tlazolteotl:[
+    "Mayahuel lowers her cup. \"You are carrying six hells inside you, sister. Put some of it down.\"",
+    "\"No.\" Tlazoltéotl takes the seventh anyway — the thirst of four hundred rabbits, every want they ever drank to forget.",
+    "The <strong class='teotl'>TEOTL</strong> of the heart-eating forest goes down like the last swallow of something strong.",
+    "Seven. Two hells left. She can already smell the black water."
+  ],
   tonatiuh:["Mayahuel lowers her cup and looks at the Fifth Sun a long moment. \"You. Still walking. Still searching.\"","\"I know what you hunt,\" she says. \"The one who will carry the light after you. You will not find them in a hell. You will find them in someone who chooses to walk out.\"","Tonatiuh is quiet. Then, softly: \"Then I will keep walking until they do.\"","The <strong class='teotl'>TEOTL</strong> of the drunkards’ heaven warms in his chest. The search for the <strong class='teotl'>SIXTH SUN</strong> goes on."],
   _default:["Mayahuel lowers her cup and studies you a long moment. \"You fought through seven hells to reach my forest. Most only wanted out.\"","She presses a gourd into your hands. \"There is a pulque worth brewing — the perfect one. But its ingredients are scattered through Mictlan's deepest places, and I cannot walk there anymore.\"","The <strong class='teotl'>TEOTL</strong> of the maguey goddess flows into you, sweet and binding — a pact, not a prize. Bring her obsidian honey, frost-agave, ember-salt, and the sap of the drowned maguey.","Seven layers conquered, and a quest begun. The heart-eaters go hungry tonight; the perfect pulque waits to be poured."],
   quetzalcoatl:["The wind god knows her — he carried her down from the sky once, when the world was young.","Her <strong class='teotl'>TEOTL</strong> comes to him gently, like the memory of two trees intertwined.","Seven layers. The Tzitzimime tore her apart; he buried her, and the first maguey grew.","Quetzalcoatl walks on. Behind him, new green pushes up through the forest floor."],
@@ -2813,6 +2980,15 @@ const STORY_LINES_L6=[
   "He marks you, and smiles, and reaches for a dart.",
 ];
 const GOD_ENDINGS_L6={
+  /* v874: Tlazolteotl's arc -- she walks down collecting the sins and desires of every
+     layer, building toward a purification rite she intends to perform on Mictlantecuhtli
+     himself, with or without his consent. Continues in GOD_ENDINGS_L9. */
+  tlazolteotl:[
+    "The arrow-rain stops. Opochtli lowers his atlatl and says the thing he has never said to anyone.",
+    "She listens the whole way through. She always does — that is the part the other gods forget about her.",
+    "The <strong class='teotl'>TEOTL</strong> of the pierced shore pours in, cold and iron-tasting.",
+    "Six. She is more filth now than goddess, and she has never been steadier."
+  ],
 tonatiuh:["Opochtli’s net falls slack, and the black water goes still around your feet.","The Fifth Sun considers the fisher-god’s quiet cunning. \"He catches what others let slip. But a sun cannot hide in the deep — it must stand in the open and burn.\" Not this vessel.","He wades on through the drowned dark, the search for the <strong class='teotl'>SIXTH SUN</strong> unfinished.","The <strong class='teotl'>TEOTL</strong> of the black river pours into him, cold and vast. He climbs toward the next hell."],
   mayahuel:["The black water stills. Mayahuel wades in to her waist and comes back with something pale and dripping.","\"Drowned maguey. It grows down there, in the dark, drinking what the river carries.\" She wrings it out. \"The last hard one.\"","The <strong class='teotl'>TEOTL</strong> of the arrow-rain shore pours in, cold and iron-bright.","The gourd is nearly full. One layer left — and at its heart, her own forest waits."],
 
@@ -2823,6 +2999,15 @@ tonatiuh:["Opochtli’s net falls slack, and the black water goes still around y
   mictlantecuhtli:["The arrows stop falling. Opochtli lowers his net and bows, which few things in Mictlan bother to do.","“I have fished these waters a long time, lord. Lately something else is fishing them.”","“Describe it.” — “It looks like you. That is the trouble.”","The <strong class='teotl'>TEOTL</strong> of the left-handed one comes to him.","Six layers. Now he knows the shape of the thing, and he does not slow down."],
 };
 const GOD_ENDINGS_L5_MAL={
+  /* v874: Tlazolteotl's arc -- she walks down collecting the sins and desires of every
+     layer, building toward a purification rite she intends to perform on Mictlantecuhtli
+     himself, with or without his consent. Continues in GOD_ENDINGS_L9. */
+  tlazolteotl:[
+    "Malinalxochitl falls among the banners, still demanding to be worshipped.",
+    "\"That is not a sin,\" Tlazoltéotl tells her. \"It is a hunger nobody ever fed.\" She swallows it whole regardless.",
+    "The <strong class='teotl'>TEOTL</strong> of the desert of flags rises into her, hot and wanting.",
+    "Five. Halfway. The thing she is assembling has started to take a shape."
+  ],
   tonatiuh:["Malinalxochitl falls, and the desert of flags goes still as her sorcery unwinds.","The Fifth Sun regards the witch-queen’s hunger to be worshipped. \"A sun is worshipped, yes — but it does not crave it. It simply gives.\" Not this soul.","He crosses the banner-sands, still searching for the vessel of the <strong class='teotl'>SIXTH SUN</strong>.","The <strong class='teotl'>TEOTL</strong> of the flagged desert settles into him. He walks on toward the heat."],
   mayahuel:["The desert burns out to embers, and Mayahuel walks the ash barefoot, gathering.","\"Ember-salt. Fire and thirst, pressed together. Without it, the pulque is just sweetness.\"","The <strong class='teotl'>TEOTL</strong> of the sorcerer-goddess crackles as it enters the gourd.","Another ingredient claimed. The perfect pulque grows dangerous."],
 
@@ -2842,6 +3027,15 @@ const GOD_ENDINGS_L5_MAL={
   mictlantecuhtli:["Malinalxochitl falls in her desert of flags, delighted rather than afraid.","“The God King, walking! Someone has finally frightened you.”","“Someone has finally interested me,” he says.","The <strong class='teotl'>TEOTL</strong> of the sorceress winds around his wrist.","Five layers inspected. Whatever is wearing his crown is wearing it further down."],
 };
 const GOD_ENDINGS_L5_XIU={
+  /* v874: Tlazolteotl's arc -- she walks down collecting the sins and desires of every
+     layer, building toward a purification rite she intends to perform on Mictlantecuhtli
+     himself, with or without his consent. Continues in GOD_ENDINGS_L9. */
+  tlazolteotl:[
+    "The turquoise gale dies, and the lord of the year lets go of a year he never forgave himself for.",
+    "She lifts it out of the fire without burning. Filth does not burn. It only ever moves.",
+    "The <strong class='teotl'>TEOTL</strong> of the hot hell fills her, ember-bright and heavy.",
+    "Five. Four hells left, and then the one who believes he owns them."
+  ],
   tonatiuh:["Xiuhtecuhtli falls, and the heat wind dies to a whisper.","The Fifth Sun meets the turquoise god’s gaze — fire that mirrors his own. \"Close. So close. But you burn for yourself. The Sixth must burn for those who come after.\"","He turns from the ashes and walks on, the vessel of the <strong class='teotl'>SIXTH SUN</strong> still unfound.","The <strong class='teotl'>TEOTL</strong> of the heat winds folds into his own flame. He climbs on."],
   mayahuel:["The old fire gutters low. Mayahuel scrapes the cooled coals into her palm without flinching.","\"Ember-salt, from the oldest hearth there is. Xiuhtecuhtli kept it burning so long he forgot why.\"","The <strong class='teotl'>TEOTL</strong> of the fire lord settles into the gourd, still faintly warm.","Another ingredient claimed. The perfect pulque grows dangerous."],
 
@@ -3361,7 +3555,23 @@ function debugFullReset(){
 function injectTlacuiloVassal(){
   const rec=getRecordedVassals();if(!rec.length)return;
   try{
-    const allTemplates=MICTLAN_CAPS.concat(TEPEME_CAPS,OBSIDIAN_CAPS,NATURE_CAPS,HUMANITY_CAPS,CEHUYLOAN_WATER_CAPS,CEHUYLOAN_WIND_CAPS,TONATIUH_DAY_CAPS,PANCUET_FIRE_CAPS,PANCUET_WIND_CAPS,XOCHITONAL_TPL,QUINAMETZIN_TPL,XIUHNEL_TPL,MIMICH_TPL,MICTLAMPEHECATL_TPL,TLACATEOCOTL_TPL,AMIMITL_TPL,ATLAUA_TPL,ACUECUEYOTL_TPL,TEMIMINA_WATER_CAPS,TEMIMINA_HUMAN_CAPS,TEYOLLO_NATURE_CAPS,TEYOLLO_DAY_CAPS);
+    /* v868: this was a hand-rolled concat that stopped at Layer 7. It omitted both Layer 8 pools
+       (APANO_NIGHT/THUNDER) and three minibosses -- OMETOCHTLI (L7), IXPUXTEQUI and NEXOXCHO (L8)
+       -- so a Tlacuilo record of any of them found no template and was silently dropped with a
+       console warning ("no template for ixpuxtequi"). The player just never got their carried
+       vassal. Rebuilt from every cap pool plus dbgMinibossTpls(), which is the canonical miniboss
+       list the L9 pool already derives from, so new minibosses are picked up automatically.
+       SPLIT-LIST: a NEW cap pool constant still has to be added to _pools below. */
+    const _pools=[MICTLAN_CAPS,NORMAL_CAPS,NATURE_CAPS,HUMANITY_CAPS,THUNDER_CAPS,
+      TEPEME_CAPS,TEPEME_EARTH_CAPS,TEPEME_THUNDER_CAPS,
+      OBSIDIAN_CAPS,OBSIDIAN_EARTH_CAPS,OBSIDIAN_NIGHT_CAPS,
+      TONATIUH_DAY_CAPS,CEHUYLOAN_WATER_CAPS,CEHUYLOAN_WIND_CAPS,CEHU_WATER_CAPS,CEHU_WIND_CAPS,
+      PANCUET_FIRE_CAPS,PANCUET_WIND_CAPS,
+      TEMIMINA_WATER_CAPS,TEMIMINA_HUMAN_CAPS,
+      TEYOLLO_NATURE_CAPS,TEYOLLO_DAY_CAPS,
+      APANO_NIGHT_CAPS,APANO_THUNDER_CAPS];
+    const allTemplates=[].concat.apply([],_pools.filter(Array.isArray))
+      .concat(typeof dbgMinibossTpls==='function'?dbgMinibossTpls():[]);
     const failed=[];
     rec.forEach(function(saved,i){
       let template=allTemplates.find(c=>c.id===saved.id);
@@ -3417,7 +3627,7 @@ const EVENT_LAYER_LOCKS={
   l2_mixcoatl: ()=>layer2Unlocked(),
   u_tonatiuh:  ()=>layer3Unlocked()&&G.layer===4, // L4 only, requires Itzpapalotl beaten once
   u_patecatl: ()=>G.layer>=5, // L5+ (future-proof L6/L7)
-  u_tonalpouhqui: ()=>G.layer>=3, // v384 soul-surge: L3+
+  u_tonalpouhqui: ()=>G.layer>=5, // v384 soul-surge: L3+ · v880: -> L5+
   u_threefold_flame: ()=>G.layer>=4, // v384 soul-surge: L4+
 };
 const EVENT_META={
@@ -3600,7 +3810,40 @@ function layerTransition(){
 }
 initG();
 
-function showScr(id){relicTipHide();document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');} // v655: hide any orphaned tooltip — a screen torn down under the cursor never fires mouseleave
+/* v877: every FX in the game is body-anchored at position:fixed so a re-render cannot kill it
+   mid-flight -- which is right, but it also means nothing removes them when the whole SCREEN
+   changes underneath. Shortening the durations helps; this guarantees it. Any transient still in
+   flight is dropped the moment we move screens, so effects can never bleed into the next view.
+   SPLIT-LIST: a new transient FX class must be added here. */
+const FX_TRANSIENT_CLASSES=['btn-ripple','btn-edge','uc-pick','spoils-pulse','cont-sweep','cont-chev',
+  'lv-spark','lv-column','sg-mote','sg-ring','tz-steam','tz-wash','blood-drop','blood-spray',
+  'blood-pool','blood-stain','sac-flash','bind-mote','bind-ring','bind-glow','sak-wheel','sak-glyph','dmg-pop'];
+/* v878 REGRESSION FIX (self-inflicted in v877). clearTransientFx() removed EVERY transient, and
+   the v875 click listener runs in the CAPTURE phase -- i.e. before the button's own onclick. So on
+   any button that changes screens the order was:
+       capture listener spawns the ripple  ->  onclick fires  ->  showScr()  ->  ripple deleted
+   The effect was created and destroyed within the same tick and never rendered a frame. Exactly
+   the Continue / Choose / Capture buttons, which is why the new animations vanished.
+   Age-gating fixes it without reintroducing the bleed: an element that has barely started is a
+   deliberate part of THIS transition and is left to play; one already mid-flight belongs to the
+   screen being left and is dropped. Read from the live animation rather than a creation stamp so
+   no FX call site needs touching. If getAnimations() is unavailable we keep the node -- a short
+   overhang is a far smaller problem than silently killing every effect again. */
+const FX_KEEP_MS=90; /* v879: durations are ~.2s now, so 'freshly spawned' is a narrower window */
+function clearTransientFx(){
+  try{
+    document.querySelectorAll('.'+FX_TRANSIENT_CLASSES.join(',.')).forEach(function(n){
+      let age=null;
+      try{
+        const anims=n.getAnimations?n.getAnimations():null;
+        if(anims&&anims.length)age=Math.max.apply(null,anims.map(function(a){return Number(a.currentTime)||0;}));
+      }catch(e){}
+      if(age===null)return;          /* cannot tell -> let it finish */
+      if(age>FX_KEEP_MS)n.remove();  /* mid-flight from the previous screen -> drop */
+    });
+  }catch(e){}
+}
+function showScr(id){clearTransientFx();relicTipHide();document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');} // v655: hide any orphaned tooltip — a screen torn down under the cursor never fires mouseleave
 function notify(msg,col){const n=document.getElementById('notif');n.textContent=msg;n.style.color=col||'#50c080';n.style.display='block';clearTimeout(n._t);n._t=setTimeout(()=>n.style.display='none',2400);}
 function showMo(icon,title,body,actions,onDismiss){ /* v785: onDismiss also fires when the modal is closed via its X or by clicking the backdrop -- both of those call hideMo() directly and never reach an action callback, which soft-locked the Cipactli cutscene */document.getElementById('mo-icon').innerHTML=icon;document.getElementById('mo-title').textContent=title;document.getElementById('mo-body').innerHTML=body.replace(/\n/g,'<br>');const ac=document.getElementById('mo-actions');ac.innerHTML='';actions.forEach(a=>{const b=document.createElement('button');b.className='btn '+(a.cls||'');b.textContent=a.label;b.onclick=()=>{if(typeof G!=='undefined'&&G)G._moDismiss=null;hideMo();if(typeof a.fn==='function')a.fn();}; /* v836: a label-only action is a reasonable thing to write; it should close the modal, not throw */ac.appendChild(b);});document.getElementById('mo').classList.add('open');if(typeof G!=='undefined'&&G)G._moDismiss=onDismiss||null;}
 function hideMo(){
@@ -4147,6 +4390,7 @@ function surgePick(key,force){
   G._surgeFlash={key,deltas:{atk:(f.atk||0)-prev.atk,mag:(f.mag||0)-prev.mag,hp:(f.hp||0)-prev.hp,def:(f.def||0)-prev.def,res:(f.res||0)-prev.res,tp:(f.tp||0)-prev.tp,cost:(f.cost||0)-prev.cost}};
   setTimeout(()=>{if(G._surgeFlash&&G._surgeFlash.key===key){G._surgeFlash=null;if(document.getElementById('training-list'))renderTraining();}},3000);
   const fname=force==='ihiyotl'?'💪 Ihiyotl':force==='teyolia'?'🫀 Teyolia':'🔮 Tonalli';
+  surgeFx('.train-card[data-uk="'+String(key).replace(/"/g,'')+'"]',force); /* v873: BEFORE renderTraining() replaces the card */
   notify('⚡ '+fname+' L'+f.lv+' channeled!','#d4af37');
   if(document.getElementById('training-list'))renderTraining();
   if(document.getElementById('temazcal-list'))renderTemazcal();
@@ -4270,8 +4514,36 @@ function getLayerResMult(){
   const L=Math.min(9,Math.max(1,G.layer||1));
   return LAYER_RES_MULT[L]||0.667; /* v794: no Tecpatl term here -- getTecpatlEffects() has no resMult key; its reward-side modifiers are inflationMult and teotlMult, applied elsewhere */
 }
-function sacFP(cu){const base=(cu.fv||3)+(getLevel(capKey(cu))-1);const _half=(cu.id&&cu.id.startsWith('tlaloque'))||!!cu.isUndead;return Math.max(1,_half?Math.floor(base*0.5):base);} // v809: undead recruits pay half, same rule as Tlaloques
-function sacFPAtLv(cu,lv){const base=(cu.fv||3)+(lv-1);const _half=(cu.id&&cu.id.startsWith('tlaloque'))||!!cu.isUndead;return Math.max(1,_half?Math.floor(base*0.5):base);} // v809
+/* v867: Flower income is `fv + (level-1)`, so it rides the unit-level curve -- by L6+ a captured
+   unit sits around Lv60-80 and sacrifices for ~70-90 Flowers each. Across several Tianguis that
+   buys out every relevant relic and the currency stops being a decision.
+   v870: the v867 version was a LAYER gate (x0.75 from L6), which meant the same vassal was
+   suddenly worth less the moment you crossed a layer boundary and the sacrifice pill visibly
+   dropped. Tapered instead: every level ABOVE FLOWER_TAPER_FROM contributes 75% of a level.
+   Continuous, unit-intrinsic, and independent of which layer you happen to be standing in -- a
+   Lv40 vassal is worth the same whenever you sacrifice it. Early game is untouched because no
+   unit is above the threshold yet, and the late-game curve lands within a point or two of the
+   layer-gated version it replaces.
+   Applied inside _sacFPBase so the altar preview, the training-card "Sacrifice: N" pill, the
+   multi-select total and the actual grant all read from one place and cannot disagree. */
+/* Tuned to LAND the ~25% late-game cut, not to be a 25% number. A 0.75 marginal rate only
+   trims the levels above the threshold, which came out at ~10% off by Lv80 -- far short of
+   the intent. 0.40 tracks the layer-gated v867 curve within a few points while staying
+   continuous and leaving everything at or below Lv45 (Layers 1-5) completely untouched. */
+const FLOWER_TAPER_FROM=45, FLOWER_TAPER_MULT=0.40;
+function taperedLevels(lv){
+  const l=Math.max(1,lv||1);
+  if(l<=FLOWER_TAPER_FROM)return l-1;
+  return (FLOWER_TAPER_FROM-1)+(l-FLOWER_TAPER_FROM)*FLOWER_TAPER_MULT;
+}
+function _sacFPBase(cu,lv){
+  const base=(cu.fv||3)+taperedLevels(lv);
+  const _half=(cu.id&&cu.id.startsWith('tlaloque'))||!!cu.isUndead; // v809: undead recruits pay half, same rule as Tlaloques
+  const v=_half?base*0.5:base;
+  return Math.max(1,Math.floor(v));
+}
+function sacFP(cu){return _sacFPBase(cu,getLevel(capKey(cu)));}
+function sacFPAtLv(cu,lv){return _sacFPBase(cu,lv);}
 function getSpecialLevel(id){return(G.specialLevels&&G.specialLevels[id])||0;}
 function godSpecialCost(godId){const lv=getSpecialLevel('god_'+godId);return Math.round(5*G.dte.godSpecialCostMult*(1+lv));}
 function allySpecialCost(baseId){const lv=getSpecialLevel(baseId);return Math.round(3*G.dte.allySpecialCostMult*(1+lv));}
@@ -5211,10 +5483,21 @@ function strikeDmg(actor,target){
   const defMult=1+(0.10*(target.defBuffStacks||0));
   let raw=a*atkMult-r*defMult*0.4+Math.random()*4-2;
   if((actor.burnStacks||0)>0)raw*=(1-Math.min(actor.burnStacks,4)*0.15);
-  raw=Math.round(raw*(G.dte.strikeBoostMult||1));
+  raw=Math.round(raw*(G.dte.strikeBoostMult||1)*ixtabMult(actor)); /* v884: Ixtab Rope */
   const dmg=Math.max(1,Math.round(raw));
   if(rollCrit(0,false,actor)){addLog(`<span style="color:#ffd700;font-size:10px">⚡ Critical!</span>`);strikeDmg._lastCrit=true;return Math.round(dmg*(actor._critMult||2));}
   strikeDmg._lastCrit=false;return dmg;
+}
+/* v884: Ixtab Rope. Applies to BOTH strikes and specials, so it lives in its own helper called
+   from each -- unlike coyotlMult, which is special-only. */
+function ixtabMult(actor){
+  if(!actor||!actor.isAlly||actor.element!=='night')return 1;
+  return 1+(getOfferingEffects().ixtabDmg||0);
+}
+function coyotlMult(actor){
+  if(!actor||!actor.isAlly||actor.element!=='humanity')return 1;
+  if((actor._coyotlChain||0)<2)return 1; /* the FIRST special only arms the chain */
+  return 1+(getOfferingEffects().coyotlChain||0);
 }
 function specialDmg(actor,flatBonus,useMag,target){
   let raw;
@@ -5228,6 +5511,7 @@ function specialDmg(actor,flatBonus,useMag,target){
   else{raw=((actor.atk||0)*atkMult)+flatBonus-(target?(target.def||0)*defMult:0)*0.4;}
   if(actor.type!=='MIX'&&(actor.burnStacks||0)>0)raw*=(1-Math.min(actor.burnStacks,4)*0.15);
   raw=Math.round(raw*(G.dte.specialBoostMult||1));
+  raw=Math.round(raw*coyotlMult(actor)*ixtabMult(actor)); /* v882 chain bonus · v884 Ixtab Rope */
   const dmg=Math.max(1,Math.round(raw));
   if(rollCrit(0,false,actor)){addLog(`<span style="color:#ffd700;font-size:10px">⚡ Critical!</span>`);return Math.round(dmg*(actor._critMult||2));}
   return dmg;
@@ -7307,12 +7591,12 @@ function buildRoundQueue(){
     const _cmPct=getOfferingEffects().roundRegenPct;
     if(_cmPct>0){
       let _cmAny=false;
-      aP.forEach(u=>{if(u.currentHp>0&&u.currentHp<u.maxHp){const _h=Math.round(u.maxHp*_cmPct);if(_h>0){u.currentHp=Math.min(u.maxHp,u.currentHp+_h);_cmAny=true;animateHit(u.id,_h,true);}}});
+      aP.forEach(u=>{if(u.currentHp>0&&u.currentHp<u.maxHp){const _h=Math.round(u.maxHp*_cmPct);if(_h>0){u.currentHp=healTo(u,_h);_cmAny=true;animateHit(u.id,_h,true);}}});
       if(_cmAny){addLog(`<span class="log-water">🗿 Chac Mool: allies regenerate ${Math.round(_cmPct*100)}% HP</span>`);renderBattle();}
     }
     // v477: Axolotl Effigy — element-scoped round-end regen (WATER)
     const _reBE=getOfferingEffects().roundRegenPctByElement;
-    if(_reBE&&Object.keys(_reBE).length){let _reAny=false;aP.forEach(u=>{const _p=_reBE[u.element]||0;if(_p>0&&u.currentHp>0&&u.currentHp<u.maxHp){const _h=Math.round(u.maxHp*_p);if(_h>0){u.currentHp=Math.min(u.maxHp,u.currentHp+_h);_reAny=true;animateHit(u.id,_h,true);}}});if(_reAny){addLog(`<span class="log-water">🦎 Axolotl Effigy: WATER units regenerate HP</span>`);renderBattle();}}
+    if(_reBE&&Object.keys(_reBE).length){let _reAny=false;aP.forEach(u=>{const _p=_reBE[u.element]||0;if(_p>0&&u.currentHp>0&&u.currentHp<u.maxHp){const _h=Math.round(u.maxHp*_p);if(_h>0){u.currentHp=healTo(u,_h);_reAny=true;animateHit(u.id,_h,true);}}});if(_reAny){addLog(`<span class="log-water">🦎 Axolotl Effigy: WATER units regenerate HP</span>`);renderBattle();}}
     // v477: Hummingbird Plume — strip the Round-1 flat ATK/MAG after round 1
     aP.forEach(u=>{if(u._r1Atk||u._r1Mag){u.atk=Math.max(0,(u.atk||0)-(u._r1Atk||0));u.mag=Math.max(0,(u.mag||0)-(u._r1Mag||0));u._r1Atk=0;u._r1Mag=0;}});
     // Hint 3: TP restored — show once at the start of round 2 in B1
@@ -7384,16 +7668,32 @@ function buildRoundQueue(){
      open while roundNum <= vialRounds; strip on the first round past it. Subtracts the recorded
      amount from exactly the units that received it. */
   if(G._vialApplied&&G._vialApplied.length){
-    const _ov=getOfferingEffects();
-    if(G.roundNum>(_ov.vialRounds||0)){
+    /* v881: each record carries its own amount and window, so two timed buffs with different
+       durations unwind correctly instead of sharing one global vialRounds. */
+    const _keep=[];
+    G._vialApplied.forEach(rec=>{
+      if(G.roundNum>(rec.rounds||0)){
+        const u=(G.units||[]).find(x=>x&&x.id===rec.uid);
+        if(u){u.atk=Math.max(0,(u.atk||0)-rec.amt);u.mag=Math.max(0,(u.mag||0)-rec.amt);}
+      }else _keep.push(rec);
+    });
+    if(_keep.length!==G._vialApplied.length)addLog('<span class="log-ab">\u{1F4A1} The glow dies.</span>');
+    G._vialApplied=_keep;
+  }
+  /* v881: Cipactonal Amate — a per-round ramp. Recomputed from roundNum against what each unit has
+     already banked, so it cannot double-apply if buildRoundQueue runs twice, and it self-corrects
+     for a unit that joined mid-battle. */
+  {
+    const _er=getOfferingEffects().elemRamp||[];
+    _er.forEach(r=>{
+      const want=Math.min((r.max||0),(G.roundNum||1)*(r.per||1));
       (G.units||[]).forEach(u=>{
-        if(!u||G._vialApplied.indexOf(u.id)<0)return;
-        u.atk=Math.max(0,(u.atk||0)-_ov.vialAmount);
-        u.mag=Math.max(0,(u.mag||0)-_ov.vialAmount);
+        if(!u||!u.isAlly||u.currentHp<=0||u.element!==r.element)return;
+        const have=u._elemRamp||0;
+        const d=want-have;
+        if(d>0){u.atk=(u.atk||0)+d;u.mag=(u.mag||0)+d;u._elemRamp=want;}
       });
-      addLog('<span class="log-ab">\u{1F4A1} The vial\u2019s glow dies.</span>');
-      G._vialApplied=[];
-    }
+    });
   }
   if(hasOffering('sak_tahn_waax')){
     G.sakTahnRounds=(G.sakTahnRounds||0)+1;
@@ -7401,13 +7701,23 @@ function buildRoundQueue(){
       G.sakTahnRounds=0;
       const tg=(G.enemies||[]).filter(e=>e&&e.currentHp>0&&!G.captureProcessed.has(e.id));
       let tot=0;
+      const _hits=[];
       tg.forEach(e=>{
-        const d=Math.max(1,Math.round((e.maxHp||0)*0.10));
+        const d=Math.max(1,Math.round((e.maxHp||0)*0.15)); /* v858: 10% -> 15% */
         e.currentHp=Math.max(0,e.currentHp-d);tot+=d;
-        G._animQueue.push({uid:e.id,dmg:d,isHeal:false,isCrit:false});
+        _hits.push({id:e.id,d:d});
         if(e.currentHp<=0)handleDeath(e);
       });
-      if(tg.length)addLog(`<span class="log-ab">\u{1F4C5} Sak Tahn Waax \u2014 the wheel completes. ${tot} across ${tg.length}.</span>`);
+      if(tg.length){
+        addLog(`<span class="log-ab">\u{1F4C5} Sak Tahn Waax \u2014 the wheel completes. ${tot} across ${tg.length}.</span>`);
+        /* v858: animate HERE rather than via G._animQueue. Nothing flushes that queue at
+           end-of-round, and the next enemy turn clears it, so every previous pulse was silent. */
+        try{
+          sakTahnFx();
+          renderBattle();
+          _hits.forEach(function(h,i){setTimeout(function(){animateHit(h.id,h.d,false,false);},220+i*90);});
+        }catch(err){console.warn('Sak Tahn fx failed',err);}
+      }
     }
   }G._serendipityUsed=false;G._serendipityFreeAction=false;G._serendipityTargetId=null;G._solarSacrificeUsed=false;
   // v563: end-of-round offerings — Chantico Hearth regen + TP-conditional stat recheck (New Fire Knife)
@@ -7417,7 +7727,7 @@ function buildRoundQueue(){
       G.units.filter(a=>a.currentHp>0&&azHas(a,'fire')).forEach(a=>{ // v639: Azure patron regenerates too (pre-existing scope kept: ALL fire units, enemies included — see changelog note)
         if(a.currentHp>=a.maxHp)return;
         const h=Math.max(1,Math.round(a.maxHp*0.05));
-        a.currentHp=Math.min(a.maxHp,a.currentHp+h);animateHit(a.id,h,true);_chN++;
+        a.currentHp=healTo(a,h);animateHit(a.id,h,true);_chN++;
       });
       if(_chN)addLog(`<span class="log-heal">🪔 Chantico Hearth — ${_chN} fire unit${_chN>1?'s':''} regenerate${_chN>1?'':'s'} 5%</span>`);
     }
@@ -7607,13 +7917,13 @@ function fireBelicAutoAction(u,liveEnemies,allies,isEnemySide,onDone){
     if(ab==='Ancestral Storm'||ab==='Storm Mend'){
       const tgt=allies.reduce((a,b)=>a.currentHp/a.maxHp<b.currentHp/b.maxHp?a:b);
       const h=Math.round(tgt.maxHp*(ab==='Ancestral Storm'?0.33:0.30)*BELIC_BOOST);
-      tgt.currentHp=Math.min(tgt.maxHp,tgt.currentHp+h);
+      tgt.currentHp=healTo(tgt,h);
       if(ab==='Ancestral Storm')tgt.armor=(tgt.armor||0)+15;
       renderBattle();animateHit(tgt.id,h,true);
       addLog(`<span class="log-heal">&#9889; Belic Rush: ${u.icon} ${ab} &#8594; ${tgt.icon} +${h} HP!</span>`);
     }else{
       const pct=Math.round(0.25*BELIC_BOOST*100);
-      allies.forEach(a=>{const h=Math.round(a.maxHp*0.25*BELIC_BOOST);a.currentHp=Math.min(a.maxHp,a.currentHp+h);animateHit(a.id,h,true);});
+      allies.forEach(a=>{const h=Math.round(a.maxHp*0.25*BELIC_BOOST);a.currentHp=healTo(a,h);animateHit(a.id,h,true);});
       if(ab==='Bioluminescent Chorus')allies.forEach(a=>applyAtkBuff(a,1)); /* v699: keep the buff half of the ability during a cascade */
       renderBattle();
       addLog(`<span class="log-heal">&#9889; Belic Rush: ${u.icon} ${ab} &#8594; all +${pct}% HP!</span>`);
@@ -7745,12 +8055,20 @@ function advanceTurn(actorId){
     var _yl=G.units.filter(function(u){return u.currentHp>0&&((u.poisonStacks||0)>0||(u.burnStacks||0)>0||(u.paralyzStacks||0)>0||(u.woundStacks||0)>0||(u.lethargyStacks||0)>0||(u.drunkStacks||0)>0||(G._slowedUnits&&G._slowedUnits.has(u.id)));});
     if(_yl.length){_yl.forEach(function(u){cleanseUnit(u);animateStatusPop(u.id,'🌼','#80d0ff');});if(G._yauhtliLogRound!==G.roundNum){G._yauhtliLogRound=G.roundNum;addLog('<span class="log-cp">🌼 Yauhtli Flower — ailments cleansed</span>');}}
   }
-  if(G._serendipityFreeAction){
+  /* v860: the free branch used to fire for WHOEVER acted next, not for the unit the bonus was
+     granted to. That is why selectActor had to cancel the bonus the moment the player clicked a
+     different ally -- otherwise that ally's ordinary turn would have been made free and the queue
+     would desync. But cancelling is wrong: a pending bonus and an ally's own un-taken turn are
+     independent. Acting with Coatlicue destroyed Cutting Gale's statue bonus.
+     Binding the free action to its owner fixes both halves: the owner's action is free, everyone
+     else's is a normal slot-consuming turn, and no cancel is needed at all. */
+  const _bonusOwner=G._bonusActedRestoreId;
+  if(G._serendipityFreeAction&&idToMark&&idToMark===_bonusOwner){
     G._serendipityFreeAction=false;
     G._serendipityUsed=true; // v332: commit the once-per-round use only now that the bonus action has fired
     G._serendipityTargetId=null;
     G._bonusActedRestoreId=null; /* v853: fired, not cancelled -- advanceTurn re-adds idToMark to actedIds above */
-    // Serendipity free bonus action — never consume a queue slot (robust to capture/reselect clearing _serendipityTargetId)
+    // bonus action — never consume a queue slot
   }else{
     G.qIdx++;
   }
@@ -7848,11 +8166,18 @@ function applySlowToUnit(target,hadArmorBefore){
     if(s.side==='enemy'&&s.unit&&s.unit.id===target.id){
       const[slot]=G.roundQueue.splice(i,1);
       G.thisRoundSlowTail.push(slot);
-      // v493: promote the next non-slowed enemy into the vacated slot so it takes the slowed unit's place
-      // (slowed enemies are already spliced out of roundQueue, so any enemy slot remaining is non-slowed)
+      /* v493: promote the next non-slowed enemy into the vacated slot so it takes the slowed unit's place.
+         v862: the old parenthetical -- "slowed enemies are already spliced out of roundQueue, so any
+         enemy slot remaining is non-slowed" -- is only true for enemies slowed THIS round, which live
+         in thisRoundSlowTail. Enemies deferred from the PREVIOUS round are real slots parked at the
+         end of roundQueue by buildRoundQueue (slowedEnemySlots), and the scan happily reached them:
+         slowing two enemies in one AoE promoted the second replacement straight out of the tail, so a
+         boss that had been correctly slowed last round acted early anyway. slowedThisRound is
+         pre-seeded with exactly those deferred ids at round build, so it is the right test. */
       for(let j=i;j<G.roundQueue.length;j++){
         const s2=G.roundQueue[j];
-        if(s2.side==='enemy'&&s2.unit&&s2.unit.currentHp>0){
+        if(s2.side==='enemy'&&s2.unit&&s2.unit.currentHp>0&&
+           !(G.slowedThisRound&&G.slowedThisRound.has(s2.unit.id))){
           const[promo]=G.roundQueue.splice(j,1);G.roundQueue.splice(i,0,promo);break;
         }
       }
@@ -7908,7 +8233,7 @@ function resolveStatusAfterAction(unit){
   if((unit.poisonStacks||0)>0){
     const amt=Math.round(unit.maxHp*0.05*unit.poisonStacks);
     if(unit.isAlly?hasPassive('uncleanPurification'):bossHasPassive('uncleanPurification')){ // v712/v729: Unclean Purification — the tick heals instead (either side)
-      const _b=unit.currentHp;unit.currentHp=Math.min(unit.maxHp,unit.currentHp+amt);
+      const _b=unit.currentHp;unit.currentHp=healTo(unit,amt);
       const _g=unit.currentHp-_b;
       if(_g>0){animateStatusPop(unit.id,'🌺 +'+_g,'#50e090'); // v714: was pink — read as damage
         addLog(`<span class="log-heal">🌺 ${unit.icon} ${unit.name}: Poison ×${unit.poisonStacks} → +${_g} HP</span>`);}
@@ -7968,11 +8293,10 @@ function selectActor(unitId){
     setTimeout(advanceTurn,700);return;
   }
   G.selectedActorId=unitId;G.battlePhase='player_selected';
-  /* v332: switching away cancels an un-fired bonus (refunds the use).
-     v853: the cancel now also restores actedIds, and _bonusActedRestoreId is checked alongside
-     _serendipityTargetId -- the line below nulls the target the moment the granted unit is
-     selected, so on a re-click of that SAME unit the old test cancelled its own bonus. */
-  if(G._serendipityFreeAction&&unitId!==G._serendipityTargetId&&unitId!==G._bonusActedRestoreId)cancelBonusAction();
+  /* v332/v853 removed in v860: cancelling an un-fired bonus on selection-switch only existed to
+     stop the WRONG unit consuming the free action. advanceTurn now checks the owner directly, so
+     clicking another ally is harmless -- their turn is a normal one and the bonus stays pending
+     for its owner. cancelBonusAction() is kept for callers that genuinely need to void a bonus. */
   if(G._serendipityTargetId===unitId)G._serendipityTargetId=null;
   renderBattle();
 }
@@ -8217,7 +8541,11 @@ function cancelBonusAction(){
    the normal case is untouched. If the bonus then goes unused, processCurrentSlot's
    "all players acted" branch steps over the spare slot harmlessly. */
 function ensureBonusSlot(){
-  for(let i=G.qIdx;i<(G.roundQueue||[]).length;i++){if(G.roundQueue[i]&&G.roundQueue[i].side==='player')return false;}
+  /* v857 inserted a slot only when none remained. v860: that was sized for the old "next action is
+     free" rule. Now that the free action is owner-bound, the player can spend the last ordinary
+     slot on somebody else BEFORE the owner takes its bonus -- so the slot has to be added
+     unconditionally at grant time. The extra slot is harmless if unused: processCurrentSlot's
+     "all players acted" branch steps over it. */
   if(!G.roundQueue)return false;
   G.roundQueue.splice(G.qIdx,0,{side:'player'});
   return true;
@@ -8267,7 +8595,21 @@ function enemyAoeTargets(actor,arr){
   for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=pool[i];pool[i]=pool[j];pool[j]=t;}
   return pool.slice(0,cap);
 }
+/* v882: Chalchiuhtlicue's Hem. aoeCapFor is the single resolver used by BOTH the battle handler
+   and the action-panel preview, so widening it here keeps the two in step -- the v-note about the
+   5-target clamp landing only on the preview was exactly this trap.
+   Guarded on cap>0: a cap of 0 means "not an AoE at all", and bumping that to 1 would silently
+   convert single-target specials (Feather Embrace and friends) into one-target AoEs. */
 function aoeCapFor(actor){
+  if(!actor)return 0;
+  const _base=_aoeCapBase(actor);
+  if(_base>0&&actor.isAlly&&actor.element==='water'){
+    const _x=getOfferingEffects().waterExtraTarget||0;
+    if(_x>0)return _base+_x;
+  }
+  return _base;
+}
+function _aoeCapBase(actor){
   if(!actor)return 0;
   // v535: when the patron is firing an oblated special, its AoE cap comes from the OBLATED ability,
   // not the patron's native one (else oblated AoE mis-routes and hits everyone).
@@ -8279,7 +8621,7 @@ function aoeCapFor(actor){
    never pay the Cuauhtemoc Macuahuitl's physical recoil. Holds both ak keys and display names
    because the two call sites resolve the ability differently. SPLIT-LIST: a new non-damaging
    special has to be added here or it will start charging recoil on PHYS/MIX casters. */
-const HEAL_ABILITIES=new Set(['ophidianMother','holyHarvest','peyoteConcoction','Chitin Shell','Bioluminescent Chorus','Gust Mend','Death Bloom','Dark Waters','Storm Mend','Stone Mend','Stone Protection','Earth Bloom','Ancestral Storm','Uapantotli']);
+const HEAL_ABILITIES=new Set(['sheWhoEatsFilth','She Who Eats Filth', /* v878: was absent, so the action panel billed a pure heal as "MAG AoE" and priced it with a damage range */ 'ophidianMother','holyHarvest','peyoteConcoction','Chitin Shell','Bioluminescent Chorus','Gust Mend','Death Bloom','Dark Waters','Storm Mend','Stone Mend','Stone Protection','Earth Bloom','Ancestral Storm','Uapantotli']);
 function specIsSupport(actor){
   if(!actor)return false;
   if(G._useOblationSpecial&&G._oblationAk)return HEAL_ABILITIES.has(G._oblationAk)||HEAL_ABILITIES.has(G._oblationAbility);
@@ -8354,7 +8696,7 @@ function executeStrike(actor,target){
       if(_oeStrk.strikeWoundEarth>0&&actor.element==='earth'&&target.currentHp>0&&applyWound(target,_oeStrk.strikeWoundEarth)){addLog(`<span class="log-wound">🦴 Tlaltecuhtli Claw: Wound ×${target.woundStacks}</span>`);} // v582
       if(_oeStrk.strikeParalyzeThunder&&actor.element==='thunder'&&target.currentHp>0&&applyParalyze(target,1)){addLog(`<span class="log-thunder">🪓 Chaac's Axe: Paralyze ×${target.paralyzStacks}</span>`);}
       // v374: Smoking Mirror Shard — basic strikes heal the attacker for 50% of HP damage dealt
-      if(_oeStrk.strikeLifesteal>0&&hpDmg>0){const _ls=Math.round(hpDmg*_oeStrk.strikeLifesteal);if(_ls>0&&actor.currentHp>0&&actor.currentHp<actor.maxHp){actor.currentHp=Math.min(actor.maxHp,actor.currentHp+_ls);animateStatusPop(actor.id,'🪞 +'+_ls,'#50c080');addLog(`<span class="log-heal">🪞 Smoking Mirror: ${actor.icon} +${_ls} HP lifesteal</span>`);}}
+      if(_oeStrk.strikeLifesteal>0&&hpDmg>0){const _ls=Math.round(hpDmg*_oeStrk.strikeLifesteal);if(_ls>0&&actor.currentHp>0&&actor.currentHp<actor.maxHp){actor.currentHp=healTo(actor,_ls);animateStatusPop(actor.id,'🪞 +'+_ls,'#50c080');addLog(`<span class="log-heal">🪞 Smoking Mirror: ${actor.icon} +${_ls} HP lifesteal</span>`);}}
       if(actor.isGod)triggerDeadlyButterfly(actor,G.enemies.filter(u=>u.currentHp>0&&!G.captureProcessed.has(u.id)));
       onHitContact(actor,target);
     }
@@ -8440,13 +8782,13 @@ function doPlayerAllyTarget(allyId){
   const ab=(_abTpl&&_abTpl.ability)||actor.ability;const spLv=getSpecialLevel(actor);const sp2=Math.floor(spLv/2);
   if(ab==='Stone Protection'||ab==='Stone Mend'){
     const pct=0.35+spLv*0.02;
-    const h=Math.round(target.maxHp*pct);target.currentHp=Math.min(target.maxHp,target.currentHp+h);
+    const h=Math.round(target.maxHp*pct);target.currentHp=healTo(target,h);
     const chimaAmt=15+sp2;target.armor=(target.armor||0)+chimaAmt;
     animateHit(target.id,h,true);
     addLog(`<span class="log-heal">${actor.icon} Stone Protection: +${Math.round(pct*100)}% HP + ${chimaAmt} Chimalli → ${target.icon} ${target.name}</span>`);
   }else if(ab==='Ancestral Storm'){
     const pct=0.43+spLv*0.02;
-    const h=Math.round(target.maxHp*pct);target.currentHp=Math.min(target.maxHp,target.currentHp+h);
+    const h=Math.round(target.maxHp*pct);target.currentHp=healTo(target,h);
     const chimaAmt=15+sp2;target.armor=(target.armor||0)+chimaAmt;
     animateHit(target.id,h,true);
     addLog(`<span class="log-heal">${actor.icon} Ancestral Storm: +${Math.round(pct*100)}% HP + ${chimaAmt} Chimalli → ${target.icon} ${target.name}</span>`);
@@ -8869,7 +9211,7 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
   else if(gd.ak==='ophidianMother'){
     const healPct=0.25+spLv*0.02+healBonusPP(u);
     aa.forEach(a=>{
-      const h=Math.round(a.maxHp*healPct);a.currentHp=Math.min(a.maxHp,a.currentHp+h);cleanseUnit(a);
+      const h=Math.round(a.maxHp*healPct);a.currentHp=healTo(a,h);cleanseUnit(a);
       animateHit(a.id,h,true);
     });
     // 10 HP Chimalli to lowest HP ally; if they already have ≥40 armor, give to a random unit instead
@@ -8883,7 +9225,7 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
   else if(gd.ak==='holyHarvest'){
     const hpPct=0.25+healBonusPP(u);const npPct=0.10+healBonusPP(u);
     aa.forEach(a=>{
-      const h=Math.round(a.maxHp*hpPct);a.currentHp=Math.min(a.maxHp,a.currentHp+h);
+      const h=Math.round(a.maxHp*hpPct);a.currentHp=healTo(a,h);
       const npGain=Math.round((a.maxNP||0)*npPct);a.currentNP=Math.min(a.maxNP||0,(a.currentNP||0)+npGain);
       cleanseUnit(a);
       animateHit(a.id,h,true);
@@ -8913,7 +9255,7 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
   else if(gd.ak==='sheWhoEatsFilth'){
     const healPct=0.25+healBonusPP(u);
     let totF=0;
-    aa.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*healPct);a.currentHp=Math.min(a.maxHp,a.currentHp+h);totF+=h;cleanseUnit(a);animateHit(a.id,h,true);});
+    aa.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*healPct);a.currentHp=healTo(a,h);totF+=h;cleanseUnit(a);animateHit(a.id,h,true);});
     let pzF=0;
     ae.forEach(e=>{if(e.currentHp>0&&applyPoison(e,1))pzF++;});
     /* As Patron/oblation the allies are poisoned too. Under Unclean Purification that is a BENEFIT,
@@ -8933,7 +9275,7 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
   else if(gd.ak==='peyoteConcoction'){
     const healPct=0.25+healBonusPP(u);
     aa.forEach(a=>{
-      const h=Math.round(a.maxHp*healPct);a.currentHp=Math.min(a.maxHp,a.currentHp+h);cleanseUnit(a);
+      const h=Math.round(a.maxHp*healPct);a.currentHp=healTo(a,h);cleanseUnit(a);
       applyAtkBuff(a,1);
       animateHit(a.id,h,true);
     });
@@ -8949,7 +9291,7 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
     const aliveAllies=aa.filter(a=>a.currentHp>0);
     const healTarget=aliveAllies.length?aliveAllies.reduce((a,b)=>a.currentHp<b.currentHp?a:b):null;
     const heal=Math.round(dmg*lifestealMult());
-    if(healTarget&&dmg>0){healTarget.currentHp=Math.min(healTarget.maxHp,healTarget.currentHp+heal);animateHit(healTarget.id,heal,true);}
+    if(healTarget&&dmg>0){healTarget.currentHp=healTo(healTarget,heal);animateHit(healTarget.id,heal,true);}
     addLog(`<span class="log-ab">☀️ Aurum Break! ${dmg} → ${pickT.name}${healTarget&&dmg>0?' + ❤️ '+healTarget.icon+' +'+heal:''}!</span>`);
     onHitContact(u,pickT);if(pickT.currentHp<=0)handleDeath(pickT);
   }
@@ -9244,7 +9586,7 @@ function checkAxolotlCharm(target){
   if(target.currentHp>=Math.round((target.maxHp||0)*0.25))return;
   G._axolotlUsed=true;
   const amt=Math.max(1,Math.round((target.maxHp||0)*pct));
-  target.currentHp=Math.min(target.maxHp,target.currentHp+amt);
+  target.currentHp=healTo(target,amt);
   try{G._animQueue.push({uid:target.id,dmg:amt,isHeal:true});}catch(e){}
   addLog(`<span class="log-heal">\u{1F98E} Axolotl Charm: ${target.icon} ${target.name} regrows ${amt} HP</span>`);
 }
@@ -9368,7 +9710,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   // generic targeted attack (the reported bug); Fuming Wall was auto-classified but unhandled.
   if(ab==='Folk Remedy'){ // v336: captured Curandera
     const pct=0.18+healBonusPP(u);
-    aa.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*pct);a.currentHp=Math.min(a.maxHp,a.currentHp+h);cleanseUnit(a);animateHit(a.id,h,true);});
+    aa.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*pct);a.currentHp=healTo(a,h);cleanseUnit(a);animateHit(a.id,h,true);});
     addLog(`<span class="log-heal">🌿 Folk Remedy! +${Math.round(pct*100)}% HP + cleanse all allies!</span>`);renderBattle();return;
   }
   if(ab==='Battle Tonic'){ // v336: captured Picietl Brave
@@ -9387,7 +9729,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   }
   if(ab==='Fuming Wall'){
     u.armor=(u.armor||0)+30;
-    const _fwH=Math.round(u.maxHp*0.20);u.currentHp=Math.min(u.maxHp,u.currentHp+_fwH);animateHit(u.id,_fwH,true);
+    const _fwH=Math.round(u.maxHp*0.20);u.currentHp=healTo(u,_fwH);animateHit(u.id,_fwH,true);
     const _fwO=aa.filter(x=>x.id!==u.id&&x.currentHp>0);
     if(_fwO.length){const ally=_fwO[Math.floor(Math.random()*_fwO.length)];ally.armor=(ally.armor||0)+30;animateBuff(ally.id);addLog(`<span class="log-sh">🌋 ${u.icon} Fuming Wall: +30 Chimalli to self & ${ally.icon} ${ally.name} + 20% HP!</span>`);}
     else addLog(`<span class="log-sh">🌋 ${u.icon} Fuming Wall: +30 Chimalli + 20% HP!</span>`);
@@ -9439,16 +9781,16 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   }
   if(ab==='Death Bloom'){
     const pct=0.16+spLv*0.02;
-    aa.forEach(a=>{a.currentHp=Math.min(a.maxHp,a.currentHp+Math.round(a.maxHp*pct));applyDefBuff(a,1);});
+    aa.forEach(a=>{a.currentHp=healTo(a,Math.round(a.maxHp*pct));applyDefBuff(a,1);});
     addLog(`<span class="log-heal">${u.icon} Death Bloom: +${Math.round(pct*100)}% all + DEF/RES UP×1!</span>`);return;
   }
   if(ab==='Dark Waters'){
     const pct=0.16+spLv*0.02;
-    aa.forEach(a=>{a.currentHp=Math.min(a.maxHp,a.currentHp+Math.round(a.maxHp*pct));applyAtkBuff(a,1);});
+    aa.forEach(a=>{a.currentHp=healTo(a,Math.round(a.maxHp*pct));applyAtkBuff(a,1);});
     addLog(`<span class="log-heal">${u.icon} Dark Waters: +${Math.round(pct*100)}% all + ATK/MAG UP×1!</span>`);return;
   }
   if(ab==='Uapantotli'){
-    aa.forEach(a=>{const h=Math.round(a.maxHp*0.20);a.currentHp=Math.min(a.maxHp,a.currentHp+h);cleanseUnit(a);animateHit(a.id,h,true);});
+    aa.forEach(a=>{const h=Math.round(a.maxHp*0.20);a.currentHp=healTo(a,h);cleanseUnit(a);animateHit(a.id,h,true);});
     addLog(`<span class="log-heal">${u.icon} Uapantotli! AoE +20% HP + cleanse!</span>`);renderBattle();return;
   }
   // ── Layer 6 Water roster — captured-ally (player) versions ──
@@ -9517,7 +9859,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   }
   if(ab==='Healing Rite'){
     let tot=0;
-    aa.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*0.22);a.currentHp=Math.min(a.maxHp,a.currentHp+h);tot+=h;cleanseUnit(a);animateHit(a.id,h,true);});
+    aa.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*0.22);a.currentHp=healTo(a,h);tot+=h;cleanseUnit(a);animateHit(a.id,h,true);});
     addLog(`<span class="log-heal">🙏 Healing Rite! +22% HP + cleanse all allies!</span>`);return;
   }
   // ── L7 MINIBOSS: Ometochtli — Drunken Revel (captured-ally version) — v547 ──
@@ -9558,7 +9900,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     const h=applyArmorDamage(t,critify(Math.max(1,Math.round(bpn(u)*(((u.atk||0)*1.7-(t.def||0)*0.4)*(G.dte.specialBoostMult||1)))),u,false),false);
     let hl=0;
     if(h>0){t.currentHp=Math.max(0,t.currentHp-h);animateHit(t.id,h,false,rollCrit._lc);onHitContact(u,t);refreshCaptureTargets();if(t.currentHp<=0)handleDeath(t);
-      hl=h;u.currentHp=Math.min(u.maxHp,u.currentHp+hl);animateHit(u.id,hl,true);} // v546: full lifesteal
+      hl=h;u.currentHp=healTo(u,hl);animateHit(u.id,hl,true);} // v546: full lifesteal
     addLog(`<span class="log-ab">🦇 Heart Feast! ${h}${hl?` — devours the heart (+${hl} self)`:''}</span>`);applyDayRecoil(u);return;
   }
   if(ab==='Rot Gore'){
@@ -9603,7 +9945,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   }
   if(ab==='Pulque Mending'){
     const pctPM=0.30+healBonusPP(u);
-    aa.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*pctPM);a.currentHp=Math.min(a.maxHp,a.currentHp+h);animateHit(a.id,h,true);applyDrunk(a,1,true);}); // v575 friendly
+    aa.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*pctPM);a.currentHp=healTo(a,h);animateHit(a.id,h,true);applyDrunk(a,1,true);}); // v575 friendly
     ae.forEach(e=>{if(e.currentHp>0)applyDrunk(e,1);}); // v546: the pulque flows for EVERYONE
     addLog(`<span class="log-heal">🍶 Pulque Mending! +${Math.round(pctPM*100)}% HP allies + DRUNK ×1 ALL units 🍺</span>`);
     return;
@@ -9638,19 +9980,19 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     addLog(`<span class="log-ab">🪶 Atlatl Rush! ${tot} + WOUND</span>`);return;
   }
   if(ab==='Surging Tide'){
-    aa.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*0.23);a.currentHp=Math.min(a.maxHp,a.currentHp+h);animateHit(a.id,h,true);});
+    aa.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*0.23);a.currentHp=healTo(a,h);animateHit(a.id,h,true);});
     const foes=ae.filter(e=>e.currentHp>0).sort(()=>Math.random()-0.5).slice(0,4);
     foes.forEach(e=>{applySlowToUnit(e,e.armor||0);});
     addLog(`<span class="log-heal">🌊 Surging Tide! +23% HP all allies + Slow ×1 to ${foes.length} foes!</span>`);return;
   }
   if(ab==='Earth Bloom'){
     const pct=0.15+spLv*0.02;
-    aa.forEach(a=>{a.currentHp=Math.min(a.maxHp,a.currentHp+Math.round(a.maxHp*pct));applyAtkBuff(a,1);});
+    aa.forEach(a=>{a.currentHp=healTo(a,Math.round(a.maxHp*pct));applyAtkBuff(a,1);});
     addLog(`<span class="log-heal">${u.icon} Earth Bloom: +${Math.round(pct*100)}% all + ATK/MAG UP ×1!</span>`);return;
   }
   if(ab==='Gust Mend'){
     const pct=0.18+spLv*0.02;
-    aa.forEach(t=>{const h=Math.round(t.maxHp*pct);t.currentHp=Math.min(t.maxHp,t.currentHp+h);cleanseUnit(t);animateHit(t.id,h,true);}); // v316: _animQueue is only drained on enemy turns — animate directly
+    aa.forEach(t=>{const h=Math.round(t.maxHp*pct);t.currentHp=healTo(t,h);cleanseUnit(t);animateHit(t.id,h,true);}); // v316: _animQueue is only drained on enemy turns — animate directly
     addLog(`<span class="log-heal">${u.icon} Gust Mend: +${Math.round(pct*100)}% all allies + cleanse</span>`);return;
   }
   if(ab==='Cinder Mend'){
@@ -9660,17 +10002,17 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   }
   if(ab==='Storm Mend'){
     const pct=0.20+spLv*0.01;
-    aa.forEach(a=>{const h=Math.round(a.maxHp*pct);a.currentHp=Math.min(a.maxHp,a.currentHp+h);cleanseUnit(a);animateHit(a.id,h,true);}); // v316: same fix as Gust Mend
+    aa.forEach(a=>{const h=Math.round(a.maxHp*pct);a.currentHp=healTo(a,h);cleanseUnit(a);animateHit(a.id,h,true);}); // v316: same fix as Gust Mend
     addLog(`<span class="log-heal">${u.icon} Storm Mend: +${Math.round(pct*100)}% all + cleanse!</span>`);return;
   }
   if((ab==='Stone Mend'||ab==='Stone Protection')&&aa.length){
     const tgt=aa.reduce((a,b)=>a.currentHp<b.currentHp?a:b);const pct=0.35+spLv*0.02;
-    tgt.currentHp=Math.min(tgt.maxHp,tgt.currentHp+Math.round(tgt.maxHp*pct));const chimaAmt=15+sp2;tgt.armor=(tgt.armor||0)+chimaAmt;
+    tgt.currentHp=healTo(tgt,Math.round(tgt.maxHp*pct));const chimaAmt=15+sp2;tgt.armor=(tgt.armor||0)+chimaAmt;
     addLog(`<span class="log-heal">${u.icon} Stone Protection: +${Math.round(pct*100)}% + ${chimaAmt} Chimalli → ${tgt.icon}</span>`);return;
   }
   if(ab==='Ancestral Storm'&&aa.length){
     const tgt=aa.reduce((a,b)=>a.currentHp<b.currentHp?a:b);const pct=0.43+spLv*0.02;
-    tgt.currentHp=Math.min(tgt.maxHp,tgt.currentHp+Math.round(tgt.maxHp*pct));const chimaAmt=15+sp2;tgt.armor=(tgt.armor||0)+chimaAmt;
+    tgt.currentHp=healTo(tgt,Math.round(tgt.maxHp*pct));const chimaAmt=15+sp2;tgt.armor=(tgt.armor||0)+chimaAmt;
     addLog(`<span class="log-heal">${u.icon} Ancestral Storm: +${Math.round(pct*100)}% + ${chimaAmt} Chimalli → ${tgt.icon}</span>`);return;
   }
   // BUFF
@@ -9866,7 +10208,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     return;
   }
   if(ab==='Burrow Mend'){
-    aa.forEach(a=>{const h=Math.round(a.maxHp*0.22);a.currentHp=Math.min(a.maxHp,a.currentHp+h);animateHit(a.id,h,true);});
+    aa.forEach(a=>{const h=Math.round(a.maxHp*0.22);a.currentHp=healTo(a,h);animateHit(a.id,h,true);});
     const others=aa.filter(a=>a.currentHp>0);
     if(others.length){const ally=others[Math.floor(Math.random()*others.length)];ally.armor=(ally.armor||0)+20;addLog(`<span class="log-heal">🦡 Burrow Mend: AoE +22% HP + ${ally.icon} +20 Chimalli!</span>`);}
     else addLog(`<span class="log-heal">🦡 Burrow Mend: AoE +22% HP!</span>`);
@@ -9929,7 +10271,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   }
   if(ab==='Solar Bloom'){
     // v527: 30% heal (was 20%) · recoil
-    aa.forEach(a=>{const h=Math.round(a.maxHp*0.30);a.currentHp=Math.min(a.maxHp,a.currentHp+h);animateHit(a.id,h,true);});
+    aa.forEach(a=>{const h=Math.round(a.maxHp*0.30);a.currentHp=healTo(a,h);animateHit(a.id,h,true);});
     aa.filter(a=>a.currentHp>0).forEach(a=>applyAtkBuff(a,1));
     addLog(`<span class="log-heal">🌸 Solar Bloom! All allies +30% HP + ATK/MAG UP ×1!</span>`);
     applyDayRecoil(u);return;
@@ -9955,7 +10297,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     let totCS=0;
     aa.forEach(a=>{if(a.currentHp<=0)return;
       const h=Math.round(a.maxHp*0.30);const b=a.currentHp;
-      a.currentHp=Math.min(a.maxHp,a.currentHp+h);totCS+=a.currentHp-b;
+      a.currentHp=healTo(a,h);totCS+=a.currentHp-b;
       cleanseUnit(a);animateHit(a.id,h,true);});
     addLog(`<span class="log-heal">🔆 Cleansing Steam! All allies +30% HP + cleanse \u2014 ${totCS} restored</span>`);
     applyDayRecoil(u);return;
@@ -10016,7 +10358,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   }
   // ── HUMANITY (player side) ──
   if(ab==='Uapantotli'){
-    aa.forEach(a=>{const h=Math.round(a.maxHp*0.20);a.currentHp=Math.min(a.maxHp,a.currentHp+h);animateHit(a.id,h,true);cleanseUnit(a);});
+    aa.forEach(a=>{const h=Math.round(a.maxHp*0.20);a.currentHp=healTo(a,h);animateHit(a.id,h,true);cleanseUnit(a);});
     addLog(`<span class="log-heal">🙏 Uapantotli! All allies +20% HP + cleanse!</span>`);return;
   }
   if(ab==='Ball Strike'){
@@ -10121,7 +10463,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     if(healJN>0){
       [u,...aa.filter(a=>a!==u&&a.currentHp>0&&(a.baseId==='ixpuxtequi'||a.id==='ixpuxtequi'))].forEach(a=>{
         if(a.currentHp<=0)return;
-        const before=a.currentHp;a.currentHp=Math.min(a.maxHp,a.currentHp+healJN);
+        const before=a.currentHp;a.currentHp=healTo(a,healJN);
         const gained=a.currentHp-before;
         if(gained>0){drained.push(a.icon+' +'+gained);animateHit(a.id,gained,true);}
       });
@@ -10145,7 +10487,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   }
   if(ab==='Bioluminescent Chorus'){ /* support AoE -- no enemy target required */
     let totBC=0;
-    aa.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*0.20);a.currentHp=Math.min(a.maxHp,a.currentHp+h);totBC+=h;applyAtkBuff(a,1);animateHit(a.id,h,true);});
+    aa.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*0.20);a.currentHp=healTo(a,h);totBC+=h;applyAtkBuff(a,1);animateHit(a.id,h,true);});
     addLog(`<span class="log-heal">\u{1F4A1} Bioluminescent Chorus! +${totBC} HP + ATK/MAG UP \u00d71 \u2192 all allies</span>`);return;
   }
   // ── L8 NIGHT single-target handlers (v682) ──
@@ -10168,7 +10510,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   }
   if(ab==='Chitin Shell'){ /* v698: reworked from a single-target strike into a party support AoE */
     let totCS=0;
-    aa.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*0.20);a.currentHp=Math.min(a.maxHp,a.currentHp+h);totCS+=h;applyDefBuff(a,1);animateHit(a.id,h,true);});
+    aa.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*0.20);a.currentHp=healTo(a,h);totCS+=h;applyDefBuff(a,1);animateHit(a.id,h,true);});
     addLog(`<span class="log-heal">🪳 Chitin Shell! +${totCS} HP + DEF/RES UP ×1 → all allies</span>`);return;
   }
   // L4/L5 single-target handlers
@@ -10517,7 +10859,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   }
   if(ak==='healingRite'&&ae.length){
     let tot=0;
-    ae.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*0.22);a.currentHp=Math.min(a.maxHp,a.currentHp+h);tot+=h;cleanseUnit(a);G._animQueue.push({uid:a.id,dmg:h,isHeal:true,isCrit:false});});
+    ae.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*0.22);a.currentHp=healTo(a,h);tot+=h;cleanseUnit(a);G._animQueue.push({uid:a.id,dmg:h,isHeal:true,isCrit:false});});
     addLog(`<span class="log-heal">🙏 Healing Rite! +22% HP + cleanse all!</span>`);return;
   }
   // ── Layer 6 Demigod trio — enemy versions ──
@@ -10538,7 +10880,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     addLog(`<span class="log-ab">🪶 Atlatl Rush! ${tot} + WOUND</span>`);return;
   }
   if(ak==='surgingTide'&&ae.length){
-    ae.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*0.23);a.currentHp=Math.min(a.maxHp,a.currentHp+h);G._animQueue.push({uid:a.id,dmg:h,isHeal:true,isCrit:false});});
+    ae.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*0.23);a.currentHp=healTo(a,h);G._animQueue.push({uid:a.id,dmg:h,isHeal:true,isCrit:false});});
     const foes=aa.filter(x=>x.currentHp>0).sort(()=>Math.random()-0.5).slice(0,4);
     foes.forEach(x=>{applySlowToUnit(x,x.armor||0);});
     addLog(`<span class="log-heal">🌊 Surging Tide! +23% HP all + Slow ×1 to ${foes.length} foes!</span>`);return;
@@ -10710,7 +11052,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     /* 30% of TOTAL damage across the party, not per target (ruled) -- roughly 1.65x ATK of
        self-healing against a full party, which makes the Head strongly self-sustaining. */
     const hlPH=Math.round(totPH*0.30);
-    if(hlPH>0&&u.currentHp>0){u.currentHp=Math.min(u.maxHp,u.currentHp+hlPH);G._animQueue.push({uid:u.id,dmg:hlPH,isHeal:true});}
+    if(hlPH>0&&u.currentHp>0){u.currentHp=healTo(u,hlPH);G._animQueue.push({uid:u.id,dmg:hlPH,isHeal:true});}
     addLog(`<span class="log-ab">\u{1F40A} Primordial Hunger! ${totPH} across the party${wndPH?` \u2014 Wound \u00d74 on ${wndPH}`:''}${hlPH?` \u2014 the Head drinks ${hlPH}`:''}</span>`);
     return;
   }
@@ -10752,7 +11094,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     (ae||[]).filter(e=>e&&e.currentHp>0).forEach(e=>{
       const amt=Math.max(1,Math.round((e.maxHp||0)*0.20));
       const before=e.currentHp;
-      e.currentHp=Math.min(e.maxHp,e.currentHp+amt);
+      e.currentHp=healTo(e,amt);
       const gain=e.currentHp-before;
       if(gain>0){totMS+=gain;cntMS++;G._animQueue.push({uid:e.id,dmg:gain,isHeal:true});}
       cleanseUnit(e);
@@ -10859,7 +11201,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     const dmg=critify(Math.max(1,Math.round(Math.round((u.atk||0)*1.7)-(lowestAlly.def||0)*0.4)),u,false);
     const h=applyArmorDamage(lowestAlly,dmg,true);
     if(h>0){lowestAlly.currentHp=Math.max(0,lowestAlly.currentHp-h);G._animQueue.push({uid:lowestAlly.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,lowestAlly);if(lowestAlly.currentHp<=0)handleDeath(lowestAlly);
-      const hl=h;u.currentHp=Math.min(u.maxHp,u.currentHp+hl);G._animQueue.push({uid:u.id,dmg:hl,isHeal:true});} // v546: full lifesteal
+      const hl=h;u.currentHp=healTo(u,hl);G._animQueue.push({uid:u.id,dmg:hl,isHeal:true});} // v546: full lifesteal
     addLog(`<span class="log-ab">🦇 Heart Feast! ${h||0} — devours the heart!</span>`);applyDayRecoil(u);return;
   }
   if(ak==='rotGore'&&lowestAlly){
@@ -10903,7 +11245,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     return;
   }
   if(ak==='pulqueMending'&&ae.length){
-    ae.forEach(e=>{if(e.currentHp<=0)return;const h=Math.round(e.maxHp*0.30);e.currentHp=Math.min(e.maxHp,e.currentHp+h);G._animQueue.push({uid:e.id,dmg:h,isHeal:true});applyDrunk(e,1,true);});
+    ae.forEach(e=>{if(e.currentHp<=0)return;const h=Math.round(e.maxHp*0.30);e.currentHp=healTo(e,h);G._animQueue.push({uid:e.id,dmg:h,isHeal:true});applyDrunk(e,1,true);});
     aa.forEach(a=>{if(a.currentHp>0)applyDrunk(a,1);}); // v546/v575: enemy own side friendly; player side offensive
     addLog(`<span class="log-heal">🍶 Pulque Mending! Enemy allies +30% HP + DRUNK ×1 ALL units 🍺</span>`);
     return;
@@ -10945,7 +11287,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     applyDayRecoil(u);return;
   }
   if(ak==='solarBloom'&&ae.length){
-    ae.forEach(e=>{const h=Math.round(e.maxHp*0.30);e.currentHp=Math.min(e.maxHp,e.currentHp+h);G._animQueue.push({uid:e.id,dmg:h,isHeal:true});e.atkBuffStacks=Math.min(4,(e.atkBuffStacks||0)+1);e.atkBuffRounds=Math.max(e.atkBuffRounds||0,4);}); // v527: 30%
+    ae.forEach(e=>{const h=Math.round(e.maxHp*0.30);e.currentHp=healTo(e,h);G._animQueue.push({uid:e.id,dmg:h,isHeal:true});e.atkBuffStacks=Math.min(4,(e.atkBuffStacks||0)+1);e.atkBuffRounds=Math.max(e.atkBuffRounds||0,4);}); // v527: 30%
     addLog(`<span class="log-heal">🌸 Solar Bloom! All enemy allies +30% HP + ATK/MAG UP ×1!</span>`);
     applyDayRecoil(u);return;
   }
@@ -10967,7 +11309,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     let totCS=0;
     ae.filter(e=>e.currentHp>0).forEach(e=>{
       const h=Math.round(e.maxHp*0.30);const b=e.currentHp;
-      e.currentHp=Math.min(e.maxHp,e.currentHp+h);const g=e.currentHp-b;
+      e.currentHp=healTo(e,h);const g=e.currentHp-b;
       if(g>0){totCS+=g;G._animQueue.push({uid:e.id,dmg:g,isHeal:true});}
       cleanseUnit(e);});
     addLog(`<span class="log-heal">🔆 Cleansing Steam! +${totCS} HP + cleanse to her side</span>`);
@@ -11099,7 +11441,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     if(h>0){lowestAlly.currentHp=Math.max(0,lowestAlly.currentHp-h);G._animQueue.push({uid:lowestAlly.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,lowestAlly);if(lowestAlly.currentHp<=0)handleDeath(lowestAlly);}
     // Heal lowest-HP enemy ally for raw damage
     const liveEnemies=ae.filter(e=>e.currentHp>0);
-    if(liveEnemies.length){const healTgt=liveEnemies.reduce((a,b)=>a.currentHp<b.currentHp?a:b);healTgt.currentHp=Math.min(healTgt.maxHp,healTgt.currentHp+rawDmg);G._animQueue.push({uid:healTgt.id,dmg:rawDmg,isHeal:true});}
+    if(liveEnemies.length){const healTgt=liveEnemies.reduce((a,b)=>a.currentHp<b.currentHp?a:b);healTgt.currentHp=healTo(healTgt,rawDmg);G._animQueue.push({uid:healTgt.id,dmg:rawDmg,isHeal:true});}
     addLog(`<span class="log-ab">☀️ Aurum Break! ${h||0} to ${lowestAlly.name}!</span>`);return;
   }
   if(ak==='shardBreath'){
@@ -11180,19 +11522,19 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   if((ab==='Stone Mend'||ab==='Stone Protection')&&ae.length){
     const tgt=ae.reduce((a,b)=>a.currentHp<b.currentHp?a:b);
     const h=Math.round(tgt.maxHp*(ab==='Stone Protection'?0.25:0.25));
-    tgt.currentHp=Math.min(tgt.maxHp,tgt.currentHp+h);
+    tgt.currentHp=healTo(tgt,h);
     const chimaAmt=ab==='Stone Protection'?10:10;
     tgt.armor=(tgt.armor||0)+chimaAmt;
     addLog(`<span class="log-heal">🗻 ${ab}: ${tgt.icon} +${h} HP + ${chimaAmt} Chimalli!</span>`);
     G._animQueue.push({uid:tgt.id,dmg:h,isHeal:true});return;
   }
   if(ab==='Earth Bloom'&&ae.length){
-    ae.forEach(a=>{const h=Math.round(a.maxHp*.20);a.currentHp=Math.min(a.maxHp,a.currentHp+h);a.atkBuffStacks=Math.min(4,(a.atkBuffStacks||0)+1);a.atkBuffRounds=Math.max(a.atkBuffRounds||0,4);G._animQueue.push({uid:a.id,dmg:h,isHeal:true});});
+    ae.forEach(a=>{const h=Math.round(a.maxHp*.20);a.currentHp=healTo(a,h);a.atkBuffStacks=Math.min(4,(a.atkBuffStacks||0)+1);a.atkBuffRounds=Math.max(a.atkBuffRounds||0,4);G._animQueue.push({uid:a.id,dmg:h,isHeal:true});});
     addLog(`<span class="log-heal">🌄 Earth Bloom: all +20% HP + ATK/MAG UP ×1!</span>`);return;
   }
   if(ab==='Ancestral Storm'&&ae.length){
     const tgt=ae.reduce((a,b)=>a.currentHp<b.currentHp?a:b);
-    const h=Math.round(tgt.maxHp*.33);tgt.currentHp=Math.min(tgt.maxHp,tgt.currentHp+h);
+    const h=Math.round(tgt.maxHp*.33);tgt.currentHp=healTo(tgt,h);
     tgt.armor=(tgt.armor||0)+15; // chimalli — no cleanse
     G._animQueue.push({uid:tgt.id,dmg:h,isHeal:true});
     addLog(`<span class="log-heal">🌩 Ancestral Storm: ${tgt.icon} +${h} HP + 15 Chimalli!</span>`);return;
@@ -11276,7 +11618,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   }
   if(ab==='Holy Harvest'&&ae.length){
     ae.forEach(a=>{
-      const h=Math.round(a.maxHp*0.20);a.currentHp=Math.min(a.maxHp,a.currentHp+h);
+      const h=Math.round(a.maxHp*0.20);a.currentHp=healTo(a,h);
       cleanseUnit(a);
       G._animQueue.push({uid:a.id,dmg:h,isHeal:true});
     });
@@ -11297,7 +11639,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     addLog(`<span class="log-ab">🌸 Pollen Burst! ${tot} AoE + ATK/MAG UP ×1 all allies!</span>`);return;
   }
   if(ab==='Uapantotli'&&ae.length){
-    ae.forEach(a=>{const h=Math.round(a.maxHp*0.20);a.currentHp=Math.min(a.maxHp,a.currentHp+h);cleanseUnit(a);G._animQueue.push({uid:a.id,dmg:h,isHeal:true});});
+    ae.forEach(a=>{const h=Math.round(a.maxHp*0.20);a.currentHp=healTo(a,h);cleanseUnit(a);G._animQueue.push({uid:a.id,dmg:h,isHeal:true});});
     addLog(`<span class="log-heal">🙏 Uapantotli! All allies +20% HP + cleanse!</span>`);return;
   }
   if(ab==='Withering Touch'&&aa.length){
@@ -11326,15 +11668,15 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     return;
   }
   if(ab==='Death Bloom'&&ae.length){
-    ae.forEach(a=>{const h=Math.round(a.maxHp*.16);a.currentHp=Math.min(a.maxHp,a.currentHp+h);G._animQueue.push({uid:a.id,dmg:h,isHeal:true});applyDefBuff(a,1);});
+    ae.forEach(a=>{const h=Math.round(a.maxHp*.16);a.currentHp=healTo(a,h);G._animQueue.push({uid:a.id,dmg:h,isHeal:true});applyDefBuff(a,1);});
     addLog(`<span class="log-heal">🌺 Death Bloom: +16% all + DEF/RES UP×1!</span>`);return;
   }
   if(ab==='Dark Waters'&&ae.length){
-    ae.forEach(a=>{const h=Math.round(a.maxHp*.16);a.currentHp=Math.min(a.maxHp,a.currentHp+h);G._animQueue.push({uid:a.id,dmg:h,isHeal:true});applyAtkBuff(a,1);});
+    ae.forEach(a=>{const h=Math.round(a.maxHp*.16);a.currentHp=healTo(a,h);G._animQueue.push({uid:a.id,dmg:h,isHeal:true});applyAtkBuff(a,1);});
     addLog(`<span class="log-heal">💧 Dark Waters: +16% all + ATK/MAG UP×1!</span>`);return;
   }
   if(ab==='Gust Mend'&&ae.length){
-    const pct=0.18;ae.forEach(a=>{const h=Math.round(a.maxHp*pct);a.currentHp=Math.min(a.maxHp,a.currentHp+h);cleanseUnit(a);G._animQueue.push({uid:a.id,dmg:h,isHeal:true});});
+    const pct=0.18;ae.forEach(a=>{const h=Math.round(a.maxHp*pct);a.currentHp=healTo(a,h);cleanseUnit(a);G._animQueue.push({uid:a.id,dmg:h,isHeal:true});});
     addLog(`<span class="log-heal">🪶 Gust Mend: +18% all + cleanse!</span>`);return;
   }
   if(ab==='Cinder Mend'&&ae.length){ // v599: reworked — ATK/MAG UP ×1 to ALL (enemy side mirrors)
@@ -11343,14 +11685,14 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   }
   if(ab==='Storm Mend'&&ae.length){
     const h20=0.20;
-    ae.forEach(a=>{const h=Math.round(a.maxHp*h20);a.currentHp=Math.min(a.maxHp,a.currentHp+h);cleanseUnit(a);G._animQueue.push({uid:a.id,dmg:h,isHeal:true});});
+    ae.forEach(a=>{const h=Math.round(a.maxHp*h20);a.currentHp=healTo(a,h);cleanseUnit(a);G._animQueue.push({uid:a.id,dmg:h,isHeal:true});});
     addLog(`<span class="log-heal">⚡ Storm Mend: +20% all + cleanse!</span>`);return;
   }
   if(ak==='sheWhoEatsFilth'){ /* v708: heals+cleanses her own host, poisons the party */
     let totHeal=0;
     ae.filter(e=>e.currentHp>0).forEach(e=>{
       const h=Math.round(e.maxHp*0.25);
-      const before=e.currentHp;e.currentHp=Math.min(e.maxHp,e.currentHp+h);
+      const before=e.currentHp;e.currentHp=healTo(e,h);
       const gained=e.currentHp-before;
       cleanseUnit(e); /* guards on isAlly internally, so the enemy slow-tail is left alone */
       if(gained>0){totHeal+=gained;G._animQueue.push({uid:e.id,dmg:gained,isHeal:true});}
@@ -11415,7 +11757,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     if(healJN>0){
       [u,...ae.filter(e=>e!==u&&e.currentHp>0&&(e.baseId==='ixpuxtequi'||e.id==='ixpuxtequi'||String(e.id).indexOf('ixpuxtequi')===0))].forEach(e=>{
         if(e.currentHp<=0)return;
-        const before=e.currentHp;e.currentHp=Math.min(e.maxHp,e.currentHp+healJN);
+        const before=e.currentHp;e.currentHp=healTo(e,healJN);
         const g2=e.currentHp-before;
         if(g2>0){drained.push(e.icon+' +'+g2);G._animQueue.push({uid:e.id,dmg:g2,isHeal:true});}
       });
@@ -11526,7 +11868,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     return;
   }
   if(ak==='burrMend'&&ae.length){
-    ae.forEach(e=>{const h=Math.round(e.maxHp*0.22);e.currentHp=Math.min(e.maxHp,e.currentHp+h);G._animQueue.push({uid:e.id,dmg:h,isHeal:true});});
+    ae.forEach(e=>{const h=Math.round(e.maxHp*0.22);e.currentHp=healTo(e,h);G._animQueue.push({uid:e.id,dmg:h,isHeal:true});});
     const others=ae.filter(e=>e.currentHp>0);
     if(others.length){const ally=others[Math.floor(Math.random()*others.length)];ally.armor=(ally.armor||0)+20;addLog(`<span class="log-heal">🦡 Burrow Mend: AoE +22% HP + ${ally.icon} ${ally.name} +20 Chimalli!</span>`);}
     else addLog(`<span class="log-heal">🦡 Burrow Mend: All allies +22% HP!</span>`);
@@ -11596,12 +11938,12 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   }
   if(ak==='peyoteConcoction'){ // v336: enemy Patecatl boss — heals his side (ae)
     const pct=0.25+healBonusPP(u);
-    ae.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*pct);a.currentHp=Math.min(a.maxHp,a.currentHp+h);cleanseUnit(a);a.atkBuffStacks=Math.min(4,(a.atkBuffStacks||0)+1);a.atkBuffRounds=Math.max(a.atkBuffRounds||0,4);G._animQueue.push({uid:a.id,dmg:h,isHeal:true});});
+    ae.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*pct);a.currentHp=healTo(a,h);cleanseUnit(a);a.atkBuffStacks=Math.min(4,(a.atkBuffStacks||0)+1);a.atkBuffRounds=Math.max(a.atkBuffRounds||0,4);G._animQueue.push({uid:a.id,dmg:h,isHeal:true});});
     addLog(`<span class="log-heal">🍶 Peyote Concoction! +${Math.round(pct*100)}% HP + cleanse + ATK/MAG UP all!</span>`);return;
   }
   if(ak==='folkRemedy'){ // v336: enemy Curandera
     const pct=0.18+healBonusPP(u);
-    ae.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*pct);a.currentHp=Math.min(a.maxHp,a.currentHp+h);cleanseUnit(a);G._animQueue.push({uid:a.id,dmg:h,isHeal:true});});
+    ae.forEach(a=>{if(a.currentHp<=0)return;const h=Math.round(a.maxHp*pct);a.currentHp=healTo(a,h);cleanseUnit(a);G._animQueue.push({uid:a.id,dmg:h,isHeal:true});});
     addLog(`<span class="log-heal">🌿 Folk Remedy! +${Math.round(pct*100)}% HP + cleanse all!</span>`);return;
   }
   if(ak==='taintedDraught'&&lowestAlly){ // v336: enemy Toloache Poisoner
@@ -11703,12 +12045,12 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   }
   if(ab==='Bioluminescent Chorus'&&ae.length){ /* v699: support AoE -- buffs and heals the enemy host */
     let totBC=0;
-    ae.filter(e=>e.currentHp>0).forEach(e=>{const h=Math.round(e.maxHp*0.20);e.currentHp=Math.min(e.maxHp,e.currentHp+h);totBC+=h;e.atkBuffStacks=Math.min(4,(e.atkBuffStacks||0)+1);e.atkBuffRounds=Math.max(e.atkBuffRounds||0,4);G._animQueue.push({uid:e.id,dmg:h,isHeal:true});});
+    ae.filter(e=>e.currentHp>0).forEach(e=>{const h=Math.round(e.maxHp*0.20);e.currentHp=healTo(e,h);totBC+=h;e.atkBuffStacks=Math.min(4,(e.atkBuffStacks||0)+1);e.atkBuffRounds=Math.max(e.atkBuffRounds||0,4);G._animQueue.push({uid:e.id,dmg:h,isHeal:true});});
     addLog(`<span class="log-heal">\u{1F4A1} Bioluminescent Chorus! +${totBC} HP + ATK/MAG UP \u00d71 \u2192 all enemy allies</span>`);return;
   }
   if(ab==='Chitin Shell'&&ae.length){ /* v698: support AoE — now heals the enemy host instead of striking */
     let totCS=0;
-    ae.filter(e=>e.currentHp>0).forEach(e=>{const h=Math.round(e.maxHp*0.20);e.currentHp=Math.min(e.maxHp,e.currentHp+h);totCS+=h;e.defBuffStacks=Math.min(4,(e.defBuffStacks||0)+1);e.defBuffRounds=Math.max(e.defBuffRounds||0,4);G._animQueue.push({uid:e.id,dmg:h,isHeal:true});});
+    ae.filter(e=>e.currentHp>0).forEach(e=>{const h=Math.round(e.maxHp*0.20);e.currentHp=healTo(e,h);totCS+=h;e.defBuffStacks=Math.min(4,(e.defBuffStacks||0)+1);e.defBuffRounds=Math.max(e.defBuffRounds||0,4);G._animQueue.push({uid:e.id,dmg:h,isHeal:true});});
     addLog(`<span class="log-heal">🪳 Chitin Shell! +${totCS} HP + DEF/RES UP ×1 → all enemy allies</span>`);return;
   }
   if(dq&&dq!=='multi'){
@@ -11783,6 +12125,25 @@ function fireSolarSacrifice(vassalId){
   G.battlePhase='player_choose';renderBattle();
 }
 // v303 (12): Chimalli guard added — these helpers must always exist (see architecture invariants)
+/* v863: Teotlan had no healing-reduction mechanic at all, so every enemy healer was fought by
+   simply out-damaging it -- and Tlazolteotl wins that race outright. Her Poison x4 self-tick is
+   5% max HP per stack, uncleansable on her own side by Unclean Purification and never decaying,
+   which is a permanent 20%-max-HP-per-round regen (7,180/round at Lv80). Wound now answers it.
+   WOUND_HEAL_MULT is applied to every point of healing a wounded unit receives, from any source
+   including regen and lifesteal. Flat while wounded rather than per-stack: "cut heals in half" is
+   one number a player can hold in their head, where 12.5%-per-stack is not.
+   Deliberately symmetric -- enemies wounding your party blunt Ophidian Mother the same way. */
+const WOUND_HEAL_MULT=0.50;
+function woundHealMult(unit){return (unit&&(unit.woundStacks||0)>0)?WOUND_HEAL_MULT:1;}
+/* Every heal in the game was an open-coded `x.currentHp=healTo(x,amt)`.
+   healTo() is the single choke point: it scales by the target's Wound, clamps, and returns the
+   new currentHp so it drops into the old assignment shape unchanged. */
+function healTo(unit,amt){
+  if(!unit)return 0;
+  let a=Number(amt)||0;
+  if(a>0)a=Math.round(a*woundHealMult(unit));
+  return Math.min(unit.maxHp,(unit.currentHp||0)+a);
+}
 function applyWound(unit,stacks){if((unit.armor||0)>0||unit._armorJustBroke)return false;unit.woundStacks=Math.min(4,(unit.woundStacks||0)+stacks);return true;}
 function applyLethargy(unit,stacks){if((unit.armor||0)>0||unit._armorJustBroke)return false;unit.lethargyStacks=Math.min(4,(unit.lethargyStacks||0)+stacks);return true;}
 // v535: oblated specials store a flat npCost captured at oblation time; scale it like effectiveNpCost
@@ -11972,6 +12333,176 @@ function captureBindFx(uid){
   lbl.style.cssText='color:#ffe08a;font-weight:800;font-size:15px;left:'+(cx-34)+'px;top:'+(r.top+2)+'px;text-shadow:0 0 10px #a8791a,0 1px 3px #000;';
   document.body.appendChild(lbl);setTimeout(function(){lbl.remove();},1100);
 }
+/* v858: the wheel completing had no visual at all. Its damage was pushed into G._animQueue from
+   buildRoundQueue, but nothing flushes that queue at end-of-round -- the next enemy turn opens
+   with G._animQueue=[] and wipes it -- so the numbers were discarded every single time and the
+   only trace was one line in the battle log. Fires its own animation instead. */
+function sakTahnFx(){
+  const board=document.getElementById('screen-battle')||document.body;
+  const r=board.getBoundingClientRect();
+  const cx=r.left+r.width/2, cy=r.top+Math.min(r.height*0.32,260);
+  const size=Math.min(300,Math.max(150,r.width*0.34));
+  [0,140].forEach(function(delay,i){
+    const w=document.createElement('div');w.className='sak-wheel';
+    const sz=size*(i?0.62:1);
+    w.style.cssText='left:'+cx+'px;top:'+cy+'px;width:'+sz+'px;height:'+sz+'px;animation-delay:'+delay+'ms;';
+    document.body.appendChild(w);setTimeout(function(){w.remove();},1200+delay);
+  });
+  const g=document.createElement('div');g.className='sak-glyph';g.textContent='\u{1F4C5}';
+  g.style.cssText='left:'+cx+'px;top:'+cy+'px;';
+  document.body.appendChild(g);setTimeout(function(){g.remove();},1200);
+}
+/* v866: shared restoration/ascension burst. Same body-anchored construction as sacrificeFx --
+   rect read synchronously, everything spawned on document.body at position:fixed -- because both
+   callers re-render their list immediately afterwards and would otherwise destroy the effect
+   mid-flight. `card` may be an element or a selector; missing/zero-size cards no-op silently. */
+function _fxRect(card){
+  const el=(typeof card==='string')?document.querySelector(card):card;
+  if(!el)return null;
+  const r=el.getBoundingClientRect();
+  return (r.width&&r.height)?r:null;
+}
+function healFx(card,delay){
+  const r=_fxRect(card);if(!r)return;
+  setTimeout(function(){
+    const wash=document.createElement('div');wash.className='tz-wash';
+    wash.style.cssText='left:'+r.left+'px;top:'+r.top+'px;width:'+r.width+'px;height:'+r.height+'px;';
+    document.body.appendChild(wash);setTimeout(function(){wash.remove();},1000);
+    const n=13;
+    for(let i=0;i<n;i++){
+      const d=document.createElement('div');d.className='tz-steam';
+      d.style.cssText='left:'+(r.left+Math.random()*r.width)+'px;top:'+(r.bottom-6-Math.random()*10)+'px;'
+        +'--dx:'+((Math.random()*2-1)*22).toFixed(1)+'px;'
+        +'--dy:'+(-(r.height*0.55+Math.random()*40)).toFixed(1)+'px;'
+        +'--dur:'+(0.75+Math.random()*0.5).toFixed(2)+'s;animation-delay:'+(Math.random()*0.3).toFixed(2)+'s;';
+      document.body.appendChild(d);setTimeout(function(){d.remove();},1600);
+    }
+    const lbl=document.createElement('div');lbl.className='dmg-pop';
+    lbl.textContent='\u2764\uFE0F RESTORED'; /* v869: heart, not the herb */
+    lbl.style.cssText='color:#7ef0c0;font-weight:800;font-size:14px;left:'+(r.left+r.width/2-46)+'px;top:'+(r.top+6)+'px;text-shadow:0 0 9px #1e7a58,0 1px 3px #000;';
+    document.body.appendChild(lbl);setTimeout(function(){lbl.remove();},1100);
+  },delay||0);
+}
+function levelUpFx(card,newLv){
+  const r=_fxRect(card);if(!r)return;
+  const col=document.createElement('div');col.className='lv-column';
+  col.style.cssText='left:'+r.left+'px;top:'+r.top+'px;width:'+r.width+'px;height:'+r.height+'px;';
+  document.body.appendChild(col);setTimeout(function(){col.remove();},950);
+  const cx=r.left+r.width/2;
+  for(let i=0;i<14;i++){
+    const sp=document.createElement('div');sp.className='lv-spark';
+    sp.style.cssText='left:'+(r.left+Math.random()*r.width)+'px;top:'+(r.bottom-4)+'px;'
+      +'--dx:'+((Math.random()*2-1)*(r.width*0.3)).toFixed(1)+'px;'
+      +'--dy:'+(-(r.height*0.7+Math.random()*34)).toFixed(1)+'px;'
+      +'--dur:'+(0.6+Math.random()*0.4).toFixed(2)+'s;animation-delay:'+(Math.random()*0.22).toFixed(2)+'s;';
+    document.body.appendChild(sp);setTimeout(function(){sp.remove();},1300);
+  }
+  const lbl=document.createElement('div');lbl.className='dmg-pop';
+  lbl.textContent=newLv?('\u25B2 Lv'+newLv):'\u25B2 LEVEL UP';
+  lbl.style.cssText='color:#ffe08a;font-weight:800;font-size:17px;left:'+(cx-30)+'px;top:'+(r.top+4)+'px;text-shadow:0 0 10px #a8791a,0 1px 3px #000;';
+  document.body.appendChild(lbl);setTimeout(function(){lbl.remove();},1100);
+}
+/* v873: Soul Surge. Motes converge on the card and a ring snaps outward as they land -- drawn
+   IN rather than thrown out, because a surge is the unit taking something into itself.
+   Same body-anchored construction as the other FX: rect read synchronously, spawned on
+   document.body, so renderTraining() cannot destroy it mid-flight. */
+const SURGE_COLORS={ihiyotl:'#ff8a5c',teyolia:'#ff6a8a',tonalli:'#b98aff'};
+function surgeFx(card,force){
+  const r=_fxRect(card);if(!r)return;
+  const c=SURGE_COLORS[force]||'#d4af37';
+  const cx=r.left+r.width/2, cy=r.top+r.height*0.45;
+  const size=Math.max(70,r.width*0.95);
+  const ring=document.createElement('div');ring.className='sg-ring';
+  ring.style.cssText='left:'+cx+'px;top:'+cy+'px;width:'+size+'px;height:'+size+'px;--sc:'+c+';';
+  document.body.appendChild(ring);setTimeout(function(){ring.remove();},1250);
+  const n=18, reach=Math.max(60,r.width);
+  for(let i=0;i<n;i++){
+    const ang=(Math.PI*2*i)/n+(Math.random()*0.35-0.175);
+    const mag=reach*(0.65+Math.random()*0.6);
+    const m=document.createElement('div');m.className='sg-mote';
+    m.style.cssText='left:'+cx+'px;top:'+cy+'px;--sc:'+c+';'
+      +'--dx:'+(Math.cos(ang)*mag).toFixed(1)+'px;'
+      +'--dy:'+(Math.sin(ang)*mag).toFixed(1)+'px;'
+      +'--dur:'+(0.45+Math.random()*0.3).toFixed(2)+'s;animation-delay:'+(Math.random()*0.14).toFixed(2)+'s;';
+    document.body.appendChild(m);setTimeout(function(){m.remove();},1100);
+  }
+}
+/* v873: Continue to Next Battle. Deliberately lighter than the others -- this fires on every
+   between-battle transition, so anything showy would wear out fast. A sweep and three chevrons
+   pulling right: momentum, not spectacle. */
+function continueFx(btn){
+  const r=_fxRect(btn||'#continue-btn');if(!r)return;
+  const sw=document.createElement('div');sw.className='cont-sweep';
+  sw.style.cssText='left:'+r.left+'px;top:'+r.top+'px;width:'+r.width+'px;height:'+r.height+'px;border-radius:8px;';
+  document.body.appendChild(sw);setTimeout(function(){sw.remove();},240); /* v879 */
+  for(let i=0;i<2;i++){ /* v877: 3 chevrons -> 2, tighter throw, no stagger tail */
+    const ch=document.createElement('div');ch.className='cont-chev';ch.textContent='\u276F';
+    ch.style.cssText='left:'+(r.right-6)+'px;top:'+(r.top+r.height/2-10)+'px;'
+      +'--dx:'+(16+i*8)+'px;--dur:'+(0.18+i*0.04).toFixed(2)+'s;animation-delay:'+(i*0.03).toFixed(2)+'s;'; /* v879 */
+    document.body.appendChild(ch);setTimeout(function(){ch.remove();},300);
+  }
+}
+/* v875: click feedback, wired as ONE delegated capture-phase listener rather than per call site.
+   Nearly every button in this game lives inside a template string that is rebuilt on each render
+   (action panel, capture window, path cards), so per-button wiring would have to be re-applied on
+   every re-render and would rot the moment a new button appeared. Delegation covers them all,
+   including buttons that do not exist yet.
+   Colour is read from the button's own class so each control reads as itself. */
+const BTN_FX_COLORS=[
+  ['btn-easy','#50c080'],['btn-hard','#e07070'],      /* path choice */
+  ['btn-strike','#ff8a4c'],['btn-special','#6aa8ff'], /* action panel */
+  ['btn-cap','#50e090'],['btn-ca','#c0844a'],         /* capture window */
+  ['btn-sac','#c060c0'],['btn-debug','#8a6ad0']
+];
+function btnFxColor(el){
+  for(const [cls,col] of BTN_FX_COLORS)if(el.classList.contains(cls))return col;
+  return '#d4af37';
+}
+function clickFx(el,x,y){
+  if(!el)return;
+  const r=el.getBoundingClientRect();
+  if(!r.width||!r.height)return;
+  const col=btnFxColor(el);
+  const cx=(typeof x==='number'&&x)?x:r.left+r.width/2;
+  const cy=(typeof y==='number'&&y)?y:r.top+r.height/2;
+  const size=Math.max(r.width,r.height)*2.1;
+  const rip=document.createElement('div');rip.className='btn-ripple';
+  rip.style.cssText='left:'+cx+'px;top:'+cy+'px;width:'+size+'px;height:'+size+'px;--rc:'+col+';';
+  document.body.appendChild(rip);setTimeout(function(){rip.remove();},300); /* v879 */
+  const edge=document.createElement('div');edge.className='btn-edge';
+  const br=getComputedStyle(el).borderRadius||'8px';
+  edge.style.cssText='left:'+r.left+'px;top:'+r.top+'px;width:'+r.width+'px;height:'+r.height+'px;border-radius:'+br+';--rc:'+col+';';
+  document.body.appendChild(edge);setTimeout(function(){edge.remove();},280); /* v879 */
+}
+function unitPickFx(el){
+  if(!el)return;
+  const r=el.getBoundingClientRect();
+  if(!r.width||!r.height)return;
+  const p=document.createElement('div');p.className='uc-pick';
+  p.style.cssText='left:'+r.left+'px;top:'+r.top+'px;width:'+r.width+'px;height:'+r.height+'px;';
+  document.body.appendChild(p);setTimeout(function(){p.remove();},320); /* v879 */
+}
+document.addEventListener('click',function(ev){
+  try{
+    const b=ev.target&&ev.target.closest?ev.target.closest('.btn'):null;
+    if(b){ if(!b.disabled)clickFx(b,ev.clientX,ev.clientY); return; }
+    /* unit cards are not .btn -- only flash the ones that are actually pickable */
+    const u=ev.target&&ev.target.closest?ev.target.closest('.uc'):null;
+    if(u&&u.onclick)unitPickFx(u);
+  }catch(e){}
+},true);
+/* v876: two rings expanding off the spoils Continue, plus the shared gold spark rise. Heavier
+   than continueFx (the shop button) on purpose -- this one closes a battle rather than just
+   stepping between shop tabs, and it is pressed once per fight instead of constantly. */
+function spoilsContinueFx(btn){
+  const r=_fxRect(btn);if(!r)return;
+  const cx=r.left+r.width/2, cy=r.top+r.height/2;
+  /* v877: one ring instead of two staggered, and the spark rise is gone entirely -- it was the
+     longest-lived part (1.2s) and the main thing bleeding onto the next screen. */
+  const p=document.createElement('div');p.className='spoils-pulse';
+  p.style.cssText='left:'+cx+'px;top:'+cy+'px;width:'+r.width+'px;height:'+r.height+'px;';
+  document.body.appendChild(p);setTimeout(function(){p.remove();},240); /* v879 */
+}
 function animateArmorBreak(uid){
   setTimeout(()=>{
     const card=document.querySelector('[data-uid="'+uid+'"]');if(!card)return;
@@ -12015,7 +12546,7 @@ function fireXoloGuide(){
   G._xoloLast=fx;
   if(fx==='heal'){
     const t=hpHurt.reduce((a,b)=>((a.currentHp/a.maxHp)<=(b.currentHp/b.maxHp))?a:b);
-    const amt=Math.max(1,Math.round(t.maxHp*0.5));t.currentHp=Math.min(t.maxHp,t.currentHp+amt);
+    const amt=Math.max(1,Math.round(t.maxHp*0.5));t.currentHp=healTo(t,amt);
     addLog(`<span class="log-heal">🐕 Xolo Guide nuzzles ${t.icon} ${t.name} — +${amt} HP</span>`);
     animateXolo(t.id,'+'+amt+' HP','#50e090');
   }else if(fx==='tp'){
@@ -12089,6 +12620,25 @@ function applyArmorDamage(target,dmg,isEnemyAttacking){
   // WOUND multiplier: +10% per stack (max 4)
   const wStacks=Math.min(4,target.woundStacks||0);
   if(wStacks>0)dmg=Math.round(dmg*(1+0.10*wStacks));
+  /* v882: Nappatecuhtli Reed. Sits beside Wound because this is the one choke point every point of
+     damage passes through, so "from every source" is literally true -- strikes, specials, poison,
+     recoil and the calendar pulse all inherit it. Enemies only, matching the offering text. */
+  if(!target.isAlly&&(target.paralyzStacks||0)>0){
+    const _pa=getOfferingEffects().paralyzeAmp||0;
+    if(_pa>0)dmg=Math.round(dmg*(1+_pa));
+  }
+  /* v883: Yopaat Flint, the mirror of the Reed. applyArmorDamage takes no attacker argument and has
+     ~190 call sites, so threading one through is out of the question -- but G._actingEnemy already
+     holds the enemy currently taking its turn (it drives the card highlight) and is nulled the
+     moment that turn ends. isEnemyAttacking gates it so ally-sourced damage can never match a
+     stale id. Only reduces damage from a PARALYZED attacker onto a THUNDER ally. */
+  if(isEnemyAttacking&&target.isAlly&&target.element==='thunder'){
+    const _yf=getOfferingEffects().yopaatFlint||0;
+    if(_yf>0&&G._actingEnemy){
+      const _atk=(G.enemies||[]).find(x=>x&&x.id===G._actingEnemy);
+      if(_atk&&(_atk.paralyzStacks||0)>0)dmg=Math.max(1,Math.round(dmg*(1-_yf)));
+    }
+  }
   /* v807: Reed Raft Fragment. Halves the FIRST hit each ally takes in a battle. Placed after the
      armour branches, so a hit fully absorbed by Chimalli returns 0 earlier and does NOT consume
      the charge -- the reduction is spent on the first blow that actually reaches HP. Tracked per
@@ -12206,8 +12756,32 @@ function beginAllyAction(actor,isSpecial){
   /* v855: v850 exempted MAGIC specials, but judged everything else by unit type -- so Coatlicue
      (PHYS) paid 10% max HP to cast Ophidian Mother, a pure heal/cleanse/Chimalli move that deals
      no damage and reads neither ATK nor MAG. A support special is exempt regardless of typing. */
+  /* v882: Huehuecoyotl Ayotl. beginAllyAction already knows whether THIS action is a special, so
+     it is the natural place to keep the chain. Casting a special extends it; a strike breaks it.
+     The counter is incremented BEFORE damage resolves, so the second consecutive cast is itself
+     buffed rather than only the third. */
+  if(actor&&actor.isAlly&&actor.element==='humanity'&&(getOfferingEffects().coyotlChain||0)>0){
+    actor._coyotlChain=isSpecial?((actor._coyotlChain||0)+1):0;
+  }
   const _magMove=isSpecial&&(moveIsMagicForRecoil(actor)||specIsSupport(actor));
   if(!_magMove&&(actor.type==='PHYS'||actor.type==='MIX')&&actor.currentHp>0){const _rc=getOfferingEffects().physRecoilPct;if(_rc>0){const _rd=Math.round((actor.maxHp||0)*_rc);if(_rd>0){actor.currentHp=Math.max(0,actor.currentHp-_rd);animateHit(actor.id,_rd,false);addLog(`<span class="log-bl">\u2694\ufe0f Macuahuitl: ${actor.name} \u2212${_rd} HP recoil</span>`);if(actor.currentHp<=0)handleDeath(actor);}}}
+  /* v884: Ixtab Rope. Unlike the Macuahuitl this is charged on EVERY action -- strike or special,
+     damaging or supporting -- because the +15% is unconditional too. Stacks with Macuahuitl recoil
+     on a PHYS/MIX night unit, which is intended: two costly offerings on one body should hurt.
+     Non-lethal by design, floored at 1 HP: the Macuahuitl can kill because its +40% ATK is a much
+     larger payoff, and losing a Night unit to its own passive every round would be unreadable. */
+  if(actor.isAlly&&actor.element==='night'&&actor.currentHp>0){
+    const _ix=getOfferingEffects().ixtabRecoil||0;
+    if(_ix>0){
+      const _id2=Math.round((actor.maxHp||0)*_ix);
+      if(_id2>0&&actor.currentHp>1){
+        const _dealt=Math.min(_id2,actor.currentHp-1);
+        actor.currentHp-=_dealt;
+        animateHit(actor.id,_dealt,false);
+        addLog(`<span class="log-bl">\u{1FAA2} Ixtab Rope: ${actor.name} \u2212${_dealt} HP</span>`);
+      }
+    }
+  }
 }
 /* v810: UNDEAD FORCES (player patron passive). The first enemy slain in a battle rises as a
    temporary ally. Design rulings: it does NOT consume a party slot, so the first kill always
@@ -13756,6 +14330,44 @@ const STORY_LINES_L9=[
   "CHICONAHUALOY\u00c1N \u2014 the place where the nine rivers rest. Nothing moves here that has not already died.",
   "Somewhere ahead, in all that grey, something enormous is already expecting you."
 ];
+/* v872: Layer 9 intro. The five scene-setting lines below are shared; the last two beats are the
+   reason the cutscene exists. Mictlantecuhtli does not bar the way here -- your teotl has grown
+   loud enough that he wants to measure it -- and the closing line is written per patron.
+   Narration rather than his own voice, so the ninth layer REACTS to whoever walked in.
+   SPLIT-LIST: one entry per GODS id (20, Mictlantecuhtli included as a playable patron facing
+   himself). A missing id falls through to _default rather than printing undefined. */
+const L9_PATRON_LINES={
+  quetzalcoatl:"The smoke moves for the first time \u2014 wind, in a place that has never had weather. He knows the feathered one by the stirring alone.",
+  tlaloc:"Water beads on nothing and falls. The dead ground drinks it and remembers rain, and he marks who brought the rain this far down.",
+  coatlicue:"The ground tightens underfoot, the way soil closes over a seed. Even here, the mother is recognised.",
+  huehueteotl:"Something warms. The oldest fire is older than this place, and this place has always known it.",
+  xolotl:"Nothing here challenges you. The dog has walked every soul down these nine layers, and the grey simply steps aside \u2014 and he notes that it did.",
+  tepeyollotl:"Far off, a heartbeat in the rock. He has heard the mountain's own before; it has never come this deep.",
+  itzpapalotl:"The smoke cuts itself on something unseen and hangs there in ribbons. Obsidian has entered the ninth desert.",
+  chicomecoatl:"Green pushes through the ash and dies, and pushes through again. He watches the ash lose.",
+  mixcoatl:"Thunder, with no sky to hold it. The hunt has followed its quarry the whole way down.",
+  xochipilli:"Somewhere in the grey, something that has not laughed in an age very nearly does. He marks the flowers, and he marks the game.",
+  ixquimilli:"The grey offers no excuses and is given none. Justice has come blindfolded and unhurried, and he respects that it came at all.",
+  tonatiuh:"Light, in the place that swallows the sun every night. The dead turn their faces without meaning to.",
+  malinalxochitl:"The dust braids itself into shapes and comes apart again. Her sorcery works here, which almost nothing does.",
+  xiuhtecuhtli:"Turquoise fire at the centre of nothing. The lord of the year keeps his own hearth, even in the ninth desert.",
+  opochtli:"The last of the black water clings to you and will not dry. What he cast the net over has come ashore on its own feet.",
+  mayahuel:"Four hundred appetites arrive with you and find nothing at all to drink. He counts them anyway.",
+  tlazolteotl:"She ate the filth of the crossing, and did not stop at the crossing. Even the grey looks cleaner where you have walked.",
+  patecatl:"Wounds that should have stayed open are closed. He has never had to account for that before.",
+  cihuacoatl:"The grey fills with a sound like women keening, far off. Hers \u2014 and they followed you here willingly.",
+  mictlantecuhtli:"And then the smoke parts, and the thing that has been waiting is wearing your own face. Of everything that ever crossed his nine layers, he has been curious about you longest.",
+  _default:"He does not name what you are. He notes only that it reached the ninth layer, and that it is still standing."
+};
+function storyLinesL9(){
+  const gid=(G&&G.god&&G.god.id)||'';
+  const tail=L9_PATRON_LINES[gid]||L9_PATRON_LINES._default;
+  return STORY_LINES_L9.concat([
+    "Your teotl was a flicker when you fell. It is not a flicker now \u2014 down here, it is the loudest thing there is.",
+    "Mictlantecuhtli has counted every layer you crossed. He does not intend to bar the way. He intends to take your measure.",
+    tail
+  ]);
+}
 const STORY_LINES_L8=[
   "The forest thins. The ground softens, then gives, then is not ground at all.",
   "Black water, wide as memory, moving without a sound.",
@@ -13769,7 +14381,7 @@ function enterLayer9(){
   layerTransition();G.layer=9;G.mercPool=null;
   G._contFn=()=>{
     G._contFn=null;
-    const goToStory=()=>{showScr('screen-story');runStory(STORY_LINES_L9);};
+    const goToStory=()=>{showScr('screen-story');runStory(storyLinesL9());}; /* v872: patron-aware */
     if(G.tecpatl>0)showMictlanMap(()=>showPenancePick(goToStory));
     else showMictlanMap(goToStory);
   };
@@ -14181,7 +14793,7 @@ function renderTemazcal(){
   all.forEach(u=>{
     const full=u.curNP>=u.maxNP&&u.curHp>=u.maxHp;const canAfford=G.res.cacao>=cost;
     const _lv=getLevel(u.id);
-    const card=document.createElement('div');card.className='tz-card';
+    const card=document.createElement('div');card.className='tz-card';card.dataset.tzk=u.id; /* v866: lets healFx find this card before renderTemazcal() replaces it */
     card.innerHTML='<div class="tz-art">'+(u._gd?godIconHtml(u._gd,64):unitIconHtml(u,64))+'</div>' // v635: gods show their portraits, not emoji
       +'<div class="tz-body">'
       +'<div class="tz-name">'+u.name+' <span style="color:var(--am);font-size:11px">Lv'+_lv+'</span> <span style="font-size:12px">'+eb(u.element,true)+'</span></div>' /* v650: compact eb — pulses when a bond is live, so patron + vassal visibly light up after the hire */
@@ -14214,6 +14826,7 @@ function doTemazcal(unitId){
     else{const cu=G.captured.find(c=>(c._captureId||c.id)===unitId);if(cu)maxHp=allyMaxHpFor(unitId,cu.hp||50,G.dte.vassalHpMult||1);}
     if(maxHp>0){if(G.unitHpOverride)delete G.unitHpOverride[unitId];if(G.unitHpRatio)delete G.unitHpRatio[unitId];if(G.unitHpSnap&&G.unitHpSnap[unitId])G.unitHpSnap[unitId].cur=G.unitHpSnap[unitId].max;} // v514: full = no override, no ratio · v515: snap shows full too
   }
+  healFx('[data-tzk="'+String(unitId).replace(/"/g,'')+'"]'); /* v866: BEFORE renderTemazcal() tears the card out */
   notify('🌿 TP & HP restored!','#9050c0');renderRes('rb-shop');renderTemazcal();
   if(document.getElementById('mercs-list'))renderMercs(); /* v652: hire buttons reflect the cacao just spent */
   if(ftueGateActive()&&!G._ftueDidTemazcal){G._ftueDidTemazcal=true;renderMercs();renderTemazcal();ftueGateUpdate();} /* v305/v307 · v653: re-render temazcal AFTER the flag flips — the earlier render in this function ran pre-flag and left the other units greyed */
@@ -14231,6 +14844,7 @@ function doTemazcalAll(){ // v417: restore every unit's TP for the sum of indivi
   G.res.cacao-=total;
   G.unitHpOverride=G.unitHpOverride||{};
   tasks.forEach(t=>{G.unitNP[t.id]=t.maxNP;if(t.hp>0){if(G.unitHpOverride)delete G.unitHpOverride[t.id];if(G.unitHpRatio)delete G.unitHpRatio[t.id];if(G.unitHpSnap&&G.unitHpSnap[t.id])G.unitHpSnap[t.id].cur=G.unitHpSnap[t.id].max;}});
+  tasks.forEach(function(t,i){healFx('[data-tzk="'+String(t.id).replace(/"/g,'')+'"]',i*90);}); /* v866: stagger so a full party reads as a sweep */
   notify('🌿 All TP restored! ('+tasks.length+' units · '+total+' 🫘)','#9050c0');
   renderRes('rb-shop');renderTemazcal();if(document.getElementById('mercs-list'))renderMercs(); /* v652 */
   if(ftueGateActive()&&!G._ftueDidTemazcal){G._ftueDidTemazcal=true;renderMercs();ftueGateUpdate();}
@@ -14353,6 +14967,7 @@ function showShop(){
   // v315: sanitize deplSel — entries must be a current capKey or an owned ally god
   G.party=[...new Set(G.party)]; // v318: self-heal duplicate gods (e.g. pre-fix Xochi Games saves)
   G.deplSel=G.deplSel.filter(sid=>G.captured.some(c=>capKey(c)===sid)||G.party.some(gid=>'god_'+gid===sid));
+  G._temazcalWarned=false; /* v859: the reminder is once per Tianguis visit, not once per run */
   if(!G._shopRolled)buildAltarGodPool();switchTab('training');renderRes('rb-shop');renderTemazcal();
   renderPartyChips();G._trainOrder=null;G._godTrainOrder=null;renderTraining();renderMercs();renderAltar();showScr('screen-shop');
   // v512: heads-up when a mini-boss (B5) or the layer boss (B8) guards the next battle
@@ -14678,6 +15293,7 @@ if(lv+1>=nextSurgeAt(sg.claimedUpTo)){
   sg.pending=true;
   if(unitId===patronKey&&!hasV('first_soul_surge_seen')){markV('first_soul_surge_seen');setTimeout(()=>showSurgeModal(unitId),60);}
 }
+levelUpFx('.train-card[data-uk="'+String(unitId).replace(/"/g,'')+'"]',lv+1); /* v866: BEFORE renderTraining() replaces the card */
 notify(`Level ${lv+1}!`,'#e8a020');renderRes('rb-shop');renderPartyChips();renderTraining();renderAltar();
 // v303 (4A): gold burst on the freshly re-rendered Level Up button + floating +1
 setTimeout(()=>{const _b=document.querySelector(`button[onclick="doLevelUp('${unitId}')"]`);if(_b){_b.classList.add('lv-burst');const _p=_b.parentElement;if(_p){_p.style.position='relative';const _f=document.createElement('span');_f.className='lv-float';_f.textContent='+1';_p.appendChild(_f);setTimeout(()=>{_b.classList.remove('lv-burst');_f.remove();},700);}}},0);
@@ -15347,6 +15963,9 @@ function toggleTemazcalWarn(){ // v511: some strategies (e.g. Cihuacoatl) WANT w
   notify(V['temazcal_warn_off']?'⚠ Pre-battle warning disabled':'⚠ Pre-battle warning enabled','#9050c0');
   if(document.getElementById('temazcal-list'))renderTemazcal();
 }
+/* v859: a unit below this fraction of max TP or max HP is "worth restoring" and re-arms the
+   pre-battle reminder. Above it on BOTH bars, the reminder stays quiet. */
+const TEMAZCAL_WARN_AT=0.80;
 function maybeWarnTemazcal(){
   // v303 (item 5): first-run early-return removed — the warning now fires on the very first run too.
   // v511: also watches HP (now persistent); can be disabled via the Temazcal toggle.
@@ -15358,8 +15977,19 @@ function maybeWarnTemazcal(){
     ...G.party.map(gdId=>{const gd=GODS.find(g=>g.id===gdId);if(!gd)return null;const baseId='god_'+gdId;const maxNP=maxNPFor(baseId,gd.np||30);const curNP=G.unitNP[baseId]!==undefined?G.unitNP[baseId]:maxNP;const maxHp=allyMaxHpFor(baseId,gd.hp||140,G.dte.godHpMult||1);const curHp=rosterCurHp(baseId,maxHp);return{curNP,maxNP,curHp,maxHp};}).filter(Boolean),
     ...G.captured.map(cu=>{const ck=capKey(cu);const maxNP=maxNPFor(ck,cu.np||20);const curNP=G.unitNP[ck]!==undefined?G.unitNP[ck]:maxNP;const maxHp=allyMaxHpFor(ck,cu.hp||50,G.dte.vassalHpMult||1);const curHp=rosterCurHp(ck,maxHp);return{curNP,maxNP,curHp,maxHp};})
   ];
-  const anyDepleted=allUnits.some(u=>u.curNP<u.maxNP||u.curHp<u.maxHp);
+  /* v859: the test was "missing even one point", so a unit at 99/100 TP triggered the same nag as
+     one at 4/100 -- it fired on essentially every Continue. Now a unit has to be genuinely worth
+     restoring: below TEMAZCAL_WARN_AT of either bar. Full units and lightly-scuffed ones pass
+     straight through. */
+  const anyDepleted=allUnits.some(u=>
+    (u.maxNP>0&&u.curNP/u.maxNP<TEMAZCAL_WARN_AT)||
+    (u.maxHp>0&&u.curHp/u.maxHp<TEMAZCAL_WARN_AT));
   if(!anyDepleted){proceedShop();return;}
+  /* v859: and only once per visit to the Tianguis. Choosing "Go to Temazcal" and then pressing
+     Continue again used to re-fire the identical modal; the reminder has done its job by then.
+     Reset in showShop(). */
+  if(G._temazcalWarned){proceedShop();return;}
+  G._temazcalWarned=true;
   showMo('🌿','Restore before battle?',
     `<div style="font-size:13px;line-height:1.6">Some of your units still have depleted <span style="color:#9050c0">✨ TP</span> or <span style="color:#e05050">❤️ HP</span>.<br>Visit the <strong>Temazcal</strong> tab to restore them for <span style="color:#c0844a">🫘 ${cost} Cacao</span> per unit.</div>`,
     [{label:'Go to Temazcal',fn:()=>{switchTab('mercs');renderTemazcal();}},
