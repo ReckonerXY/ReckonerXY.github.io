@@ -925,7 +925,17 @@ const OFFERINGS={
   xolo_guide:{name:'Xolo Guide',tier:'event',icon:'🐕',desc:'Spectral companion — acts each round-end (heal / TP / bite / dig Cacao)',flavor:'The little dog you fed now pads beside you through Mictlan, fierce and loyal.',eff:{xoloGuide:true}}
 };
 function hasOffering(id){return (G.offerings||[]).includes(id);}
-function grantOffering(id){if(!OFFERINGS[id])return;if(!G.offerings)G.offerings=[];if(!G.offerings.includes(id))G.offerings.push(id);}
+function grantOffering(id){
+  if(!OFFERINGS[id])return;
+  if(!G.offerings)G.offerings=[];
+  if(G.offerings.includes(id))return;
+  /* v889: the Tzompantli tally is run-scoped and was counting sacrifices made BEFORE the offering
+     existed, so buying it mid-run cashed in the whole back-catalogue at once -- up to +50 ATK/MAG
+     on the spot. The counter now starts from zero at the moment of acquisition, so the offering
+     always costs the same 50 sacrifices regardless of when it is bought. */
+  if(id==='tzompantli_skull')G.tzompantliSac=0;
+  G.offerings.push(id);
+}
 function grantRandomOffering(tier){
   const owned=new Set(G.offerings||[]);
   const pool=Object.keys(OFFERINGS).filter(id=>{const o=OFFERINGS[id];return o&&o.tier===tier&&o.price&&!owned.has(id)&&!(o.noStockIf&&o.noStockIf());});
@@ -1167,6 +1177,14 @@ function offeringStatLayer(base,element,isGod,type,turquoise,isTlaloqueU,isPatro
   const fa=azFlat(oe.flatAtkByElement,element,isPatronU); if(fa)t.atk+=fa; // v639: azure-aware
   const fm=azFlat(oe.flatMagByElement,element,isPatronU); if(fm)t.mag+=fm;
   const _fd=azFlat(oe.flatDefByElement,element,isPatronU); if(_fd)t.def+=_fd;
+  /* v886: offeringStatLayer models every other element-scoped hook -- flat ATK/MAG/DEF/RES, the Day
+     stat multiplier, the Tlaloque HP multiplier -- but never hpMultByElement. The battle build at
+     applyOfferings() has always applied it to any ally, so the HP was really being granted; the
+     card and the detail modal simply never showed it, which reads as "the offering does nothing".
+     Latent since v567 (Huauhtli Bar, +30% HP to NATURE) and only noticed now that Turkey Bones put
+     a second offering on that hook. Ordered before dayStatMult to match applyOfferings(). */
+  const _hme=azMult(oe.hpMultByElement,element,isPatronU);
+  if(_hme&&_hme!==1)t.hp=Math.round(t.hp*_hme);
   const _fr=azFlat(oe.flatResByElement,element,isPatronU); if(_fr)t.res+=_fr;
   // v374: Fifth Sun Stone — DAY units +25% all stats (except TP)
   if(element==='day'&&oe.dayStatMult!==1){t.hp=Math.round(t.hp*oe.dayStatMult);t.atk=Math.round(t.atk*oe.dayStatMult);t.mag=Math.round(t.mag*oe.dayStatMult);t.def=Math.round(t.def*oe.dayStatMult);t.res=Math.round(t.res*oe.dayStatMult);}
@@ -2086,7 +2104,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v884'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v889'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -7659,7 +7677,7 @@ function buildRoundQueue(){
     }
   }
   /* v761: enemies never enter actedIds, so own-side turn order needs its own counter. */
-  G.qIdx=0;G.actedIds=new Set();G._enemyActedCount=0;G._enemyActedIds=new Set();G._bonusActedRestoreId=null;G._kukulkanPending=false;G.roundNum++; /* v853/v856: markers are round-scoped, like actedIds */
+  G.qIdx=0;G.actedIds=new Set();G._enemyActedCount=0;G._enemyActedIds=new Set();G._bonusActedRestoreId=null;G._kukulkanPending=false;G._belicRushRound=null;G.roundNum++; /* v885 */ /* v853/v856: markers are round-scoped, like actedIds */
   /* v806: Sak Tahn Waax Calendar. The count is a RUN counter, not a battle counter -- it
      deliberately carries across fights, so a player can walk into a boss room with it nearly
      primed and land the pulse on round 1. Ruled intended in the L8 design; watch it in playtest.
@@ -7900,6 +7918,13 @@ const BELIC_SPEC_MAP={
   'Fang Flash':     {mult:1.3, type:'phys',allyFn:as=>{as.forEach(a=>{if(a.currentHp>0)applyCritBuff(a,1);});}},
   'Colony Sting':   {mult:0.9, type:'mag', aoe:true,status:t=>{applyParalyze(t,1);}},
   'Voltaic Discharge':{mult:1.5,type:'mag',aoe:true,status:t=>{applyParalyze(t,2);}},
+  /* v887: SPLIT-LIST. fireBelicAutoAction dispatches purely by ability NAME -- an ability in none
+     of these three tables silently falls through to a plain strike, which is why Nexoxcho never
+     cast under the cascade despite having the TP. Both Layer 8 minibosses were missing.
+     The cascade models damage and status only, so Nexoxcho's self-drain and Ixpuxtequi's splash
+     are not reproduced here; they hit for their listed multiplier with their status applied. */
+  'Jestress Nightmare':{mult:1.1,type:'mag',aoe:true,status:t=>{applyPoison(t,1);}},
+  'Descent from the Trees':{mult:1.5,type:'mag',status:t=>{applyParalyze(t,1);applyPoison(t,1);}},
 };
 const BELIC_HEAL_ABILS=new Set(['Ancestral Storm','Storm Mend','Gust Mend','Holy Harvest','Dark Waters','Bioluminescent Chorus']);
 
@@ -8007,8 +8032,13 @@ function runBelicChain(units,idx,getEnemies,getAllies,isEnemySide,animFn){
 
 function scheduleBelicRushCascade(mixcoatlActorId){
   if(!hasPassive('belicRush'))return; // v700: was G.god.pk!=='belicRush' — that ignored Sacred Oblation
+  /* v885: once per round, whoever gets here first. The cascade is now invoked from TWO places (see
+     the zappingStrike handler) so that an async double-hit cannot lose it; this guard makes the
+     second caller a no-op instead of a double cascade. */
+  if(G._belicRushRound===G.roundNum)return;
   const thunderAllies=G.units.filter(u=>u.element==='thunder'&&u.currentHp>0&&u.id!==mixcoatlActorId&&!G.actedIds.has(u.id));
   if(!thunderAllies.length)return;
+  G._belicRushRound=G.roundNum; /* v885: claim the round before any async work starts */
   thunderAllies.forEach(u=>G.actedIds.add(u.id));
   G._belicCascading=true;
   addLog(`<span class="log-thunder">&#9889; Belic Rush &#8212; ${thunderAllies.length} Thunder unit${thunderAllies.length>1?'s':''} cascade!</span>`);
@@ -9447,6 +9477,17 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
     // actedIds is populated in advanceTurn AFTER fireGodSpecial returns,
     // so size===0 means no one has acted yet = Mixcoatl is first
     const actedFirst=G.actedIds.size===0;
+    /* v885: Belic Rush used to be triggered ONLY from advanceTurn. On the double-hit path that call
+       is deferred by 4*160+500ms while the second arrow resolves at 400ms -- and a kill on either
+       arrow opens a capture window in between, so by the time the deferred advanceTurn ran the
+       cascade was not happening. Reported repro: both arrows kill, no cascade.
+       Rather than keep guessing which condition the race breaks, the cascade is now fired from the
+       handler itself, at the point Mixcoatl's action is genuinely finished. The advanceTurn call is
+       left in place and the round guard above makes whichever arrives second a no-op, so this holds
+       whether or not the deferred path also gets there.
+       Note scheduleBelicRushCascade excludes the caster by id rather than by actedIds, so it is safe
+       to run here even though advanceTurn has not marked Mixcoatl as acted yet. */
+    const _belicNow=()=>{try{scheduleBelicRushCascade(u.id);}catch(e){console.warn('belic rush failed',e);}};
     if(actedFirst){
       G._multiHitPending=true;
       setTimeout(()=>{
@@ -9460,8 +9501,9 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
           onHitContact(u,tgt2);refreshCaptureTargets();if(tgt2.currentHp<=0)handleDeath(tgt2);
         }
         G._multiHitPending=false;
+        _belicNow(); /* v885: second arrow resolved — Mixcoatl's turn is over */
       },400);
-    }
+    }else _belicNow(); /* v885: single-arrow path */
   }
   else if(gd.ak==='patolliGamble'){
     const roll=rollPatolli();
@@ -12329,8 +12371,8 @@ function captureBindFx(uid){
     document.body.appendChild(m);setTimeout(function(){m.remove();},1250);
   }
   const lbl=document.createElement('div');lbl.className='dmg-pop';
-  lbl.textContent='\u2726 BOUND';
-  lbl.style.cssText='color:#ffe08a;font-weight:800;font-size:15px;left:'+(cx-34)+'px;top:'+(r.top+2)+'px;text-shadow:0 0 10px #a8791a,0 1px 3px #000;';
+  lbl.textContent='\u2726 CAPTURED'; /* v888 */
+  lbl.style.cssText='color:#ffe08a;font-weight:800;font-size:15px;left:'+(cx-46)+'px;top:'+(r.top+2)+'px;text-shadow:0 0 10px #a8791a,0 1px 3px #000;';
   document.body.appendChild(lbl);setTimeout(function(){lbl.remove();},1100);
 }
 /* v858: the wheel completing had no visual at all. Its damage was pushed into G._animQueue from
