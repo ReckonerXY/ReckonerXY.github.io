@@ -113,6 +113,11 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
    throw, and roughly half the opacity. */
 @keyframes spoilsPulse{0%{opacity:0;transform:translate(-50%,-50%) scale(.75)}25%{opacity:.5}100%{opacity:0;transform:translate(-50%,-50%) scale(1.35)}}
 .spoils-pulse{position:fixed;border-radius:12px;pointer-events:none;z-index:9998;border:1.5px solid rgba(240,205,100,.7);box-shadow:0 0 12px rgba(240,205,100,.3);animation:spoilsPulse .2s ease-out forwards} /* v879: .28s -> .2s */
+/* v895: release. The altar's blood FALLS; a spared soul RISES and disperses. */
+@keyframes spareRise{0%{opacity:0;transform:translate(0,0) scale(.45)}20%{opacity:.95}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.25)}}
+.spare-mote{position:fixed;width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:9999;background:radial-gradient(circle at 35% 30%,#eaffe4,#9fe08a 55%,#3f8a45);box-shadow:0 0 9px rgba(150,230,140,.8);animation:spareRise var(--dur,.95s) cubic-bezier(.25,.6,.35,1) forwards}
+@keyframes spareOpen{0%{opacity:0;transform:translate(-50%,-50%) scale(.35)}30%{opacity:.75}100%{opacity:0;transform:translate(-50%,-50%) scale(1.7)}}
+.spare-ring{position:fixed;border-radius:50%;pointer-events:none;z-index:9998;border:1.5px solid rgba(160,235,150,.85);box-shadow:0 0 14px rgba(160,235,150,.45);animation:spareOpen .8s ease-out forwards}
 @keyframes resCountGlow{0%{text-shadow:0 0 0 rgba(212,175,55,0)}35%{text-shadow:0 0 12px rgba(212,175,55,.9)}100%{text-shadow:0 0 0 rgba(212,175,55,0)}}
 .res-counting{animation:resCountGlow 1s ease-out}
 /* v400: card-frame look */
@@ -867,9 +872,9 @@ const OFFERINGS={
   greenstone_figurine:{name:'Greenstone Figurine',tier:'common',icon:'🟩',price:100,priceType:'cacao',desc:'Vassals +10% max HP',flavor:'A polished jade celt, cool to the touch — the stone the gods prize above gold.',eff:{vassalHpMult:1.10}},
   rubber_ball:{name:'Rubber Ball (Ōlli)',tier:'common',icon:'⚫',price:100,priceType:'cacao',desc:'HUMANITY units +7 ATK',flavor:'Hardened ōlli from the sacred ballcourt; it remembers every game played for the gods.',eff:{flatAtkByElement:{humanity:7}}},
   wind_jewel:{name:'Ehecacōzcatl (Wind Jewel)',tier:'common',icon:'🌀',price:100,priceType:'cacao',desc:'WIND units +7 MAG',flavor:"Quetzalcoatl's spiral conch-jewel, humming with the breath of the four winds.",eff:{flatMagByElement:{wind:7}}},
-  cacao_effigy:{name:'Cacao Effigy',tier:'common',icon:'🟤',price:100,priceType:'cacao',desc:'+10% Cacao on spoils',flavor:"A small clay statue cradling a cacao pod — the merchants' quiet blessing.",eff:{cacaoMult:1.10}},
-  spondylus_pendant:{name:'Spondylus Pendant',tier:'common',icon:'🐚',price:100,priceType:'cacao',desc:'+10% Blood on spoils',flavor:'Crimson shell traded from distant seas, dearer than jade to the old kings.',eff:{bloodMult:1.10}},
-  copal_brazier:{name:'Copal Brazier',tier:'common',icon:'🔥',price:100,priceType:'cacao',desc:'−2 TP cost',flavor:'Sweet copal smoke curling upward — the gods lean close to listen.',eff:{tpCostFlat:2}},
+  cacao_effigy:{name:'Cacao Effigy',tier:'uncommon',icon:'🟤',price:250,priceType:'cacao',desc:'+10% Cacao on spoils \u2014 battles won in 3 rounds or less' /* v903: common -> uncommon. v904: and conditional -- an unconditional economy multiplier compounds across a whole run. */,flavor:"A small clay statue cradling a cacao pod — the merchants' quiet blessing.",eff:{cacaoMultSwift:1.10}},
+  spondylus_pendant:{name:'Spondylus Pendant',tier:'uncommon',icon:'🐚',price:250,priceType:'cacao',desc:'+10% Blood on spoils \u2014 Perfect Battles only' /* v903: common -> uncommon. v904: and conditional. */,flavor:'Crimson shell traded from distant seas, dearer than jade to the old kings.',eff:{bloodMultPerfect:1.10}},
+  copal_brazier:{name:'Copal Brazier',tier:'common',icon:'🔥',price:100,priceType:'cacao',desc:'−5 TP cost',flavor:'Sweet copal smoke curling upward — the gods lean close to listen.',eff:{tpCostFlat:5}},
   yauhtli_flower:{name:'Yauhtli Flower',tier:'common',icon:'🌼',price:100,priceType:'cacao',desc:'Cleanse all allies of ailments at the start of the first round',flavor:"Sacred marigold of Tlaloc, burned to drive sickness from the body.",eff:{roundCleanse:1}},
   // Pochteca — Uncommon (750 Cacao) — v370
   stingray_spine:{name:'Stingray Spine',tier:'uncommon',icon:'🦴',price:250,priceType:'cacao',desc:'All ally strikes apply Poison \u00d71',flavor:"A bloodletter's barb, still slick with the venom of devotion.",eff:{strikePoison:1}},
@@ -908,6 +913,15 @@ const OFFERINGS={
   nappatecuhtli_reed:{name:'Nappatecuhtli Reed',tier:'rare',icon:'\u{1F33E}',price:600,priceType:'cacao',desc:'Paralyzed enemies take +25% damage from every source',flavor:'The reed-lord binds what thrashes. What is bound does not turn the blow aside.',eff:{paralyzeAmp:0.25}},
   chalchiuhtlicue_hem:{name:"Chalchiuhtlicue's Hem",tier:'rare',icon:'\u{1F30A}',price:600,priceType:'cacao',desc:'WATER units\u2019 multi-target specials strike one additional enemy',flavor:'Her skirt of jade spreads until it touches one more shore than you meant.',eff:{waterExtraTarget:1}},
   ixtab_rope:{name:'Ixtab Rope',tier:'uncommon',icon:'\u{1FAA2}',price:250,priceType:'cacao',desc:'NIGHT units deal +15% damage with strikes and specials, but lose 10% max HP after acting',flavor:'The rope-goddess takes the hanged into her own heaven. She does not ask them to come down.',eff:{ixtabDmg:0.15,ixtabRecoil:0.10}},
+  xochipilli_terracota:{name:'Xochipilli Terracota',tier:'uncommon',icon:'\u{1F3FA}',price:250,priceType:'cacao',desc:'HUMANITY units\u2019 specials cost 40% less TP \u2014 first 2 rounds only',flavor:'A clay flute in the shape of the flower prince. The first two songs are free.',eff:{tpCostMultByElementRounds:{elements:{humanity:0.60},rounds:2}}},
+  /* v903: conditional commons replacing the flat pair above. Both pay MORE than 10%, but only
+     when the condition is earned -- a Perfect Battle, or the Hard Path. A reward for playing well
+     rather than a passive tax cut, and worth nothing to someone coasting.
+     These are read at SPOILS time, not folded into getOfferingEffects: `isPerfect` is derived from
+     G.spoils inside the reward chain and does not exist during battle, so a global accumulator
+     would flicker on every stat preview. */
+  pochteca_tally:{name:"Pochteca's Tally",tier:'common',icon:'\u{1F9FE}',price:100,priceType:'cacao',desc:'+5% Cacao on spoils',flavor:'The pochteca count twice and write once. A clean ledger is worth more than a full one.',eff:{cacaoMult:1.05}},
+  vessel_of_first_blood:{name:'Vessel of the First Blood',tier:'common',icon:'\u{1FA78}',price:100,priceType:'cacao',desc:'+5% Blood on spoils',flavor:'It takes only the first of what is spilled, and asks for nothing after.',eff:{bloodMult:1.05}},
   bioluminescent_vial:{name:'Bioluminescent Vial',tier:'common',icon:'\u{1F4A1}',price:100,priceType:'cacao',desc:'THUNDER & NIGHT units: +7 ATK and +7 MAG \u2014 first 2 rounds only' /* v883: uncommon/250 -> common/100, window 3 -> 2 rounds */,flavor:'Cave-water that glows when shaken. It does not glow for long.',eff:{vialElements:['thunder','night'],vialAmount:7,vialRounds:2}},
   obsidian_fishhook:{name:'Obsidian Fishhook',tier:'uncommon',icon:'\u{1FA9D}',price:250,priceType:'cacao',desc:'The first enemy killed each battle yields +50% Blood',flavor:'Barbed glass on a twist of maguey line. It only needs to catch once.',eff:{firstKillBloodBonus:0.50}},
   axolotl_charm:{name:'Axolotl Charm',tier:'uncommon',icon:'\u{1F98E}',price:250,priceType:'cacao',desc:'Once per battle, the first vassal to fall below 25% HP heals 30%',flavor:'The salamander that refuses to finish becoming anything else. It simply grows the piece back.',eff:{axolotlHeal:0.30}},
@@ -948,6 +962,19 @@ function offeringRewardLine(r){
   if(r.granted)return `You gain ${r.o.icon} <strong>${r.o.name}</strong>!<br><em style="color:#c0e060">${r.o.desc}</em>`;
   return `Your collection is complete at that rarity.<br><em style="color:#e0c060">+${r.amount} ${r.res==='cacao'?'🫘 Cacao':'🌼 Flowers'} instead.</em>`;
 }
+/* v893: one place that answers "how many rounds does a windowed relic last?".
+   Patecatl's Potent Treatment adds +1. Every finite COUNTDOWN window is read through here, so a
+   future relic using vialRounds / roundCleanse / roundBuff / round1FlatByElement inherits the
+   extension with no extra wiring -- that is the whole point of routing them through one function.
+   Deliberately NOT applied to count-UP relics: the Sak Tahn Waax Calendar accumulates toward a
+   12-round threshold rather than draining a window, so +1 there would DELAY the payoff, not extend
+   it. Same for the per-round perpetuals (Chac Mool, Chantico Hearth, Axolotl Effigy, Cipactonal
+   Amate, K'uk'ulkan, Xolo Guide) which have no window to extend. None of those call relicWindow. */
+function relicWindow(n){
+  const base=Number(n)||0;
+  if(base<=0)return base;
+  return base+((typeof hasPassive==='function'&&hasPassive('potentTreatment'))?1:0);
+}
 function getOfferingEffects(){
   const e={atkMult:1,magMult:1,defMult:1,resMult:1,hpMult:1,vassalHpMult:1,tpMult:1,tpCostFlat:0,cacaoMult:1,bloodMult:1,tpFlat:0,weakestHpMult:1,weakestDefBuff:false,firstHitReduction:0,vials:[],startChimalliByElement:{},weakestElemDefRes:[],elemRamp:[],coyotlChain:0,paralyzeAmp:0,waterExtraTarget:0,yopaatFlint:0,ixtabDmg:0,ixtabRecoil:0,vialElements:null,vialAmount:0,vialRounds:0,firstKillBloodBonus:0,axolotlHeal:0,flatAtkByElement:{},flatMagByElement:{},battleStartAtkBuff:false,strikePoison:0,strikeBurnFire:false,strikeParalyzeThunder:false,startChimalliRandom:0,roundRegenPct:0,reviveVassal:0,weakestFlatDefRes:0,mask2r:{atk:1,mag:1,def:1,res:1},strikeLifesteal:0,revivePatron:0,dayStatMult:1,tlaloqueHpMult:1,tlaloqueStatMult:1,tpCostMult:1,flatDefByElement:{},flatResByElement:{},critBonusParty:0,critBonusByElement:{},critMultBonus:0,round1FlatByElement:{},roundRegenPctByElement:{},waterStrikeSplash:0,physAtkMult:1,physRecoilPct:0,tpCostMultByElement:{},hpMultByElement:{},drunkUncleansable:false,dayAtkMult:1,dayExtraRecoil:0,kukulkanBonus:false,jumpingBeans:false,windCacaoDiscount:0,ehecatlSpare:false,flayedSkin:0,strikeWoundEarth:0,ayotochtli:0,bloodyArrow:0};
   (G.offerings||[]).forEach(id=>{const o=OFFERINGS[id];if(!o||!o.eff)return;const f=o.eff;
@@ -981,6 +1008,17 @@ function getOfferingEffects(){
     if(f.strikePoison)e.strikePoison+=f.strikePoison;
     if(f.strikeBurnFire)e.strikeBurnFire=true;
     if(f.tpCostMultByElement)Object.keys(f.tpCostMultByElement).forEach(el=>e.tpCostMultByElement[el]=(e.tpCostMultByElement[el]||1)*f.tpCostMultByElement[el]);
+    /* v894: same hook as Centeotl Cob but time-limited. Folded into the SAME accumulator while its
+       window is open, so effectiveNpCost() needs no new branch and the two stack multiplicatively
+       exactly as two permanent discounts would. The window goes through relicWindow(), so Patecatl
+       extends it for free -- which is the payoff for routing windows through one helper in v893. */
+    if(f.tpCostMultByElementRounds){
+      const _w=relicWindow(f.tpCostMultByElementRounds.rounds||0);
+      if(!G.roundNum||G.roundNum<=_w){
+        const _m=f.tpCostMultByElementRounds.elements||{};
+        Object.keys(_m).forEach(el=>e.tpCostMultByElement[el]=(e.tpCostMultByElement[el]||1)*_m[el]);
+      }
+    }
     if(f.hpMultByElement)Object.keys(f.hpMultByElement).forEach(el=>e.hpMultByElement[el]=(e.hpMultByElement[el]||1)*f.hpMultByElement[el]);
     if(f.drunkUncleansable)e.drunkUncleansable=true;
     if(f.dayAtkMult)e.dayAtkMult*=f.dayAtkMult;
@@ -1111,9 +1149,9 @@ function applyOfferings(){
     (G.units||[]).forEach(u=>{
       if(!u||!u.isAlly||v.elements.indexOf(u.element)<0)return;
       u.atk=(u.atk||0)+v.amount;u.mag=(u.mag||0)+v.amount;
-      G._vialApplied.push({uid:u.id,amt:v.amount,rounds:v.rounds});n++;
+      G._vialApplied.push({uid:u.id,amt:v.amount,rounds:relicWindow(v.rounds)});n++; /* v893 */
     });
-    if(n)addLog(`<span class="log-ab">\u{1F4A1} ${v.label}: +${v.amount} ATK/MAG to ${n} for ${v.rounds} rounds</span>`);
+    if(n)addLog(`<span class="log-ab">\u{1F4A1} ${v.label}: +${v.amount} ATK/MAG to ${n} for ${relicWindow(v.rounds)} rounds</span>`);
   });
   /* v881: Tecciztecatl Conch — Chimalli to EVERY unit of an element (Moctezuma Shield picks one at random). */
   Object.keys(oe.startChimalliByElement||{}).forEach(el=>{
@@ -1195,28 +1233,28 @@ function offeringStatLayer(base,element,isGod,type,turquoise,isTlaloqueU,isPatro
   }
   // v370: 2-round masks reflected only during their active window (rounds 1-2 or pre-battle)
   if(!G.roundNum||G.roundNum<=2){
-    if(!G.roundNum||G.roundNum<=2){ // v504: 2-round mask boosts stop inflating modal stats after they fade
+    if(!G.roundNum||G.roundNum<=relicWindow(2)){ // v504: 2-round mask boosts stop inflating modal stats after they fade · v893: windowed
       if(oe.mask2r.atk!==1)t.atk=Math.round(t.atk*oe.mask2r.atk);
       if(oe.mask2r.mag!==1)t.mag=Math.round(t.mag*oe.mask2r.mag);
       if(oe.mask2r.def!==1)t.def=Math.round(t.def*oe.mask2r.def);
       if(oe.mask2r.res!==1)t.res=Math.round(t.res*oe.mask2r.res);
     }
   }
-  if(!G.roundNum||G.roundNum<=1){const _r1=azR1(oe.round1FlatByElement,element,isPatronU);t.atk+=_r1.atk;t.mag+=_r1.mag;} // v639 // v481: Hummingbird Plume (Round 1)
+  if(!G.roundNum||G.roundNum<=relicWindow(1)){const _r1=azR1(oe.round1FlatByElement,element,isPatronU);t.atk+=_r1.atk;t.mag+=_r1.mag;} // v639 // v481: Hummingbird Plume · v893: windowed
   if(turquoise){t.def+=turquoise;t.res+=turquoise;} // v370: Turquoise flat grant (blessed unit only)
   const affecting=[];
   const _M=(el)=>element===el||(isPatronU&&hasPassive('azureZephyr')&&(el==='fire'||el==='wind')&&(element==='fire'||element==='wind')); // v639
   const _B=(map)=>!!(map&&(azFlat(map,element,isPatronU)||azMult(map,element,isPatronU)!==1));
   (G.offerings||[]).forEach(id=>{const o=OFFERINGS[id];if(!o||!o.eff)return;const f=o.eff;let hit=false;
     if(f.atkMult&&usesAtk)hit=true;
-    if(f.roundCleanse&&(!G.roundNum||G.roundNum<=f.roundCleanse))hit=true; // v362/v504: list only while the cleanse rounds are still active
+    if(f.roundCleanse&&(!G.roundNum||G.roundNum<=relicWindow(f.roundCleanse)))hit=true; // v362/v504 · v893: windowed
     if(f.magMult&&usesMag)hit=true;
     if(f.defMult||f.resMult||f.hpMult||f.tpMult||f.tpCostFlat)hit=true;
     /* v821: the offerings added in v807 had no entry here, so none of them appeared in a unit's
        boosting list even when active. Conditional ones are listed honestly -- the Vial only on the
        elements it covers, and only while its 3-round window is open. */
     if(f.tpFlat)hit=true;
-    if(f.vialElements&&f.vialElements.indexOf(element)>=0&&(!G.roundNum||G.roundNum<=(f.vialRounds||0)))hit=true;
+    if(f.vialElements&&f.vialElements.indexOf(element)>=0&&(!G.roundNum||G.roundNum<=relicWindow(f.vialRounds||0)))hit=true; /* v893 */
     if(f.firstHitReduction||f.axolotlHeal)hit=true;
     if(f.weakestHpMult||f.weakestDefBuff)hit=true;
     if(f.vassalHpMult&&!isGod)hit=true;
@@ -1225,11 +1263,12 @@ function offeringStatLayer(base,element,isGod,type,turquoise,isTlaloqueU,isPatro
     if(_B(f.flatDefByElement))hit=true;
     if(_B(f.hpMultByElement))hit=true;
     if(_B(f.tpCostMultByElement))hit=true;
+    if(f.tpCostMultByElementRounds&&(f.tpCostMultByElementRounds.elements||{})[element]&&(!G.roundNum||G.roundNum<=relicWindow(f.tpCostMultByElementRounds.rounds||0)))hit=true; /* v894 */
     if(_B(f.flatResByElement))hit=true;
     if(f.critBonusParty)hit=true;
     if(_B(f.critBonusByElement))hit=true;
     if(f.physAtkMult&&f.physAtkMult!==1&&usesAtk)hit=true;
-    if(f.round1FlatByElement&&(azR1(f.round1FlatByElement,element,isPatronU).atk||azR1(f.round1FlatByElement,element,isPatronU).mag)&&(!G.roundNum||G.roundNum<=1))hit=true;
+    if(f.round1FlatByElement&&(azR1(f.round1FlatByElement,element,isPatronU).atk||azR1(f.round1FlatByElement,element,isPatronU).mag)&&(!G.roundNum||G.roundNum<=relicWindow(1)))hit=true; /* v893 */
     if(f.waterStrikeSplash&&_M('water'))hit=true;
     if(_B(f.roundRegenPctByElement))hit=true;
     if(f.critMultBonus)hit=true;
@@ -1253,8 +1292,21 @@ function offeringStatLayer(base,element,isGod,type,turquoise,isTlaloqueU,isPatro
     if(f.strikeLifesteal)hit=true;
     if(f.strikeBurnFire&&_M('fire'))hit=true;
     if(f.strikeParalyzeThunder&&element==='thunder')hit=true;
-    if(f.roundBuff&&(f.atkMult2r||f.defMult2r||f.magMult2r||f.resMult2r)&&(!G.roundNum||G.roundNum<=f.roundBuff))hit=true;
+    if(f.roundBuff&&(f.atkMult2r||f.defMult2r||f.magMult2r||f.resMult2r)&&(!G.roundNum||G.roundNum<=relicWindow(f.roundBuff)))hit=true; /* v893 */
     if(hit&&!f.weakestFlatDefRes)affecting.push(id);}); // Turquoise listed per-unit below, not party-wide
+  /* v891: the loop above opens with `if(!o||!o.eff)return;`, so an offering whose effect is
+     hardcoded rather than data-driven can NEVER be listed. Three are built that way -- their
+     behaviour lives behind hasOffering() calls scattered through the battle build instead of an
+     eff block -- and all three were invisible in every unit's boosting panel despite being owned
+     and working. Tzompantli Skull is the one that shows: it grants up to +50 ATK/MAG, is applied
+     in offeringStatLayer above, and still never appeared in the list underneath.
+     SPLIT-LIST: a new eff-less offering needs an entry here.
+     Listed conditionally where the effect is conditional -- Tzompantli only once it has a tally,
+     Sak Tahn only once the wheel has started turning. */
+  const _own=id=>(G.offerings||[]).indexOf(id)>=0&&!affecting.includes(id);
+  if(_own('tzompantli_skull')&&(G.tzompantliSac||0)>0)affecting.push('tzompantli_skull');
+  if(_own('sak_tahn_waax'))affecting.push('sak_tahn_waax');
+  if(_own('ball_game_ring'))affecting.push('ball_game_ring');
   if(turquoise&&hasOffering('turquoise_serpent')&&!affecting.includes('turquoise_serpent'))affecting.push('turquoise_serpent');
   return {total:t,affecting};
 }
@@ -1272,8 +1324,16 @@ function showBattleUnitDetail(bu){
 function offeringRoundLimit(o){
   // Last round (inclusive) a round-limited offering's effect stays active; 0 if not round-limited.
   // Future round-limited effects: add their fields here so they inherit the grey-out + counter.
-  if(o&&o.eff&&o.eff.roundCleanse)return o.eff.roundCleanse;
-  if(o&&o.eff&&o.eff.roundBuff)return o.eff.roundBuff;
+  /* v898: this only knew about roundCleanse and roundBuff, so the vials, Hummingbird Plume and
+     Xochipilli Terracota showed no counter at all -- and none of the four went through
+     relicWindow(), so under Patecatl the badge still read the base duration while the effect
+     genuinely lasted a round longer. Every window the game has, read through the one helper. */
+  const f=(o&&o.eff)||{};
+  if(f.roundCleanse)return relicWindow(f.roundCleanse);
+  if(f.roundBuff)return relicWindow(f.roundBuff);
+  if(f.vialRounds)return relicWindow(f.vialRounds);
+  if(f.tpCostMultByElementRounds)return relicWindow(f.tpCostMultByElementRounds.rounds||0);
+  if(f.round1FlatByElement)return relicWindow(1);
   return 0;
 }
 // v373: unified status wording for round-limited & consumable offerings
@@ -1338,24 +1398,24 @@ const STATUS_INFO={
   drunk:{icon:'🍺',name:'Drunk',color:'#e0a040',base:'<strong>5% chance per stack</strong> an action hits the wrong target — its own side, itself included (4 max).',fn:n=>`<strong>${5*n}% chance</strong> an action hits the wrong target — its own side, itself included (${n} stack${n>1?'s':''}).`},
   slow:{icon:'🐢',name:'Slowed',color:'#7ec8e3',base:'Acts last this round. <em>(Cannot stack.)</em>',fn:n=>`Acts last this round. <em>(Cannot stack.)</em>`},
   // v624: buff pips get the same hover treatment as debuffs
-  atkup:{icon:'⬆',name:'ATK/MAG UP',color:'#ffe080',base:'<strong>+10% ATK & MAG per stack</strong>.',fn:n=>`<strong>+${10*n}% ATK & MAG</strong> — strikes and 🔮 specials hit harder (${n} stack${n>1?'s':''}).`},
-  defup:{icon:'⬆',name:'DEF/RES UP',color:'#80c0ff',base:'<strong>+10% DEF & RES per stack</strong>.',fn:n=>`<strong>+${10*n}% DEF & RES</strong> — takes less physical and magical damage (${n} stack${n>1?'s':''}).`},
-  critup:{icon:'⬆',name:'CRIT UP',color:'#ffd24d',base:'<strong>+5% critical chance per stack</strong>.',fn:n=>`<strong>+${5*n}% critical hit chance</strong> (${n} stack${n>1?'s':''}).`},
+  atkup:{icon:'⬆',name:'ATK/MAG UP',color:'#ffe080',base:'<strong>+10% ATK & MAG per stack</strong>.',fn:(n,_a,r)=>`<strong>+${10*n}% ATK & MAG</strong> — strikes and 🔮 specials hit harder (${n} stack${n>1?'s':''}${r>0?`, ${r} round${r>1?'s':''} left`:''}).`},
+  defup:{icon:'⬆',name:'DEF/RES UP',color:'#80c0ff',base:'<strong>+10% DEF & RES per stack</strong>.',fn:(n,_a,r)=>`<strong>+${10*n}% DEF & RES</strong> — takes less physical and magical damage (${n} stack${n>1?'s':''}${r>0?`, ${r} round${r>1?'s':''} left`:''}).`},
+  critup:{icon:'⬆',name:'CRIT UP',color:'#ffd24d',base:'<strong>+5% critical chance per stack</strong>.',fn:(n,_a,r)=>`<strong>+${5*n}% critical hit chance</strong> (${n} stack${n>1?'s':''}${r>0?`, ${r} round${r>1?'s':''} left`:''}).`},
 };
-function statusTip(e,kind,stacks,ally){
+function statusTip(e,kind,stacks,ally,rounds){ /* v900: rounds reaches the copy */
   const s=STATUS_INFO[kind];if(!s)return;
   const tt=document.getElementById('relic-tooltip');if(!tt)return;
   const n=Math.max(1,Math.min(4,parseInt(stacks,10)||1));
-  tt.innerHTML=`<strong style="color:${s.color}">${s.icon} ${s.name}</strong><br><span style="color:var(--td)">${s.fn(n,!!ally)}</span>`;
+  tt.innerHTML=`<strong style="color:${s.color}">${s.icon} ${s.name}</strong><br><span style="color:var(--td)">${s.fn(n,!!ally,parseInt(rounds,10)||0)}</span>`;
   tt.style.display='block';
   const x=(e.clientX!==undefined?e.clientX:(e.touches&&e.touches[0]?e.touches[0].clientX:0));
   const y=(e.clientY!==undefined?e.clientY:(e.touches&&e.touches[0]?e.touches[0].clientY:0));
   tt.style.left=Math.min(x+12,window.innerWidth-216)+'px';
   tt.style.top=Math.min(y+14,window.innerHeight-96)+'px';
 }
-function statusTipTap(e,kind,stacks,ally){ // touch: tap to show, tap anywhere to dismiss
+function statusTipTap(e,kind,stacks,ally,rounds){ // touch: tap to show, tap anywhere to dismiss
   if(e&&e.stopPropagation)e.stopPropagation();
-  statusTip(e,kind,stacks,ally);
+  statusTip(e,kind,stacks,ally,rounds);
   setTimeout(()=>{document.addEventListener('click',relicTipHide,{once:true});},50);
 }
 /* v880: the pip's onclick used to call event.stopPropagation() unconditionally, so any click that
@@ -1366,17 +1426,17 @@ function statusTipTap(e,kind,stacks,ally){ // touch: tap to show, tap anywhere t
    through untouched and no tooltip opens (hover still shows it on desktop). Only on a card with no
    click behaviour does the pip claim the event for its own tooltip, which is what tapping a pip is
    for on mobile in the first place. */
-function pipTap(e,kind,stacks,ally){
+function pipTap(e,kind,stacks,ally,rounds){
   try{
     const card=e&&e.target&&e.target.closest?e.target.closest('.uc'):null;
     if(card&&card.onclick)return; // actionable card -> let the click reach it
   }catch(err){}
   if(e&&e.stopPropagation)e.stopPropagation();
-  statusTipTap(e,kind,stacks,ally);
+  statusTipTap(e,kind,stacks,ally,rounds);
 }
-function pipAttrs(kind,stacks,ally){ // shared handlers for every status pip — stacks drive the computed text
-  const n=stacks||1;const a=ally?1:0; // v714: ally flag so Poison can read as a heal under Unclean Purification
-  return `style="cursor:help" onmouseenter="statusTip(event,'${kind}',${n},${a})" onmousemove="statusTip(event,'${kind}',${n},${a})" onmouseleave="relicTipHide()" ontouchstart="statusTipTap(event,'${kind}',${n},${a})" onclick="pipTap(event,'${kind}',${n},${a})"`;
+function pipAttrs(kind,stacks,ally,rounds){ // shared handlers for every status pip — stacks drive the computed text
+  const n=stacks||1;const a=ally?1:0;const rd=parseInt(rounds,10)||0; /* v900 */ // v714: ally flag so Poison can read as a heal under Unclean Purification
+  return `style="cursor:help" onmouseenter="statusTip(event,'${kind}',${n},${a},${rd})" onmousemove="statusTip(event,'${kind}',${n},${a},${rd})" onmouseleave="relicTipHide()" ontouchstart="statusTipTap(event,'${kind}',${n},${a},${rd})" onclick="pipTap(event,'${kind}',${n},${a},${rd})"`;
 }
 function relicTipHide(){const tt=document.getElementById('relic-tooltip');if(tt)tt.style.display='none';}
 // v615: stat tooltips on training cards — same hover/tap behavior as status pips, same #relic-tooltip
@@ -1527,7 +1587,8 @@ function rerollPochteca(){
 function buyOffering(i,payWith){
   var st=G._pochtecaStock||[];var it=st[i];if(!it||it.sold)return;
   var pt=payWith||it.priceType; // v684: player chooses cacao or flower
-  var eff=(pt==='flower')?Math.round((it.flowerPrice||it.price)*offeringPriceMult()):Math.round(it.price*offeringPriceMult());
+  var _tier=(OFFERINGS[it.id]||{}).tier; /* v902 */
+  var eff=(pt==='flower')?Math.round((it.flowerPrice||it.price)*offeringPriceMult('flower',_tier)):Math.round(it.price*offeringPriceMult('cacao',_tier));
   if((G.res[pt]||0)<eff){notify('Not enough '+(pt==='flower'?'Flowers':'Cacao')+'!','#e05050');return;}
   G.res[pt]-=eff;G.offeringsBought=(G.offeringsBought||0)+1;grantOffering(it.id);it.sold=true;
   var o=OFFERINGS[it.id];notify((o?o.icon+' '+o.name:it.id)+' acquired','#c0e060');
@@ -1540,7 +1601,8 @@ function renderPochtecaReal(){
   el.innerHTML='<p style="font-size:11px;color:#d4af37;margin-bottom:.6rem">💎 The Wandering Pochteca lays out his wares. Effects apply at the start of each battle and persist for the run.</p>'+
     '<div style="display:flex;gap:8px;align-items:stretch">'+
     stock.map(function(it,i){var o=OFFERINGS[it.id];
-      var cEff=Math.round(it.price*offeringPriceMult());var fEff=Math.round((it.flowerPrice||it.price)*offeringPriceMult());
+      var _tr=(OFFERINGS[it.id]||{}).tier; /* v902 */
+      var cEff=Math.round(it.price*offeringPriceMult('cacao',_tr));var fEff=Math.round((it.flowerPrice||it.price)*offeringPriceMult('flower',_tr));
       var canC=(G.res.cacao||0)>=cEff,canF=(G.res.flower||0)>=fEff;
       var btn=it.sold?'<span style="margin-top:auto;font-size:11px;color:#50c080;font-weight:600">Acquired ✦</span>':
         ('<div style="margin-top:auto;width:100%;display:flex;gap:4px">'+
@@ -1593,6 +1655,7 @@ function renderTlacuiloServices(){
   var el=document.getElementById('tlacuilo-services');if(!el)return;
   if(!POCHTECA_TEST_FREE&&!(getDTEffects().tlacuiloUnlocked)){el.innerHTML='';return;} // Codex Services DT node gates the Tlacuilo
   var av=tlacVassals();
+  var cloneAv=tlacCloneVassals(); /* v890: recording keeps the full pool, cloning excludes mini-bosses */
   var recorded=getRecordedVassals();
   var hasClone=(G.captured||[]).some(function(c){return c._clone;});
   var slotFree=(G.deplSel||[]).length<getMaxAllies();
@@ -1602,8 +1665,8 @@ function renderTlacuiloServices(){
     av.forEach(function(cu){var k=capKey(cu);h+='<button class="btn" style="width:100%;margin-bottom:5px;text-align:left;padding:7px 11px" onclick="doTlacuiloRecord(\''+k+'\')">'+cu.icon+' <strong>'+cu.name+'</strong> <span style="font-size:10px;color:var(--td)">Lv'+getLevel(k)+'</span></button>';});
     h+='<button class="btn" style="width:100%;font-size:11px;opacity:.7" onclick="G._tlacuiloPicker=null;renderPochteca()">← Back</button>';
   } else if(G._tlacuiloPicker==='clone'){
-    h+='<div style="font-size:12px;color:var(--am);margin-bottom:.5rem">Clone which vassal? An identical copy at the <strong>same level</strong> (with its Soul Surge) joins your roster.</div>';
-    av.forEach(function(cu){var k=capKey(cu);var lv=getLevel(k);var price=lv*50;var can=(G.res.cacao||0)>=price;
+    h+='<div style="font-size:12px;color:var(--am);margin-bottom:.5rem">Clone which vassal? An identical copy at the <strong>same level</strong> (with its Soul Surge) joins your roster.<br><span style="color:var(--td);font-size:11px">Mini-bosses cannot be cloned \u2014 record them instead.</span></div>';
+    cloneAv.forEach(function(cu){var k=capKey(cu);var lv=getLevel(k);var price=lv*50;var can=(G.res.cacao||0)>=price;
       h+='<button class="btn btn-ca" '+(can?'':'disabled')+' style="width:100%;margin-bottom:5px;text-align:left;padding:7px 11px'+(can?'':';opacity:.4')+'" onclick="doTlacuiloClone(\''+k+'\')">'+cu.icon+' <strong>'+cu.name+'</strong> <span style="font-size:10px;color:var(--td)">Lv'+lv+'</span> <span style="float:right">🫘 '+price+'</span></button>';});
     h+='<button class="btn" style="width:100%;font-size:11px;opacity:.7" onclick="G._tlacuiloPicker=null;renderPochteca()">← Back</button>';
   } else {
@@ -1615,8 +1678,8 @@ function renderTlacuiloServices(){
       +'<div style="font-size:13px;font-weight:600">📜 Record a Vassal <span style="float:right;font-size:11px;color:#c0844a">'+(recCount>=3?'—':('🫘 '+nextCost))+'</span></div>'
       +'<div style="font-size:10px;color:var(--td);margin:3px 0 7px">'+recNote+'</div>'
       +'<button class="btn btn-ca" '+(recDis?'disabled':'')+' style="width:100%;font-size:12px'+(recDis?';opacity:.4':'')+'" onclick="G._tlacuiloPicker=\'record\';renderPochteca()">'+recLbl+'</button></div>';
-    var cloneDis=hasClone||!av.length;
-    var cloneLbl=hasClone?'A clone already walks with you':(!av.length?'No vassals':'Clone…');
+    var cloneDis=hasClone||!cloneAv.length;
+    var cloneLbl=hasClone?'A clone already walks with you':(!cloneAv.length?(av.length?'No cloneable vassals':'No vassals'):'Clone…'); /* v890 */
     h+='<div style="background:var(--bm);border:1px solid var(--br);border-radius:10px;padding:10px">'
       +'<div style="font-size:13px;font-weight:600">⧉ Clone a Vassal <span style="float:right;font-size:11px;color:#c0844a">🫘 Lv×50</span></div>'
       +'<div style="font-size:10px;color:var(--td);margin:3px 0 7px">An identical copy (with its Soul Surge) at the same level joins your roster. One clone at a time.</div>'
@@ -1639,8 +1702,22 @@ function doTlacuiloRecord(k){
   notify('📜 '+cu.icon+' '+cu.name+' recorded — returns next run at Lv1','#d4af37');
   G._tlacuiloPicker=null;renderPochteca();renderRes('rb-shop');if(typeof renderAltar==='function')renderAltar();
 }
+/* v890: a captured mini-boss has isMiniBoss explicitly set to FALSE on its roster entry (the
+   capture path strips the flag so it renders and pays out as an ordinary vassal), so that field
+   cannot be used to identify one. baseId resolving in MINIBOSS_CAP_STATS is the reliable test --
+   the same one v844's save repair uses.
+   Recording is deliberately still allowed: carrying one forward at Lv1 is a slow, single-copy
+   reward. Cloning is not -- it duplicates a mini-boss at its CURRENT level with its Soul Surge
+   intact, and two of them at once is out of line with everything else on the roster. */
+function isMinibossCapture(cu){
+  if(!cu)return false;
+  const bid=cu.baseId||cu.id||'';
+  return !!(typeof MINIBOSS_CAP_STATS!=='undefined'&&MINIBOSS_CAP_STATS[bid]);
+}
+function tlacCloneVassals(){return (typeof tlacVassals==='function'?tlacVassals():[]).filter(function(cu){return !isMinibossCapture(cu);});}
 function doTlacuiloClone(k){
   var cu=(G.captured||[]).find(function(c){return capKey(c)===k;});if(!cu||cu.isGod)return;
+  if(isMinibossCapture(cu)){notify('Mini-bosses cannot be cloned','#e05050');return;} /* v890: guard the action too, not just the list */
   if((G.captured||[]).some(function(c){return c._clone;})){notify('Only one clone at a time','#e05050');return;}
   var lv=getLevel(k);var price=lv*50;
   if((G.res.cacao||0)<price){notify('Not enough Cacao','#e05050');return;}
@@ -2104,7 +2181,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v889'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v904'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -2274,7 +2351,7 @@ const GODS=[
     type:'PHYS',hp:150,atk:19,mag:0,def:11,res:8,np:38,npCost:23,
     passive:'Ueyiatl Tactics: at battle start, Opochtli and all allies gain +15% CRIT for this battle.',pk:'ueyiatlTactics',pv:.15,
     ability:'Sinistral Minacachalli',ad:'1.2×ATK (3 targets), +15% CRIT; on any crit grant ATK/MAG UP ×1 to all allies',ak:'sinistralMinacachalli',locked:true,unlockCriteria:'Conquer Temiminayólan'},
-  {id:'mayahuel',name:'Mayahuel',flavor:'Maguey Goddess of Pulque',element:'nature',icon:'🌵',
+  {id:'mayahuel',name:'Mayahuel',flavor:'Maguey Goddess of Pulque',element:'nature',icon:'\u{1F378}',
     type:'MAG',hp:165,atk:0,mag:16,def:8,res:12,np:42,npCost:23,
     passive:'Inebriated Reverie: DRUNK on allies causes no misfires — instead each stack grants +5% ATK/MAG/DEF/RES.',pk:'inebriatedReverie',
     ability:'Octli Drench',ad:'1.5×MAG to 1 target + 10% splash to others + DRUNK ×1 to ALL enemies — as Patron, also DRUNK ×1 to ALL allies',ak:'octliDrench',locked:true,unlockCriteria:'Conquer Teyōllōcuālōyān'},
@@ -2284,7 +2361,7 @@ const GODS=[
     ability:'She Who Eats Filth',ad:'Heal all allies 25% + cleanse + Poison ×1 to ALL enemies — as Patron, also Poison ×1 to ALL allies',ak:'sheWhoEatsFilth',locked:true,unlockCriteria:'Conquer Apanohualóyan'},
   {id:'patecatl',name:'Patecatl',flavor:'Apothecary God of Medicine',element:'humanity',icon:'🍶',
     type:'MAG',hp:160,atk:0,mag:15,def:8,res:12,np:40,npCost:22,
-    passive:'Potent Treatment: All ally healing specials are +10% more effective and buffs last 1 round longer.',
+    passive:'Potent Treatment: All ally healing specials are +10% more effective and buffs last 1 round longer. \u2014 and round-limited offerings last +1 round',
     pk:'potentTreatment',pv:.10,
     ability:'Peyote Concoction',ad:'Heal all allies 25% HP + cleanse + ATK/MAG UP \xd71 to all',ak:'peyoteConcoction',
     locked:true,unlockCriteria:'Defeat him in his Apothecary'},
@@ -3941,8 +4018,30 @@ function windDeployedCount(){ // v580: patron + deployed vassals with element 'w
   (G.deplSel||[]).forEach(k=>{const cu=(G.captured||[]).find(c=>capKey(c)===k);if(cu&&cu.element==='wind')n++;});
   return n;
 }
-function offeringPriceMult(){
-  let m=1+0.25*(G.offeringsBought||0); // v397: each relic bought this run +25% to subsequent relics
+/* v901: the escalator was flat -- every relic added a fixed +25%, so the curve was a straight line
+   while Cacao income compounds with layer depth. By the late game a full board of offerings was
+   affordable several times over (30k+ banked with nothing left to buy).
+   The rate now steps up at 5 / 10 / 15 purchases, so the first handful stay cheap and each further
+   band bites harder. Bands are marginal, not retroactive: buying your 6th relic does not reprice
+   the 5 you already own, it just costs more than the 5th did. */
+const OFFERING_PRICE_BANDS=[[5,0.25],[10,0.40],[15,0.60],[Infinity,0.85]];
+/* v902: Flowers inflate faster than Cacao, and faster still on the better tiers.
+   Sacrificing a few Lv60+ vassals on L5+ yields Flowers far quicker than battles yield Cacao, so a
+   single escalator applied to both currencies left the Flower route barely gated -- the cheap way
+   to buy a rare stayed cheap. These multiply the BAND RATE, not the final price, so the first few
+   purchases are still near-identical between currencies and the gap opens as the count climbs. */
+const FLOWER_RATE_MULT=1.40;
+const FLOWER_TIER_RATE={common:1.00,uncommon:1.15,rare:1.30};
+function offeringPriceMult(priceType,tier){
+  const bought=G.offeringsBought||0;
+  const rateScale=(priceType==='flower')?FLOWER_RATE_MULT*(FLOWER_TIER_RATE[tier]||1):1;
+  let m=1,prev=0;
+  for(const [upTo,rate] of OFFERING_PRICE_BANDS){
+    const inBand=Math.max(0,Math.min(bought,upTo)-prev);
+    m+=inBand*rate*rateScale;
+    prev=upTo;
+    if(bought<=upTo)break;
+  }
   const _d=(getOfferingEffects().windCacaoDiscount||0)*windDeployedCount(); // v580: Gold Serpent Ornament
   if(_d>0)m*=Math.max(0.5,1-_d); // floor at 50% off
   return m;
@@ -7615,8 +7714,9 @@ function buildRoundQueue(){
     // v477: Axolotl Effigy — element-scoped round-end regen (WATER)
     const _reBE=getOfferingEffects().roundRegenPctByElement;
     if(_reBE&&Object.keys(_reBE).length){let _reAny=false;aP.forEach(u=>{const _p=_reBE[u.element]||0;if(_p>0&&u.currentHp>0&&u.currentHp<u.maxHp){const _h=Math.round(u.maxHp*_p);if(_h>0){u.currentHp=healTo(u,_h);_reAny=true;animateHit(u.id,_h,true);}}});if(_reAny){addLog(`<span class="log-water">🦎 Axolotl Effigy: WATER units regenerate HP</span>`);renderBattle();}}
-    // v477: Hummingbird Plume — strip the Round-1 flat ATK/MAG after round 1
-    aP.forEach(u=>{if(u._r1Atk||u._r1Mag){u.atk=Math.max(0,(u.atk||0)-(u._r1Atk||0));u.mag=Math.max(0,(u.mag||0)-(u._r1Mag||0));u._r1Atk=0;u._r1Mag=0;}});
+    // v477: Hummingbird Plume — strip the Round-1 flat ATK/MAG after its window
+    /* v893: was unconditional at this point (start of round 2). Now honours relicWindow(1). */
+    if(G.roundNum>relicWindow(1))aP.forEach(u=>{if(u._r1Atk||u._r1Mag){u.atk=Math.max(0,(u.atk||0)-(u._r1Atk||0));u.mag=Math.max(0,(u.mag||0)-(u._r1Mag||0));u._r1Atk=0;u._r1Mag=0;}});
     // Hint 3: TP restored — show once at the start of round 2 in B1
     if(G._b1HintState&&G.roundNum===1&&G.layer===1&&G.battleNum===1&&G._b1SpecHintSeen){setB1Hint('✨ A small amount of <strong>Tonalli Points</strong> is restored at the end of every round');}
     // Reinforcements: roll chance to spawn enemy next round
@@ -7756,8 +7856,11 @@ function buildRoundQueue(){
   /* v758: telegraph the summon a full round in advance of it resolving. */
   {const _mp=mictlanSummonPending();
    if(_mp)addLog(`<span class="log-ab">\u{1F480} ${_mp.name} gathers the dead \u2014 a god will rise at the end of this round.</span>`);}
-  // v370: 2-round masks expire — restore pre-mask stats at the start of round 3
-  if(G.roundNum===3){
+  // v370: 2-round masks expire — restore pre-mask stats once the window closes
+  /* v893: was hardcoded to round 3. relicWindow(2)+1 is the first round past the window, so
+     Patecatl pushes the fade to round 4. Uses > rather than === so a skipped round cannot strand
+     the buff permanently. */
+  if(G.roundNum>relicWindow(2)){
     let _mFade=false;
     G.units.forEach(u=>{if(u._mask2rBase){u.atk=u._mask2rBase.atk;u.mag=u._mask2rBase.mag;u.def=u._mask2rBase.def;u.res=u._mask2rBase.res;delete u._mask2rBase;_mFade=true;}});
     if(_mFade)addLog(`<span class="log-ab">😐 The ritual masks fade — their power was fleeting.</span>`);
@@ -8081,7 +8184,7 @@ function advanceTurn(actorId){
   const idToMark=actorId||G.selectedActorId;
   if(idToMark)G.actedIds.add(idToMark);
   // v362: Yauhtli Flower — after an enemy acts, strip ailments from allies (cleanseUnit respects Malinalxochitl's 1-stack scalding-miasma rule)
-  if(hasOffering('yauhtli_flower')&&G.roundNum<=1&&!actorId){ // v563: nerfed 2 rounds → 1 // enemy turns advance via advanceTurn() (no arg)
+  if(hasOffering('yauhtli_flower')&&G.roundNum<=relicWindow(((OFFERINGS.yauhtli_flower||{}).eff||{}).roundCleanse||1)&&!actorId){ // v563: nerfed 2 rounds → 1 · v893: reads its own eff through relicWindow
     var _yl=G.units.filter(function(u){return u.currentHp>0&&((u.poisonStacks||0)>0||(u.burnStacks||0)>0||(u.paralyzStacks||0)>0||(u.woundStacks||0)>0||(u.lethargyStacks||0)>0||(u.drunkStacks||0)>0||(G._slowedUnits&&G._slowedUnits.has(u.id)));});
     if(_yl.length){_yl.forEach(function(u){cleanseUnit(u);animateStatusPop(u.id,'🌼','#80d0ff');});if(G._yauhtliLogRound!==G.roundNum){G._yauhtliLogRound=G.roundNum;addLog('<span class="log-cp">🌼 Yauhtli Flower — ailments cleansed</span>');}}
   }
@@ -12545,6 +12648,35 @@ function spoilsContinueFx(btn){
   p.style.cssText='left:'+cx+'px;top:'+cy+'px;width:'+r.width+'px;height:'+r.height+'px;';
   document.body.appendChild(p);setTimeout(function(){p.remove();},240); /* v879 */
 }
+/* v895: release effect. Mirrors sacrificeFx structurally -- rect read synchronously, everything
+   spawned body-level so renderAltar() cannot cut it short -- but inverted: motes drift UP and
+   outward instead of falling, in jade rather than red, because the unit is being let go rather
+   than spent. resIcon/resAmt float the Blood or Cacao actually yielded. */
+function spareFx(ck,resAmt,resIcon,delay){
+  const r=_fxRect('[data-sacck="'+String(ck||'').replace(/"/g,'')+'"]');
+  if(!r)return;
+  const cx=r.left+r.width/2, cy=r.top+r.height*0.5;
+  setTimeout(function(){
+    const ring=document.createElement('div');ring.className='spare-ring';
+    const sz=Math.max(60,r.width*0.8);
+    ring.style.cssText='left:'+cx+'px;top:'+cy+'px;width:'+sz+'px;height:'+sz+'px;';
+    document.body.appendChild(ring);setTimeout(function(){ring.remove();},850);
+    for(let i=0;i<14;i++){
+      const m=document.createElement('div');m.className='spare-mote';
+      m.style.cssText='left:'+(r.left+Math.random()*r.width)+'px;top:'+(r.top+r.height*0.35+Math.random()*r.height*0.4)+'px;'
+        +'--dx:'+((Math.random()*2-1)*(r.width*0.45)).toFixed(1)+'px;'
+        +'--dy:'+(-(r.height*0.5+Math.random()*46)).toFixed(1)+'px;'
+        +'--dur:'+(0.7+Math.random()*0.45).toFixed(2)+'s;animation-delay:'+(Math.random()*0.22).toFixed(2)+'s;';
+      document.body.appendChild(m);setTimeout(function(){m.remove();},1400);
+    }
+    if(resAmt){
+      const lbl=document.createElement('div');lbl.className='dmg-pop';
+      lbl.textContent='+'+resAmt+' '+(resIcon||'');
+      lbl.style.cssText='color:#b8f0a0;font-weight:800;font-size:16px;left:'+(cx-26)+'px;top:'+(r.top+6)+'px;text-shadow:0 0 9px #2f6a30,0 1px 3px #000;';
+      document.body.appendChild(lbl);setTimeout(function(){lbl.remove();},1100);
+    }
+  },delay||0);
+}
 function animateArmorBreak(uid){
   setTimeout(()=>{
     const card=document.querySelector('[data-uid="'+uid+'"]');if(!card)return;
@@ -13272,9 +13404,9 @@ function pPips(stacks,ally){if(!stacks)return'';return`<div style="margin-top:2p
 function woundBadge(stacks){if(!stacks)return'';return`<div style="margin-top:2px" ${pipAttrs('wound',stacks)}><span class="burn-pip" style="color:#ff6060;border-color:#8a1010;background:#1a0000">🩸×${stacks}</span></div>`;}
 function lethargyBadge(stacks){if(!stacks)return'';return`<div style="margin-top:2px" ${pipAttrs('lethargy',stacks)}><span class="burn-pip" style="color:#c080ff;border-color:#6a3aaa;background:#0d001a">🥶×${stacks} LTH</span></div>`;}
 function drunkBadge(stacks){if(!stacks)return'';return`<div style="margin-top:2px" ${pipAttrs('drunk',stacks)}><span class="burn-pip" style="color:#e0a040;border-color:#8a5010;background:#1a0e00">🍺×${stacks}</span></div>`;}
-function atkBuffBadge(stacks,rounds){if(!stacks)return'';return`<div style="margin-top:2px" ${pipAttrs('atkup',stacks)}><span class="burn-pip" style="color:#ffe080;border-color:#8a6010;background:#1a1000">ATK/MAG UP ×${stacks}</span></div>`;} // v624: hoverable
-function defBuffBadge(stacks,rounds){if(!stacks)return'';return`<div style="margin-top:2px" ${pipAttrs('defup',stacks)}><span class="burn-pip" style="color:#80c0ff;border-color:#104080;background:#001018">DEF/RES UP ×${stacks}</span></div>`;} // v624: hoverable
-function critBuffBadge(stacks,rounds){if(!stacks)return'';return`<div style="margin-top:2px" ${pipAttrs('critup',stacks)}><span class="burn-pip" style="color:#ffd24d;border-color:#8a5e10;background:#1a1200">CRIT UP ×${stacks}</span></div>`;} // v624: hoverable
+function atkBuffBadge(stacks,rounds){if(!stacks)return'';return`<div style="margin-top:2px" ${pipAttrs('atkup',stacks,0,rounds)}><span class="burn-pip" style="color:#ffe080;border-color:#8a6010;background:#1a1000">ATK/MAG UP ×${stacks}</span></div>`;} // v624: hoverable
+function defBuffBadge(stacks,rounds){if(!stacks)return'';return`<div style="margin-top:2px" ${pipAttrs('defup',stacks,0,rounds)}><span class="burn-pip" style="color:#80c0ff;border-color:#104080;background:#001018">DEF/RES UP ×${stacks}</span></div>`;} // v624: hoverable
+function critBuffBadge(stacks,rounds){if(!stacks)return'';return`<div style="margin-top:2px" ${pipAttrs('critup',stacks,0,rounds)}><span class="burn-pip" style="color:#ffd24d;border-color:#8a5e10;background:#1a1200">CRIT UP ×${stacks}</span></div>`;} // v624: hoverable
 function paraPips(stacks){if(!stacks)return'';return`<div style="margin-top:2px" ${pipAttrs('paralyze',stacks)}><span class="para-pip">⚡×${stacks} PAR</span></div>`;}
 function bPips(stacks){if(!stacks)return'';return`<div style="margin-top:2px" ${pipAttrs('burn',stacks)}><span class="burn-pip">🔥×${stacks}</span></div>`;}
 function slowBadge(uid){
@@ -14073,6 +14205,16 @@ function showSpoils(){
         // v348: unfold the total one bonus at a time — base → Hard → Perfect → Blessed Crops → Offerings
         const steps=[];
         if(isHard)steps.push({bm:1.2,cm:1.2,bl:'(+20% Hard)',cl:'(+20% Hard)'});
+        /* v903: conditional spoils offerings. Multiplied across every owned copy the same way the
+           flat ones are, and pushed as their own step so the running total animates them
+           separately and the label says WHY they paid out. */
+        const _ownEff=k=>(G.offerings||[]).reduce((m,id)=>{const f=(OFFERINGS[id]||{}).eff||{};return f[k]?m*f[k]:m;},1);
+        /* v904: G.roundNum still holds the round the battle ENDED on -- it is only reset by
+           startBattle -- so it is a valid read here in the spoils chain. */
+        const _swift=(G.roundNum||99)<=3;
+        const _cs=_ownEff('cacaoMultSwift'), _bp=_ownEff('bloodMultPerfect');
+        if(_swift&&_cs>1)steps.push({bm:1,cm:_cs,bl:'',cl:'(+'+Math.round((_cs-1)*100)+'% \u26a1)'});
+        if(isPerfect&&_bp>1)steps.push({bm:_bp,cm:1,bl:'(+'+Math.round((_bp-1)*100)+'% \u2b50)',cl:''});
         if(isPerfect)steps.push({bm:1.15,cm:1.15,bl:'(+15% Perfect)',cl:'(+15% Perfect)'});
         if(blessedMult!==1)steps.push({bm:blessedMult,cm:blessedMult,bl:'(+'+Math.round((blessedMult-1)*100)+'% 🌽)',cl:'(+'+Math.round((blessedMult-1)*100)+'% 🌽)'});
         if(_oe.bloodMult!==1||_oe.cacaoMult!==1)steps.push({bm:_oe.bloodMult,cm:_oe.cacaoMult,bl:_oe.bloodMult>1?'(+'+Math.round((_oe.bloodMult-1)*100)+'% '+_bEmo+')':'',cl:_oe.cacaoMult>1?'(+'+Math.round((_oe.cacaoMult-1)*100)+'% '+_cEmo+')':''});
@@ -15176,7 +15318,14 @@ function showUnitTooltip(u){
   if(_pbInfo){const m=_pbInfo.mult;T.atk=Math.round(T.atk*m);T.mag=Math.round(T.mag*m);T.def=Math.round(T.def*m);T.res=Math.round(T.res*m);}
   if(u.isGod){
     const _ghm=(G.dte&&G.dte.godHpMult)||1;
-    if(_ghm!==1)T.hp=Math.round((hp-sb.hp)*_ghm)+sb.hp; // DT multiplies the level-scaled base only, not Soul Surge
+    /* v892: this rebuilt T.hp from `hp` -- the RAW level-scaled base -- which threw away every
+       offering multiplier offeringStatLayer had just applied. Any god holding an hpMult offering
+       showed base x godHpMult in the modal while battle showed base x offerings x godHpMult.
+       Sacred Atole (+25% party HP) made it obvious: modal 7,746 against 9.7K in the field.
+       The vassal branch immediately below has multiplied the offering-layered value since v732;
+       this is the same fix on the god side. Soul Surge is still excluded from the DT multiplier,
+       which is why sb.hp comes out and goes back in. */
+    if(_ghm!==1)T.hp=Math.round((T.hp-sb.hp)*_ghm)+sb.hp; // DT multiplies the level-scaled base only, not Soul Surge
     if(_affInfo)T.hp=Math.round(T.hp*_affInfo.mult);
   }
   else if(u.isAlly||!u.enemyLevel){ // v732: vassal side -- modal omitted vassalHpMult, so vassal HP read up to 20% low vs battle/Temazcal
@@ -15768,6 +15917,7 @@ function doSpare(capId){
       const rng=Math.random()<0.5;
       const resLabel=rng?'🩸 Blood':'🫘 Cacao';
       const resKey=rng?'blood':'cacao';
+      spareFx(capId,amt,rng?'\u{1FA78}':'\u{1FAD8}'); /* v895: BEFORE renderAltar() removes the card */
       G.captured=G.captured.filter(c=>(c._captureId||c.id)!==capId);
       G.deplSel=G.deplSel.filter(x=>x!==capId);
       delete G.levels[capId];delete G.shields[capId];
@@ -15791,9 +15941,10 @@ function doSpareSelected(){
   showMo('','Spare Selected',`Release ${units.length} unit${units.length>1?'s':''} (${names})?<br><br><span style="font-size:12px;color:var(--td)">Each unit will yield Blood or Cacao upon release.</span>`,[
     {label:`Release All`,fn:()=>{
       let totalBlood=0,totalCacao=0;
-      units.forEach(cu=>{
+      units.forEach((cu,_i)=>{
         const ck=capKey(cu);const amt=spareAmt(cu);
         const rng=Math.random()<0.5;
+        spareFx(ck,amt,rng?'\u{1FA78}':'\u{1FAD8}',_i*100); /* v895: staggered, like the batch sacrifice */
         if(rng)totalBlood+=amt;else totalCacao+=amt;
         const _sLv=surgeRefundLv(ck);if(_sLv){totalBlood+=_sLv*50;totalCacao+=_sLv*25;} // v339: Soul Surge refund (v526: paid levels only)
         G.captured=G.captured.filter(c=>(c._captureId||c.id)!==ck);G.deplSel=G.deplSel.filter(x=>x!==ck);
