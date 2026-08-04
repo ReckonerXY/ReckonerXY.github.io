@@ -452,7 +452,7 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
       <div style="font-size:11px;color:#a070c0;font-weight:500;margin-bottom:4px">🔒 God Unlocks</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-debug" onclick="dbgRelockGod('tlazolteotl')" style="font-size:11px;padding:4px 10px">🌺 Re-lock Tlazoltéotl</button>
-        <button class="btn btn-debug" onclick="dbgRelockGod('mayahuel')" style="font-size:11px;padding:4px 10px">🌵 Re-lock Mayahuel</button>
+        <button class="btn btn-debug" onclick="dbgRelockGod('mayahuel')" style="font-size:11px;padding:4px 10px">🌵 Re-lock Mayahuel</button><button class="btn btn-debug" onclick="dbgClearDebugUnlocks()" style="font-size:11px;padding:4px 10px;background:#2a1a1a;border-color:#a06060;color:#ffb0b0">🧹 Clear Mictlan Stamps</button>
       </div>
       <div style="font-size:10px;color:#7a6a9a;margin-top:3px">Clears that layer's conquest flags so the unlock sequence fires again.</div>
     </div>
@@ -469,7 +469,7 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
     </div>
     <div class="debug-row" style="border-top:1px solid #4a2a6a;margin-top:4px;padding-top:8px"><div><div style="font-size:12px;color:#60c0ff">B7→B8 Transition Test</div><div style="font-size:10px;color:#a070c0">Test the spoils→shop→boss-deploy path</div></div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px"><button class="btn btn-debug" onclick="debugJumpB7Spoils()" style="font-size:11px;padding:4px 10px;background:#0a1a2a;border-color:#204a8a;color:#60c0ff">B7 Spoils →</button><button class="btn btn-debug" onclick="debugJumpB8Shop()" style="font-size:11px;padding:4px 10px;background:#1a0a2a;border-color:#5a20a0;color:#b080ff">B8 Shop →</button></div></div>
     <div class="debug-row" style="border-top:1px solid #4a2a6a;margin-top:4px;padding-top:8px"><div><div style="font-size:12px;color:#ff8040">L5 B8 Boss Choice Test</div><div style="font-size:10px;color:#a070c0">Jump to L5 B7 shop or B8 boss choice</div></div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px"><button class="btn btn-debug" onclick="debugJumpL5B7()" style="font-size:11px;padding:4px 10px;background:#1a0800;border-color:#8a4010;color:#ff8040">L5 B8 Shop →</button><button class="btn btn-debug" onclick="debugJumpL5B8Choice()" style="font-size:11px;padding:4px 10px;background:#1a0e00;border-color:#c06010;color:#ffb060">B8 Boss Choice →</button></div></div>
-    <div class="debug-row" style="border-top:1px solid #4a2a6a;margin-top:4px;padding-top:8px"><div><div style="font-size:12px;color:#ff6060">Boss Test (Tianguis → boss)</div><div style="font-size:10px;color:#a070c0">Lv100 team, 999k resources, Pochteca stocked — shop then fight</div></div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px"><select id="dbg-boss-patron" title="Patron god for the boss-jump team" style="font-size:11px;padding:3px 6px;background:#1a0a2a;border:0.5px solid #4a2a6a;color:#c0a0e0;border-radius:6px;flex-basis:100%;margin-bottom:3px"></select><button class="btn btn-debug" onclick="debugJumpBoss(1)" style="font-size:11px;padding:4px 9px;background:#2a0a0a;border-color:#8a3030;color:#ff8080">L1</button><button class="btn btn-debug" onclick="debugJumpBoss(2)" style="font-size:11px;padding:4px 9px;background:#2a0a0a;border-color:#8a3030;color:#ff8080">L2</button><button class="btn btn-debug" onclick="debugJumpBoss(3)" style="font-size:11px;padding:4px 9px;background:#2a0a0a;border-color:#8a3030;color:#ff8080">L3</button><button class="btn btn-debug" onclick="debugJumpBoss(4)" style="font-size:11px;padding:4px 9px;background:#2a0a0a;border-color:#8a3030;color:#ff8080">L4</button><button class="btn btn-debug" onclick="debugJumpBoss(5)" style="font-size:11px;padding:4px 9px;background:#2a0a0a;border-color:#8a3030;color:#ff8080">L5 Mal/Xiu</button><button class="btn btn-debug" onclick="debugJumpBoss(6)" style="font-size:11px;padding:4px 9px;background:#0a1a2a;border-color:#206a8a;color:#60c0ff">L6 Opochtli</button><button class="btn btn-debug" onclick="debugJumpBoss(7)" style="font-size:11px;padding:4px 9px;background:#0a1a2a;border-color:#206a8a;color:#60c0ff">L7 Mayahuel</button><button class="btn btn-debug" onclick="debugJumpBoss(8)" style="font-size:11px;padding:4px 9px;background:#0a1a2a;border-color:#206a8a;color:#60c0ff">L8 Tlazoléotl</button><button class="btn btn-debug" onclick="debugJumpBoss(9)" style="font-size:11px;padding:4px 9px;background:#2a0a2a;border-color:#8a30a0;color:#e080ff">L9 Mictlan.</button></div></div>
+    <div class="debug-row" style="border-top:1px solid #4a2a6a;margin-top:4px;padding-top:8px"><div><div style="font-size:12px;color:#ff6060">Boss Test (Tianguis → boss)</div><div style="font-size:10px;color:#a070c0">Lv100 team, 999k resources, Pochteca stocked — shop then fight</div></div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px"><select id="dbg-boss-patron" title="Patron god for the boss-jump team" style="font-size:11px;padding:3px 6px;background:#1a0a2a;border:0.5px solid #4a2a6a;color:#c0a0e0;border-radius:6px;flex-basis:100%;margin-bottom:3px"></select><button class="btn btn-debug" onclick="debugJumpBoss(1)" style="font-size:11px;padding:4px 9px;background:#2a0a0a;border-color:#8a3030;color:#ff8080">L1</button><button class="btn btn-debug" onclick="debugJumpBoss(2)" style="font-size:11px;padding:4px 9px;background:#2a0a0a;border-color:#8a3030;color:#ff8080">L2</button><button class="btn btn-debug" onclick="debugJumpBoss(3)" style="font-size:11px;padding:4px 9px;background:#2a0a0a;border-color:#8a3030;color:#ff8080">L3</button><button class="btn btn-debug" onclick="debugJumpBoss(4)" style="font-size:11px;padding:4px 9px;background:#2a0a0a;border-color:#8a3030;color:#ff8080">L4</button><button class="btn btn-debug" onclick="debugJumpBoss(5)" style="font-size:11px;padding:4px 9px;background:#2a0a0a;border-color:#8a3030;color:#ff8080">L5 Mal/Xiu</button><button class="btn btn-debug" onclick="debugJumpBoss(6)" style="font-size:11px;padding:4px 9px;background:#0a1a2a;border-color:#206a8a;color:#60c0ff">L6 Opochtli</button><button class="btn btn-debug" onclick="debugJumpBoss(7)" style="font-size:11px;padding:4px 9px;background:#0a1a2a;border-color:#206a8a;color:#60c0ff">L7 Mayahuel</button><button class="btn btn-debug" onclick="debugJumpBoss(8)" style="font-size:11px;padding:4px 9px;background:#0a1a2a;border-color:#206a8a;color:#60c0ff">L8 Tlazoléotl</button><button class="btn btn-debug" onclick="dbgForceXbalanque()" style="font-size:11px;padding:4px 9px;background:#2a1a3a;border-color:#a070c0;color:#e0b0ff">🐆 L8 Xbalanque</button><button class="btn btn-debug" onclick="debugJumpBoss(9)" style="font-size:11px;padding:4px 9px;background:#2a0a2a;border-color:#8a30a0;color:#e080ff">L9 Mictlan.</button></div></div>
     <div class="debug-row" style="border-top:1px solid #4a2a6a;margin-top:4px;padding-top:8px"><div><div style="font-size:12px;color:#e05050">Full Reset</div><div style="font-size:10px;color:#a070c0">Clears ALL progress: DT, TEOTL, victories</div></div><button class="btn btn-bl" onclick="debugFullReset()" style="font-size:11px;padding:4px 10px">Wipe All</button></div>
   </div>
 </div>
@@ -1567,7 +1567,34 @@ function maybeRollPochteca(isFirstRun){
 }
 // v669: Offering Surplus (DT). Escalates across the WHOLE run, not per stall, so repeat rerolling
 // has a real cost curve instead of resetting free at every shop.
-function offeringRerollCost(){return 25+25*(G.offeringRerolls||0);}
+/* v922: both of these sinks were priced purely on run progress -- Temazcal on battles completed,
+   rerolls on rerolls used -- so neither noticed how deep you were. Cacao income scales hard with
+   layer depth, and by L5+ both had stopped being decisions.
+   Bands compound: x1.20 from Layer 2, and another x1.30 from Layer 5 for x1.56 total.
+   Shared helper so the two stay in step and any future cacao sink can opt in with one call. */
+const LAYER_COST_BANDS=[[2,1.20],[5,1.30]];
+function layerCostMult(){
+  const L=(G&&G.layer)||1;
+  let m=1;
+  for(const [from,rate] of LAYER_COST_BANDS)if(L>=from)m*=rate;
+  return m;
+}
+/* v923: rerolls were +25 flat forever, so the 30th cost 775 -- linear growth against income that
+   compounds. Past the 10th each further reroll now MULTIPLIES the price, and the rate steps up at
+   25 and 30. Bands are marginal: the linear part still covers the first ten, and each band only
+   compounds over the rerolls actually taken inside it.
+   Deliberately harsh at the tail -- rerolling thirty times in one run is not a strategy the
+   economy should support, and the curve should say so long before you get there. */
+const REROLL_GROWTH_BANDS=[[10,25,1.10],[25,30,1.15],[30,Infinity,1.20]];
+function offeringRerollCost(){
+  const n=G.offeringRerolls||0;
+  let c=25+25*Math.min(n,10);
+  for(const [from,to,rate] of REROLL_GROWTH_BANDS){
+    const inBand=Math.max(0,Math.min(n,to)-from);
+    if(inBand>0)c*=Math.pow(rate,inBand);
+  }
+  return Math.round(c*layerCostMult());
+}
 function rerollPochteca(){
   if(!getDTEffects().offeringRerollUnlocked)return;
   var st=G._pochtecaStock;if(!st||!st.length)return;
@@ -2181,7 +2208,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v904'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v928'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -2373,14 +2400,33 @@ const GODS=[
   /* v808: Mictlantecuhtli, playable. Stats sit above the roster because he is the reward for
      finishing the whole descent, not a mid-run pickup. Undead Forces and Mictlan Clasp are
      declared here but land in their own builds -- pk/ak are the dispatch keys. */
+  /* v906: playable Xbalanque. Stat line is the LOCKED table from the Layer 8 design doc --
+     ATK 21 is the highest of any playable god, justified because Nullifidian Rage only pays off
+     with vassals in the party and Godbane Blowgun's 2x only lands against gods.
+     NOTE: the passive and the special are NOT implemented yet (next builds). He stays behind
+     locked:true and godUnlocked('xbalanque'), which currently answers false in normal play
+     because the no-casualty streak is not tracked -- so he is debug-only until those land. */
+  {id:'xbalanque',name:'Xbalanque',flavor:'Twin Jaguar God Killer',element:'humanity',icon:'\u{1F406}',
+    type:'PHYS',hp:155,atk:21,mag:0,def:12,res:8,np:40,npCost:24,
+    passive:'Nullifidian Rage: Xbalanque and his allies gain +7% HP, ATK, MAG, DEF and RES per vassal in the party',pk:'nullifidianRage',
+    ability:'Godbane Blowgun',ad:'0.5\u00d7ATK, 5 hits to random enemies \u2014 2\u00d7 damage against GODS',ak:'godbaneBlowgun',
+    locked:true,unlockCriteria:'Defeat him in Apanohual\u00f3yan'} /* v907: naming Xbalanque on a ??? card gave the secret boss away before the player ever met him */,
   {id:'mictlantecuhtli',name:'Mictlantecuhtli',flavor:'God King of the Dead',element:'night',icon:'\u{1F480}',
     type:'MAG',hp:175,atk:0,mag:22,def:10,res:12,np:44,npCost:24,
     passive:'Undead Forces: once per battle, the first enemy slain returns as a temporary ally \u2014 it costs you no party slot',pk:'undeadForcesPlayer',pv:1,
     ability:'Mictlan Clasp',ad:'0.5\u00d7MAG to 6 targets \u2014 a fatal blow raises that unit as an undead recruit in the spoils (gods exempt)',ak:'mictlanClaspPlayer',
-    locked:true,unlockCriteria:'Conquer the whole of Mictlan \u2014 clear Layer 9'},
+    locked:true,unlockCriteria:'Conquer Mictlan'} /* v907 */,
 ];
 
 const GOD_ENDINGS={
+  /* v911: Xbalanque -- the Hero Twin who already beat an underworld once, walking a
+     second one with the boredom of a returning champion. Continues in GOD_ENDINGS_L9. */
+  xbalanque:[
+    "Xolotl goes down hard, and laughs about it. \"Another twin,\" he says. \"You people never come alone.\"",
+    "\"I did,\" says Xbalanque. \"This time I did.\"",
+    "The <strong class='teotl'>TEOTL</strong> of the first layer returns to a hand that has held it before.",
+    "One down. He has counted nine hells once already. He is not impressed by the number."
+  ],
   /* v874: Tlazolteotl's arc -- she walks down collecting the sins and desires of every
      layer, building toward a purification rite she intends to perform on Mictlantecuhtli
      himself, with or without his consent. Continues in GOD_ENDINGS_L9. */
@@ -2412,6 +2458,14 @@ const GOD_ENDINGS={
   mictlantecuhtli:["Xolotl goes down, and the dog does not seem surprised at who is standing over him.","“You do not walk your own house, lord. You sit in it.”","“I am walking it now,” Mictlantecuhtli says. “Something has been moving through my layers that I did not put there.”","The <strong class='teotl'>TEOTL</strong> of the guide of the dead returns to its owner.","One layer inspected. No usurper. And no sign of her."],
 };
 const GOD_ENDINGS_L2={
+  /* v911: Xbalanque -- the Hero Twin who already beat an underworld once, walking a
+     second one with the boredom of a returning champion. Continues in GOD_ENDINGS_L9. */
+  xbalanque:[
+    "The mountains close on him and he is simply not there when they meet.",
+    "Trickery beat the Lords of Xibalba. Stone is easier.",
+    "The <strong class='teotl'>TEOTL</strong> of the clashing peaks comes loose without a fight.",
+    "Two. He is remembering how this is done."
+  ],
   /* v874: Tlazolteotl's arc -- she walks down collecting the sins and desires of every
      layer, building toward a purification rite she intends to perform on Mictlantecuhtli
      himself, with or without his consent. Continues in GOD_ENDINGS_L9. */
@@ -2784,6 +2838,14 @@ const STORY_LINES_L3=[
   "She is already walking toward you.",
 ];
 const GOD_ENDINGS_L3={
+  /* v911: Xbalanque -- the Hero Twin who already beat an underworld once, walking a
+     second one with the boredom of a returning champion. Continues in GOD_ENDINGS_L9. */
+  xbalanque:[
+    "Itzpapalotl meets him blade for blade, and for a moment the obsidian mountain rings like a ballcourt.",
+    "\"You fight like something that has already died once,\" she says, falling.",
+    "\"Twice,\" he says. The <strong class='teotl'>TEOTL</strong> of the glass hell follows him out.",
+    "Three. The old game, the old rules, a new court."
+  ],
   /* v874: Tlazolteotl's arc -- she walks down collecting the sins and desires of every
      layer, building toward a purification rite she intends to perform on Mictlantecuhtli
      himself, with or without his consent. Continues in GOD_ENDINGS_L9. */
@@ -2824,6 +2886,14 @@ const STORY_LINES_L4=[
   "Press on. The frozen peaks cannot hold you forever.",
 ];
 const GOD_ENDINGS_L4={
+  /* v911: Xbalanque -- the Hero Twin who already beat an underworld once, walking a
+     second one with the boredom of a returning champion. Continues in GOD_ENDINGS_L9. */
+  xbalanque:[
+    "Ixquimilli weighs him and finds the scales will not settle.",
+    "\"You are owed nothing and you are guilty of nothing. You simply refuse to stay dead.\"",
+    "\"That was always the trick,\" says Xbalanque, and takes the <strong class='teotl'>TEOTL</strong> of the cold hell.",
+    "Four. The blindfold stays on. Some things are better not seen coming."
+  ],
   /* v874: Tlazolteotl's arc -- she walks down collecting the sins and desires of every
      layer, building toward a purification rite she intends to perform on Mictlantecuhtli
      himself, with or without his consent. Continues in GOD_ENDINGS_L9. */
@@ -3005,6 +3075,14 @@ const STORY_LINES_L7=[
    of their own (design doc section 9). Unlike every other layer this is the END of the run,
    so the closing line has to read as terminal rather than as a descent to the next layer. */
 const GOD_ENDINGS_L9={
+  /* v911 */
+  xbalanque:[
+    "Cipactli comes apart, and Mictlantecuhtli rises from a throne he has not needed to leave in an age.",
+    "\"The Lords of Xibalba made the same mistake,\" says Xbalanque. \"They thought the court was theirs because they built it.\"",
+    "The God King of the Dead considers this, and then \u2014 slowly, like a man conceding a game rather than a war \u2014 he steps aside.",
+    "The full <strong class='teotl'>TEOTL</strong> returns. Xbalanque climbs out of the ninth hell for the second time in his existence, and does not look back at it.",
+    "Somewhere above, a second light takes its place beside the first."
+  ],
   quetzalcoatl:["Cipactli comes apart, and Quetzalcoatl watches the pieces settle with something close to grief. He helped make the world out of a body like that.","Mictlantecuhtli kneels. “You came for bones once. What is it this time?”","“The same thing,” the serpent says. “Something to build with.”","The <strong class='teotl'>TEOTL</strong> of the God King rises into him like breath drawn after a long dive.","He goes up out of the smoke carrying nine layers of names, and drops none of them."],
   tlaloc:["The last of Cipactli goes still, and water finds it within moments. Water always does.","Mictlantecuhtli kneels in the wet. “Nine rivers, rainmaker. You crossed every one.”","“They were mine before they were yours,” Tlaloc says, and it is not a boast. It is a fact about rain.","The <strong class='teotl'>TEOTL</strong> of the God King sinks into him the way rain sinks into stone — slowly, and forever.","Above, the thirteen heavens are dry. He has never been there. He is curious."],
   coatlicue:["Cipactli is unmade limb from limb, and Coatlicue does not look away. She has buried worse. She has borne worse.","Mictlantecuhtli kneels before the mother of gods. “You could have stayed above.”","“My children are down here,” she says. “All of them end up down here.”","The <strong class='teotl'>TEOTL</strong> of the God King settles into her skirt of serpents without a sound.","She climbs, and the earth she is made of climbs with her."],
@@ -3028,6 +3106,21 @@ const GOD_ENDINGS_L9={
   _default:["Cipactli comes apart, limb from limb, and the God King of the Dead kneels at last.","The <strong class='teotl'>TEOTL</strong> of Mictlantecuhtli himself passes into you.","Nine layers. Nine rivers, all of them behind you now.","The smoke thins. You have crossed the whole of Mictlan — and you are still standing.","Every river forded, every god unmade, every death carried back up — all of it settled into you on the way down. You are not what began this descent.","The dead have no more to teach you. Mictlan is behind you, and above it the thirteen heavens turn.","Somewhere in the highest of them, <strong class='teotl'>OMETEOTL</strong> is waiting to see what you have become."],
 };
 const GOD_ENDINGS_L8={
+  /* v926: Chicomecoatl -- the one who feeds, arguing her way down through gods who take. */
+  chicomecoatl:[
+    "The black water stills, and Tlazoltéotl looks up from what she has been eating.",
+    "\"Filth and harvest,\" the goddess of refuse says. \"Sister, we are the same trade. I take what rots and you take what grows out of it.\"",
+    "Chicomecoatl does not argue. She has known that longer than Tlazoltéotl has.",
+    "The <strong class='teotl'>TEOTL</strong> of the crossing goes with her. Eight hells. One field left to sow."
+  ],
+  /* v911: Xbalanque -- the Hero Twin who already beat an underworld once, walking a
+     second one with the boredom of a returning champion. Continues in GOD_ENDINGS_L9. */
+  xbalanque:[
+    "The black water parts for something wearing his own shape, and he cuts it down without slowing.",
+    "Xibalba tried this too. Copies, riddles, a house full of knives. It did not work then either.",
+    "The <strong class='teotl'>TEOTL</strong> of the crossing is his, and there is only one hell after this one.",
+    "Eight. Somewhere below, the God King of the Dead is arranging a court he has already outwitted once."
+  ],
   /* v874: Tlazolteotl's arc -- she walks down collecting the sins and desires of every
      layer, building toward a purification rite she intends to perform on Mictlantecuhtli
      himself, with or without his consent. Continues in GOD_ENDINGS_L9. */
@@ -3045,6 +3138,21 @@ const GOD_ENDINGS_L8={
   mictlantecuhtli:["Tlazoltéotl kneels in the black water and eats the filth of the crossing, as she always does.","“You are almost there, lord. Ask me the question.”","“Is she below me?” — “Everything is below you. That is what being God King means. It is also the problem.”","The <strong class='teotl'>TEOTL</strong> of the eater of filth settles in him, heavy as silt.","Eight layers. One left — and the thing on his throne is in it. So, he is nearly certain, is she."],
 };
 const GOD_ENDINGS_L7={
+  /* v926: Chicomecoatl -- the one who feeds, arguing her way down through gods who take. */
+  chicomecoatl:[
+    "Mayahuel sets down her cup. \"Maize and maguey. The two halves of every meal in the world.\"",
+    "\"And you drank yours,\" says Chicomecoatl, not unkindly, taking the seventh hell from her hands.",
+    "The <strong class='teotl'>TEOTL</strong> of the heart-eating forest settles into her like grain into a granary.",
+    "Seven. Two hells left, and she is still counting what she has left to give away."
+  ],
+  /* v911: Xbalanque -- the Hero Twin who already beat an underworld once, walking a
+     second one with the boredom of a returning champion. Continues in GOD_ENDINGS_L9. */
+  xbalanque:[
+    "Mayahuel offers the cup before the fight and again after.",
+    "He takes it the second time. \"To the brother who is not here,\" he says, and drinks.",
+    "The <strong class='teotl'>TEOTL</strong> of the heart-eating forest warms going down.",
+    "Seven. Two hells left. He has done this walk before, and it ended in the sky."
+  ],
   /* v874: Tlazolteotl's arc -- she walks down collecting the sins and desires of every
      layer, building toward a purification rite she intends to perform on Mictlantecuhtli
      himself, with or without his consent. Continues in GOD_ENDINGS_L9. */
@@ -3075,6 +3183,21 @@ const STORY_LINES_L6=[
   "He marks you, and smiles, and reaches for a dart.",
 ];
 const GOD_ENDINGS_L6={
+  /* v926: Chicomecoatl -- the one who feeds, arguing her way down through gods who take. */
+  chicomecoatl:[
+    "The arrow-rain stops. Opochtli lowers his atlatl over an empty shore.",
+    "\"You take from the water,\" says Chicomecoatl. \"I give to the field. Both of us are feeding people who will never know our names.\"",
+    "The <strong class='teotl'>TEOTL</strong> of the pierced shore passes between them without a struggle.",
+    "Six hells fed. She has not gone hungry once, and neither has anyone walking with her."
+  ],
+  /* v911: Xbalanque -- the Hero Twin who already beat an underworld once, walking a
+     second one with the boredom of a returning champion. Continues in GOD_ENDINGS_L9. */
+  xbalanque:[
+    "Opochtli fills the sky with arrows. Not one of them finds him.",
+    "\"How,\" the hunter says, more curious than beaten.",
+    "\"You aimed at where a man would be.\" The <strong class='teotl'>TEOTL</strong> of the pierced shore comes away clean.",
+    "Six. The blowgun rides easier at his hip than it did."
+  ],
   /* v874: Tlazolteotl's arc -- she walks down collecting the sins and desires of every
      layer, building toward a purification rite she intends to perform on Mictlantecuhtli
      himself, with or without his consent. Continues in GOD_ENDINGS_L9. */
@@ -3094,6 +3217,21 @@ tonatiuh:["Opochtli’s net falls slack, and the black water goes still around y
   mictlantecuhtli:["The arrows stop falling. Opochtli lowers his net and bows, which few things in Mictlan bother to do.","“I have fished these waters a long time, lord. Lately something else is fishing them.”","“Describe it.” — “It looks like you. That is the trouble.”","The <strong class='teotl'>TEOTL</strong> of the left-handed one comes to him.","Six layers. Now he knows the shape of the thing, and he does not slow down."],
 };
 const GOD_ENDINGS_L5_MAL={
+  /* v926: Chicomecoatl -- the one who feeds, arguing her way down through gods who take. */
+  chicomecoatl:[
+    "Malinalxochitl falls among the banners, and the desert of flags goes quiet.",
+    "Chicomecoatl kneels and pushes a maize kernel into ground that has never held one.",
+    "It will not grow. She plants it anyway — that has always been the point.",
+    "The <strong class='teotl'>TEOTL</strong> of the desert of flags follows her, and something green trails behind her feet."
+  ],
+  /* v911: Xbalanque -- the Hero Twin who already beat an underworld once, walking a
+     second one with the boredom of a returning champion. Continues in GOD_ENDINGS_L9. */
+  xbalanque:[
+    "Malinalxochitl calls the desert against him and the banners answer her.",
+    "He waits it out. Sorcery tires. Twins do not.",
+    "The <strong class='teotl'>TEOTL</strong> of the desert of flags settles on his shoulders like a won wager.",
+    "Five. Halfway down, or halfway back. He has never been sure which."
+  ],
   /* v874: Tlazolteotl's arc -- she walks down collecting the sins and desires of every
      layer, building toward a purification rite she intends to perform on Mictlantecuhtli
      himself, with or without his consent. Continues in GOD_ENDINGS_L9. */
@@ -3122,6 +3260,21 @@ const GOD_ENDINGS_L5_MAL={
   mictlantecuhtli:["Malinalxochitl falls in her desert of flags, delighted rather than afraid.","“The God King, walking! Someone has finally frightened you.”","“Someone has finally interested me,” he says.","The <strong class='teotl'>TEOTL</strong> of the sorceress winds around his wrist.","Five layers inspected. Whatever is wearing his crown is wearing it further down."],
 };
 const GOD_ENDINGS_L5_XIU={
+  /* v926: Chicomecoatl -- the one who feeds, arguing her way down through gods who take. */
+  chicomecoatl:[
+    "The turquoise gale dies, and the heat goes out of the sand.",
+    "\"You burn everything to keep one hearth lit,\" she tells the fallen lord of the year.",
+    "\"I feed everyone and keep nothing. We are not so different, and you are still wrong.\"",
+    "The <strong class='teotl'>TEOTL</strong> of the hot hell cools in her hands like bread out of the oven."
+  ],
+  /* v911: Xbalanque -- the Hero Twin who already beat an underworld once, walking a
+     second one with the boredom of a returning champion. Continues in GOD_ENDINGS_L9. */
+  xbalanque:[
+    "The turquoise fire takes him whole and he steps out of it unhurried.",
+    "He and his brother chose the fire once. It has no leverage left over him.",
+    "The <strong class='teotl'>TEOTL</strong> of the hot hell goes quietly.",
+    "Five. Four hells to go, and the one at the bottom already knows his name."
+  ],
   /* v874: Tlazolteotl's arc -- she walks down collecting the sins and desires of every
      layer, building toward a purification rite she intends to perform on Mictlantecuhtli
      himself, with or without his consent. Continues in GOD_ENDINGS_L9. */
@@ -3170,6 +3323,13 @@ function layer2Unlocked(){return Object.keys(V).some(k=>k.startsWith('layer2_')&
    on an L9 clear, so the flag is per-god rather than per-account -- exactly what a completion
    marker wants. */
 function godConquered(id){return !!(V&&V['layer9_'+id]);}
+/* v910: does Xbalanque show up at the Layer 8 boss? Both LOCKED conditions, and note this is the
+   APPEARANCE gate -- becoming PLAYABLE additionally requires beating him, which sets
+   'xbalanque_unlocked' in godUnlocked() below. */
+function xbalanqueShouldAppear(){
+  if(typeof layer8Unlocked==='function'&&!layer8Unlocked())return false; /* Apanohualoyan cleared at least once */
+  return (G._noCasualtyLayers||0)>=3;
+}
 function godUnlocked(id,vSrc){
   const _v=vSrc||V;
   const _scan=pfx=>Object.keys(_v).some(k=>k.indexOf(pfx)===0&&_v[k]);
@@ -3192,6 +3352,7 @@ function godUnlocked(id,vSrc){
     case 'cihuacoatl':     return _flag('cihuacoatl_unlocked');
     case 'mictlantecuhtli':return _scan('layer9_'); // v808: a full Mictlan clear, any patron
     case 'tonatiuh':       return _flag('tonatiuh_unlocked');
+    case 'xbalanque':      return _flag('xbalanque_unlocked'); /* v906: set only by BEATING him at L8 B8 -- that encounter is not wired yet, so this stays false outside debug */
     default: { const gd=(typeof GODS!=='undefined')?GODS.find(g=>g.id===id):null; return gd?!gd.locked:false; }
   }
 }
@@ -3523,12 +3684,59 @@ function debugJumpL5B7(){
   notify('🧪 L5 B8 Shop — Continue leads to boss choice','#ff8040');
   showShop();
 }
+/* v913: force the scripted Layer 8 replacement. Sets BOTH appearance conditions -- the
+   Apanohualoyan clear that layer8Unlocked() reads, and the three-clean-layer streak -- then jumps
+   to the L8 boss. Xbalanque still arrives the normal way, at the top of round 2 via
+   runXbalanqueEntrance(), so this exercises the real script rather than bypassing it.
+   Play round 1 against Tlazolteotl WITHOUT killing her; kill her in round 1 and the swap is
+   correctly skipped, which is itself worth testing. */
+function dbgForceXbalanque(){
+  /* v914: the streak was being set BEFORE debugJumpBoss(), which calls initG() and rebuilds G
+     from scratch -- so G._noCasualtyLayers was back to 0 by the time the encounter was built and
+     xbalanqueShouldAppear() answered false. The run-scoped flags have to be written AFTER the
+     jump. markV writes to V (persistent), so that half was always fine either way. */
+  debugJumpBoss(8);
+  G._noCasualtyLayers=3;
+  G._layerCasualty=false;
+  G._xbalanqueDone=false;
+  G._xbalanquePending=0; /* the encounter builder sets this when the boss set is assembled */
+  try{saveRun();}catch(e){}
+  notify('\u{1F406} Streak forced \u2014 survive round 1 and he appears','#c090ff');
+}
+/* v917: v915 and v916 persisted debug unlocks into real saves. This scrubs them back out --
+   every layer9_ stamp (which is what puts a star on each god and unlocks Mictlantecuhtli) plus the
+   flag-style unlocks, leaving genuinely earned progress from actual runs alone is NOT possible to
+   distinguish, so this is an explicit "reset my unlocks" rather than a surgical repair. */
+function dbgClearDebugUnlocks(){
+  const hits=Object.keys(V).filter(k=>k.indexOf('layer9_')===0)
+    .concat(['mictlantecuhtli_unlocked','xbalanque_unlocked'].filter(k=>V[k]));
+  if(!hits.length){notify('Nothing to clear \u2014 no Mictlan stamps found','#80c080');return;}
+  showMo('\u{1F9F9}','Clear Mictlan Stamps',
+    `This removes <strong>${hits.length}</strong> flag${hits.length>1?'s':''}: every <em>layer9_</em> conquest stamp (the \u2605 on each god card), plus Mictlantecuhtli and Xbalanque as patrons.<br><br><span style="color:#e0a060">There is no way to tell a debug-seeded stamp from one you genuinely earned, so this clears them all.</span> Everything else \u2014 DT nodes, TEOTL, other gods \u2014 is untouched.`,
+    [{label:'\u{1F9F9} Clear Them',cls:'btn-sac',fn:()=>{
+      hits.forEach(k=>{delete V[k];});
+      saveV();loadV();
+      notify('\u{1F9F9} Cleared '+hits.length+' flag'+(hits.length>1?'s':'')+' \u2014 reopen the god select to see it','#c090ff');
+      if(typeof renderGods==='function'&&document.getElementById('god-grid'))renderGods(); /* v918: matches dbgRelockGod's own refresh call */
+    }},{label:'Cancel',fn:()=>{}}]);
+}
 function debugJumpBoss(layer){
+  /* v917: REGRESSION FIX for v915. The seeds below were historically dead -- saveV() had been
+     swallowed by a trailing comment, so loadV() on the next line discarded them. v915 restored the
+     saveV() and the seeds started working... by writing every debug unlock into the player's REAL
+     persistent save. A single boss test then granted Mictlantecuhtli and stamped a Mictlan clear
+     against all 21 gods.
+     Both behaviours were wrong. The seeds are for the session only: they exist so a boss test has
+     a full roster to draw on, not so the account inherits it. Seeding AFTER loadV() gives them
+     effect without persistence -- nothing calls saveV(), so they vanish on reload, which is
+     exactly right for a debug jump. */
+  G.dte=getDTEffects();initG();loadV();
   GODS.forEach(g=>{V[g.id]=true;V['layer2_'+g.id]=true;V['layer3_'+g.id]=true;V['layer4_'+g.id]=true;V['layer5_xiu_'+g.id]=true;V['layer5_mal_'+g.id]=true;});
   V['chicomecoatl_unlocked']=true;V['mixcoatl_unlocked']=true;V['xochipilli_unlocked']=true;V['patecatl_unlocked']=true;V['tonatiuh_unlocked']=true;V['cihuacoatl_unlocked']=true;
-  /* v769: L1/L6/L7/L8 flags were never seeded here, so Xolotl, Opochtli, Mayahuel and Tlazolteotl were absent from Mictlantecuhtli's account-scoped summon roster in every boss test. */
-  GODS.forEach(g=>{V['layer1_'+g.id]=true;V['layer6_'+g.id]=true;V['layer7_'+g.id]=true;V['layer8_'+g.id]=true;V['layer9_'+g.id]=true;}); // v808: layer9_ unlocks MictlantecuhtlisaveV();
-  G.dte=getDTEffects();initG();loadV();
+  /* v769: L1/L6/L7/L8 flags -- without these, Xolotl, Opochtli, Mayahuel and Tlazolteotl were
+     absent from Mictlantecuhtli's account-scoped summon roster in every boss test. */
+  GODS.forEach(g=>{V['layer1_'+g.id]=true;V['layer6_'+g.id]=true;V['layer7_'+g.id]=true;V['layer8_'+g.id]=true;V['layer9_'+g.id]=true;});
+  /* v917: deliberately NO saveV() here -- see the note above. */
   const _selId=(document.getElementById('dbg-boss-patron')||{}).value||'huehueteotl';
   const patron=GODS.find(g=>g.id===_selId)||GODS.find(g=>g.id==='huehueteotl')||GODS[0];
   G.god=patron;G.party=[patron.id];G.levels['god_'+patron.id]=100;
@@ -4407,7 +4615,16 @@ function unitBaseFor(key){
 // v666: the (lv>=50?1.30:1) gate was removed — it fired on the same level as _lvCostMult's
 //       1.25->1.5 step, compounding to +58% in a single level. _lvCostMult now carries Lv50 alone.
 function npLevelCurve(bc,lv){
-  return (bc+Math.floor(lv/2)+Math.floor(lv/20))*(lv>35?1.20:1)*(lv>20?1.25:1)*(lv>20?1.10:1)*(lv>40?1.05:1)*(lv>=60?1.05:1);
+  /* v925: the multiplier stack stops at 60, so from there to 100 cost grew only on the near-linear
+     (bc + lv/2 + lv/20) term while TP pools keep climbing -- specials got steadily cheaper in real
+     terms across the whole endgame.
+     v928: a RAMP rather than more steps. Every other multiplier here is a cliff -- crossing 71 with
+     two of them would have added +11 then +14 in a single level, which is what "drastic" looks
+     like. 1% compounding per level past 70 lands on the same targets (x1.10 by 80, x1.22 by 90)
+     while the biggest single-level increase in the whole band is about +2. It also keeps growing
+     past 90 instead of flattening, which is where the erosion was worst. */
+  const lateRamp=Math.pow(1.01,Math.max(0,lv-70));
+  return (bc+Math.floor(lv/2)+Math.floor(lv/20))*(lv>35?1.20:1)*(lv>20?1.25:1)*(lv>20?1.10:1)*(lv>40?1.05:1)*(lv>=60?1.05:1)*lateRamp;
 }
 function baseNpCostFromObj(b,lv,isGod){
   const bc=isGod?(b.npCost||14):(b.npCost||9);
@@ -4720,7 +4937,47 @@ function applySyn(units){
     addLog(`<span class="log-elem">✦ Elemental Synergy: +${Math.round(pct*100)}% ATK/MAG/DEF/RES to ${azureZephyr?'fire and wind':patronElem} units (${count} bond${count>1?'s':''})!</span>`);
   }
 }
+/* v909: what counts as a GOD for Godbane Blowgun's 2x. Genaro's ruling: layer bosses,
+   Mictlantecuhtli and the gods he summons in both phases, and anything matching a playable god.
+   Four separate marks are needed because none of them covers the others:
+     - isGod        player-side gods (matters only if this is ever mirrored onto an enemy caster)
+     - isBoss       every layer boss, Cipactli's parts included
+     - _summonedGod set by the Mictlantecuhtli summon path, which STRIPS pk and rebuilds HP, so a
+                    summoned god does not carry isGod and would otherwise be missed
+     - id match     any remaining enemy built from a GODS template; runtime ids look like
+                    'boss_tlazolteotl_8' or 'mixcoatl_9_ab3', so the prefix and the numeric/random
+                    suffixes come off before the lookup.
+   Shared rather than inlined so the enemy handler below and the player one can never disagree. */
+function isGodTarget(t){
+  if(!t)return false;
+  if(t.isGod||t.isBoss||t._summonedGod)return true;
+  let base=String(t.baseGodId||t.id||'').replace(/^boss_/,'');
+  base=base.replace(/_[a-z0-9]{2,4}$/,'').replace(/_\d+$/,'');
+  return (typeof GODS!=='undefined')&&GODS.some(g=>g.id===base);
+}
 function applyAff(units){
+  /* v908: Nullifidian Rage (Xbalanque). +7% to all FIVE stats per vassal in the party, to every
+     ally -- gods included. The god penalty in the original sketch was cut during design so the
+     passive would not restrict team building, and the vassal rate was raised 5% -> 7% to
+     compensate [LOCKED in the Layer 8 doc].
+     Counts deployed non-god allies, not the whole roster, so it rewards actually fielding vassals.
+     HP scales maxHp and currentHp together: this runs at battle start when the unit is at full,
+     and moving only maxHp would open every fight already wounded.
+     Placed at the top of applyAff so Divine Strength and Pantheon Boost multiply the raised
+     values, matching how those already compound with each other. */
+  if(hasPassive('nullifidianRage')){
+    const vassals=units.filter(u=>u&&u.isAlly&&!u.isGod&&u.currentHp>0).length;
+    if(vassals>0){
+      const m=1+0.07*vassals;
+      units.filter(u=>u&&u.isAlly).forEach(u=>{
+        u.maxHp=Math.round((u.maxHp||0)*m);
+        u.currentHp=Math.min(u.maxHp,Math.round((u.currentHp||0)*m));
+        u.atk=Math.round((u.atk||0)*m);u.mag=Math.round((u.mag||0)*m);
+        u.def=Math.round((u.def||0)*m);u.res=Math.round((u.res||0)*m);
+      });
+      addLog(`<span class="log-god">\u{1F406} Nullifidian Rage: \u00d7${m.toFixed(2)} HP/ATK/MAG/DEF/RES \u2014 ${vassals} vassal${vassals>1?'s':''} at his back!</span>`);
+    }
+  }
   const dtMult=G.dte.godStatsMult;
   if(dtMult>1){
     units.filter(u=>u.isGod).forEach(u=>{
@@ -4873,6 +5130,9 @@ const GOD_SELECT_DESC={
 // smooth:false → pixelated/crisp  |  smooth:true → browser bilinear
 // mix-blend-mode:screen removes the black background on dark cards
 const GOD_PORTRAITS={
+  /* v906: Xbalanque, 64x64 Piskel ABGR export decoded to PNG. The boss_ alias loop below derives
+     'boss_xbalanque' from this key automatically, so the L8 encounter gets the art for free. */
+  xbalanque:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAGyElEQVR42t1bP2gbZxT/nbHkOoGAB5dWxlzAg4amARe0GHmSEQG7LWhzloAJJUMa0qSh9eYtgxMnpB5MqFOyxEsxlKYQhEUHCy+CFtwsHlwiTEK4DoFAkkYaroP0Pr17uu90dzpLp34g7u93vt/v/b733vfus4EYtVwia9N+qV42evE3hxCztlPb7enfix0Bc8lZ7J3fd6jBq1nTph07+Xqd8/usUWvcpv65RNaWP05ALEjgL0b71rRp64iRQFxJuHCK36d+sl/fSRi9cMqmlyDgtC+B5hJZ29o07S/OjNjWpvs9GiVoCeiGhKEowGN1BObZVwCArTNHAIDFp5PY2jjCyXQFWxtHyupbG0eO/nTPyXQFkigAmJlI+3qPD/+sGmF8gsGBvHv42vANmtrqCHDjPQCguj/mAC/b+NIzfPnpB/jxm48AABfvvFT7ALB4aVKFv1wia/OIMJecdTxLFyatadMmMnwrgKzoAKYBTvdidaRxsgmejiX4i3deOp7xy1//qnMEfvHSpAO8ru09P1C/sA5WtuFQ1ibQ/LzG8g5r43Qb8DBJz8xEukHChJMEek4QFQxLIKMQKuCWvvHeeUz7XAlM2lziUuoAsFK82jiRh+1GgpQ9+YO95wdqOzORRiZ/iEpxSvmCIH7AaLO0lLYkQoJv3vfu4WvDzclxQjjwlfxdAEAmfwgACkAnNeQSWZsI4MQQCaV6WRHgRwWGVurSsszZ8X3uODkB0sGR5Qk8Obi55KwigYjwSwIpgsBzJRARnATpN0r1smFwJ9hmeQ+r6yKGTgWcBP6imfwhbj5+geWFlC8CcomsXaqXjVwiaxNx1F+SsHd+HzOPzrac6Pn9hmIenUWpXgYAY1iBF968zfoaq7s1aX15zAHzlw/qECvFKcfkicBzoLSvhgsDDwBG29h3CW1+gXcaBhfvvMSbg4yyOgBFRBD5y4SLnkcTKQK6U9tV50gJHHxnHxAAeJAhsFK8it9ufe1wfn6tT9K/9iLZeubTSYfkpQKY1R2Y2w4kGUGA8xc8ma44wqBbxkchkIiY//YHrOTvakkgy3OHSSRwAqT0peS1USDKWaFOAZwImQtQWJQEuAHXOc1cImtz4G6S7wkBcrLj5RSJiK2No7Z0mHt6As79hpvPkCTs1HZhGEZvCdjLb7e8brGgvVfOGd4cZEAhjlvdzWF6Oc0gJBjHZX1Ogjan15BDoW15IeWQux/wkoSeESBTVL/zeE7WTLGAndquAu5mdb/h0i8Jw1GBz+QPgeYsjU9Y/M3unEogqxMJHHiQZKlULxu5Rw0S5MQqEgWQ5GXhIgh43t6OW67WD5Mlur2nW3+jW6tLa/G0NmiTk6IgCdKxFUQ8Ja+RLF27VkhibbvmSFoAYC1Va7seVubdNiMK8NS49TkJWAdwGW1bDr7XwCNxgjJEObxzsUHU+NIzLG+ncG09qcCvpWq4ufQC2E75KnQeZxuKCnyntpaqtcAH7BtbBbiNXZ4MVYpTzfDTuLYmih8DTQDP0lQFplP2Vyw0S2DhEptYKqBSnHJkcn4yPhQLjpA3UAoo1csGObi55Cz28tsKOE1ubp+r4PqTjNq26gCFFhExISGUAogEAk/lKS/wjjJWsRArEkIlQqPzlk1feq1NU30RtjZN+7vnlmPLr4/OW6ovbaP6zNXTMMjb2FIVY39UGwfrwPWFjGOL9cYlM1XBlfvxMuZQFOCV/B9XtPeZqUos1Rz5GqHbjysNsJfh/AG4ch+49xVQLWT6ngFGFgZfPTAxtlTFqwcm7jWjnAQIAPjpE9wDUC2ciJUCupoOqyjAq8Drmg6XAfPzt6j+egKLlyZV+Oyn9UMD54uhuCeXUcCxz9YMUR/5vNgrgFd8edYXNBPU9e2HGoww4FUtr5nQEKBOcwF+H/WV12NfD3B78cBzAR/PjC0BOotzEH72gygntkPAy4I6cF7W7scQCO0EJVC/PkAtYojB+A+VB7its6FCaadyOH314RWkfmeDXf9Rt7U6stLDvyHwilI/K0GRJkayfT//cdsCaTrPt/1MgCIFT4C8wEmiJEkDSwAHT0239J0rgH79JmE4irFPY7rV9M7Q65v//6IeMGiObahb64exptu3/4EZAlL6/MuPVzzn5XSuloEjQL44L4nTej0//eeSs2y1Z9YeuC9DfKlqUPLc+tIi6IEIfbu//6yqO9SsabNjWJN9KSz66RsrJ5j++zpWileRyR9ieSGFfz47rT57Z/KHnv/Pw/sCCNQ3NpMhKoLSKk9dc1vFGbZv7HwAtSe1svbauaT3uO6mb2ymw52aXPsbtu9xtf8ATfO8FULH7skAAAAASUVORK5CYII='},
   /* v781: Cipactli's five parts, 64x64 Piskel ABGR exports. Keys are the bare part names
      because unitIconHtml strips 'boss_' and a trailing _<digits>, so the runtime id
      'boss_cipactli_head_2' reduces to 'cipactli_head'. The boss_ alias loop below then
@@ -5001,7 +5261,7 @@ function renderGods(){
     d.className='god-card'+(chosen?' chosen':'')+(locked?' locked':'');
     if(locked){
       if(lockedShown>=maxLockedVisible){return;} lockedShown++;
-      d.innerHTML=`<div style="font-size:28px;margin-bottom:4px">❓</div><div style="font-size:12px;font-weight:500;color:var(--td)">???</div><div style="font-size:10px;color:var(--td);font-style:italic;margin-top:2px">Unknown deity</div><div style="font-size:10px;color:#4a3a18;margin-top:5px">🔒 ${gd.unlockCriteria}</div>`;
+      d.innerHTML=`<div style="font-size:28px;margin-bottom:4px">❓</div><div style="font-size:13px;font-weight:600;color:#8a7a5a">???</div><div style="font-size:11px;color:#6a5c42;font-style:italic;margin-top:2px">Unknown deity</div><div style="font-size:11px;color:#a8905a;margin-top:6px;line-height:1.35;padding:0 4px">🔒 ${gd.unlockCriteria}</div>`;
       d.onclick=()=>{
         const panel=document.getElementById('god-detail-panel');if(panel)panel.style.display='none';
       };
@@ -5373,6 +5633,11 @@ function buildEnemySet(bn,diff){
         maxNP:bn8,currentNP:bn8,enemyLevel:lv8,isAlly:false};
       const gp=getApanoPool();const guard=[];
       for(let i=0;i<7;i++){const c=gp[Math.floor(Math.random()*gp.length)];guard.push(mkEnemy(c,i+1,0.95,lv8));} // v728: 4->7 honour guard
+      /* v912: arm the scripted replacement. Only the FLAG is set here -- Xbalanque is not built
+         until the end of round 1, so a player who loses to Tlazoltéotl never sees him and the
+         round-1 fight is untouched. lv8 is captured for the build. */
+      G._xbalanquePending=xbalanqueShouldAppear()?lv8:0;
+      G._xbalanqueDone=false;
       return[boss8,...guard.filter(Boolean)];
     }
     if(isL7){
@@ -7683,7 +7948,38 @@ function orderEnemyTurns(list){
   }
   return arr;
 }
+/* v912: Xbalanque's scripted entrance. The LOCKED rule from the design doc is absolute -- if
+   G.enemies is ever empty, even for an instant, buildRoundQueue fires the victory screen mid
+   cutscene. So the order here is: PUSH Xbalanque first, and only then kill Tlazoltéotl. The array
+   goes 1 -> 2 -> 1 and never touches zero.
+   Runs at the START of round 2, before the aE snapshot below, so the queue is assembled with him
+   already present and Tlazoltéotl already gone. Statuses and buffs on her are deliberately lost;
+   he inherits nothing, which the doc calls out as intended. */
+function runXbalanqueEntrance(){
+  if(!G._xbalanquePending||G._xbalanqueDone)return;
+  if((G.roundNum||0)<1)return;                     /* round 1 must have been played */
+  const her=(G.enemies||[]).find(e=>e&&e.id==='boss_tlazolteotl_8'&&e.currentHp>0);
+  if(!her)return;                                  /* she already died -- no swap, no Xbalanque */
+  const lv=G._xbalanquePending;
+  const T=XBALANQUE_BOSS_TPL;
+  const hp=Math.round(sc(T.hp||0,lv)*(typeof diffHpMult==='function'?diffHpMult(G.chosenDifficulty):1)*((getTecpatlEffects().bossHpMult)||1));
+  const np=Math.round(sc(T.np||58,lv));
+  const x={...T,id:'boss_xbalanque_8',maxHp:hp,currentHp:hp,
+    atk:Math.round(sc(T.atk||0,lv)*(G.chosenDifficulty==='hard'?1.1:1)),mag:0,
+    def:Math.round(sc(T.def||0,lv)),res:Math.round(sc(T.res||0,lv)),
+    maxNP:np,currentNP:np,enemyLevel:lv,isAlly:false};
+  G.enemies.push(x);                               /* STEP 1 -- array is now 2+ */
+  fxSummon&&fxSummon(x.id);
+  her.currentHp=0;                                 /* STEP 2 -- only now is she removed */
+  G._unitStates=G._unitStates||{};G._unitStates[her.id]='slain';
+  G._deathProcessed=G._deathProcessed||new Set();G._deathProcessed.add(her.id);
+  G.captureProcessed=G.captureProcessed||new Set();G.captureProcessed.add(her.id);
+  G._xbalanqueDone=true;G._xbalanquePending=0;
+  addLog('<span class="log-ab">\u{1F406} A dart takes Tlazolt\u00e9otl through the throat. She does not finish falling before he is already standing where she stood.</span>');
+  addLog('<span class="log-god">\u{1F406} <strong>XBALANQUE</strong> \u2014 the Twin who beat an underworld once \u2014 takes the field.</span>');
+}
 function buildRoundQueue(){
+  runXbalanqueEntrance(); /* v912: BEFORE the aE snapshot below */
   G._belicCascading=false; // safety: any unfinished cascade from prior round is cancelled
   if(G.captureQueue.length&&!G.capActive){processNextCap();return;}
   const aP=G.units.filter(u=>u.currentHp>0);
@@ -8780,11 +9076,11 @@ function isAoeOrAutoSpecial(actor){
   // v535: oblated specials route on the oblated ak, so a single-target oblated special
   // (e.g. a patron holding Cihuacoatl's kit) no longer forces the AoE/auto path.
   const ak=(actor.isGod&&G._useOblationSpecial&&G._oblationAk)?G._oblationAk:(gd?.ak||'');const ab=actor.ability||'';
-  if(actor.isGod)return['deluge','ophidianMother','cripplingShock','obsidianStorm','holyHarvest','patolliGamble','miseryBlizzard','torridTornado','torridTornadoBoss','peyoteConcoction','sheWhoEatsFilth','sinistralMinacachalli','cihuateteoFury','mictlanClaspPlayer'].includes(ak); // v811: Mictlan Clasp is a 6-target AoE -- absent from this list it fell through to the single-target path and asked for a target // v713: sheWhoEatsFilth is a party heal — it was falling through to the targeted path
+  if(actor.isGod)return[/* v919: Godbane Blowgun re-rolls a random living target for each of its 5 darts, so it needs no target prompt -- without this it fell through to the single-target path and asked the player to pick one. */'godbaneBlowgun','deluge','ophidianMother','cripplingShock','obsidianStorm','holyHarvest','patolliGamble','miseryBlizzard','torridTornado','torridTornadoBoss','peyoteConcoction','sheWhoEatsFilth','sinistralMinacachalli','cihuateteoFury','mictlanClaspPlayer'].includes(ak); // v811: Mictlan Clasp is a 6-target AoE -- absent from this list it fell through to the single-target path and asked for a target // v713: sheWhoEatsFilth is a party heal — it was falling through to the targeted path
   const aoeOrAuto=new Set(['Searing Stings','Writhing Bloom','Filthwater Plume','Drowning Grasp','Chitin Shell','Colony Sting','Voltaic Discharge','Bioluminescent Chorus','Jestress Nightmare','Atlatl Rush','Howling Gust','Magma Burst','Septic Howl','Murk','Thunder Crash','Collapse','Tremor','Death Bloom','Dark Waters','Earth Bloom','Gust Mend','Storm Mend',
     'Pollen Burst','Withering Touch','Uapantotli','Coil Crush','Toxic Bloom','Feeding Frenzy','Arrow Rain','Net Cast','Trident Lunge','Healing Rite','Mystical Shots','Surging Tide',
     'Craft Shard','Biting Draft','Permafrost','Iceburn Storm','Howling Chill','Burrow Mend','Ball Strike','Sun Dive','Sacred Arrow','Cleansing Steam','Prism Volley','Solar Pounce',
-    'Obsidian Storm','Shard Breath','Tectonic Slam','Haunt',
+    'Obsidian Storm','Shard Breath','Tectonic Slam','Haunt','Godbane Blowgun', /* v919 */
     // L4/L5 AoE abilities
     'Ash Surge','Solar Crush','Sandblast','Howling Drift','Virulent Gale','Death Screech','Fuming Wall','Wind Rush',
     // Multi-hit abilities fire automatically (random targets)
@@ -9118,7 +9414,14 @@ function resolveCap(enemyId,doCapture){
       const _vvM=(hasOffering('vulture_vessel')&&dead._killerAlly&&dead._killerElem==='nature')?1.15:1; // v657: 5% -> 15% (uncommon + conditional, must beat the two commons)
       const _baM=1+(((dead.woundStacks||0)>0)?(getOfferingEffects().bloodyArrow||0):0); // v582: Bloody Arrow — wounded kills bleed more
       const _bty=unitBounty(dead);const _gB=Math.round(_bty*G.dte.bloodBonus*_vvM*_baM),_gC=Math.round(_bty*0.6*G.dte.cacaoBonus*_vvM); // v657: bounty replaces HP-driven spoils
-      G.spoils.killed.push({unit:dead,blood:_gB,cacao:_gC,_idx:sidx});
+      /* v921: remember which offering paid, not just that the number came out higher. The
+         multipliers are computed here and then thrown away, so the spoils screen had no way to
+         show why one kill was worth more than the next -- a Vulture Vessel proc looked identical
+         to an ordinary kill unless you happened to know the base bounty. */
+      const _boosts=[];
+      if(_vvM>1)_boosts.push({icon:'\u{1F3FA}',label:'Vulture Vessel',pct:Math.round((_vvM-1)*100),col:'#c0a060'});
+      if(_baM>1)_boosts.push({icon:'\u{1FA78}',label:'Bloody Arrow',pct:Math.round((_baM-1)*100),col:'#e07070'});
+      G.spoils.killed.push({unit:dead,blood:_gB,cacao:_gC,_idx:sidx,boosts:_boosts});
       if(G.runStats)G.runStats.slain++; // v829: counted here rather than in handleDeath -- a slain enemy passes through both, and counting in both would double every kill
       addLog(`<span class="log-ca">${dead.icon} ${dead.name} slain.</span> <span class="log-gain">+${_gB} 🩸 +${_gC} 🫘</span>`);
       flashResGain(_gB,_gC);renderRes('rb-battle');
@@ -9398,6 +9701,25 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
     let selfF=0;
     if(hasPassive('uncleanPurification'))aa.forEach(a=>{if(a.currentHp>0){a.poisonStacks=Math.min(4,(a.poisonStacks||0)+1);selfF++;}});
     addLog(`<span class="log-heal">\u{1F33A} She Who Eats Filth! +${Math.round(healPct*100)}% HP + cleanse all \u2014 \u{1F922} Poison \u00d71 to ${pzF} ${pzF===1?'enemy':'enemies'}${selfF?` and ${selfF} ${selfF===1?'ally':'allies'}`:''}</span>`);
+  }
+  else if(gd.ak==='godbaneBlowgun'){
+    /* v909: player-side Godbane Blowgun. Mirrors the enemy version's shape -- 5 darts, each at a
+       freshly re-rolled living target, so darts land on whoever is still standing rather than
+       being wasted on a corpse. Not an AoE, so aoeCapFor does not apply and Chalchiuhtlicue's Hem
+       cannot widen it. bpn(u) and specialBoostMult are folded in the way the other player
+       specials do it, which the enemy version does not use. */
+    let tot=0,godHits=0,hits=0;
+    for(let i=0;i<5;i++){
+      const live=ae.filter(e=>e.currentHp>0);
+      if(!live.length)break;
+      const tgt=live[Math.floor(Math.random()*live.length)];
+      const isG=isGodTarget(tgt); if(isG)godHits++;
+      let raw=Math.max(1,Math.round(bpn(u)*(((u.atk||0)*0.5*(isG?2:1)-(tgt.def||0)*0.4)*(G.dte.specialBoostMult||1))));
+      if(rollCrit(0,false,u))raw=Math.round(raw*(u._critMult||2));
+      const h=applyArmorDamage(tgt,raw,false);onHitContact(u,tgt);
+      if(h>0){tgt.currentHp=Math.max(0,tgt.currentHp-h);tot+=h;hits++;animateHit(tgt.id,h,false,rollCrit._lc);if(tgt.currentHp<=0)handleDeath(tgt);}
+    }
+    addLog(`<span class="log-ab">\u{1F406} Godbane Blowgun! ${hits} dart${hits===1?'':'s'} for ${tot}${godHits?` \u2014 ${godHits} struck a god (\u00d72)`:''}</span>`);
   }
   else if(gd.ak==='sinistralMinacachalli'){
     let total=0,anyCrit=false;
@@ -11860,7 +12182,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
       const live=aa.filter(a=>a.currentHp>0);
       if(!live.length)break;
       const tgt=live[Math.floor(Math.random()*live.length)];
-      const isG=!!tgt.isGod; if(isG)godHits++;
+      const isG=isGodTarget(tgt); if(isG)godHits++; /* v909: was isGod only -- missed layer bosses and summoned gods */
       const dmg=critify(Math.max(1,Math.round((u.atk||0)*0.5*(isG?2:1)-(tgt.def||0)*0.4)),u,true);
       const h=applyArmorDamage(tgt,dmg,true);onHitContact(u,tgt);
       if(h>0){tgt.currentHp=Math.max(0,tgt.currentHp-h);tot+=h;hits++;G._animQueue.push({uid:tgt.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});if(tgt.currentHp<=0)handleDeath(tgt);}
@@ -13195,6 +13517,7 @@ function handleDeath(dead){
     G._unitStates[dead.id]='fallen';
     G.party=G.party.filter(id=>id!==dead.baseGodId);G.deadGods.push(dead.baseGodId);
     G.spoils.allyDeaths.push({unit:dead});
+    G._layerCasualty=true; /* v910: Xbalanque's no-casualty streak. A mid-battle DEATH only -- sacrifices never reach handleDeath, which is exactly the LOCKED definition. */
     addLog(`<span class="log-dd">💀 ${dead.name} fallen permanently!</span>`);
     notify(`${dead.name} fallen!`,'#e05050');
     if(dead.isPatron){setTimeout(()=>endBattle(false),600);return;}
@@ -13224,6 +13547,7 @@ function handleDeath(dead){
     if(diedKey&&!G.capturedDiedThisBattle.includes(diedKey))G.capturedDiedThisBattle.push(diedKey);
     G.deplSel=G.deplSel.filter(x=>x!==diedKey); // also remove from deplSel immediately
     G.spoils.allyDeaths.push({unit:dead});
+    G._layerCasualty=true; /* v910: Xbalanque's no-casualty streak. A mid-battle DEATH only -- sacrifices never reach handleDeath, which is exactly the LOCKED definition. */
     // v509: Death and Rebirth — first eligible death claims the rebirth (ally vassals & Tlaloques; gods excluded upstream)
     if(!G._darClaim&&hasPassive('deathAndRebirth')&&diedKey){
       G._darClaim={kind:'ally',key:diedKey,name:dead.name,icon:dead.icon};
@@ -13877,9 +14201,17 @@ function renderActionPanel(){
     // Special damage estimate — look up actual flat bonus from singleDmgMap
     const singleDmgRef={'Bone Shard':10,'Skull Flame':8,'Wail':8,'Thunder Yip':10,'Coil Crush':0,'Soul Drain':0,'Scorching Bite':12,'Seismic Bolt':16,'Static Bite':6,'Electro Bite':5,'Lightning Fang':8,'Life Siphon':0};
     const godSpecFlat={'seismicRoar':8,'ophidianMother':0,'deluge':0,'tlalocanDeluge':0,'featherEmbrace':0,'oldFire':20,'cripplingShock':0,'riverJudge':0,'obsidianStorm':14,'holyHarvest':0,'zappingStrike':0,'aurumBreak':0,'frostMacuahuitl':0};
-    const godSpecMult={'deluge':1.35,'tlalocanDeluge':1.35,'obsidianStorm':1.25,'aurumBreak':1.5,'frostMacuahuitl':1.5};
+    const godSpecMult={'deluge':1.35,'tlalocanDeluge':1.35,'obsidianStorm':1.25,'aurumBreak':1.5,'frostMacuahuitl':1.5,'cihuateteoFury':0.6,'cripplingShock':0.6,'featherEmbrace':1.5,'godbaneBlowgun':0.5,'mictlanClaspPlayer':0.5,'octliDrench':1.5,'oldFire':1.6,'seismicRoar':1.5,'sinistralMinacachalli':1.2,'zappingStrike':1.1}; /* v924: 12 patron abilities were missing, previewing at 1.0x */
     // Vassal ability mult overrides (for abilities that use a mult formula instead of base+flat)
-    const vassalSpecMult={'Rain Drop':1.3,'Soul Drain':1.3,'Life Siphon':1.35,'Coil Crush':1.4,'Wail':1.5,'Thorn Lash':1.5,'Vine Grasp':1.3,'Blood Drink':1.8,'Glass Cut':1.6,'Pollen Burst':1.1,'Ball Strike':0.55,'War Rhythm':1.2,'Heavy Cleave':1.3,'Razor Dive':1.3,'Haunt':1.3,'Venom Shade':1.3,'Thorn Mangle':1.5,'Ancient Crush':1.4,'Iceburn Storm':1.1,'Death Screech':1.4,'Shard Breath':1.2,'Tremor':1.3,'Withering Touch':1.25,'Tectonic Slam':1.05,'Howling Gust':1.4,'Murk':1.2,'Magma Burst':1.2,'Septic Howl':1.25,'Collapse':1.2,'Haunt':1.1,'Frost Macuahuitl':1.5,'Solar Crush':1.6,'Craft Shard':1.1,'Permafrost':1.6,'Biting Draft':1.2,'Howling Chill':1.05,'Ash Surge':1.1,'Sandblast':1.1,'Howling Drift':1.1,'Virulent Gale':1.1,'Obsidian Blade':2.0,'Sun Dive':1.25,'Solar Pounce':1.6,'Sacred Arrow':0.7,'Prism Volley':0.5,'Filthwater Plume':0.75,'Drowning Grasp':1.5,'Writhing Bloom':1.2,'Colony Sting':0.9,'Voltaic Discharge':1.5,'Gnaw the Fallen':1.9,'Abyssal Lure':1.3,'Fang Flash':1.3,'Descent from the Trees':1.5,'Jestress Nightmare':1.1};
+    const vassalSpecMult={'Rain Drop':1.3,'Soul Drain':1.3,'Life Siphon':1.35,'Coil Crush':1.4,'Wail':1.5,'Thorn Lash':1.5,'Vine Grasp':1.3,'Blood Drink':1.8,'Glass Cut':1.6,'Pollen Burst':1.1,'Ball Strike':0.55,'War Rhythm':1.2,'Heavy Cleave':1.3,'Razor Dive':1.3,'Haunt':1.3,'Venom Shade':1.3,'Thorn Mangle':1.5,'Ancient Crush':1.4,'Iceburn Storm':1.1,'Death Screech':1.4,'Shard Breath':1.2,'Tremor':1.3,'Withering Touch':1.25,'Tectonic Slam':1.05,'Howling Gust':1.4,'Murk':1.2,'Magma Burst':1.2,'Septic Howl':1.25,'Collapse':1.2,'Haunt':1.1,'Frost Macuahuitl':1.5,'Solar Crush':1.6,'Craft Shard':1.1,'Permafrost':1.6,'Biting Draft':1.2,'Howling Chill':1.05,'Ash Surge':1.1,'Sandblast':1.1,'Howling Drift':1.1,'Virulent Gale':1.1,'Obsidian Blade':2.0,'Sun Dive':1.25,'Solar Pounce':1.6,'Sacred Arrow':0.7,'Prism Volley':0.5,'Filthwater Plume':0.75,'Drowning Grasp':1.5,'Writhing Bloom':1.2,'Colony Sting':0.9,'Voltaic Discharge':1.5,'Gnaw the Fallen':1.9,'Abyssal Lure':1.3,'Fang Flash':1.3,'Descent from the Trees':1.5,'Jestress Nightmare':1.1,'Arrow Rain':0.9,'Atlatl Rush':1.4,'Atlatl Throw':1.6,'Bone Shard':1.7,'Carrion Breath':1.3,'Copper Axe':1.7,'Diving Gust':1.6,'Dolphin Dash':1.2,'Electro Bite':1.4,'Five-Rabbit Haze':0.9,'Flint Sting':1.6,'Gale Strike':1.9,'Gar Chomp':1.5,'Heart Feast':1.7,'Hollow Blow':1.2,'Lava Fang':1.7,'Lightning Fang':1.4,'Marlin Pierce':1.6,'Mystical Shots':1.2,'Net Cast':0.8,'Open the Chest':1.7,'Pack Surge':1.2,'River Poison':1.2,'Rot Gore':1.8,'Scorching Bite':1.3,'Searing Stings':1.1,'Seismic Bolt':1.6,'Shadow Cut':1.5,'Stale Gust':1.2,'Static Bite':1.3,'Tainted Draught':1.2,'Thunder Yip':1.6,'Toxic Bloom':1.2,'Venom Coil':1.5,'Wind Rush':1.3};
+    /* v924: the preview multiplier table had drifted badly out of step with the handlers.
+       35 vassal abilities were absent, so the action panel priced each of them at 1.0xATK
+       while the battle handler used the real figure -- Copper Axe showed 178-182 next to a
+       188-192 Strike when it actually hits for 1.7x. Every ability whose `ad` opens with an
+       explicit NxATK/NxMAG is now listed, taken from the ad string itself so the table and
+       the description cannot disagree. Boss-only kits are deliberately excluded: they never
+       render a player action panel.
+       SPLIT-LIST: a new vassal special needs an entry here as well as its handler. */
     // v579: 5-target vassal AoEs capped at 0.9x — wide coverage shouldn't also carry full power
     Object.keys(AOE_CAP_AB).forEach(function(_ab){if(AOE_CAP_AB[_ab]>=5&&vassalSpecMult[_ab]!==undefined&&vassalSpecMult[_ab]>0.9)vassalSpecMult[_ab]=0.9;});
     let flatBonus=singleDmgRef[specLabel]??5;
@@ -14085,11 +14417,23 @@ function endBattle(win){
     if(G.chosenDifficulty==='hard')G.hardBattles++;
     if((G.enemies||[]).some(e=>e&&(e.isBoss||e.isMiniBoss)))G._pochtecaGuarantee=true; // v357: guarantee Pochteca next shop after a miniboss/layer-boss win
     if(G.battleNum>=8){
+      /* v910: a layer is complete. Xbalanque appears only after THREE consecutive clean layers,
+         so the streak advances on a spotless layer and resets to zero the moment one costs a life.
+         Run-scoped deliberately: "three layers consecutively" reads as a run of the ladder, and
+         parking it on G means a defeat wipes the progress with everything else. */
+      if(G._layerCasualty){G._noCasualtyLayers=0;}
+      else{
+        G._noCasualtyLayers=(G._noCasualtyLayers||0)+1;
+        if(G._noCasualtyLayers>=3)addLog('<span class="log-god">\u{1F406} Something in the dark has been counting your clean crossings\u2026</span>');
+      }
+      G._layerCasualty=false;
       // Mark victory for appropriate layer
       if(G.layer===2)markV('layer2_'+G.god.id);
       else if(G.layer===6)markV('layer6_'+G.god.id);
       else if(G.layer===9)markV('layer9_'+G.god.id); // v788: records a full Mictlan clear for this patron; will gate Mictlantecuhtli
-      else if(G.layer===8)markV('layer8_'+G.god.id); // v715: unlocks Tlazoltéotl (layer8Unlocked)
+      else if(G.layer===8){markV('layer8_'+G.god.id); // v715: unlocks Tlazoltéotl (layer8Unlocked)
+        if(G._xbalanqueDone)markV('xbalanque_unlocked'); /* v912: PLAYABLE only if he actually appeared and you still won */
+      }
       else if(G.layer===7)markV('layer7_'+G.god.id); // v554: unlocks Mayahuel (layer7Unlocked)
       else markV(G.god.id);
     }
@@ -14204,7 +14548,7 @@ function showSpoils(){
         if(hasPassive('blessedCrops')){const natureAllies=[...(G.party||[]).map(id=>GODS.find(g=>g.id===id)).filter(g=>g&&g.element==='nature'),...(G.captured||[]).filter(cu=>cu.element==='nature')].length;if(natureAllies>0){blessedMult=1+natureAllies*0.05;blessedNote=`<div style="font-size:11px;color:#a0c060;text-align:center;margin-top:.4rem">🌽 Blessed Crops: ${natureAllies} Nature allies ×${blessedMult.toFixed(2)} spoils!</div>`;}}
         // v348: unfold the total one bonus at a time — base → Hard → Perfect → Blessed Crops → Offerings
         const steps=[];
-        if(isHard)steps.push({bm:1.2,cm:1.2,bl:'(+20% Hard)',cl:'(+20% Hard)'});
+        if(isHard)steps.push({bm:1.2,cm:1.2,bl:'(+20% Hard)',cl:'(+20% Hard)',src:'\u{1F525} Hard Path \u2014 +20% Blood & Cacao'}); /* v905 */
         /* v903: conditional spoils offerings. Multiplied across every owned copy the same way the
            flat ones are, and pushed as their own step so the running total animates them
            separately and the label says WHY they paid out. */
@@ -14213,20 +14557,39 @@ function showSpoils(){
            startBattle -- so it is a valid read here in the spoils chain. */
         const _swift=(G.roundNum||99)<=3;
         const _cs=_ownEff('cacaoMultSwift'), _bp=_ownEff('bloodMultPerfect');
-        if(_swift&&_cs>1)steps.push({bm:1,cm:_cs,bl:'',cl:'(+'+Math.round((_cs-1)*100)+'% \u26a1)'});
-        if(isPerfect&&_bp>1)steps.push({bm:_bp,cm:1,bl:'(+'+Math.round((_bp-1)*100)+'% \u2b50)',cl:''});
-        if(isPerfect)steps.push({bm:1.15,cm:1.15,bl:'(+15% Perfect)',cl:'(+15% Perfect)'});
-        if(blessedMult!==1)steps.push({bm:blessedMult,cm:blessedMult,bl:'(+'+Math.round((blessedMult-1)*100)+'% 🌽)',cl:'(+'+Math.round((blessedMult-1)*100)+'% 🌽)'});
-        if(_oe.bloodMult!==1||_oe.cacaoMult!==1)steps.push({bm:_oe.bloodMult,cm:_oe.cacaoMult,bl:_oe.bloodMult>1?'(+'+Math.round((_oe.bloodMult-1)*100)+'% '+_bEmo+')':'',cl:_oe.cacaoMult>1?'(+'+Math.round((_oe.cacaoMult-1)*100)+'% '+_cEmo+')':''});
+        if(_swift&&_cs>1)steps.push({bm:1,cm:_cs,bl:'',cl:'(+'+Math.round((_cs-1)*100)+'% \u26a1)',src:(OFFERINGS.cacao_effigy.icon+' '+OFFERINGS.cacao_effigy.name+' \u2014 +'+Math.round((_cs-1)*100)+'% Cacao (won in '+(G.roundNum||0)+' rounds)')});
+        if(isPerfect&&_bp>1)steps.push({bm:_bp,cm:1,bl:'(+'+Math.round((_bp-1)*100)+'% \u2b50)',cl:'',src:(OFFERINGS.spondylus_pendant.icon+' '+OFFERINGS.spondylus_pendant.name+' \u2014 +'+Math.round((_bp-1)*100)+'% Blood')});
+        if(isPerfect)steps.push({bm:1.15,cm:1.15,bl:'(+15% Perfect)',cl:'(+15% Perfect)',src:'\u2b50 Perfect Battle \u2014 +15% Blood & Cacao'}); /* v905 */
+        if(blessedMult!==1)steps.push({bm:blessedMult,cm:blessedMult,bl:'(+'+Math.round((blessedMult-1)*100)+'% 🌽)',cl:'(+'+Math.round((blessedMult-1)*100)+'% 🌽)',src:'🌽 Blessed Crops \u2014 +'+Math.round((blessedMult-1)*100)+'% Blood & Cacao'}); /* v905 */
+        if(_oe.bloodMult!==1||_oe.cacaoMult!==1)steps.push({bm:_oe.bloodMult,cm:_oe.cacaoMult,bl:_oe.bloodMult>1?'(+'+Math.round((_oe.bloodMult-1)*100)+'% '+_bEmo+')':'',cl:_oe.cacaoMult>1?'(+'+Math.round((_oe.cacaoMult-1)*100)+'% '+_cEmo+')':'',src:(function(){
+          /* v905: name the offerings actually responsible rather than just showing their icons. */
+          const names=(G.offerings||[]).filter(id=>{const f=(OFFERINGS[id]||{}).eff||{};return f.bloodMult||f.cacaoMult;})
+            .map(id=>OFFERINGS[id].icon+' '+OFFERINGS[id].name);
+          if(!names.length)return '';
+          const parts=[];
+          if(_oe.bloodMult>1)parts.push('+'+Math.round((_oe.bloodMult-1)*100)+'% Blood');
+          if(_oe.cacaoMult>1)parts.push('+'+Math.round((_oe.cacaoMult-1)*100)+'% Cacao');
+          return names.join(', ')+' \u2014 '+parts.join(', ');
+        })()});
         const tot=document.getElementById('spoils-total');tot.style.display='flex';tot.style.flexDirection='column';tot.style.alignItems='center';tot.style.gap='4px';
         let curB=baseTb,curC=baseTc;const bL=[],cL=[];
+        /* v905: a running list of WHERE each bonus came from. The compact "(+20% Hard)" tags read
+           fine one at a time but become unreadable once four or five are stacked side by side, and
+           the offering ones showed only an icon. Each source line is revealed as its step fires,
+           so the explanation unravels in step with the numbers. */
+        const srcBox=document.createElement('div');
+        srcBox.style.cssText='margin-top:.5rem;text-align:center;font-size:11px;color:var(--td);line-height:1.6';
         const paint=(pop)=>{tot.innerHTML=`<div style="display:flex;gap:32px;align-items:flex-start"><div style="text-align:center"><div style="font-size:22px;line-height:1.1">🩸</div><div class="${pop?'spoil-pop':''}" style="font-size:24px;font-weight:600;color:#e05050">+${curB}</div><div style="font-size:11px;color:var(--td);min-height:15px;margin:1px 0">${bL.join(' ')}</div><div style="font-size:14px;font-weight:700;color:#e05050;letter-spacing:1.5px">BLOOD</div></div><div style="text-align:center"><div style="font-size:22px;line-height:1.1">🫘</div><div class="${pop?'spoil-pop':''}" style="font-size:24px;font-weight:600;color:#c0844a">+${curC}</div><div style="font-size:11px;color:var(--td);min-height:15px;margin:1px 0">${cL.join(' ')}</div><div style="font-size:14px;font-weight:700;color:#c0844a;letter-spacing:1.5px">CACAO</div></div></div>`;};
         paint(false);
         let si=0;
         const runStep=()=>{
           if(si>=steps.length){
+            if(srcBox.childNodes.length&&!srcBox.parentNode)tot.appendChild(srcBox); /* v905 */
             let note='';
-            if(isPerfect){G.perfectBattles=(G.perfectBattles||0)+1;note=`<div style="font-size:11px;color:#d4af37;text-align:center;margin-top:.4rem">⭐ Perfect Battle! +15% rewards!</div>`;}
+            /* v920: the counter still ticks, but the banner is gone -- v905's source list already
+               prints "Perfect Battle - +15% Blood & Cacao" as its own line, so this said the same
+               thing twice, two lines apart. */
+            if(isPerfect){G.perfectBattles=(G.perfectBattles||0)+1;}
             note+=blessedNote;
             if(note){const n=document.createElement('div');n.innerHTML=note;tot.appendChild(n);}
             G.res.blood+=curB;G.res.cacao+=curC;G._stage='spoils';saveRun();document.getElementById('spoils-cont').style.display='block';return;
@@ -14234,7 +14597,12 @@ function showSpoils(){
           const st=steps[si++];
           curB=Math.round(curB*st.bm);curC=Math.round(curC*st.cm);
           if(st.bl)bL.push(st.bl);if(st.cl)cL.push(st.cl);
-          paint(true);setTimeout(runStep,650);
+          paint(true);
+          /* v905: paint() rewrites tot.innerHTML, so srcBox must be re-attached after every step
+             rather than appended once -- otherwise the list is wiped by the next repaint. */
+          if(st.src){const r=document.createElement('div');r.innerHTML=st.src;srcBox.appendChild(r);}
+          if(srcBox.childNodes.length)tot.appendChild(srcBox);
+          setTimeout(runStep,650);
         };
         if(steps.length)setTimeout(runStep,500);else runStep();
       },400);return;}
@@ -14245,12 +14613,15 @@ function showSpoils(){
     const em=ELEM_META[e.unit.element];
     const mt=e.mercyBonus?`<span style="font-size:10px;color:#d4af37;margin-left:4px">Mercy+</span>`:'';
     const ft=e.featherBonus?`<span style="font-size:10px;color:#60e0c0;margin-left:4px">🐍 2×</span>`:'';
+    /* v921: one tag per offering that raised THIS kill's payout, in the same shape as Mercy+ and
+       the Feather Embrace 2x so the row reads consistently. */
+    const bt=(e.boosts||[]).map(b=>`<span style="font-size:10px;color:${b.col};margin-left:4px" title="${b.label}">${b.icon} +${b.pct}%</span>`).join('');
     const lt=e.type==='captured'?`<span style="font-size:10px;color:var(--td);margin-left:2px">Lv${e.unit.enemyLevel||1}</span>`:'';
     /* v813: Reanimated reads as its own outcome. These units were killed by Mictlan Clasp and
        raised, not spared and captured, so labelling them "captured" misrepresented what happened. */
     const tlLabel=e.tlaloqueJoin?`<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:#0a2035;color:#60c0ff;margin-left:4px">🌧 joins party!</span>`:e.rebirthJoin?`<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:#35102a;color:#ffb0d0;margin-left:4px">🤱 reborn at Lv1!</span>`:e.reanimated?`<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:#1a1200;color:#d4af37;margin-left:4px">\u{1F480} Reanimated</span>`:'';
     const row=document.createElement('div');row.className='spoils-row';
-    row.innerHTML=`<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:16px">${e.unit.icon}</span><span style="font-size:13px">${e.unit.name}</span>${lt}${(em&&G.dte.synergyUnlocked)?`<span class="elem-badge ${em.cls}">${em.icon}</span>`:''}<span style="font-size:11px;padding:2px 7px;border-radius:10px;background:${tbg};color:${tc2}">${e.type}</span>${mt}${ft}${tlLabel}</div><div style="display:flex;gap:10px">${e.blood?`<span style="color:#e05050;font-size:13px">+${e.blood}</span>`:''}${e.cacao?`<span style="color:#c0844a;font-size:13px">+${e.cacao}</span>`:''}</div>`;
+    row.innerHTML=`<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:16px">${e.unit.icon}</span><span style="font-size:13px">${e.unit.name}</span>${lt}${(em&&G.dte.synergyUnlocked)?`<span class="elem-badge ${em.cls}">${em.icon}</span>`:''}<span style="font-size:11px;padding:2px 7px;border-radius:10px;background:${tbg};color:${tc2}">${e.type}</span>${mt}${bt}${ft}${tlLabel}</div><div style="display:flex;gap:10px">${e.blood?`<span style="color:#e05050;font-size:13px">+${e.blood}</span>`:''}${e.cacao?`<span style="color:#c0844a;font-size:13px">+${e.cacao}</span>`:''}</div>`;
     list.appendChild(row);setTimeout(()=>{row.classList.add('show');setTimeout(next,450);},50);
   }
   next();
@@ -14458,6 +14829,16 @@ function showEnding(){
              newUnlockBan+=`<div style="font-size:12px;color:#e070b0;margin-bottom:1rem;padding:.5rem;background:#1a0a14;border:0.5px solid #6a2a4a;border-radius:8px">🌺 <strong>Tlazoltéotl</strong> has been unlocked as a patron!</div>`;
              setTimeout(()=>showMo('🌺','New Patron Unlocked!',`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'tlazolteotl',icon:'🌺',name:'Tlazoltéotl',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#e070b0;margin:.5rem 0 .25rem">Tlazoltéotl</div><div style="font-size:12px;color:#b05a88;margin-bottom:.75rem">Forgiving Goddess of Filth and Lust</div><div style="font-size:12px;color:var(--td);line-height:1.6">She can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs.</div></div>`,[{label:'Give It Here',fn:()=>{}}]),900); // v731: match the Xolotl/Mayahuel unlock layout
            }
+           /* v916: Xbalanque's unlock announcement. The block above only ever knew about
+              Tlazolteotl, so beating the secret boss unlocked him silently and the player was
+              shown HER card instead -- the reward for the hardest gate in the game went unnamed.
+              Gated on G._xbalanqueDone (he actually appeared AND the layer was cleared) and on
+              not having had him before, mirroring the wasTlazPrev test. */
+           const wasXbalPrev=G._preRunV&&G._preRunV['xbalanque_unlocked'];
+           if(G._xbalanqueDone&&!wasXbalPrev&&gd.id!=='xbalanque'){
+             newUnlockBan+=`<div style="font-size:12px;color:#d0a060;margin-bottom:1rem;padding:.5rem;background:#1a1206;border:0.5px solid #6a5220;border-radius:8px">\u{1F406} <strong>Xbalanque</strong> has been unlocked as a patron!</div>`;
+             setTimeout(()=>showMo('\u{1F406}','New Patron Unlocked!',`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'xbalanque',icon:'\u{1F406}',name:'Xbalanque',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#e0b070;margin-top:.5rem">Xbalanque</div><div style="font-size:12px;color:#a08050;margin-top:.25rem">Twin Jaguar God Killer</div><div style="font-size:12px;color:var(--td);margin-top:.75rem">He can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs.</div></div>`,[{label:'The Court Is Mine'}]),900);
+           }
            actEl.innerHTML=`${newUnlockBan}<button class="btn" onclick="enterLayer9()" style="padding:10px 24px;background:#1a0a1e;border-color:#6a2a8a;color:#c080e0">Enter Layer 9 \u2192</button>`;
          }else if(isL9){
            /* v789: the run ends HERE now -- nine layers, not eight. */
@@ -14541,6 +14922,7 @@ const L9_PATRON_LINES={
   patecatl:"Wounds that should have stayed open are closed. He has never had to account for that before.",
   cihuacoatl:"The grey fills with a sound like women keening, far off. Hers \u2014 and they followed you here willingly.",
   mictlantecuhtli:"And then the smoke parts, and the thing that has been waiting is wearing your own face. Of everything that ever crossed his nine layers, he has been curious about you longest.",
+  xbalanque:"He knows this one. A boy who walked into a hell like this once and walked out as a light in the sky. The grey does not part for him — it braces.",
   _default:"He does not name what you are. He notes only that it reached the ninth layer, and that it is still standing."
 };
 function storyLinesL9(){
@@ -14941,7 +15323,12 @@ function switchTab(t){
 function temazcalCost(){
   // Base 10, +2 per battle completed this run. Resets naturally since G.battlesCompleted resets in initG().
   // L2/L3 carry over since battlesCompleted is cumulative across all layers in one run.
-  return 5+Math.max(0,G.battlesCompleted-1)*1;
+  /* v923: an extra x1.25 at Layer 9, on TOP of the shared L2/L5 bands, for x1.95 total.
+     Kept out of layerCostMult() on purpose -- rerolls now have their own per-reroll escalator and
+     would be double-taxed if they inherited this too. Say the word and it moves into the shared
+     helper instead. */
+  const l9=((G&&G.layer)||1)>=9?1.25:1;
+  return Math.round((5+Math.max(0,G.battlesCompleted-1)*1)*layerCostMult()*l9);
 }
 function renderTemazcal(){
   const el=document.getElementById('temazcal-list');if(!el)return;el.innerHTML='';
@@ -15152,6 +15539,8 @@ function showShop(){
   G.party=[...new Set(G.party)]; // v318: self-heal duplicate gods (e.g. pre-fix Xochi Games saves)
   G.deplSel=G.deplSel.filter(sid=>G.captured.some(c=>capKey(c)===sid)||G.party.some(gid=>'god_'+gid===sid));
   G._temazcalWarned=false; /* v859: the reminder is once per Tianguis visit, not once per run */
+  if(G.battleNum===1)G._layerCasualty=false; /* v910: each layer is judged on its own casualties */
+  G._xbalanquePending=0;G._xbalanqueDone=G._xbalanqueDone||false; /* v912: pending is per-encounter; done persists until the layer is scored */
   if(!G._shopRolled)buildAltarGodPool();switchTab('training');renderRes('rb-shop');renderTemazcal();
   renderPartyChips();G._trainOrder=null;G._godTrainOrder=null;renderTraining();renderMercs();renderAltar();showScr('screen-shop');
   // v512: heads-up when a mini-boss (B5) or the layer boss (B8) guards the next battle
@@ -15300,6 +15689,13 @@ function showUnitTooltip(u){
   const hp=scA(bo.hp||100,lv)+sb.hp,atk=scA(bo.atk||0,lv)+sb.atk,mag=scA(bo.mag||0,lv)+sb.mag,def=scA(bo.def||0,lv)+sb.def,res=scA(bo.res||0,lv)+sb.res,np=scA(bo.np||20,lv)+sb.tp;
   const _tpLvMult=lv>=50?1.5:lv>=40?1.25:1;
   const npCostAtLv=Math.ceil(Math.max(1,baseNpCostFromObj(bo,lv,!!u.isGod)-sb.cost-getOfferingEffects().tpCostFlat)*_tpLvMult); // v428: match in-battle effectiveNpCost (was crude fallback)
+  /* v927: every other stat on this card shows its delta, but the special's TP cost showed only the
+     final number -- so Copal Brazier, Centeotl Cob and a Tonalli surge were all invisible unless
+     you happened to remember the unmodified figure. _tpLvMult carries the element-scoped
+     multipliers, sb.cost the surge, tpCostFlat the offerings; comparing against the untouched
+     curve captures all three in one number. */
+  const npCostRaw=Math.ceil(baseNpCostFromObj(bo,lv,!!u.isGod));
+  const _npSaved=Math.max(0,npCostRaw-npCostAtLv);
   const typeLabel=bo.type==='MAG'?'Magical':bo.type==='MIX'?'MIX':'Physical';
   /* v822: surgeForceBadge() existed since v326 but was never called from anywhere -- which is why
      Teyolia, Ihiyotl and Tonalli levels were invisible outside the surge picker itself. */
@@ -15397,7 +15793,7 @@ function showUnitTooltip(u){
   const patronLine=u.isPatron?('<div style="margin-top:4px"><span style="color:#d4af37;font-weight:700;font-size:13.5px">⭐ '+(_pi>0?_pv.slice(0,_pi):_pv)+(_pi>0?':':'')+'</span> <em style="color:#a08040;font-size:11px">'+(_pi>0?_pv.slice(_pi+1).trim():'')+'</em></div>'
     +(_ov?('<div style="margin-top:3px"><span style="color:#a060e0;font-weight:700;font-size:13.5px">✟ '+(_oi>0?_ov.slice(0,_oi):_ov)+(_oi>0?':':'')+'</span> <em style="color:#8a6ab0;font-size:11px">'+(_oi>0?_ov.slice(_oi+1).trim():'')+'</em></div>'):'')):'';
   const _adTxt=(((unitDefById((bo&&bo.id)||u.id)||bo).ad)||'');
-  const abilLine=bo.ability?('<div class="tc-spec"><span class="tc-spec-name">🔮 '+bo.ability+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(_adTxt)+'</span></span><span class="tc-cost" '+statAttrs('cost')+'>✨ Cost: '+npCostAtLv+'</span></div><div class="tc-desc">'+_adTxt+'</div>'):'';
+  const abilLine=bo.ability?('<div class="tc-spec"><span class="tc-spec-name">🔮 '+bo.ability+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(_adTxt)+'</span></span><span class="tc-cost" '+statAttrs('cost')+'>✨ Cost: '+npCostAtLv+(_npSaved>0?'<span style="color:#60c080;font-size:11px;font-weight:400;margin-left:3px">−'+_npSaved+'</span>':'')+'</span></div><div class="tc-desc">'+_adTxt+'</div>'):'';
   const _oblCostLv=Math.ceil(oblationCostAtLv(lv)*_tpLvMult); // v773: same curve as npCostAtLv above, so the card matches what battle charges
   /* v771: the oblated special now mirrors the native special's markup (tc-spec + tc-cost +
      tc-desc) rather than being a cramped one-liner, so the two read as peers. The cost was
