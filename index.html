@@ -118,6 +118,18 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .spare-mote{position:fixed;width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:9999;background:radial-gradient(circle at 35% 30%,#eaffe4,#9fe08a 55%,#3f8a45);box-shadow:0 0 9px rgba(150,230,140,.8);animation:spareRise var(--dur,.95s) cubic-bezier(.25,.6,.35,1) forwards}
 @keyframes spareOpen{0%{opacity:0;transform:translate(-50%,-50%) scale(.35)}30%{opacity:.75}100%{opacity:0;transform:translate(-50%,-50%) scale(1.7)}}
 .spare-ring{position:fixed;border-radius:50%;pointer-events:none;z-index:9998;border:1.5px solid rgba(160,235,150,.85);box-shadow:0 0 14px rgba(160,235,150,.45);animation:spareOpen .8s ease-out forwards}
+/* v932: a unit's stats just went up. Gold ring + lift, deliberately short -- this fires on every
+   affected unit at once, so anything longer reads as the whole panel flashing. */
+@keyframes synPulse{0%{box-shadow:0 0 0 0 rgba(240,205,100,.75);transform:translateY(0)}35%{box-shadow:0 0 14px 4px rgba(240,205,100,.55);transform:translateY(-2px)}100%{box-shadow:0 0 0 0 rgba(240,205,100,0);transform:translateY(0)}}
+.syn-pulse{animation:synPulse .55s ease-out}
+@keyframes synMoteUp{0%{opacity:0;transform:translate(0,0) scale(.4)}25%{opacity:1}100%{opacity:0;transform:translate(var(--dx),-26px) scale(1)}}
+.syn-mote{position:fixed;width:5px;height:5px;border-radius:50%;pointer-events:none;z-index:9999;background:radial-gradient(circle,#fff2c0,#f0c850 60%,#a8791a);box-shadow:0 0 7px rgba(240,200,90,.9);animation:synMoteUp var(--dur,.6s) ease-out forwards}
+/* v935: Ometeotl's blessing. A slow breathing glow rather than a one-shot burst -- the card sits
+   on screen while the player deliberates, so it has to stay pleasant on a long look. */
+@keyframes blessGlow{0%,100%{box-shadow:0 0 6px 1px rgba(200,170,255,.35),inset 0 0 10px rgba(200,170,255,.08)}50%{box-shadow:0 0 18px 5px rgba(210,180,255,.65),inset 0 0 16px rgba(210,180,255,.16)}}
+.god-card.blessed-god{border-color:#a888e0!important;animation:blessGlow 2.4s ease-in-out infinite}
+@keyframes blessSpark{0%{opacity:0;transform:translate(0,0) scale(.3) rotate(0)}25%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1) rotate(140deg)}}
+.bless-spark{position:absolute;pointer-events:none;z-index:3;font-size:11px;color:#d8c0ff;text-shadow:0 0 8px #a070e0;animation:blessSpark var(--dur,2.2s) ease-out infinite;animation-delay:var(--dl,0s)}
 @keyframes resCountGlow{0%{text-shadow:0 0 0 rgba(212,175,55,0)}35%{text-shadow:0 0 12px rgba(212,175,55,.9)}100%{text-shadow:0 0 0 rgba(212,175,55,0)}}
 .res-counting{animation:resCountGlow 1s ease-out}
 /* v400: card-frame look */
@@ -706,7 +718,7 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
   <div id="panel-altar" class="tab-panel">
     <p style="font-size:12px;color:var(--td);margin-bottom:.75rem">Sacrifice units for Flowers, recruit gods, purchase Chimalli Armors.</p>
     <div class="altar-sec-lbl" id="altar-sac-title">Sacrifice Units</div><div id="altar-sacrifice-list"></div>
-    <div class="altar-sec-lbl">Recruit Gods</div><div id="altar-reroll-dbg" style="display:none;margin-bottom:6px"></div><div id="altar-gods-list"></div>
+    <div class="altar-sec-lbl">Recruit Gods <span style="font-size:10px;color:var(--td);font-weight:400;letter-spacing:0;text-transform:none">(summoned at Lv1)</span></div><div id="altar-reroll-dbg" style="display:none;margin-bottom:6px"></div><div id="altar-gods-list"></div>
     <div id="altar-god-specials-section" style="display:none"><div class="altar-sec-lbl">God Special Upgrades</div><div id="altar-god-specials"></div></div>
     <div class="altar-sec-lbl">Chimalli Armor</div><div id="altar-shields"></div>
   </div>
@@ -748,7 +760,19 @@ const TREE_NODES=[
      ATK/MAG/DEF/RES. It is its own purchase now, gated behind Bond I so the branch still reads
      as one progression. */
   {id:'god_affinity',label:'God Affinity',desc:'Each other deployed god grants all gods +10% HP',cost:600,cat:'gods',req:['synergy_unlock'],tier:2,x:588,y:278},
-  {id:'synergy_unlock_2',label:'Elemental Bond II',desc:'Elemental Synergy peaks: each other patron-element deployed unit grants +20% ATK/MAG/DEF/RES',cost:1200,cat:'gods',req:['synergy_unlock'],tier:2,x:312,y:278},
+  /* v935 placement was wrong: (450,352) sits 8px from the Divinity hub at (450,360), so the node
+     overlapped it and its connector doubled back up to the parent instead of leading away.
+     v936: the Elemental Bond row is extended leftward into a chain --
+       Elemental Bond I (450,278) -> Ometeotl Blessing (312,278) -> Elemental Bond II (200,278)
+     Every other position tried put the connector straight through an existing node, because the
+     parent sits far right and anything to its left is behind Elemental Bond II. Chaining is the
+     one arrangement where both lines run clean: 138px and 112px, no crossings, and the closest
+     neighbour to either node is 82px away -- both in line with the tree's existing spacing.
+     NOTE this re-parents Elemental Bond II onto the blessing, so the 1200-cost node now sits
+     behind a 42-cost one. In practice that gates nothing (nobody reaches 1200 TEOTL without
+     spending 42), but it IS a dependency change rather than a pure move. */
+  {id:'ometeotl_blessing',label:'Ometeotl Blessing',desc:'Each run, Ometeotl blesses one unlocked god at random: +5% Blood AND Cacao for the whole run if you choose them',cost:42,cat:'gods',req:['synergy_unlock'],tier:1,x:312,y:278},
+  {id:'synergy_unlock_2',label:'Elemental Bond II',desc:'Elemental Synergy peaks: each other patron-element deployed unit grants +20% ATK/MAG/DEF/RES',cost:1200,cat:'gods',req:['ometeotl_blessing'],tier:2,x:200,y:278} /* v936: moved left and re-parented; see the note above */,
   {id:'god_special_up',label:'God Health Boost I',desc:'Increase all God HP by 10%',cost:500,cat:'gods',req:['god_stats_1'],tier:2,x:588,y:196},
   {id:'sacred_oblation',label:'Sacred Oblation',desc:'Sacrifice an Ally God at the Altar to bestow their patron ability upon your Patron God — for this run',cost:1250,cat:'gods',req:['god_special_up'],tier:3,x:588,y:114},
   {id:'god_special_up_2',label:'God Health Boost II',desc:'Increase all God HP by another 10% (total +20%)',cost:1600,cat:'gods',req:['god_special_up'],tier:3,x:450,y:114},
@@ -780,8 +804,8 @@ const TREE_NODES=[
      one purchase or nothing -- so the first rank now lands at 999 and the second at 5,555.
      The original ids are kept for rank I so existing saves keep what they already bought.
      Stacking is ADDITIVE (+10% and +10% = exactly 20%); multiplying would give 21%. */
-  {id:'bloodlust',label:'Bloodlust I',desc:'+10% Blood earned from all battles',cost:999,cat:'combat',req:['special_boost'],tier:4,x:635,y:430},
-  {id:'theobroma',label:'Theobroma Desire I',desc:'+10% Cacao earned from all battles',cost:999,cat:'combat',req:['special_boost'],tier:4,x:835,y:430},
+  {id:'bloodlust',label:'Bloodlust' /* v929: the follow-up node is 'Blood Surge', not 'Bloodlust II' -- the numeral implied a tier chain that does not exist */,desc:'+10% Blood earned from all battles',cost:999,cat:'combat',req:['special_boost'],tier:4,x:635,y:430},
+  {id:'theobroma',label:'Theobroma Desire' /* v929: follow-up is 'Cacao Flow' */,desc:'+10% Cacao earned from all battles',cost:999,cat:'combat',req:['special_boost'],tier:4,x:835,y:430},
   {id:'bloodlust2',label:'Blood Surge',desc:'+15% more Blood from all battles (25% total)',cost:5555,cat:'combat',req:['bloodlust'],tier:5,x:635,y:530},
   {id:'theobroma2',label:'Cacao Flow',desc:'+15% more Cacao from all battles (25% total)',cost:5555,cat:'combat',req:['theobroma'],tier:5,x:835,y:530},
   {id:'battle_bonus',label:'Blood Surge',desc:'[Merged into Blood Surge — the second Bloodlust rank now carries this]',cost:0,cat:'combat',req:['bloodlust2'],tier:6,x:635,y:630,hidden:true},
@@ -923,11 +947,11 @@ const OFFERINGS={
   pochteca_tally:{name:"Pochteca's Tally",tier:'common',icon:'\u{1F9FE}',price:100,priceType:'cacao',desc:'+5% Cacao on spoils',flavor:'The pochteca count twice and write once. A clean ledger is worth more than a full one.',eff:{cacaoMult:1.05}},
   vessel_of_first_blood:{name:'Vessel of the First Blood',tier:'common',icon:'\u{1FA78}',price:100,priceType:'cacao',desc:'+5% Blood on spoils',flavor:'It takes only the first of what is spilled, and asks for nothing after.',eff:{bloodMult:1.05}},
   bioluminescent_vial:{name:'Bioluminescent Vial',tier:'common',icon:'\u{1F4A1}',price:100,priceType:'cacao',desc:'THUNDER & NIGHT units: +7 ATK and +7 MAG \u2014 first 2 rounds only' /* v883: uncommon/250 -> common/100, window 3 -> 2 rounds */,flavor:'Cave-water that glows when shaken. It does not glow for long.',eff:{vialElements:['thunder','night'],vialAmount:7,vialRounds:2}},
-  obsidian_fishhook:{name:'Obsidian Fishhook',tier:'uncommon',icon:'\u{1FA9D}',price:250,priceType:'cacao',desc:'The first enemy killed each battle yields +50% Blood',flavor:'Barbed glass on a twist of maguey line. It only needs to catch once.',eff:{firstKillBloodBonus:0.50}},
+  obsidian_fishhook:{name:'Obsidian Fishhook',tier:'uncommon',icon:'\u{1FA9D}',price:250,priceType:'cacao',desc:'The first enemy slain each battle yields +50% Blood' /* v930: "killed" read as any death; it is specifically a SLAY -- a capture never arms it */,flavor:'Barbed glass on a twist of maguey line. It only needs to catch once.',eff:{firstKillBloodBonus:0.50}},
   axolotl_charm:{name:'Axolotl Charm',tier:'uncommon',icon:'\u{1F98E}',price:250,priceType:'cacao',desc:'Once per battle, the first vassal to fall below 25% HP heals 30%',flavor:'The salamander that refuses to finish becoming anything else. It simply grows the piece back.',eff:{axolotlHeal:0.30}},
   /* v806: the three Layer 8 rares from the L8 design doc, none of which had been built. */
   ball_game_ring:{name:'Ball Game Ring',tier:'rare',icon:'\u{1F3C0}',price:600,priceType:'cacao',flowerPrice:20,desc:'+2 Flowers per enemy defeated by a HUMANITY ally',flavor:'The stone hoop of the tlachtli court \u2014 every sinking of the ball was a sun set right.'},
-  tzompantli_skull:{name:'Tzompantli Skull',tier:'rare',icon:'\u{1F480}',price:600,priceType:'cacao',flowerPrice:20,desc:'+1 ATK/MAG per enemy sacrificed at the Altar (max 50)',flavor:'A rack of skulls, each one a debt the sun no longer has to collect.'},
+  tzompantli_skull:{name:'Tzompantli Skull',tier:'rare',icon:'\u{1F480}',price:600,priceType:'cacao',flowerPrice:20,desc:'+1 ATK/MAG per vassal sacrificed at the Altar (max 50)' /* v929: only your own vassals can be sacrificed -- "enemy" implied it counted kills */,flavor:'A rack of skulls, each one a debt the sun no longer has to collect.'},
   sak_tahn_waax:{name:'Sak Tahn Waax Calendar',tier:'rare',icon:'\u{1F4C5}',price:600,priceType:'cacao',flowerPrice:20,desc:'Every 12 rounds, deal 15% of max HP to all enemies \u2014 the count carries between battles',flavor:'A Maya long-count wheel, patient as erosion. It does not care which fight you are in.'},
   // Event-exclusive — Patecatl's Apothecary (migrated from runBoosts)
   sacred_atole:{name:'Sacred Atole',tier:'event',icon:'🌽',desc:'Party +25% max HP',flavor:'Warmth settles into your bones.',eff:{hpMult:1.25}},
@@ -1620,6 +1644,10 @@ function buyOffering(i,payWith){
   G.res[pt]-=eff;G.offeringsBought=(G.offeringsBought||0)+1;grantOffering(it.id);it.sold=true;
   var o=OFFERINGS[it.id];notify((o?o.icon+' '+o.name:it.id)+' acquired','#c0e060');
   renderPochteca();renderRelicBar();renderRes('rb-shop');
+  /* v932: pulse whoever this offering actually boosts. renderPartyChips() first so the chips
+     exist to be pulsed, then a tick's delay so the freshly-rendered nodes are laid out. */
+  renderPartyChips();
+  setTimeout(function(){try{pulseOfferingRecipients(it.id);}catch(e){}},30);
 }
 function renderPochtecaReal(){
   var el=document.getElementById('pochteca-list');if(!el)return;
@@ -2208,7 +2236,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v928'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v936'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -2379,7 +2407,12 @@ const GODS=[
     passive:'Ueyiatl Tactics: at battle start, Opochtli and all allies gain +15% CRIT for this battle.',pk:'ueyiatlTactics',pv:.15,
     ability:'Sinistral Minacachalli',ad:'1.2×ATK (3 targets), +15% CRIT; on any crit grant ATK/MAG UP ×1 to all allies',ak:'sinistralMinacachalli',locked:true,unlockCriteria:'Conquer Temiminayólan'},
   {id:'mayahuel',name:'Mayahuel',flavor:'Maguey Goddess of Pulque',element:'nature',icon:'\u{1F378}',
-    type:'MAG',hp:165,atk:0,mag:16,def:8,res:12,np:42,npCost:23,
+    /* v929: MAG -> MIX. Her strikes are now physical (primStat sends anything that is not MAG
+       or magStrike down the ATK branch) while Octli Drench stays magical -- its handler reads
+       u.mag explicitly, so the special is unaffected by the type change.
+       ATK 14 against MAG 16 keeps the caster identity primary; compare Quetzalcoatl at 18/15,
+       who leans the other way. */
+    type:'MIX',hp:165,atk:14,mag:16,def:8,res:12,np:42,npCost:23,
     passive:'Inebriated Reverie: DRUNK on allies causes no misfires — instead each stack grants +5% ATK/MAG/DEF/RES.',pk:'inebriatedReverie',
     ability:'Octli Drench',ad:'1.5×MAG to 1 target + 10% splash to others + DRUNK ×1 to ALL enemies — as Patron, also DRUNK ×1 to ALL allies',ak:'octliDrench',locked:true,unlockCriteria:'Conquer Teyōllōcuālōyān'},
   {id:'tlazolteotl',name:'Tlazoltéotl',flavor:'Forgiving Goddess of Filth and Lust',element:'night',icon:'🌺',
@@ -5220,7 +5253,22 @@ function unitIconHtml(u,size){
   return`<span style="font-size:${size}px;line-height:1">${u.icon}</span>`;
 }
 
+/* v935: who is blessed this run. Rolled once and parked on DT (persistent) rather than G, because
+   the god-select screen exists BEFORE a run does -- G is rebuilt the moment a patron is chosen, so
+   anything stored there would not survive the choice it is supposed to influence.
+   Only unlocked gods are eligible [Genaro's ruling]; a blessing on a card the player cannot pick
+   would be pure taunt. Cleared when a run ends, so the next visit rerolls. */
+function rollOmeteotlBlessing(){
+  if(!DT.unlocked.has('ometeotl_blessing')){DT.blessedGod=null;return;}
+  if(DT.blessedGod&&GODS.some(g=>g.id===DT.blessedGod))return; /* already rolled for this run */
+  const pool=GODS.filter(g=>!(g.locked&&!godUnlocked(g.id)));
+  if(!pool.length){DT.blessedGod=null;return;}
+  DT.blessedGod=pool[Math.floor(Math.random()*pool.length)].id;
+  try{saveDT();}catch(e){}
+}
+function isBlessedGod(id){return !!(DT.unlocked.has('ometeotl_blessing')&&DT.blessedGod&&DT.blessedGod===id);}
 function renderGods(){
+  rollOmeteotlBlessing(); /* v935 */
   /* v833: the Champions entry stays hidden until Mictlan has been conquered at least once.
      Gated on layer9Unlocked() rather than on the champions store, so a save that cleared Layer 9
      before the recorder existed (v830) still gets the button -- it will show the empty state,
@@ -5258,7 +5306,7 @@ function renderGods(){
     const locked=gd.locked&&!godUnlocked(gd.id); // v808: see unlockedCount above
     const chosen=G.god&&G.god.id===gd.id;
     const d=document.createElement('div');
-    d.className='god-card'+(chosen?' chosen':'')+(locked?' locked':'');
+    d.className='god-card'+(chosen?' chosen':'')+(locked?' locked':'')+((!locked&&isBlessedGod(gd.id))?' blessed-god':''); /* v935 */
     if(locked){
       if(lockedShown>=maxLockedVisible){return;} lockedShown++;
       d.innerHTML=`<div style="font-size:28px;margin-bottom:4px">❓</div><div style="font-size:13px;font-weight:600;color:#8a7a5a">???</div><div style="font-size:11px;color:#6a5c42;font-style:italic;margin-top:2px">Unknown deity</div><div style="font-size:11px;color:#a8905a;margin-top:6px;line-height:1.35;padding:0 4px">🔒 ${gd.unlockCriteria}</div>`;
@@ -5271,6 +5319,21 @@ function renderGods(){
       const _conq=godConquered(gd.id)?' <span title="Mictlan conquered" style="color:#d4af37">\u2605</span>':''; // v824
       d.innerHTML=`${tpHeader}<div style="height:64px;display:flex;align-items:center;justify-content:center;margin-bottom:4px">${godIconHtml(gd,52)}</div><div class="jersey" style="font-size:18px;color:${chosen?'#d4af37':'var(--tx)'}">${gd.name}${_conq}</div>`; // v630: tile pills reverted — the ask was pills in descriptions, not on tiles
       d.onclick=()=>{G.god=gd;document.getElementById('confirm-god').disabled=false;renderGods();showGodDetail(gd);};
+    }
+    /* v935: four drifting sparks, positioned inside the card. The card is position:relative via
+       .god-card, so these ride with it rather than needing body-level coordinates. */
+    if(!locked&&isBlessedGod(gd.id)){
+      const tag=document.createElement('div');
+      tag.style.cssText='position:absolute;top:3px;right:5px;font-size:9px;color:#c8a8ff;letter-spacing:.3px;z-index:4';
+      tag.textContent='\u2726 BLESSED';
+      d.style.position='relative';d.appendChild(tag);
+      for(let i=0;i<4;i++){
+        const sp=document.createElement('div');sp.className='bless-spark';sp.textContent='\u2726';
+        sp.style.cssText='left:'+(12+Math.random()*70)+'%;top:'+(55+Math.random()*30)+'%;'
+          +'--dx:'+((Math.random()*2-1)*14).toFixed(1)+'px;--dy:'+(-(20+Math.random()*22)).toFixed(1)+'px;'
+          +'--dur:'+(1.8+Math.random()*1.0).toFixed(2)+'s;--dl:'+(Math.random()*1.6).toFixed(2)+'s;';
+        d.appendChild(sp);
+      }
     }
     el.appendChild(d);
   });
@@ -7610,10 +7673,16 @@ function renderDeployChips(){
   el.innerHTML='';
   const pg=G.god;const ma=getMaxAllies();
   const all=[];
-  if(pg)all.push({id:'god_'+pg.id,name:pg.name,icon:pg.icon,element:pg.element,level:getLevel('god_'+pg.id),isPatron:true,isGod:true,baseObj:pg});
+  if(pg)all.push({id:'god_'+pg.id,_sel:'god_'+pg.id,name:pg.name,icon:pg.icon,element:pg.element,level:getLevel('god_'+pg.id),isPatron:true,isGod:true,baseObj:pg});
   G.deplSel.forEach(sid=>{
-    if(sid.startsWith('god_')){const gd=GODS.find(g=>g.id===sid.replace('god_',''));if(gd&&gd.id!==pg?.id)all.push({id:'god_'+gd.id,name:gd.name,icon:gd.icon,element:gd.element,level:getLevel('god_'+gd.id),isPatron:false,isGod:true,baseObj:gd});}
-    else{const cu=G.captured.find(c=>c._captureId===sid||c.id===sid);if(cu)all.push({id:cu.id,name:cu.name,icon:cu.icon,element:cu.element,level:getLevel(capKey(cu)),isPatron:false,isGod:false,baseObj:cu});}
+    if(sid.startsWith('god_')){const gd=GODS.find(g=>g.id===sid.replace('god_',''));if(gd&&gd.id!==pg?.id)all.push({id:'god_'+gd.id,_sel:'god_'+gd.id,name:gd.name,icon:gd.icon,element:gd.element,level:getLevel('god_'+gd.id),isPatron:false,isGod:true,baseObj:gd});}
+    /* v934: the chip object was rebuilt with id:cu.id and DROPPED _captureId, so its pulse key
+       came out as the raw id while deployedUnitsForPulse -- which spreads the roster entry -- keyed
+       off _captureId. Where those two differ (hired mercs, older captures) no chip ever matched,
+       which is why every vassal stayed dark while the gods, keyed by 'god_'+id on both sides,
+       pulsed fine. Carrying the deplSel entry itself removes the guesswork: it is the key both
+       sides are already indexed by. */
+    else{const cu=G.captured.find(c=>c._captureId===sid||c.id===sid);if(cu)all.push({id:cu.id,_sel:sid,name:cu.name,icon:cu.icon,element:cu.element,level:getLevel(capKey(cu)),isPatron:false,isGod:false,baseObj:cu});}
   });
   const badge=document.createElement('div');badge.style.cssText='font-size:11px;color:var(--am);padding:4px 8px;background:#2a1a08;border:0.5px solid #6a4a10;border-radius:6px;align-self:center;white-space:nowrap;flex-shrink:0';
   badge.textContent=`${all.length} / ${ma+1}`;el.appendChild(badge);
@@ -7621,7 +7690,7 @@ function renderDeployChips(){
     // Use capKey for captured units (ensures _captureId key matches G.shields)
     const shieldKey=u.isGod?u.id:(u.baseObj?capKey(u.baseObj):u.id);
     const armorHp=G.unitArmor[shieldKey]!==undefined?G.unitArmor[shieldKey]:(G.shields[shieldKey]||0)*G.dte.chimaArmorPerStack;
-    const d=document.createElement('div');d.className='party-chip';
+    const d=document.createElement('div');d.className='party-chip';d.dataset.punit=(u._sel||u._captureId||u.id); /* v934: the deploy screen shows chips too */
     d.style.cssText=u.isPatron?'border-color:#c0a020;background:#2a1e04;cursor:pointer':'cursor:pointer';
     const _dei=eb(u.element,true);
 d.innerHTML=`<div style="margin-bottom:1px">${unitIconHtml(u,28)}</div><div style="font-size:11px;font-weight:500;color:${u.isPatron?'#d4af37':u.isGod?'#c0a060':'var(--tx)'}">${u.isPatron?'⭐ ':u.isGod?'✦ ':''}${u.name}</div><div style="font-size:10px;color:var(--td)">Lv${u.level} ${_dei}${armorHp?` 🛡${armorHp}`:''}</div>`;
@@ -9418,7 +9487,21 @@ function resolveCap(enemyId,doCapture){
          multipliers are computed here and then thrown away, so the spoils screen had no way to
          show why one kill was worth more than the next -- a Vulture Vessel proc looked identical
          to an ordinary kill unless you happened to know the base bounty. */
+      /* v930: the Fishhook only ever fired on the uncapturable path in handleDeath -- bosses and
+         the like -- so on a normal run it almost never procced, which is exactly why it read as
+         doing nothing. This is the branch every ordinary slain enemy actually takes.
+         Deliberately here and not in the capture branch above: a captured enemy is not slain, so
+         it must neither consume the once-per-battle charge nor pay the bonus. */
       const _boosts=[];
+      if(!G._fishhookUsed){
+        const _fh=getOfferingEffects().firstKillBloodBonus||0;
+        if(_fh>0){
+          G._fishhookUsed=true;
+          _gB=Math.round(_gB*(1+_fh));
+          _boosts.push({icon:'\u{1FA9D}',label:'Obsidian Fishhook',pct:Math.round(_fh*100),col:'#c0a878'});
+          addLog(`<span class="log-gain">\u{1FA9D} Obsidian Fishhook: +${Math.round(_fh*100)}% Blood on the first catch</span>`);
+        }
+      }
       if(_vvM>1)_boosts.push({icon:'\u{1F3FA}',label:'Vulture Vessel',pct:Math.round((_vvM-1)*100),col:'#c0a060'});
       if(_baM>1)_boosts.push({icon:'\u{1FA78}',label:'Bloody Arrow',pct:Math.round((_baM-1)*100),col:'#e07070'});
       G.spoils.killed.push({unit:dead,blood:_gB,cacao:_gC,_idx:sidx,boosts:_boosts});
@@ -12999,6 +13082,92 @@ function spareFx(ck,resAmt,resIcon,delay){
     }
   },delay||0);
 }
+/* v932: does OFFERING id actually boost this unit? Rather than re-deriving the element rules,
+   this borrows offeringStatLayer's own `affecting` list -- the same one the unit modal prints
+   under "OFFERINGS BOOSTING THIS UNIT" -- so the pulse and that list can never disagree.
+   Falls back to true on any error: pulsing a unit that gained nothing is a much smaller sin than
+   silently skipping one that did. */
+function offeringAffectsUnit(id,u){
+  if(!u)return false;
+  try{
+    const r=offeringStatLayer({hp:100,atk:10,mag:10,def:10,res:10,tp:10},u.element,!!u.isGod,u.type,0,false,!!u.isPatron,null);
+    return ((r&&r.affecting)||[]).indexOf(id)>=0;
+  }catch(e){return true;}
+}
+/* v932: pulse every listed unit AT ONCE (Genaro's call -- staggering was the alternative).
+   Looks in both the shop party chips and the Edit Party rows, so whichever is on screen reacts. */
+function synergyPulse(uids){
+  if(!uids||!uids.length)return;
+  const seen=[];
+  uids.forEach(function(uid){
+    document.querySelectorAll('[data-punit="'+String(uid).replace(/"/g,'')+'"]').forEach(function(el){
+      el.classList.remove('syn-pulse');void el.offsetWidth;el.classList.add('syn-pulse');
+      setTimeout(function(){el.classList.remove('syn-pulse');},620);
+      seen.push(el);
+    });
+  });
+  /* a few motes rising off each pulsed card, so the effect reads as a gain rather than a flash */
+  seen.forEach(function(el){
+    const r=el.getBoundingClientRect();
+    if(!r.width||!r.height)return;
+    for(let i=0;i<4;i++){
+      const m=document.createElement('div');m.className='syn-mote';
+      m.style.cssText='left:'+(r.left+8+Math.random()*(r.width-16))+'px;top:'+(r.top+r.height*0.6)+'px;'
+        +'--dx:'+((Math.random()*2-1)*10).toFixed(1)+'px;--dur:'+(0.45+Math.random()*0.25).toFixed(2)+'s;'
+        +'animation-delay:'+(Math.random()*0.12).toFixed(2)+'s;';
+      document.body.appendChild(m);setTimeout(function(){m.remove();},900);
+    }
+  });
+}
+/* v932: everyone currently deployed who is boosted by OFFERING id. */
+/* v932: after a party change, pulse everyone whose Elemental Synergy bond is live -- adding or
+   removing a unit of the patron's element shifts the bonus for the whole matching group, not just
+   the unit you clicked. Deferred a tick because the caller re-renders the rows underneath us. */
+function synMatchesPatron(el){
+  if(!G.god)return false;
+  return el===G.god.element||(hasPassive('azureZephyr')&&(el==='fire'||el==='wind')&&(G.god.element==='fire'||G.god.element==='wind'));
+}
+/* v933: `wasAdd` and the toggled unit's element now gate the pulse. Removing a unit LOWERS the
+   bond, and a non-matching unit changes nothing for the group -- flashing gold in either case
+   said "you gained something" when the opposite or nothing had happened. */
+function pulseSynergyRecipients(togEl,wasAdd){
+  if(!wasAdd||!synMatchesPatron(togEl))return;
+  setTimeout(function(){
+    try{
+      if(!G.god||calcSynergy().count<=0)return;
+      const ids=deployedUnitsForPulse().filter(u=>synMatchesPatron(u.element)).map(u=>u._sel||u._captureId||u.id);
+      synergyPulse(ids);
+    }catch(e){}
+  },40);
+}
+function pulseOfferingRecipients(id){
+  /* v933: was preferring G.units when non-empty. 'units' is in RUN_SKIP so it is dropped from
+     SAVES, but it is never cleared in memory -- in the shop it still holds the PREVIOUS battle's
+     roster. Anyone not in that battle (a freshly hired Hollow Warrior, a unit swapped in since)
+     was absent, so no chip matched and no pulse fired, while the gods -- who are always deployed
+     and so always present in the stale array -- pulsed correctly. That is exactly the reported
+     split. The chips and rows are built from deplSel, so build the pulse set from deplSel too. */
+  const ids=deployedUnitsForPulse().filter(u=>offeringAffectsUnit(id,u)).map(u=>u._sel||u._captureId||u.id);
+  synergyPulse(ids);
+}
+/* Outside battle G.units is empty, so rebuild the deployed set from the roster the same way the
+   party chips do. */
+function deployedUnitsForPulse(){
+  /* v934: every entry carries _sel -- the exact deplSel string -- so the ids the pulse emits are
+     the ids the chips and rows advertise, with no key derivation on either side. */
+  const out=[];
+  if(G.god)out.push({...G.god,isGod:true,isPatron:true,isAlly:true,id:'god_'+G.god.id,_sel:'god_'+G.god.id});
+  (G.deplSel||[]).forEach(function(sid){
+    if(String(sid).indexOf('god_')===0){
+      const g=GODS.find(x=>'god_'+x.id===sid);
+      if(g&&(!G.god||g.id!==G.god.id))out.push({...g,isGod:true,isAlly:true,id:sid,_sel:sid});
+    }else{
+      const c=(G.captured||[]).find(x=>capKey(x)===sid);
+      if(c)out.push({...c,isAlly:true,id:sid,_sel:sid});
+    }
+  });
+  return out;
+}
 function animateArmorBreak(uid){
   setTimeout(()=>{
     const card=document.querySelector('[data-uid="'+uid+'"]');if(!card)return;
@@ -13567,11 +13736,14 @@ function handleDeath(dead){
     const _feM=dead._featherBonus||1; // v319: Feather Embrace fatal on a boss routes here with 2.5×
     let _gbB=Math.round(dead.maxHp*.45*G.dte.bloodBonus*getLayerResMult()*_feM);const _gbC=Math.round(dead.maxHp*.27*getLayerResMult()*_feM);
     /* v807: Obsidian Fishhook -- first kill of the battle only, Blood side alone. */
+    let _fhBoost=0;
     if(!G._fishhookUsed){
       const _fh=getOfferingEffects().firstKillBloodBonus;
-      if(_fh>0){G._fishhookUsed=true;_gbB=Math.round(_gbB*(1+_fh));addLog(`<span class="log-gain">\u{1FA9D} Obsidian Fishhook: +${Math.round(_fh*100)}% Blood on the first catch</span>`);}
+      if(_fh>0){G._fishhookUsed=true;_gbB=Math.round(_gbB*(1+_fh));_fhBoost=Math.round(_fh*100);addLog(`<span class="log-gain">\u{1FA9D} Obsidian Fishhook: +${Math.round(_fh*100)}% Blood on the first catch</span>`);}
     }
-    G.spoils.killed.push({unit:dead,blood:_gbB,cacao:_gbC,featherBonus:_feM>1,_idx:++G._spoilIdx});
+    /* v930: carry the proc onto the spoils row, the same way the v921 kill boosts do. */
+    G.spoils.killed.push({unit:dead,blood:_gbB,cacao:_gbC,featherBonus:_feM>1,_idx:++G._spoilIdx,
+      boosts:_fhBoost?[{icon:'\u{1FA9D}',label:'Obsidian Fishhook',pct:_fhBoost,col:'#c0a878'}]:[]});
     if(G.runStats)G.runStats.slain++; // v829: the uncapturable path (bosses etc.) -- these never reach resolveCap
     addLog(`<span class="log-dd">${dead.icon} ${dead.name} — DEFEATED</span> <span class="log-gain">+${_gbB} 🩸 +${_gbC} 🫘</span>`);
     flashResGain(_gbB,_gbC);renderRes('rb-battle');
@@ -14549,6 +14721,8 @@ function showSpoils(){
         // v348: unfold the total one bonus at a time — base → Hard → Perfect → Blessed Crops → Offerings
         const steps=[];
         if(isHard)steps.push({bm:1.2,cm:1.2,bl:'(+20% Hard)',cl:'(+20% Hard)',src:'\u{1F525} Hard Path \u2014 +20% Blood & Cacao'}); /* v905 */
+        /* v935: Ometeotl's blessing, if the player chose the god he marked. */
+        if(G.god&&isBlessedGod(G.god.id))steps.push({bm:1.05,cm:1.05,bl:'(+5% \u2726)',cl:'(+5% \u2726)',src:'\u2726 Ometeotl Blessing \u2014 +5% Blood & Cacao'});
         /* v903: conditional spoils offerings. Multiplied across every owned copy the same way the
            flat ones are, and pushed as their own step so the running total animates them
            separately and the label says WHY they paid out. */
@@ -14717,6 +14891,10 @@ function runTeotlReveal(earned,opts){
   nextRow();
 }
 function showEnding(){
+  /* v935: the run is over -- drop the blessing so the next visit to god select rerolls it.
+     Deliberately here rather than in initG(): initG runs when a patron is CHOSEN, which would
+     clear the very blessing that choice was made for. */
+  DT.blessedGod=null;try{saveDT();}catch(e){}
   const gd=G.god;
   const _eLayer=(G._endingLayer!=null?G._endingLayer:G.layer); // v572: use the frozen cleared-layer snapshot
   const isL2=_eLayer===2;
@@ -15650,10 +15828,16 @@ function renderPartyChips(){
   _epb.className='btn';_epb.id='edit-party-btn';_epb.onclick=showEditPartyModal;
   _epb.style.cssText='font-size:11px;padding:5px 11px;flex-shrink:0';
   _epb.textContent='✕ Edit Party';
-  if(pg)all.push({id:'god_'+pg.id,name:pg.name,icon:pg.icon,element:pg.element,level:getLevel('god_'+pg.id),isPatron:true,isGod:true,baseObj:pg});
+  if(pg)all.push({id:'god_'+pg.id,_sel:'god_'+pg.id,name:pg.name,icon:pg.icon,element:pg.element,level:getLevel('god_'+pg.id),isPatron:true,isGod:true,baseObj:pg});
   G.deplSel.forEach(sid=>{
-    if(sid.startsWith('god_')){const gd=GODS.find(g=>g.id===sid.replace('god_',''));if(gd&&gd.id!==pg?.id)all.push({id:'god_'+gd.id,name:gd.name,icon:gd.icon,element:gd.element,level:getLevel('god_'+gd.id),isPatron:false,isGod:true,baseObj:gd});}
-    else{const cu=G.captured.find(c=>c._captureId===sid||c.id===sid);if(cu)all.push({id:cu.id,name:cu.name,icon:cu.icon,element:cu.element,level:getLevel(capKey(cu)),isPatron:false,isGod:false,baseObj:cu});}
+    if(sid.startsWith('god_')){const gd=GODS.find(g=>g.id===sid.replace('god_',''));if(gd&&gd.id!==pg?.id)all.push({id:'god_'+gd.id,_sel:'god_'+gd.id,name:gd.name,icon:gd.icon,element:gd.element,level:getLevel('god_'+gd.id),isPatron:false,isGod:true,baseObj:gd});}
+    /* v934: the chip object was rebuilt with id:cu.id and DROPPED _captureId, so its pulse key
+       came out as the raw id while deployedUnitsForPulse -- which spreads the roster entry -- keyed
+       off _captureId. Where those two differ (hired mercs, older captures) no chip ever matched,
+       which is why every vassal stayed dark while the gods, keyed by 'god_'+id on both sides,
+       pulsed fine. Carrying the deplSel entry itself removes the guesswork: it is the key both
+       sides are already indexed by. */
+    else{const cu=G.captured.find(c=>c._captureId===sid||c.id===sid);if(cu)all.push({id:cu.id,_sel:sid,name:cu.name,icon:cu.icon,element:cu.element,level:getLevel(capKey(cu)),isPatron:false,isGod:false,baseObj:cu});}
   });
   const badge=document.createElement('div');badge.style.cssText='font-size:11px;color:var(--am);padding:4px 8px;background:#2a1a08;border:0.5px solid #6a4a10;border-radius:6px;align-self:center;white-space:nowrap';
   badge.textContent=`${all.length} / ${ma+1}`;
@@ -15663,7 +15847,8 @@ function renderPartyChips(){
     // Use persisted armor HP if available (reflects post-battle damage)
     const armorKey=u.isGod?u.id:(u.baseObj&&u.baseObj._captureId?u.baseObj._captureId:u.id);
     const shHp=G.unitArmor[armorKey]!==undefined?G.unitArmor[armorKey]:(sh*G.dte.chimaArmorPerStack);
-    const d=document.createElement('div');d.className='party-chip';d.style.cssText=u.isPatron?'border-color:#c0a020;background:#2a1e04;cursor:pointer':'cursor:pointer';
+    const d=document.createElement('div');d.className='party-chip';d.dataset.punit=(u._sel||u._captureId||u.id); /* v932 · v934: _sel is the deplSel key, which is what the pulse set is built from */
+    d.style.cssText=u.isPatron?'border-color:#c0a020;background:#2a1e04;cursor:pointer':'cursor:pointer';
     const _sei=eb(u.element,true);
 d.innerHTML=`<div style="margin-bottom:1px">${unitIconHtml(u,28)}</div><div style="font-size:11px;font-weight:500;color:${u.isPatron?'#d4af37':u.isGod?'#c0a060':'var(--tx)'}">${u.isPatron?'⭐ ':u.isGod?'✦ ':''}${u.name}</div><div style="font-size:10px;color:var(--td)">Lv${u.level} ${_sei}${shHp?` 🛡${shHp}`:''}</div>`;
     d.onclick=()=>showUnitTooltip(u);
@@ -15823,7 +16008,7 @@ function showUnitTooltip(u){
 
 function buildEditPartyRows(){
   const ma=getMaxAllies();const pg=G.god;
-  const patronRow=pg?`<div style="display:flex;align-items:center;gap:8px;padding:5px 4px;border-bottom:0.5px solid var(--br);background:#1e1604;border-radius:4px;margin-bottom:2px"><span style="display:inline-flex;align-items:center">${godIconHtml(pg,28)}</span><div style="flex:1"><div style="font-size:12px;font-weight:500;color:#d4af37">${pg.name} <span style="font-size:9px;color:#806030">★ Patron</span></div><div style="font-size:10px;color:var(--td)">Lv${getLevel('god_'+pg.id)} · ${pg.type||'PHY'}</div></div><span style="font-size:10px;color:#504030;padding:3px 8px">Always in</span></div>`:'';
+  const patronRow=pg?`<div data-punit="god_${pg.id}" style="display:flex;align-items:center;gap:8px;padding:5px 4px;border-bottom:0.5px solid var(--br);background:#1e1604;border-radius:4px;margin-bottom:2px"><span style="display:inline-flex;align-items:center">${godIconHtml(pg,28)}</span><div style="flex:1"><div style="font-size:12px;font-weight:500;color:#d4af37">${pg.name} <span style="font-size:9px;color:#806030">★ Patron</span>${calcSynergy().count>0?' <span '+SYN_ATTRS.replace('style="','style="font-size:9px;color:#d4af37;background:#1e1604;border:0.5px solid #5a4a10;border-radius:8px;padding:1px 5px;')+'>\u{1F517} +'+Math.round(calcSynergy().pct*100)+'%</span>':''}</div><div style="font-size:10px;color:var(--td)">Lv${getLevel('god_'+pg.id)} · ${pg.type||'PHY'}</div></div><span style="font-size:10px;color:#504030;padding:3px 8px">Always in</span></div>`:'';
   const allyRows=getAllyPool().map(u=>{
     const uid=u._captureId||u.id;
     const inParty=G.deplSel.includes(uid);
@@ -15838,10 +16023,10 @@ function buildEditPartyRows(){
     const _synMatch=calcSynergy().count>0&&G.god&&(u.element===G.god.element||(hasPassive('azureZephyr')&&(u.element==='fire'||u.element==='wind'))); // v640
     const synPill=_synMatch?('<span '+SYN_ATTRS.replace('style="','style="font-size:9px;color:#d4af37;background:#1e1604;border:0.5px solid #5a4a10;border-radius:6px;padding:1px 5px;')+'>🔗 +'+Math.round((calcSynergy().pct)*100)+'%</span>'):''; // v647: total
     const rowOpacity=disabled?'opacity:0.35;':'';
-    return`<div style="display:flex;align-items:center;gap:8px;padding:5px 4px;border-bottom:0.5px solid var(--br);${rowOpacity}">
+    return`<div data-punit="${uid}" style="display:flex;align-items:center;gap:8px;padding:5px 4px;border-bottom:0.5px solid var(--br);border-radius:6px;${rowOpacity}">
       <span style="display:inline-flex;align-items:center">${unitIconHtml(u,28)}</span>
       <div style="flex:1"><div style="font-size:12px;font-weight:500">${u.name} ${elemHtml} ${synPill}</div><div style="font-size:10px;color:var(--td)">Lv${lv} · ${uType}</div></div>
-      <button ${disabled?'disabled':''} onclick="(function(){${addFn}renderPartyChips();renderAltar();if(document.getElementById('training-list'))renderTraining();if(document.getElementById('synergy-panel'))renderSynPanel();var ec=document.getElementById('edit-party-content');if(ec)ec.innerHTML=buildEditPartyRows();var sc=document.getElementById('party-slot-counter');if(sc)sc.textContent='Slots: '+G.deplSel.length+'/${ma}. Patron always deploys.';})()" style="font-size:18px;padding:2px 8px;border-radius:6px;border:none;background:transparent;cursor:${disabled?'default':'pointer'}">${inParty?'✅':'⬜'}</button>
+      <button ${disabled?'disabled':''} onclick="(function(){${addFn}renderPartyChips();renderAltar();pulseSynergyRecipients('${u.element}',${!inParty});if(document.getElementById('training-list'))renderTraining();if(document.getElementById('synergy-panel'))renderSynPanel();var ec=document.getElementById('edit-party-content');if(ec)ec.innerHTML=buildEditPartyRows();var sc=document.getElementById('party-slot-counter');if(sc)sc.textContent='Slots: '+G.deplSel.length+'/${ma}. Patron always deploys.';})()" style="font-size:18px;padding:2px 8px;border-radius:6px;border:none;background:transparent;cursor:${disabled?'default':'pointer'}">${inParty?'✅':'⬜'}</button>
     </div>`;
   }).join('');
   return patronRow+allyRows;
@@ -16038,7 +16223,14 @@ function renderTraining(){
       +((u.isPatron&&(G._oblationGodName||(G._oblationHistory&&G._oblationHistory.length&&G._oblationHistory[G._oblationHistory.length-1].name)))?' <span style="font-style:italic;font-weight:400;font-size:13px;color:#a060e0">'+(G._oblationGodName||G._oblationHistory[G._oblationHistory.length-1].name)+'</span>':'') /* v774 */
       +(isDeployed?' <span class="tc-dep">Deployed</span>':'')+(shHp?' <span style="font-size:10px;color:#60c0e0;font-weight:400">🛡 '+shHp+' HP</span>':'')+'</div>' // v617: Deployed pill rides with the name
       +'<div class="tc-meta"><div class="tc-lv">Level <span data-lvnum>'+lv+'</span>'+(lvf&&lvf.lv>0?' <span class="stat-up-glow">+'+lvf.lv+'</span>':'')+'</div>'
-      +'<div style="margin-top:2px">'+eb(u.element)+((calcSynergy().count>0&&G.god&&(u.element===G.god.element||(hasPassive('azureZephyr')&&(u.element==='fire'||u.element==='wind'))))?'<div style="font-size:9px;color:#d4af37;margin-top:2px" '+SYN_ATTRS+'>🔗 Synergy: +'+Math.round(calcSynergy().pct*100)+'%</div>':'')+'</div></div>' /* v617–v620 · v640 pill · v647 total · v648: a trailing // comment had commented out these closing divs, shattering the card layout */
+      /* v934: says what the unit IS. Nothing on this card distinguished a patron from a recruited
+         ally god from a captured vassal, which matters -- ally gods drop their patron passive, and
+         several offerings and the Nullifidian Rage count key off vassal-ness. */
+      +'<div style="margin-top:2px">'
+      +(u.isPatron?'<span class="elem-badge" style="background:#2a1e04;color:#d4af37;border:0.5px solid #6a5210;font-size:9px">\u2605 Patron God</span> '
+        :u.isGod?'<span class="elem-badge" style="background:#241a2e;color:#c0a060;border:0.5px solid #5a4470;font-size:9px">\u2726 Ally God</span> '
+        :'<span class="elem-badge" style="background:#1a2418;color:#8ab070;border:0.5px solid #3a5a34;font-size:9px">Vassal</span> ')
+      +eb(u.element)+((calcSynergy().count>0&&G.god&&(u.element===G.god.element||(hasPassive('azureZephyr')&&(u.element==='fire'||u.element==='wind'))))?'<div style="font-size:9px;color:#d4af37;margin-top:2px" '+SYN_ATTRS+'>🔗 Synergy: +'+Math.round(calcSynergy().pct*100)+'%</div>':'')+'</div></div>' /* v617–v620 · v640 pill · v647 total · v648: a trailing // comment had commented out these closing divs, shattering the card layout */
       +'</div>'
       +'<div class="tc-mid">'
       +'<div class="tc-art" style="cursor:pointer" onclick="showUnitTooltip(G._tcModal[\''+ukJs+'\'])" title="View full stats">'+unitIconHtml(u,92)+'</div>' // v628 · v643: art opens the stats modal
