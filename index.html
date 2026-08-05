@@ -422,7 +422,7 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
     <div class="jersey" style="font-size:48px;color:var(--am);letter-spacing:4px;margin-bottom:.1rem">TEOTLAN</div>
     <div class="jersey" style="font-size:22px;color:var(--td);margin-bottom:.5rem;letter-spacing:3px">LAND OF GODS</div>
     <div style="font-size:11px;color:#6a5a30;margin-bottom:1.5rem;font-style:italic">Codex I: Mictlan</div>
-    <div style="font-size:10px;color:#4a3a20;margin-bottom:1.2rem;letter-spacing:.5px">Created by Genaro Vallejo</div>
+    <div style="font-size:11px;color:#9a8560;margin-bottom:1.2rem;letter-spacing:.6px">Created by Genaro Vallejo</div>
     <button class="btn" id="resume-run-btn" onclick="resumeRun()" style="padding:10px 28px;font-size:15px;display:none;background:#1e4a30;border-color:#50e090;margin-bottom:.55rem">▶ Continue Run</button>
     <button class="btn" id="intro-btn" style="padding:10px 28px;font-size:15px">Begin</button>
     <div style="margin-top:.6rem;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
@@ -1239,6 +1239,15 @@ function offeringStatLayer(base,element,isGod,type,turquoise,isTlaloqueU,isPatro
   const fa=azFlat(oe.flatAtkByElement,element,isPatronU); if(fa)t.atk+=fa; // v639: azure-aware
   const fm=azFlat(oe.flatMagByElement,element,isPatronU); if(fm)t.mag+=fm;
   const _fd=azFlat(oe.flatDefByElement,element,isPatronU); if(_fd)t.def+=_fd;
+  /* v939: New Fire Knife appeared in the boosting list and in the buffs strip, but never in the
+     ATK/MAG numbers -- so a FIRE unit under 40% TP showed the offering twice and the bonus zero
+     times. It is conditional on LIVE TP, which the card only knows for a real unit, so it is
+     applied via the surge-key path the same way other live-state offerings are. */
+  if(surgeKey&&typeof hasOffering==='function'&&hasOffering('new_fire_knife')&&element==='fire'){
+    const _u=(G.units||[]).find(x=>x&&(x._captureId||x.id)===surgeKey)
+          ||(G.captured||[]).find(x=>capKey(x)===surgeKey);
+    if(_u&&(_u.maxNP||0)>0&&(_u.currentNP||0)/(_u.maxNP)<=0.40){t.atk+=30;t.mag+=30;}
+  }
   /* v886: offeringStatLayer models every other element-scoped hook -- flat ATK/MAG/DEF/RES, the Day
      stat multiplier, the Tlaloque HP multiplier -- but never hpMultByElement. The battle build at
      applyOfferings() has always applied it to any ally, so the HP was really being granted; the
@@ -2236,7 +2245,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v938'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v941'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -3171,6 +3180,16 @@ const GOD_ENDINGS_L8={
   mictlantecuhtli:["Tlazoltéotl kneels in the black water and eats the filth of the crossing, as she always does.","“You are almost there, lord. Ask me the question.”","“Is she below me?” — “Everything is below you. That is what being God King means. It is also the problem.”","The <strong class='teotl'>TEOTL</strong> of the eater of filth settles in him, heavy as silt.","Eight layers. One left — and the thing on his throne is in it. So, he is nearly certain, is she."],
 };
 const GOD_ENDINGS_L7={
+  /* v940: Huehueteotl -- the oldest fire, older than the underworld he is walking through.
+     He was falling through to the generic Mayahuel quest text, which reads as a pact she offers a
+     newcomer; she would not offer it to him. */
+  huehueteotl:[
+    "Mayahuel lowers her cup when she sees what is standing in her forest, and does not offer it.",
+    "\"You,\" she says. \"You were burning before there was anything to burn. You were old when the first pulque soured.\"",
+    "Huehueteotl says nothing. He has outlasted every god who ever demanded an answer from him, and he will outlast her.",
+    "The <strong class='teotl'>TEOTL</strong> of the heart-eating forest banks itself in his chest like a coal under ash.",
+    "Seven hells. He has been walking down for longer than Mictlan has existed, and he is not tired yet."
+  ],
   /* v926: Chicomecoatl -- the one who feeds, arguing her way down through gods who take. */
   chicomecoatl:[
     "Mayahuel sets down her cup. \"Maize and maguey. The two halves of every meal in the world.\"",
@@ -5372,7 +5391,7 @@ function showGodDetail(gd){
    if(_fl2&&isBlessedGod(gd.id)){
      const bb=document.createElement('div');bb.id='gdp-blessed';
      bb.style.cssText='display:block;margin-top:5px;font-size:11px;font-weight:600;color:#c8a8ff;background:#160f24;border:0.5px solid #6a4aa0;border-radius:6px;padding:4px 9px;box-shadow:0 0 10px rgba(200,170,255,.22)';
-     bb.innerHTML='\u2726 Blessed for this run \u2014 <strong>+5% Blood &amp; Cacao</strong> if you choose them';
+     bb.innerHTML='\u2726 Blessed for this run \u2014 <strong>+5% Blood &amp; Cacao</strong>';
      (document.getElementById('gdp-conquered')||_fl2).insertAdjacentElement('afterend',bb);
    }}
   document.getElementById('gdp-flavor').textContent=gd.flavor;
@@ -9505,7 +9524,13 @@ function resolveCap(enemyId,doCapture){
     if(!G._spoilIds.has(dead.id)){G._spoilIds.add(dead.id);if(!G._spoilIdx)G._spoilIdx=0;const sidx=++G._spoilIdx;
       const _vvM=(hasOffering('vulture_vessel')&&dead._killerAlly&&dead._killerElem==='nature')?1.15:1; // v657: 5% -> 15% (uncommon + conditional, must beat the two commons)
       const _baM=1+(((dead.woundStacks||0)>0)?(getOfferingEffects().bloodyArrow||0):0); // v582: Bloody Arrow — wounded kills bleed more
-      const _bty=unitBounty(dead);const _gB=Math.round(_bty*G.dte.bloodBonus*_vvM*_baM),_gC=Math.round(_bty*0.6*G.dte.cacaoBonus*_vvM); // v657: bounty replaces HP-driven spoils
+      /* v941 CRASH FIX (self-inflicted in v930). _gB was declared const, and the Obsidian Fishhook
+         block added below reassigns it -- "TypeError: Assignment to constant variable", thrown
+         inside handleDeath before the spoils entry is pushed. The battle froze on the FIRST enemy
+         slain each battle, for any player holding the Fishhook. Refreshing restored the save
+         because nothing had been committed, which is exactly the reported behaviour: resume works,
+         fight again and it crashes again. */
+      const _bty=unitBounty(dead);let _gB=Math.round(_bty*G.dte.bloodBonus*_vvM*_baM),_gC=Math.round(_bty*0.6*G.dte.cacaoBonus*_vvM); // v657: bounty replaces HP-driven spoils
       /* v921: remember which offering paid, not just that the number came out higher. The
          multipliers are computed here and then thrown away, so the spoils screen had no way to
          show why one kill was worth more than the next -- a Vulture Vessel proc looked identical
@@ -13757,7 +13782,13 @@ function handleDeath(dead){
     G._unitStates[dead.id]='slain';
     if(!G._spoilIdx)G._spoilIdx=0;
     const _feM=dead._featherBonus||1; // v319: Feather Embrace fatal on a boss routes here with 2.5×
-    let _gbB=Math.round(dead.maxHp*.45*G.dte.bloodBonus*getLayerResMult()*_feM);const _gbC=Math.round(dead.maxHp*.27*getLayerResMult()*_feM);
+    /* v939: bosses never reach resolveCap, so this branch has to re-apply the kill-attribution
+       offerings itself -- and it never did. Wounding Opochtli and finishing him paid nothing,
+       because Bloody Arrow only existed on the ordinary slay path. Same for Vulture Vessel.
+       Mirrors the multipliers and the spoils tags used there. */
+    const _vvM=(hasOffering('vulture_vessel')&&dead._killerAlly&&dead._killerElem==='nature')?1.15:1;
+    const _baM=1+(((dead.woundStacks||0)>0)?(getOfferingEffects().bloodyArrow||0):0); /* v939: read the same effect value the slay path does rather than hardcoding 1.20 -- if the offering is ever retuned, both sides move together */
+    let _gbB=Math.round(dead.maxHp*.45*G.dte.bloodBonus*getLayerResMult()*_feM*_vvM*_baM);const _gbC=Math.round(dead.maxHp*.27*getLayerResMult()*_feM*_vvM);
     /* v807: Obsidian Fishhook -- first kill of the battle only, Blood side alone. */
     let _fhBoost=0;
     if(!G._fishhookUsed){
@@ -13766,7 +13797,12 @@ function handleDeath(dead){
     }
     /* v930: carry the proc onto the spoils row, the same way the v921 kill boosts do. */
     G.spoils.killed.push({unit:dead,blood:_gbB,cacao:_gbC,featherBonus:_feM>1,_idx:++G._spoilIdx,
-      boosts:_fhBoost?[{icon:'\u{1FA9D}',label:'Obsidian Fishhook',pct:_fhBoost,col:'#c0a878'}]:[]});
+      boosts:(function(){ /* v939: tag them on the row like the ordinary slay path does */
+        const b=[];
+        if(_vvM>1)b.push({icon:'\u{1F3FA}',label:'Vulture Vessel',pct:Math.round((_vvM-1)*100),col:'#c0a060'});
+        if(_baM>1)b.push({icon:'\u{1FA78}',label:'Bloody Arrow',pct:Math.round((_baM-1)*100),col:'#e07070'});
+        if(_fhBoost)b.push({icon:'\u{1FA9D}',label:'Obsidian Fishhook',pct:_fhBoost,col:'#c0a878'});
+        return b;})()});
     if(G.runStats)G.runStats.slain++; // v829: the uncapturable path (bosses etc.) -- these never reach resolveCap
     addLog(`<span class="log-dd">${dead.icon} ${dead.name} — DEFEATED</span> <span class="log-gain">+${_gbB} 🩸 +${_gbC} 🫘</span>`);
     flashResGain(_gbB,_gbC);renderRes('rb-battle');
@@ -13827,6 +13863,11 @@ function handleDeath(dead){
       const isMal=dead.id.startsWith('boss_mal');
       const prefix=isMal?'layer5_mal_':'layer5_xiu_';
       const k=prefix+G.god.id;
+      /* v939: the guard this branch describes was never written. `unlocked` below is computed
+         AFTER V[k]=true, so it is always true, and it was never tested anyway -- the modal fired
+         on every Layer 5 clear, re-announcing a god the player unlocked runs ago. Every other
+         boss branch computes a wasLocked BEFORE setting the flag; this one did not. */
+      const _bossWasLocked=!(isMal?malinalxochitlUnlocked():xiuhtecuhtliUnlocked());
       V[k]=true;saveV();
       G._scaldingMiasmaActive=false;G._enemyMiasma=false;
       if((G.tecpatl||0)>=DT.tecpatl_level){DT.tecpatl_level=Math.min(20,(DT.tecpatl_level||0)+1);}
@@ -13839,7 +13880,7 @@ function handleDeath(dead){
       const bossName=isMal?'Malinalxochitl':'Xiuhtecuhtli';
       const bossFlavor=isMal?'Sorcerer Goddess of the Desert':'Turquoise God of Heat Winds';
       const bossColor=isMal?'#ff8040':'#40c0ff';
-      setTimeout(()=>showMo(bossIcon,'New Patron Unlocked!',`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:bossGodId,icon:bossIcon,name:bossGodId,isGod:true},56)}<div style="font-size:16px;font-weight:600;color:${bossColor};margin:.5rem 0 .25rem">${bossName}</div><div style="font-size:12px;color:var(--td);margin-bottom:.75rem">${bossFlavor}</div><div style="font-size:12px;color:var(--td);line-height:1.6">They can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs.</div></div>`,[{label:'Continue',fn:()=>{}}]),400);
+      if(_bossWasLocked)setTimeout(()=>showMo(bossIcon,'New Patron Unlocked!',`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:bossGodId,icon:bossIcon,name:bossGodId,isGod:true},56)}<div style="font-size:16px;font-weight:600;color:${bossColor};margin:.5rem 0 .25rem">${bossName}</div><div style="font-size:12px;color:var(--td);margin-bottom:.75rem">${bossFlavor}</div><div style="font-size:12px;color:var(--td);line-height:1.6">They can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs.</div></div>`,[{label:'Continue',fn:()=>{}}]),400);
     }
     // L4 boss victory flag
     if(dead.id.startsWith('boss_ixqui')){const k='layer4_'+G.god.id;
@@ -16012,7 +16053,14 @@ function showUnitTooltip(u){
   const cardBody='<div class="train-card'+(u.isPatron?' tc-patron':'')+'" style="text-align:left;max-width:360px;margin:0 auto">'
     +'<div class="tc-head"><div class="tc-name">'+u.name+(u.isPatron?' ⭐':u.isGod?' ✦':'')
       +((u.isPatron&&(G._oblationGodName||(G._oblationHistory&&G._oblationHistory.length&&G._oblationHistory[G._oblationHistory.length-1].name)))?' <span style="font-style:italic;font-weight:400;font-size:13px;color:#a060e0">'+(G._oblationGodName||G._oblationHistory[G._oblationHistory.length-1].name)+'</span>':'')+'</div>' /* v771/v774: _oblationGodName only exists from v770, so fall back to the history entry for runs oblated before it */ // v629: ⭐ patron / ✦ ally god, matching the party chips
-    +'<div class="tc-meta"><div class="tc-lv">Level '+lv+'</div><div style="margin-top:2px">'+eb(u.element)
+    /* v940: the v934 pip landed on mkUnitCard only. showUnitTooltip builds its own header, which
+       is why the training card showed "Patron God" and this modal did not. Same three states,
+       same styling, so the two cards finally agree. */
+    +'<div class="tc-meta"><div class="tc-lv">Level '+lv+'</div><div style="margin-top:2px">'
+    +(u.isPatron?'<span class="elem-badge" style="background:#2a1e04;color:#d4af37;border:0.5px solid #6a5210;font-size:9px">\u2605 Patron God</span> '
+      :u.isGod?'<span class="elem-badge" style="background:#241a2e;color:#c0a060;border:0.5px solid #5a4470;font-size:9px">\u2726 Ally God</span> '
+      :'<span class="elem-badge" style="background:#1a2418;color:#8ab070;border:0.5px solid #3a5a34;font-size:9px">Vassal</span> ')
+    +eb(u.element)
     +' <span '+typeAttrs(bo.type==='MAG'?'MAG':bo.type==='MIX'?'MIX':'PHY',specTypeEmoji(_adTxt)==='❤️')+'><span style="font-size:11px">'+(bo.type==='MAG'?'🪄':bo.type==='MIX'?'🗡️🪄':'🗡️')+'</span> <b style="font-size:10px">'+(bo.type==='MAG'?'MAG':bo.type==='MIX'?'MIX':'PHY')+'</b>'+(specTypeEmoji(_adTxt)==='❤️'?' ❤️':'')+'</span>'
     +'</div></div></div>' // v620/v621: label back with a typing tooltip; ❤️ marks a healing special
     +'<div class="tc-mid"><div class="tc-art">'+unitIconHtml(u,112)+'</div>' // v620: art fills the left column
