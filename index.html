@@ -837,13 +837,13 @@ const CHAMPIONS_RECENT_CAP=20;
 function loadDT(){
   try{
     const d=localStorage.getItem('teotlan_dt');
-    if(d){const p=JSON.parse(d);DT.teotl=p.teotl||0;DT.unlocked=new Set(p.unlocked||[]);DT.tecpatl_level=p.tecpatl_level||0;DT.tecpatl_seen=new Set(p.tecpatl_seen||[]);DT.godTecpatl=p.godTecpatl||{};DT.champions=p.champions||{};} // v830
+    if(d){const p=JSON.parse(d);DT.teotl=p.teotl||0;DT.unlocked=new Set(p.unlocked||[]);DT.tecpatl_level=p.tecpatl_level||0;DT.tecpatl_seen=new Set(p.tecpatl_seen||[]);DT.godTecpatl=p.godTecpatl||{};DT.champions=p.champions||{};DT.blessedGod=p.blessedGod||null;} // v830 · v937: loadDT rebuilds DT from a fixed whitelist, so anything absent here is silently dropped on reload -- which is exactly how the blessing vanished
     // v303 migration: dmg_preview became Strike Boost's prereq — grant it free to saves that already own strike_boost
     if(DT.unlocked.has('strike_boost')&&!DT.unlocked.has('dmg_preview'))DT.unlocked.add('dmg_preview');
     // No auto-unlocks: player must interact with Divinity Tree
   }catch(e){DT={teotl:0,unlocked:new Set(),champions:{}}} // v830
 }
-function saveDT(){try{localStorage.setItem('teotlan_dt',JSON.stringify({teotl:DT.teotl,unlocked:[...DT.unlocked],tecpatl_level:DT.tecpatl_level,tecpatl_seen:[...DT.tecpatl_seen],godTecpatl:DT.godTecpatl,champions:DT.champions}));}catch(e){}}
+function saveDT(){try{localStorage.setItem('teotlan_dt',JSON.stringify({teotl:DT.teotl,unlocked:[...DT.unlocked],tecpatl_level:DT.tecpatl_level,tecpatl_seen:[...DT.tecpatl_seen],godTecpatl:DT.godTecpatl,champions:DT.champions,blessedGod:DT.blessedGod||null}));}catch(e){}}
 loadDT();
 
 // ── OFFERINGS (v346) — Slay-the-Spire "relic" model: held = effect active for the run, ──
@@ -2236,7 +2236,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v936'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v938'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -5266,7 +5266,12 @@ function rollOmeteotlBlessing(){
   DT.blessedGod=pool[Math.floor(Math.random()*pool.length)].id;
   try{saveDT();}catch(e){}
 }
-function isBlessedGod(id){return !!(DT.unlocked.has('ometeotl_blessing')&&DT.blessedGod&&DT.blessedGod===id);}
+/* v937: during a run the answer is whatever was frozen at confirmGod; on the god-select screen
+   (no run yet) it falls back to the pending DT roll. */
+function isBlessedGod(id){
+  if(typeof G!=='undefined'&&G&&G._blessedGodId)return G._blessedGodId===id;
+  return !!(DT.unlocked.has('ometeotl_blessing')&&DT.blessedGod&&DT.blessedGod===id);
+}
 function renderGods(){
   rollOmeteotlBlessing(); /* v935 */
   /* v833: the Champions entry stays hidden until Mictlan has been conquered at least once.
@@ -5357,6 +5362,19 @@ function showGodDetail(gd){
      b.textContent='\u2605 MICTLAN CONQUERED';
      _fl.insertAdjacentElement('afterend',b);
    }}
+  /* v938: the blessing banner. Mirrors the MICTLAN CONQUERED badge structurally -- removed and
+     rebuilt on every panel render, so switching between gods cannot leave a stale one behind --
+     but carries the glow's violet so the panel and the card read as the same effect.
+     Full sentence rather than a bare tag: the card already says BLESSED, what the panel has to
+     answer is what that is worth. */
+  {const _fl2=document.getElementById('gdp-flavor');
+   const _oldB=document.getElementById('gdp-blessed');if(_oldB)_oldB.remove();
+   if(_fl2&&isBlessedGod(gd.id)){
+     const bb=document.createElement('div');bb.id='gdp-blessed';
+     bb.style.cssText='display:block;margin-top:5px;font-size:11px;font-weight:600;color:#c8a8ff;background:#160f24;border:0.5px solid #6a4aa0;border-radius:6px;padding:4px 9px;box-shadow:0 0 10px rgba(200,170,255,.22)';
+     bb.innerHTML='\u2726 Blessed for this run \u2014 <strong>+5% Blood &amp; Cacao</strong> if you choose them';
+     (document.getElementById('gdp-conquered')||_fl2).insertAdjacentElement('afterend',bb);
+   }}
   document.getElementById('gdp-flavor').textContent=gd.flavor;
   document.getElementById('gdp-elem').innerHTML=eb(gd.element);
   document.getElementById('gdp-type').innerHTML=`${typeLabel}<div style="font-size:12.5px;color:var(--td);margin-top:2px">❤️ HP ${gd.hp} · ✨ TP ${gd.np}</div>`; // v625: bigger, NP → TP (player-facing name), stat emojis for consistency
@@ -5380,6 +5398,11 @@ function showGodDetail(gd){
 
 function confirmGod(){
   if(!G.god)return;G.party=[G.god.id];G.levels['god_'+G.god.id]=1;G.deplSel=[];
+  /* v937: freeze the blessing onto the run. Living only on DT meant two failure modes: a reload
+     lost it (loadDT's whitelist dropped the field), and any later visit to the god-select screen
+     would reroll it out from under an in-progress run. G is written by saveRun, so stamping it
+     here makes it survive quit-and-resume and immune to rerolls. */
+  G._blessedGodId=(DT.unlocked.has('ometeotl_blessing')&&DT.blessedGod)?DT.blessedGod:null;
   G._preRunV={...V};
   injectTlacuiloVassal(); // ensure vassal is in G.captured before smartAutoSel fills deplSel
   setRecordedVassals(G._tlacuiloUninjected||[]); // v503: consume only successfully injected records — never destroy ones that failed to restore
