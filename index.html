@@ -253,6 +253,7 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .tc-forces .f0{opacity:.4}
 .tc-spec{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:12.5px}
 .tc-spec-name{color:#6090e0;font-weight:600}
+.chima-pip{white-space:nowrap;border-bottom:1px dotted #3a6a8a}
 .tc-cost{font-size:11px;color:#c0a0e0;background:#1a0a2a;border:0.5px solid #503070;border-radius:8px;padding:1px 7px;white-space:nowrap}
 .tc-desc{font-size:11.5px;color:var(--td);line-height:1.35}
 .tc-sacpill{font-size:10px;color:#b09030;margin-top:2px}
@@ -397,7 +398,7 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .card-icon-btn:active{transform:scale(.9)}
 /* ═══ v556: battle kinetics ═══ */
 @keyframes fxLunge{0%{transform:translate(0,0)}45%{transform:translate(var(--lx),var(--ly)) scale(1.04)}100%{transform:translate(0,0)}}
-.fx-lunge{animation:fxLunge .34s cubic-bezier(.3,.1,.3,1);position:relative;z-index:30}
+.fx-lunge{animation:fxLunge .34s cubic-bezier(.3,.1,.3,1);position:relative;z-index:30;transition:none!important}
 @keyframes fxStomp{0%{transform:translate(0,0)}40%{transform:translate(0,var(--sy,-14px)) scale(1.05)}70%{transform:translate(0,3px) scale(.98)}100%{transform:translate(0,0)}}
 .fx-stomp{animation:fxStomp .3s ease-out;position:relative;z-index:30}
 @keyframes fxPulse{0%{box-shadow:0 0 0 0 var(--fxc,#d4af37)}70%{box-shadow:0 0 18px 6px transparent}100%{box-shadow:0 0 0 0 transparent}}
@@ -817,8 +818,8 @@ const TREE_NODES=[
   {id:'cost_reduce_1',label:'Cheaper Blood I',desc:'Level-up Blood costs reduced by 10%',cost:25,cat:'qol',req:['trade_route'],tier:1,x:235,y:360},
   {id:'cost_reduce_2',label:'Cheaper Blood II',desc:'Level-up Blood costs reduced by another 15% (total -25%)',cost:550, /* v871: 600 -> 550 */cat:'qol',req:['cost_reduce_1'],tier:2,x:130,y:294},
   {id:'flower_reduce',label:'Flower Discount',desc:'God recruit and Chimalli cost reduced by 15%',cost:450,cat:'qol',req:['cost_reduce_1'],tier:2,x:130,y:430},
-  {id:'chima_1',label:'Chimalli Armor I',desc:'Chimalli armor grants 30 HP per stack (up to 60 HP total)',cost:1800,cat:'qol',req:['flower_reduce'],tier:3,x:25,y:430},
-  {id:'chima_2',label:'Chimalli Armor II',desc:'[Merged into base Chimalli — all shields now grant status immunity on break]',cost:0,cat:'qol',req:['chima_1'],tier:4,x:25,y:426,hidden:true},
+  {id:'chima_1',label:'Chimalli Armor I',desc:'Buy a 3rd Chimalli stack \u2014 +5% max HP armor (up to 15% total)',cost:1800,cat:'qol',req:['flower_reduce'],tier:3,x:25,y:430},
+  {id:'chima_2',label:'Chimalli Armor II',desc:'Buy a 4th Chimalli stack \u2014 +5% max HP armor (up to 20% total)',cost:2600,cat:'qol',req:['chima_1'],tier:4,x:25,y:426,hidden:true},
 ];
 // v382: decramp — push the GODS branch north and the ALLIES branch south (hub stays centered).
 // Leaves the WEST/ECONOMY zone open (x < 25) for the future Tlacuilo unlock + Pochteca upgrade nodes.
@@ -904,11 +905,11 @@ const OFFERINGS={
   stingray_spine:{name:'Stingray Spine',tier:'uncommon',icon:'🦴',price:250,priceType:'cacao',desc:'All ally strikes apply Poison \u00d71',flavor:"A bloodletter's barb, still slick with the venom of devotion.",eff:{strikePoison:1}},
   head_old_god:{name:'Head of the Old God',tier:'uncommon',icon:'🪔',price:250,priceType:'cacao',desc:"FIRE units' strikes apply Burn \u00d71",flavor:'A clay brazier-head of Huehueteotl; the oldest fire never truly goes out.',eff:{strikeBurnFire:1}},
   chaac_axe:{name:"Chaac's Axe",tier:'uncommon',icon:'🪓',price:250,priceType:'cacao',desc:"THUNDER units' strikes apply Paralyze \u00d71",flavor:'The lightning-axe of the rain god; each blow cracks the sky open.',eff:{strikeParalyzeThunder:1}},
-  moctezuma_shield:{name:'Moctezuma Shield',tier:'uncommon',icon:'🛡',price:250,priceType:'cacao',desc:'One random unit starts with 10 HP Chimalli',flavor:'A turquoise war-shield fit for an emperor; it chooses whom it guards.',eff:{startChimalliRandom:10}},
+  moctezuma_shield:{name:'Moctezuma Shield',tier:'uncommon',icon:'🛡',price:250,priceType:'cacao',desc:'One random unit starts with Chimalli worth 5% of max HP',flavor:'A turquoise war-shield fit for an emperor; it chooses whom it guards.',eff:{startChimalliRandom:0.05}},
   chac_mool:{name:'Chac Mool',tier:'uncommon',icon:'🗿',price:250,priceType:'cacao',desc:'All allies regenerate 5% HP per round',flavor:'The reclining messenger waits with his bowl, patient to carry offerings to the gods.',eff:{roundRegenPct:0.05}},
   mictlantecuhtli_idol:{name:'Mictlantecuhtli Idol',tier:'uncommon',icon:'💀',price:250,priceType:'cacao',desc:'Consumable: revive the first fallen vassal at 50% HP',flavor:'The grinning lord of the dead returns one soul — and only one — to the fight.',consumable:true,eff:{reviveVassal:0.5}},
   mictecacihuatl_figure:{name:'Mictecacihuatl Figure',tier:'uncommon',icon:'🌺',price:250,priceType:'cacao',desc:'Consumable: revive the first fallen non-patron ally god at 50% HP',flavor:'The Lady of the Dead keeps her marigold vigil — she sends one god back across the river.',consumable:true,eff:{reviveGod:0.5}},
-  turquoise_serpent:{name:'Turquoise Serpent Pectoral',tier:'uncommon',icon:'🐍',price:250,priceType:'cacao',desc:'+20 DEF & +20 RES to the weakest unit',flavor:"Two turquoise heads — a king's unbroken ward, given to the one who needs it most.",eff:{weakestFlatDefRes:20}},
+  turquoise_serpent:{name:'Turquoise Serpent Pectoral',tier:'uncommon',icon:'🐍',price:250,priceType:'cacao',desc:'+20 DEF & +20 RES to your lowest-HP unit',flavor:"Two turquoise heads — a king's unbroken ward, given to the one who needs it most.",eff:{weakestFlatDefRes:20}},
   mezcala_mask:{name:'Mezcala Mask',tier:'uncommon',icon:'😐',price:250,priceType:'cacao',desc:'Party +15% MAG & +15% RES for the first 2 rounds',flavor:"A spare stone face from the Mezcala hills, older than memory — it sharpens the mind's eye.",eff:{roundBuff:2,magMult2r:1.15,resMult2r:1.15}},
   zitlali_mask:{name:'Zitlali Jaguar Mask',tier:'uncommon',icon:'😼',price:250,priceType:'cacao',desc:'Party +15% ATK & +15% DEF for the first 2 rounds',flavor:'A star-flecked jaguar visage; for two breaths you fight like a beast under night sky.',eff:{roundBuff:2,atkMult2r:1.15,defMult2r:1.15}},
   // Pochteca — Rare (2,500 Cacao or 50 Flowers, 50/50) — v374
@@ -927,9 +928,9 @@ const OFFERINGS={
   /* v881: five new commons. Day had NO common at all and Humanity had none above 100 cacao;
      Night was thin at every tier. Elements referenced here reuse existing element keys. */
   cipactonal_amate:{name:'Cipactonal Amate',tier:'common',icon:'\u{1F4DC}',price:100,priceType:'cacao',desc:'DAY units gain +1 ATK & MAG each round (starts at +1, caps at +10)',flavor:'The first day-keeper drew the count on bark paper, and the count has been running ever since.',eff:{elemRamp:{element:'day',per:1,max:10}}},
-  tlamatlquiticitl:{name:'Tlamatlquiticitl Remedy',tier:'common',icon:'\u2695\uFE0F',price:100,priceType:'cacao',desc:'+20 DEF & RES to the weakest DAY unit \u2014 needs 2+ DAY units deployed',flavor:'The midwife-healer works only where there is someone to hold the light for her.',eff:{weakestElemDefRes:{element:'day',amount:20,minCount:2}}},
+  tlamatlquiticitl:{name:'Tlamatlquiticitl Remedy',tier:'common',icon:'\u2695\uFE0F',price:100,priceType:'cacao',desc:'+20 DEF & RES to your lowest-HP unit \u2014 needs at least 1 DAY unit deployed',flavor:'The midwife-healer works only where there is someone to hold the light for her.',eff:{weakestElemDefRes:{element:'day',amount:20,minCount:1,anyElement:true}} /* v960 */},
   coatepec_ball:{name:'Coatepec Ball',tier:'common',icon:'\u{1F3D0}',price:100,priceType:'cacao',desc:'DAY & EARTH units: +7 ATK and +7 MAG \u2014 first 2 rounds only',flavor:'Struck down the slope of the serpent hill, it has not stopped rolling.',eff:{vialElements:['day','earth'],vialAmount:7,vialRounds:2}},
-  tecciztecatl_conch:{name:'Tecciztecatl Conch',tier:'common',icon:'\u{1F41A}',price:100,priceType:'cacao',desc:'All NIGHT units start battle with 5 HP Chimalli',flavor:'He hesitated at the fire and became the moon. The shell remembers the flinching.',eff:{startChimalliByElement:{night:5}}},
+  tecciztecatl_conch:{name:'Tecciztecatl Conch',tier:'common',icon:'\u{1F41A}',price:100,priceType:'cacao',desc:'All NIGHT units start with Chimalli worth 3% of max HP',flavor:'He hesitated at the fire and became the moon. The shell remembers the flinching.',eff:{startChimalliByElement:{night:0.03}}},
   hueypachtli_dough:{name:'Hueypachtli Dough',tier:'common',icon:'\u{1FAD3}',price:100,priceType:'cacao',desc:'HUMANITY units +7 MAG',flavor:'Amaranth and honey, pressed into the shape of a god so the people could eat it.',eff:{flatMagByElement:{humanity:7}}},
   turkey_bones:{name:'Turkey Bones',tier:'common',icon:'\u{1F983}',price:100,priceType:'cacao',desc:'THUNDER units +10% max HP',flavor:'Totolin bones, cracked for the marrow and kept for the luck.',eff:{hpMultByElement:{thunder:1.10}}},
   huehuecoyotl_ayotl:{name:"Huehuecoyotl Ayotl",tier:'uncommon',icon:'\u{1F422}',price:250,priceType:'cacao',desc:'HUMANITY units deal +20% special damage while casting specials on consecutive turns',flavor:'The old coyote keeps the beat on a turtle shell. Miss one and the dance is over.',eff:{coyotlChain:0.20}},
@@ -952,7 +953,7 @@ const OFFERINGS={
   /* v806: the three Layer 8 rares from the L8 design doc, none of which had been built. */
   ball_game_ring:{name:'Ball Game Ring',tier:'rare',icon:'\u{1F3C0}',price:600,priceType:'cacao',flowerPrice:20,desc:'+2 Flowers per enemy defeated by a HUMANITY ally',flavor:'The stone hoop of the tlachtli court \u2014 every sinking of the ball was a sun set right.'},
   tzompantli_skull:{name:'Tzompantli Skull',tier:'rare',icon:'\u{1F480}',price:600,priceType:'cacao',flowerPrice:20,desc:'+1 ATK/MAG per vassal sacrificed at the Altar (max 50)' /* v929: only your own vassals can be sacrificed -- "enemy" implied it counted kills */,flavor:'A rack of skulls, each one a debt the sun no longer has to collect.'},
-  sak_tahn_waax:{name:'Sak Tahn Waax Calendar',tier:'rare',icon:'\u{1F4C5}',price:600,priceType:'cacao',flowerPrice:20,desc:'Every 12 rounds, deal 15% of max HP to all enemies \u2014 the count carries between battles',flavor:'A Maya long-count wheel, patient as erosion. It does not care which fight you are in.'},
+  sak_tahn_waax:{name:'Sak Tahn Waax Calendar',tier:'rare',icon:'\u{1F4C5}',price:600,priceType:'cacao',flowerPrice:20,desc:'Every 12 rounds, deal 20% of max HP to all enemies \u2014 the count carries between battles',flavor:'A Maya long-count wheel, patient as erosion. It does not care which fight you are in.'},
   // Event-exclusive — Patecatl's Apothecary (migrated from runBoosts)
   sacred_atole:{name:'Sacred Atole',tier:'event',icon:'🌽',desc:'Party +25% max HP',flavor:'Warmth settles into your bones.',eff:{hpMult:1.25}},
   tecuitlatl_cake:{name:'Tecuitlatl Cake',tier:'event',icon:'🍵',desc:'+20% max TP, −5 TP cost',flavor:'Your spirit quickens.',eff:{tpMult:1.20,tpCostFlat:5}},
@@ -974,10 +975,56 @@ function grantOffering(id){
   if(id==='tzompantli_skull')G.tzompantliSac=0;
   G.offerings.push(id);
 }
+/* ═══ v948: element-aware offering grants ════════════════════════════════════════════════════
+   OFFERINGS carries no element field, so an offering's element is DERIVED at runtime. Three
+   sources, in priority order:
+     1. OFFERING_ELEM_OVERRIDE below — explicit, wins over everything.
+     2. An eff key prefixed with an element id, e.g. eff:{waterStrikeSplash:0.20} -> water.
+     3. An element id appearing in ALLCAPS as a whole word in desc, e.g. "WATER units...".
+   An offering matching none of these is AGNOSTIC (party-wide) — 45 of the 86 currently are, and
+   that is correct: "Party +8% ATK" helps everyone.
+
+   FUTURE-PROOFING: this is why derivation was chosen over a hand-written table. A new offering
+   that either names its element in the eff key or writes it in ALLCAPS in desc classifies itself
+   with no maintenance here. Only genuinely ambiguous ones need an override line.
+   ══════════════════════════════════════════════════════════════════════════════════════════ */
+const OFFERING_ELEM_IDS=['wind','earth','water','fire','thunder','night','nature','humanity','day'];
+const OFFERING_ELEM_OVERRIDE={
+  /* multi-element or mis-derived entries. An empty array forces AGNOSTIC. */
+  minacachalli:['humanity','water'],      // eff and desc both name two
+  coatepec_ball:['day','earth'],
+  bioluminescent_vial:['night','thunder']
+};
+function offeringElems(id){
+  const ov=OFFERING_ELEM_OVERRIDE[id];
+  if(ov)return ov;
+  const o=OFFERINGS[id];if(!o)return[];
+  const hits=new Set();
+  Object.keys(o.eff||{}).forEach(k=>{
+    const lk=String(k).toLowerCase();
+    OFFERING_ELEM_IDS.forEach(e=>{if(lk.indexOf(e)===0)hits.add(e);});
+  });
+  const d=String(o.desc||'');
+  OFFERING_ELEM_IDS.forEach(e=>{if(new RegExp('\\b'+e.toUpperCase()+'\\b').test(d))hits.add(e);});
+  return[...hits];
+}
+/* Picks from `pool`, preferring offerings that will actually do something for this patron.
+   Ruling: 50% element-matched / 50% agnostic. If the chosen side is empty, use the other. If
+   both are empty every useful one is already owned, so fall back to a flat random pick. */
+function pickPreferredOffering(pool){
+  const el=(G.god&&G.god.element)||null;
+  if(!el||!pool.length)return pool[Math.floor(Math.random()*pool.length)];
+  const match=[],agnostic=[];
+  pool.forEach(id=>{const es=offeringElems(id);if(!es.length)agnostic.push(id);else if(es.indexOf(el)>=0)match.push(id);});
+  let bucket=(Math.random()<0.5)?match:agnostic;
+  if(!bucket.length)bucket=(bucket===match)?agnostic:match;
+  if(!bucket.length)bucket=pool; // everything relevant is owned — anything goes
+  return bucket[Math.floor(Math.random()*bucket.length)];
+}
 function grantRandomOffering(tier){
   const owned=new Set(G.offerings||[]);
   const pool=Object.keys(OFFERINGS).filter(id=>{const o=OFFERINGS[id];return o&&o.tier===tier&&o.price&&!owned.has(id)&&!(o.noStockIf&&o.noStockIf());});
-  if(pool.length){const id=pool[Math.floor(Math.random()*pool.length)];grantOffering(id);return{granted:true,o:OFFERINGS[id]};}
+  if(pool.length){const id=pickPreferredOffering(pool);grantOffering(id);return{granted:true,o:OFFERINGS[id]};}
   const val=({common:{cacao:100,flower:2},uncommon:{cacao:250,flower:5},rare:{cacao:600,flower:20}})[tier]||{cacao:100,flower:2};
   if(Math.random()<0.5){G.res.cacao+=val.cacao;return{granted:false,res:'cacao',amount:val.cacao};}
   G.res.flower+=val.flower;return{granted:false,res:'flower',amount:val.flower};
@@ -1092,6 +1139,22 @@ function applyTamales(u,oe){
   if(oe.tlaloqueHpMult!==1){const _r=u.maxHp>0?u.currentHp/u.maxHp:1;u.maxHp=Math.round(u.maxHp*oe.tlaloqueHpMult);u.currentHp=Math.round(u.maxHp*_r);}
   if(oe.tlaloqueStatMult!==1){u.atk=Math.round((u.atk||0)*oe.tlaloqueStatMult);u.mag=Math.round((u.mag||0)*oe.tlaloqueStatMult);u.def=Math.round((u.def||0)*oe.tlaloqueStatMult);u.res=Math.round((u.res||0)*oe.tlaloqueStatMult);const _nr=u.maxNP>0?u.currentNP/u.maxNP:1;u.maxNP=Math.round((u.maxNP||0)*oe.tlaloqueStatMult);u.currentNP=Math.round((u.maxNP||0)*_nr);}
 }
+/* v962: ONE definition of "weakest ally", shared by the Tlamatlquiticitl Remedy and the
+   Turquoise Serpent Pectoral. Both previously picked the lowest DEF+RES, which disagreed with
+   every player's reading of the word: it ignored HP entirely, so a 2,378 HP archer with 276/200
+   counted as more fragile than a 1,904 HP healer with 160/227. It also treated DEF and RES as
+   interchangeable, so a high-RES / low-DEF unit read as average and got skipped even though
+   physical damage shreds it. Lowest max HP instead [Genaro, v962]. Ties break on DEF+RES.
+   NOTE: Llorona Tear and Snake Scale deliberately do NOT use this -- they target the lowest-LEVEL
+   vassal via weakestDeployedVassal(), which is a different rule and stays as it is. */
+function weakestAlly(pool){
+  if(!pool||!pool.length)return null;
+  return pool.reduce((a,b)=>{
+    const ah=a.maxHp||0,bh=b.maxHp||0;
+    if(ah!==bh)return ah<bh?a:b;
+    return ((a.def||0)+(a.res||0))<=((b.def||0)+(b.res||0))?a:b;
+  });
+}
 function applyOfferings(){
   const oe=getOfferingEffects();
   (G.units||[]).forEach(u=>{
@@ -1144,8 +1207,14 @@ function applyOfferings(){
       if(oe.mask2r.res!==1)u.res=Math.round((u.res||0)*oe.mask2r.res);
     }
     if(oe.battleStartAtkBuff)applyAtkBuff(u,1);
-    if(G._pulqueFeast){applyAtkBuff(u,1);u.drunkStacks=Math.min(4,(u.drunkStacks||0)+2);reverieRecalc(u);} // v568: Pulque Feast — the drink bypasses the Chimalli gate (voluntary)
+    if(G._pulqueFeast){u.drunkStacks=Math.min(4,(u.drunkStacks||0)+4);reverieRecalc(u);} // v568: bypasses the Chimalli gate (voluntary) · v947: DRUNK x4, ATK buff dropped — the prize moved to the event roll
   });
+  /* v973: _pulqueFeast is a NEXT-BATTLE flag but nothing ever cleared it, so once the Feast was
+     accepted every remaining battle of the run opened with DRUNK x4. Every sibling carry-out
+     (nextBattleWound, _nextBattlePoison, nextBattleBurnStacks, _nextBattleNPPenalty) resets itself
+     the moment it fires; this one never did. Cleared here, AFTER the per-unit loop above -- doing
+     it inside the loop would leave only the first ally drunk. */
+  if(G._pulqueFeast)G._pulqueFeast=false;
   /* v807: Llorona Tear and Snake Scale both act on the lowest-level deployed vassal. Resolved
      here, at battle start, once the party is assembled -- doing it per-unit in the loop above
      would need the whole roster to compare against. */
@@ -1181,26 +1250,35 @@ function applyOfferings(){
   Object.keys(oe.startChimalliByElement||{}).forEach(el=>{
     const amt=oe.startChimalliByElement[el];if(!(amt>0))return;
     const hit=(G.units||[]).filter(u=>u&&u.isAlly&&u.currentHp>0&&u.element===el);
-    hit.forEach(u=>{u.armor=(u.armor||0)+amt;});
+    hit.forEach(u=>grantChimalli(u,amt,'Tecciztecatl Conch')); /* v964 */
     if(hit.length)addLog(`<span class="log-sh">\u{1F41A} Tecciztecatl Conch: ${hit.length} ${el.toUpperCase()} unit${hit.length>1?'s':''} +${amt} HP Chimalli</span>`);
   });
-  /* v881: Tlamatlquiticitl Remedy — weakest unit OF AN ELEMENT, and only above a deployment threshold. */
+  /* v881: Tlamatlquiticitl Remedy — gated on a count of one element.
+     v960: `anyElement` splits the GATE from the TARGET. The element count is still the
+     requirement, but the buff now lands on the weakest ally of any element, so a lone DAY unit
+     unlocks protection for whoever actually needs it. The old form asked for two DAY units and
+     then healed one of those same two, which is why it read as doing nothing on a mixed party. */
   (oe.weakestElemDefRes||[]).forEach(w=>{
-    const pool=(G.units||[]).filter(u=>u&&u.isAlly&&u.currentHp>0&&u.element===w.element);
-    if(pool.length<(w.minCount||1))return;
-    const t=pool.reduce((a,b)=>((a.def||0)+(a.res||0))<=((b.def||0)+(b.res||0))?a:b);
+    const gate=(G.units||[]).filter(u=>u&&u.isAlly&&u.currentHp>0&&u.element===w.element);
+    if(gate.length<(w.minCount||1))return;
+    const pool=w.anyElement?(G.units||[]).filter(u=>u&&u.isAlly&&u.currentHp>0):gate;
+    if(!pool.length)return;
+    const t=weakestAlly(pool); if(!t)return; /* v962 */
     t.def=(t.def||0)+w.amount;t.res=(t.res||0)+w.amount;
+    t._remedy=(t._remedy||0)+w.amount; /* v961: the Remedy mutated def/res and left no trace, so
+      nothing on the card could show it -- the +DEF/RES chip players were seeing belongs to the
+      Turquoise Serpent Pectoral. */
     addLog(`<span class="log-sh">\u2695\uFE0F Tlamatlquiticitl Remedy: ${t.icon} ${t.name} +${w.amount} DEF & RES</span>`);
   });
-  // v370: Moctezuma Shield — one random living ally gets +10 Chimalli (independent of Snake Skirt; can stack)
+  // v370: Moctezuma Shield — one random living ally gets Chimalli (5% of max HP since v975; independent of Snake Skirt, can stack)
   if(oe.startChimalliRandom>0){
     const _msA=(G.units||[]).filter(u=>u.isAlly&&u.currentHp>0);
-    if(_msA.length){const _mt=_msA[Math.floor(Math.random()*_msA.length)];_mt.armor=(_mt.armor||0)+oe.startChimalliRandom;addLog(`<span class="log-sh">🛡 Moctezuma Shield: ${_mt.icon} ${_mt.name} +${oe.startChimalliRandom} HP Chimalli!</span>`);}
+    if(_msA.length){const _mt=_msA[Math.floor(Math.random()*_msA.length)];grantChimalli(_mt,oe.startChimalliRandom,'Moctezuma Shield');addLog(`<span class="log-sh">🛡 Moctezuma Shield: ${_mt.icon} ${_mt.name} +${oe.startChimalliRandom} HP Chimalli!</span>`);}
   }
   // v370: Turquoise Serpent Pectoral — flat +DEF/+RES to the single weakest (lowest DEF+RES) ally; dies with the unit, re-picks next battle
   if(oe.weakestFlatDefRes>0){
     const _tsA=(G.units||[]).filter(u=>u.isAlly&&u.currentHp>0);
-    if(_tsA.length){const _wt=_tsA.reduce((a,b)=>((a.def||0)+(a.res||0))<=((b.def||0)+(b.res||0))?a:b);_wt.def=(_wt.def||0)+oe.weakestFlatDefRes;_wt.res=(_wt.res||0)+oe.weakestFlatDefRes;_wt._turquoise=oe.weakestFlatDefRes;if(_wt._mask2rBase){_wt._mask2rBase.def+=oe.weakestFlatDefRes;_wt._mask2rBase.res+=oe.weakestFlatDefRes;}addLog(`<span class="log-sh">🐍 Turquoise Serpent: ${_wt.icon} ${_wt.name} +${oe.weakestFlatDefRes} DEF & RES!</span>`);}
+    if(_tsA.length){const _wt=weakestAlly(_tsA);_wt.def=(_wt.def||0)+oe.weakestFlatDefRes;_wt.res=(_wt.res||0)+oe.weakestFlatDefRes;_wt._turquoise=oe.weakestFlatDefRes;if(_wt._mask2rBase){_wt._mask2rBase.def+=oe.weakestFlatDefRes;_wt._mask2rBase.res+=oe.weakestFlatDefRes;}addLog(`<span class="log-sh">🐍 Turquoise Serpent: ${_wt.icon} ${_wt.name} +${oe.weakestFlatDefRes} DEF & RES!</span>`);}
   }
   if((G.offerings||[]).length)addLog(`<span class="log-god">🪶 Offerings active: ${G.offerings.length}</span>`);
 }
@@ -1509,6 +1587,29 @@ function synTip(e){ // v643: hover the 🔗 label for the live synergy explanati
 }
 function synTipTap(e){if(e&&e.stopPropagation)e.stopPropagation();synTip(e);setTimeout(()=>{document.addEventListener('click',relicTipHide,{once:true});},50);}
 const SYN_ATTRS='style="cursor:help" onmouseenter="synTip(event)" onmouseleave="relicTipHide()" ontouchstart="synTipTap(event)" onclick="event.stopPropagation();synTipTap(event)"';
+/* ═══ v976: Chimalli pip ═════════════════════════════════════════════════════════════════════
+   Chimalli is now a core defensive layer but nothing ever explained it in situ. chimaWord()
+   decorates the word wherever it appears in ability, passive and offering text with a hoverable
+   shield pip, using the same relic-tooltip surface (and the same hover + tap pair) as the
+   synergy and stat tips. Purely presentational -- it rewrites display strings only, never data. */
+const CHIMA_ATTRS='style="cursor:help" onmouseenter="chimaTip(event)" onmouseleave="relicTipHide()" ontouchstart="chimaTipTap(event)" onclick="event.stopPropagation();chimaTipTap(event)"';
+function chimaTip(e){
+  const tt=document.getElementById('relic-tooltip');if(!tt)return;
+  tt.innerHTML='<div style="font-weight:700;color:#60c0e0;margin-bottom:3px">\u{1F6E1} Chimalli</div>'
+    +'<div style="font-size:12px">HP armor that protects your <span style="color:#e05050">\u2764</span> HP and blocks status.</div>';
+  tt.style.display='block';
+  const x=(e.clientX!==undefined?e.clientX:(e.touches&&e.touches[0]?e.touches[0].clientX:0));
+  const y=(e.clientY!==undefined?e.clientY:(e.touches&&e.touches[0]?e.touches[0].clientY:0));
+  tt.style.left=Math.min(x+12,window.innerWidth-216)+'px';tt.style.top=Math.min(y+14,window.innerHeight-96)+'px';
+}
+function chimaTipTap(e){if(e&&e.stopPropagation)e.stopPropagation();chimaTip(e);setTimeout(()=>{document.addEventListener('click',relicTipHide,{once:true});},50);}
+/* Wraps every standalone "Chimalli" in a display string. Skips text that already carries a pip so
+   repeated renders cannot nest them. */
+function chimaWord(txt){
+  if(!txt||String(txt).indexOf('chima-pip')>=0)return txt;
+  return String(txt).replace(/\bChimalli\b/g,
+    '<span class="chima-pip" '+CHIMA_ATTRS+'><span style="color:#60c0e0">\u{1F6E1}</span> Chimalli</span>');
+}
 function specTip(e,name,ad){ // v635: hover a special's name for its full detail (altar cards)
   const tt=document.getElementById('relic-tooltip');if(!tt)return;
   tt.innerHTML='<strong style="color:#6090e0">🔮 '+name+'</strong><br><span style="color:var(--td)">'+ad+'</span>';
@@ -1824,7 +1925,10 @@ function getDTEffects(){
     cacaoStartBonus:(u.has('cacao_starter_2')?100:0)+(u.has('cacao_starter_1')?50:0),
     bloodCostMult:u.has('cost_reduce_2')?0.75:u.has('cost_reduce_1')?0.90:1,
     flowerCostMult:u.has('flower_reduce')?0.85:1,
-    chimaArmorPerStack:u.has('chima_1')?30:20,
+    /* v975: a stack is a flat 5% for everyone. The Chimalli nodes now buy an extra stack SLOT
+       rather than fattening every stack, so the Altar reads 2 / 3 / 4 purchases -> 10% / 15% / 20%. */
+    chimaArmorPerStack:0.05,
+    chimaMaxStacks:u.has('chima_2')?4:u.has('chima_1')?3:2,
     chimaImmune:u.has('chima_2'),
     cacaoBonus:(1+(u.has('theobroma')?0.10:0)+(u.has('theobroma2')?0.15:0))*((G.layer||1)>=3?0.70:1), // v820
     pantheonBoostTiers:(u.has('pantheon_boost_2')?2:u.has('pantheon_boost')?1:0),
@@ -2113,8 +2217,8 @@ const TECPATL_MODS=[
   {id:'enemy_crit_1',family:'Enemy Crit Up',tier:1,name:'Enemy Crit Up I',icon:'💥',desc:'Enemies have +10% CRIT chance.',effect:'enemyCritBonus:0.10'},
   {id:'enemy_crit_2',family:'Enemy Crit Up',tier:2,name:'Enemy Crit Up II',icon:'💥',desc:'Enemies have +20% CRIT chance.',effect:'enemyCritBonus:0.20',req:'enemy_crit_1'},
   // ENEMY CHIMALLI
-  {id:'enemy_chima_1',family:'Enemy Chimalli',tier:1,name:'Enemy Chimalli I',icon:'🛡',desc:'All enemies begin with 20 HP of Chimalli armor.',effect:'enemyChimalli:20'},
-  {id:'enemy_chima_2',family:'Enemy Chimalli',tier:2,name:'Enemy Chimalli II',icon:'🛡',desc:'All enemies begin with 40 HP of Chimalli armor.',effect:'enemyChimalli:40',req:'enemy_chima_1'},
+  {id:'enemy_chima_1',family:'Enemy Chimalli',tier:1,name:'Enemy Chimalli I',icon:'🛡',desc:'All enemies begin with Chimalli worth 10% of their max HP.',effect:'enemyChimalli:10%'},
+  {id:'enemy_chima_2',family:'Enemy Chimalli',tier:2,name:'Enemy Chimalli II',icon:'🛡',desc:'All enemies begin with Chimalli worth 20% of their max HP.',effect:'enemyChimalli:20%',req:'enemy_chima_1'},
   // BOSS SURGE
   {id:'boss_surge_1',family:'Boss Surge',tier:1,name:'Boss Surge I',icon:'💀',desc:'Bosses and escorts have 1.5× HP and +5% CRIT.',effect:'bossHpMult:1.5|bossCritBonus:0.05'},
   {id:'boss_surge_2',family:'Boss Surge',tier:2,name:'Boss Surge II',icon:'💀',desc:'Bosses and escorts have 2× HP and +10% CRIT.',effect:'bossHpMult:2.0|bossCritBonus:0.10',req:'boss_surge_1'},
@@ -2154,7 +2258,7 @@ function getTecpatlEffects(){
     enemyDefMult:   has('enemy_def_2')?1.4:has('enemy_def_1')?1.2:1.0,
     enemyResMult:   has('enemy_res_2')?1.4:has('enemy_res_1')?1.2:1.0,
     enemyCritBonus: has('enemy_crit_2')?0.20:has('enemy_crit_1')?0.10:0,
-    enemyChimalli:  has('enemy_chima_2')?40:has('enemy_chima_1')?20:0,
+    enemyChimalli:  has('enemy_chima_2')?0.20:has('enemy_chima_1')?0.10:0, /* v964: fractions of enemy max HP */
     bossHpMult:     has('boss_surge_3')?2.5:has('boss_surge_2')?2.0:has('boss_surge_1')?1.5:1.0,
     bossCritBonus:  has('boss_surge_3')?0.15:has('boss_surge_2')?0.10:has('boss_surge_1')?0.05:0,
     reinforceChance:has('reinforce_3')?0.30:has('reinforce_2')?0.20:has('reinforce_1')?0.10:0,
@@ -2245,7 +2349,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v941'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v979'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -2263,7 +2367,7 @@ const MICTLAN_LAYERS=[
   {num:6,name:'Temiminayólan',      sub:'The Place Where Arrows Rain',            icon:'🏹', element:'Water · Human',                         boss:'Opochtli',       available:true},
   {num:7,name:'Teyōllōcuālōyān',    sub:'The Place Where Hearts Are Devoured',    icon:'🫀', element:'Nature · Day',                        boss:'Mayahuel',      available:true},
   {num:8,name:'Apanohualóyan',      sub:'The Place of Crossing the Black Waters', icon:'🌊', element:'Night · Thunder',                          boss:'Tlazoltéotl',    available:true},
-  {num:9,name:'Chiconahualoyán',    sub:'The Nine Deserts — Realm of the Dead',   icon:'💀', element:'Cosmos · Night · Day · Fire',           boss:'Mictlantecuhtli',available:true} /* v789 */,
+  {num:9,name:'Chiconahualoyán',    sub:'Reign of the God King of the Dead',   icon:'💀', element:'Cosmos · Night · Day · Fire',           boss:'Mictlantecuhtli',available:true} /* v789 */,
 ];
 /* v744: single source for layer naming. Five separate ternary chains each carried their own
    copy of this list -- the codex label, the map title, two `layerName` consts and the
@@ -2353,8 +2457,8 @@ const GODS=[
     ability:'Tlalocan Deluge',ad:'1.35×MAG (up to 4 targets); first kill auto-slain and rises as a Tlaloque ally at the same level',ak:'deluge'},
   {id:'coatlicue',name:'Coatlicue',flavor:'Mother Goddess of Earth',element:'earth',icon:'🌎',
     type:'PHYS',hp:180,atk:16,mag:0,def:15,res:9,np:40,npCost:20,
-    passive:'Snake Skirt: at battle start, the lowest HP ally receives 20 HP Chimalli armor',pk:'freeChimalli',pv:20,
-    ability:'Ophidian Mother',ad:'Heal all allies 25% HP + Cleanse +10 HP Chimalli to lowest HP ally',ak:'ophidianMother'},
+    passive:'Snake Skirt: at battle start, the lowest HP ally receives Chimalli worth 5% of max HP',pk:'freeChimalli',pv:0.05,
+    ability:'Ophidian Mother',ad:'Heal all allies 25% HP + Cleanse + 5% max-HP Chimalli to lowest HP ally',ak:'ophidianMother'},
   {id:'huehueteotl',name:'Huehueteotl',flavor:'Old God of Fire',element:'fire',icon:'🪔',
     type:'MAG',hp:130,atk:0,mag:18,def:6,res:5,np:28,npCost:12,
     passive:'Undying Ember: at start of each round, deal 10% maxHP to random enemy (ignores all defenses, triggers capture on kill)',pk:'ephemeralEmber',pv:.10,
@@ -2700,13 +2804,13 @@ const XOCHITONAL_TPL={id:'xochitonal',name:'Xochitonal',flavor:'Guardian iguana 
 
 // ── LAYER 2: TEPEME MONAMICTLAN ──
 const TEPEME_CAPS=[
-  {id:'te1',name:'Tepetl Wraith',icon:'🗻',element:'earth',type:'MAG',hp:120,atk:0,mag:10,def:16,res:10,np:28,npCost:24,ability:'Stone Protection',ad:'Heal 1 ally 35% + 15 HP Chimalli',acd:12,fv:4},
+  {id:'te1',name:'Tepetl Wraith',icon:'🗻',element:'earth',type:'MAG',hp:120,atk:0,mag:10,def:16,res:10,np:28,npCost:24,ability:'Stone Protection',ad:'Heal 1 ally 35% + 3% max-HP Chimalli',acd:12,fv:4},
   {id:'te2',name:'Quake Crawler',icon:'🦂',element:'earth',type:'PHYS',hp:110,atk:20,mag:0,def:10,res:6,np:24,npCost:16,ability:'Tremor',ad:'1.3×ATK, 3 targets + Slow ×1',acd:10,fv:4},
   {id:'te3',name:'Obsidian Giant',icon:'🪨',element:'earth',type:'PHYS',hp:155,atk:15,mag:0,def:20,res:10,np:28,npCost:10,ability:'Stone Fusillade',ad:'4-hit Multi: ATK×0.8 physical per hit to random enemies',ak:'stoneFusillade',acd:13,fv:5},
   {id:'te4',name:'Cave Specter',icon:'👻',element:'earth',type:'MAG',hp:110,atk:0,mag:18,def:12,res:8,np:28,npCost:26,ability:'Collapse',ad:'0.9×MAG, 5 targets + Paralyze ×1',acd:11,fv:4},
   {id:'te5',name:'Mountain Bloomer',icon:'🌄',element:'earth',type:'MAG',hp:105,atk:0,mag:10,def:13,res:10,np:28,npCost:11,ability:'Earth Bloom',ad:'Heal all 20% + ATK/MAG UP ×1 all',acd:12,fv:4},
   {id:'tt1',name:'Thunder Serpent',icon:'⚡',element:'thunder',type:'PHYS',hp:95,atk:22,mag:0,def:7,res:6,np:22,npCost:12,ability:'Lightning Fang',ad:'1.4×ATK + Burn ×1',acd:9,fv:4},
-  {id:'tt2',name:'Storm Ancestor',icon:'🌩',element:'thunder',type:'MAG',hp:105,atk:0,mag:15,def:9,res:8,np:28,npCost:25,ability:'Ancestral Storm',ad:'Heal 1 ally 43% + 15 HP Chimalli',acd:11,fv:4},
+  {id:'tt2',name:'Storm Ancestor',icon:'🌩',element:'thunder',type:'MAG',hp:105,atk:0,mag:15,def:9,res:8,np:28,npCost:25,ability:'Ancestral Storm',ad:'Heal 1 ally 43% + 4% max-HP Chimalli',acd:11,fv:4},
   {id:'tt3',name:'Volt Bat',icon:'🦇',element:'thunder',type:'PHYS',hp:85,atk:20,mag:0,def:6,res:5,np:22,npCost:10,ability:'Electro Bite',ad:'1.4×ATK + Poison ×2',acd:9,fv:4},
   {id:'tt4',name:'Sky Cracker',icon:'🌪',element:'thunder',type:'MAG',hp:100,atk:0,mag:16,def:8,res:7,np:28,npCost:13,ability:'Static Burst',ad:'4-hit Multi: (MAG×0.55) per hit to random enemies + Paralyze ×1 each target',acd:11,fv:4},
   {id:'tt5',name:'Mountain Thunder',icon:'⛰',element:'thunder',type:'PHYS',hp:135,atk:18,mag:0,def:13,res:9,np:28,npCost:12,ability:'Seismic Bolt',ad:'1.6×ATK + Paralyze ×1',acd:12,fv:5},
@@ -2716,7 +2820,7 @@ const MINIBOSS_CAP_STATS={
   'xochitonal':{hp:160,atk:0,mag:14,def:10,res:8,np:30,npCost:21,fv:5,ability:'River Judge',ad:'5-hit Multi: (MAG+2)/2.5 per hit, Poison ×1 each unique target hit — stronger vs fewer enemies',ak:'riverJudge',type:'MAG',element:'water'},
   'quinametzin':{hp:180,atk:22,mag:0,def:14,res:5,np:32,npCost:32,fv:5,ability:'Ancient Crush',ad:'1.4×ATK, 4 targets + Paralyze ×1 each + DEF/RES UP ×1 all allies',ak:'ancientCrush',type:'PHYS',element:'earth'}, // v327: matches boss special; atk +4, res −2
   'xiuhnel':{hp:200,atk:20,mag:0,def:12,res:5,np:35,npCost:29,fv:6,ability:'Blood Drink',ad:'1.8×ATK single + heals self for all damage dealt',ak:'bloodDrink',type:'PHYS',element:'night'},
-  'mimich':{hp:180,atk:18,mag:0,def:10,res:5,np:35,npCost:30,fv:6,ability:'Thorn Mangle',ad:'1.5×ATK, 3 targets + WOUND ×1 all + 15 HP Chimalli self & Xiuhnel',ak:'thornMangle',type:'PHYS',element:'earth'},
+  'mimich':{hp:180,atk:18,mag:0,def:10,res:5,np:35,npCost:30,fv:6,ability:'Thorn Mangle',ad:'1.5×ATK, 3 targets + WOUND ×1 all + 5% max-HP Chimalli to self and a random ally',ak:'thornMangle',type:'PHYS',element:'earth'},
 };
 const TEPEME_EARTH_CAPS=TEPEME_CAPS.filter(c=>c.element==='earth');
 const TEPEME_THUNDER_CAPS=TEPEME_CAPS.filter(c=>c.element==='thunder');
@@ -2727,7 +2831,7 @@ const TEPEYOLLOTL_TPL={id:'boss_tepy',name:'Tepeyollotl',flavor:'Jaguar God of E
 const OBSIDIAN_CAPS=[
   // EARTH
   {id:'oe1',name:'Flint Shard',icon:'🪨',element:'earth',type:'PHYS',hp:95,atk:17,mag:0,def:9,res:4,np:20,npCost:13,ability:'Glass Cut',ad:'1.6×ATK + WOUND ×1',ak:'glassCut',acd:10,fv:4},
-  {id:'oe2',name:'Obsidian Sentinel',icon:'🗿',element:'earth',type:'PHYS',hp:150,atk:10,mag:0,def:18,res:6,np:48,npCost:35,ability:'Basalt Shield',ad:'Grant self + one random ally 30 HP Chimalli',ak:'basaltShield',acd:14,fv:5},
+  {id:'oe2',name:'Obsidian Sentinel',icon:'🗿',element:'earth',type:'PHYS',hp:150,atk:10,mag:0,def:18,res:6,np:48,npCost:35,ability:'Basalt Shield',ad:'Grant self + one random ally 12% max-HP Chimalli',ak:'basaltShield',acd:14,fv:5},
   {id:'oe3',name:'Glass Drake',icon:'🐉',element:'earth',type:'PHYS',hp:125,atk:26,mag:0,def:14,res:6,np:24,npCost:23,ability:'Shard Breath',ad:'1.2×ATK, 4 targets + WOUND ×1 each',ak:'shardBreath',acd:13,fv:5},
   {id:'oe4',name:'Jaded Scorpion',icon:'🦂',element:'earth',type:'PHYS',hp:115,atk:24,mag:0,def:12,res:5,np:22,npCost:15,ability:'Flint Sting',ad:'1.6×ATK + Burn ×1 + Poison ×1',ak:'magmaSting',acd:12,fv:4},
   {id:'oe5',name:'Basalt Colossus',icon:'⛰️',element:'earth',type:'PHYS',hp:170,atk:23,mag:0,def:26,res:9,np:28,npCost:25,ability:'Tectonic Slam',ad:'0.9×ATK, 5 targets + Slow ×1',ak:'tectonicSlam',acd:15,fv:6},
@@ -2741,7 +2845,7 @@ const OBSIDIAN_CAPS=[
 const OBSIDIAN_EARTH_CAPS=OBSIDIAN_CAPS.filter(c=>c.element==='earth');
 const OBSIDIAN_NIGHT_CAPS=OBSIDIAN_CAPS.filter(c=>c.element==='night');
 const XIUHNEL_TPL={id:'xiuhnel',name:'Xiuhnel',flavor:'The Cloud Serpent Who Drank',icon:'🐊',isMiniBoss:true,isBoss:false,isAlly:false,element:'night',type:'PHYS',ability:'Blood Drink',ad:'1.8×ATK single + heals Xiuhnel for all damage dealt',ak:'bloodDrink',hp:330,atk:24,mag:0,def:14,res:6,np:40,npCost:29,fv:0};
-const MIMICH_TPL={id:'mimich',name:'Mimich',flavor:'The Cloud Serpent Who Ran',icon:'🐍',isMiniBoss:true,isBoss:false,isAlly:false,element:'earth',type:'PHYS',ability:'Thorn Mangle',ad:'1.5×ATK AoE + WOUND ×1 all + 15 HP Chimalli to self & Xiuhnel',ak:'thornMangle',hp:290,atk:19,mag:0,def:11,res:5,np:40,npCost:29,fv:0};
+const MIMICH_TPL={id:'mimich',name:'Mimich',flavor:'The Cloud Serpent Who Ran',icon:'🐍',isMiniBoss:true,isBoss:false,isAlly:false,element:'earth',type:'PHYS',ability:'Thorn Mangle',ad:'1.5×ATK AoE + WOUND ×1 all + 5% max-HP Chimalli to self and a random ally',ak:'thornMangle',hp:290,atk:19,mag:0,def:11,res:5,np:40,npCost:29,fv:0};
 const OPOCHTLI_TPL={id:'boss_opochtli',name:'Opochtli',flavor:'Swift God of Fishing',icon:'🎣',isBoss:true,isAlly:false,element:'water',type:'PHYS',ability:'Sinistral Minacachalli',ad:'1.2×ATK (3 targets), +15% CRIT; on any crit grant ATK/MAG UP ×1 to allies',ak:'sinistralMinacachalli',hp:760,atk:31,mag:0,def:17,res:13,np:54,npCost:23,fv:0};
 const ITZPAPALOTL_TPL={id:'boss_itzpap',name:'Itzpapalotl',flavor:'Warrior Goddess of Obsidian',icon:'🦋',isBoss:true,isAlly:false,element:'night',type:'MIX',magStrike:true,ability:'Obsidian Storm',ad:'1.4\xd7ATK AoE + 20% CRIT per hit',ak:'obsidianStorm',hp:620,atk:22,mag:26,def:12,res:10,np:50,npCost:22,fv:0};
 // v547 L7 MINIBOSS — bulky by design: an annoyance that snowballs (self-refilling warren) if unfocused
@@ -2751,7 +2855,7 @@ const OMETOCHTLI_TPL={id:'ometochtli',name:'Ometochtli',flavor:'Leader of the Ce
    the patron abilities (Unclean Purification / Nullifidian Rage) and Xbalanque's scripted
    round-1 replacement are all deferred until L8 scaffolding exists. Debug-testable now. */
 const TLAZOLTEOTL_BOSS_TPL={id:'boss_tlazolteotl',name:'Tlazolt\u00e9otl',flavor:'Forgiving Goddess of Filth and Lust',icon:'\u{1F33A}',isBoss:true,isAlly:false,element:'night',type:'MAG',pk:'uncleanPurification',ability:'She Who Eats Filth',ad:'Heal all allies 25% + cleanse + Poison \u00d71 to all enemies \u2014 also Poison \u00d71 to her own side, where it heals instead',ak:'sheWhoEatsFilth',hp:860,atk:0,mag:34,def:16,res:18,np:56,npCost:36,fv:0}; /* v864: 24 -> 30. v865: -> 36. Her boss form had the cheapest cost/pool ratio of ANY healer in the game (0.43 vs 0.50-0.89), and the gap widens at level because pool and cost scale on different curves. */
-const XBALANQUE_BOSS_TPL={id:'boss_xbalanque',name:'Xbalanque',flavor:'Twin Jaguar God Killer',icon:'\u{1F406}',isBoss:true,isAlly:false,element:'humanity',type:'PHYS',pk:'nullifidianRage',ability:'Godbane Blowgun',ad:'0.5\u00d7ATK, 5 hits to random targets \u2014 2\u00d7 against GODS',ak:'godbaneBlowgun',hp:1020,atk:36,mag:0,def:20,res:14,np:58,npCost:25,fv:0};
+const XBALANQUE_BOSS_TPL={id:'boss_xbalanque',name:'Xbalanque',flavor:'Twin Jaguar God Killer',icon:'\u{1F406}',isBoss:true,isAlly:false,element:'humanity',type:'PHYS',pk:'nullifidianRage',ability:'Godbane Blowgun',ad:'0.75\u00d7ATK, 5 hits to random targets \u2014 2.5\u00d7 against GODS',ak:'godbaneBlowgun',hp:1020,atk:36,mag:0,def:20,res:14,np:58,npCost:25,fv:0};
 /* v748: Mictlantecuhtli — Layer 9 boss, PHASE 1. Design doc v0_6 section 7.2.
    Deliberately partial this build: only the Mictlan Clasp damage exists. Undead Forces
    (once-per-round summoning) and the fatal->convert-to-enemy-ally clause each land in their
@@ -2852,8 +2956,8 @@ function _applyDayRecoilBase(u){
 
 // ── LAYER 4: CEHUÉLŌYĀN ──
 const CEHUYLOAN_WATER_CAPS=[
-  {id:'cw1',name:'Horn Lizard',icon:'🦎',element:'water',type:'PHYS',hp:130,atk:12,mag:0,def:22,res:10,np:30,npCost:21,ability:'Spiny Guard',ad:'Grant self + 1 random ally 25 HP Chimalli',ak:'spinyGuard',acd:13,fv:5},
-  {id:'cw2',name:'Mountain Badger',icon:'🦡',element:'water',type:'MAG',hp:100,atk:0,mag:12,def:14,res:10,np:32,npCost:28,ability:'Burrow Mend',ad:'AoE heal 22% HP + 1 random ally 20 HP Chimalli',ak:'burrMend',acd:14,fv:5},
+  {id:'cw1',name:'Horn Lizard',icon:'🦎',element:'water',type:'PHYS',hp:130,atk:12,mag:0,def:22,res:10,np:30,npCost:21,ability:'Spiny Guard',ad:'Grant self + 1 random ally 10% max-HP Chimalli',ak:'spinyGuard',acd:13,fv:5},
+  {id:'cw2',name:'Mountain Badger',icon:'🦡',element:'water',type:'MAG',hp:100,atk:0,mag:12,def:14,res:10,np:32,npCost:28,ability:'Burrow Mend',ad:'AoE heal 22% HP + 1 random ally 7% max-HP Chimalli',ak:'burrMend',acd:14,fv:5},
   {id:'cw3',name:'Frost Hare',icon:'🐰',element:'water',type:'PHYS',hp:75,atk:20,mag:0,def:7,res:5,np:22,npCost:12,ability:'Cold Dash',ad:'2-hit (ATK×0.9 each) + Burn ×1 per hit',ak:'coldDash',acd:10,fv:5},
   {id:'cw4',name:'Crotalus',icon:'🐍',element:'water',type:'PHYS',hp:110,atk:18,mag:0,def:10,res:6,np:24,npCost:14,ability:'Venom Coil',ad:'1.5×ATK + Poison ×2 + Wound ×1',ak:'venomCoil',acd:11,fv:5},
   {id:'cw5',name:'Peak Specter',icon:'❄️',element:'water',type:'MAG',hp:82,atk:0,mag:16,def:6,res:7,np:26,npCost:21,ability:'Permafrost',ad:'1.6×MAG, 2 targets + Burn ×1 + Slow ×1',ak:'permafrost',acd:12,fv:5},
@@ -2972,7 +3076,7 @@ const PANCUET_FIRE_CAPS=[
   {id:'df1',name:'Ember Scorpion',icon:'🦂',element:'fire',type:'PHYS',hp:105,atk:20,mag:0,def:11,res:5,np:24,npCost:11,ability:'Searing Stings',ad:'1.1×ATK, 4 targets + Burn ×1 + Slow ×1',ak:'searingStingF',fv:5},
   {id:'df2',name:'Magma Serpent',icon:'🐍',element:'fire',type:'PHYS',hp:115,atk:19,mag:0,def:13,res:5,np:26,npCost:12,ability:'Lava Fang',ad:'1.7×ATK single + Poison ×2',ak:'lavaFang',fv:5},
   {id:'df3',name:'Cinder Chaneque',icon:'🔥',element:'fire',type:'MAG',hp:90,atk:0,mag:20,def:6,res:9,np:28,npCost:30,ability:'Ash Surge',ad:'0.9×MAG, 5 targets + Burn ×1',ak:'ashSurge',fv:5},
-  {id:'df4',name:'Obsidian Flame',icon:'🌋',element:'fire',type:'PHYS',hp:130,atk:17,mag:0,def:19,res:7,np:32,npCost:26,ability:'Fuming Wall',ad:'Grant self + 1 random ally 30 HP Chimalli + heal self 20% HP',ak:'fumingWall',fv:6},
+  {id:'df4',name:'Possessed Hearth',icon:'🌋',element:'fire',type:'PHYS',hp:130,atk:17,mag:0,def:19,res:7,np:32,npCost:26,ability:'Fuming Wall',ad:'Heal all allies 15% HP + 15% max-HP Chimalli to self and 1 random ally',ak:'fumingWall',fv:6},
   {id:'df5',name:'Sunbaked Colossus',icon:'🌞',element:'fire',type:'PHYS',hp:160,atk:18,mag:0,def:22,res:8,np:32,npCost:28,ability:'Solar Crush',ad:'1.6×ATK, 2 targets + Lethargy ×1 + Burn ×1',ak:'solarCrush',fv:6},
 ];
 const PANCUET_WIND_CAPS=[
@@ -3155,6 +3259,26 @@ const GOD_ENDINGS_L8={
     "Chicomecoatl does not argue. She has known that longer than Tlazoltéotl has.",
     "The <strong class='teotl'>TEOTL</strong> of the crossing goes with her. Eight hells. One field left to sow."
   ],
+  /* v977: Coatlicue vs Tlazolteotl. The filth-eater consumes what is already spoiled; Coatlicue
+     is the ground everything rots INTO and grows back out of. Tlazolteotl ends things. Coatlicue
+     composts them. Same work, opposite direction. */
+  coatlicue:["The black water stills. Tlazolteotl looks up, mouth full, and laughs without swallowing.",
+    "\"Sister earth. You have been eating my leavings since the first world.\"",
+    "\"You take what is spoiled,\" Coatlicue says. \"I take what is left after you, and I make it grow.\"",
+    "\"And neither of us is ever finished.\" The filth-eater wipes her hands. \"Go on, then. There is more of me further down.\"",
+    "The <strong class='teotl'>TEOTL</strong> of the crossing settles into soil that has taken worse and yielded anyway.",
+    "Eight layers crossed. Everything Mictlan discarded went into her, and none of it was wasted."],
+  /* v963: Cihuacoatl. Her passive is Death and Rebirth -- the first ally slain returns as a Lv1
+     child. Tlazolteotl eats what is already ruined; Cihuacoatl refuses to let anything get that
+     far. Two goddesses working the same seam from opposite ends. */
+  cihuacoatl:[
+    "The black water stills. Tlazolteotl straightens up from her meal and looks at what Cihuacoatl is carrying.",
+    "\"You brought them all down here,\" the filth-eater says. \"Not one left behind for me.\"",
+    "\"They were not finished,\" Cihuacoatl answers, and does not put the child down.",
+    "Tlazolteotl laughs, and it is not unkind. \"Sister, I eat what is over. You keep deciding nothing is.\"",
+    "The <strong class='teotl'>TEOTL</strong> of the crossing settles into arms already full, and somehow they hold it too.",
+    "Eight hells crossed. Everyone who walked in is still walking."
+  ],
   /* v911: Xbalanque -- the Hero Twin who already beat an underworld once, walking a
      second one with the boredom of a returning champion. Continues in GOD_ENDINGS_L9. */
   xbalanque:[
@@ -3221,6 +3345,15 @@ const GOD_ENDINGS_L7={
   mayahuel:["She faces herself across the clearing — goddess and reflection, cup for cup.","The <strong class='teotl'>TEOTL</strong> of the maguey returns to its one true root.","Seven layers. The Tzitzimime broke her once; nothing in Mictlan will manage it twice.","Mayahuel drinks deep, and the forest of hearts blooms."],
   opochtli:["The fisher-god trades the tideline for the treeline and does not slow.","Her <strong class='teotl'>TEOTL</strong> settles into his net like a strange, sweet catch.","Seven layers. He has drunk with the four hundred and out-waited their mother.","Opochtli walks on, humming one of the rabbits' songs."],
   cihuacoatl:["The mother of mortals meets the mother of pulque, and neither bows — but one falls.","The <strong class='teotl'>TEOTL</strong> of the maguey settles into her arms like a sleeping child.","Seven layers. She has midwifed harder births than a goddess's surrender.","Cihuacoatl walks on. Behind her, the rabbits curl up to sleep it off."],
+  /* v977: Coatlicue vs Mayahuel. Coatlicue is the earth that swallows everything and gives it
+     back as growth; Mayahuel is the maguey that turns the same soil into something people drink
+     to forget. Two mothers arguing about what to do with what the ground produces. */
+  coatlicue:["Mayahuel pours, and holds the gourd out. \"You have carried them a long way. Set them down. Drink.\"",
+    "\"I do not set them down,\" Coatlicue says.",
+    "\"That is the whole of your trouble.\" The maguey goddess does not lower the cup. \"Four hundred children I made from myself, and I let every one of them go.\"",
+    "\"Then you know it can be done,\" says the mother of the earth, \"and you know what it costs.\"",
+    "The <strong class='teotl'>TEOTL</strong> of the maguey goes into her anyway, warm and unhurried, and for one long moment nothing in her aches.",
+    "Seven layers crossed. She shoulders them all again and walks on toward the black water."],
   tlaloc:["Rain reaches even the sunless forest. The maguey drinks, and yields.","The <strong class='teotl'>TEOTL</strong> of the pulque goddess mingles with the storm like sap in water.","Seven layers drowned. The heart-eaters slink away from the thunder.","Tlaloc walks on, toward the black crossing."],
   mictlantecuhtli:["Mayahuel sets down her cup and looks at him for a long, level moment.","“She was here,” the maguey goddess says. “Your lady. A long time ago, going down. She did not say she was coming back.”","It is the first word of Mictlancíhuatl he has had in nine hundred years. He says nothing at all.","The <strong class='teotl'>TEOTL</strong> of the drunkards' heaven passes to him unremarked.","Seven layers. He goes to the eighth faster than he came."],
 };
@@ -3380,7 +3513,17 @@ function godConquered(id){return !!(V&&V['layer9_'+id]);}
    'xbalanque_unlocked' in godUnlocked() below. */
 function xbalanqueShouldAppear(){
   if(typeof layer8Unlocked==='function'&&!layer8Unlocked())return false; /* Apanohualoyan cleared at least once */
-  return (G._noCasualtyLayers||0)>=3;
+  if((G._noCasualtyLayers||0)<3)return false;
+  /* v960: before he is unlocked the gate stays deterministic, so a clean enough run is always
+     rewarded with the encounter that unlocks him. AFTER the unlock he shows up half the time,
+     which puts Tlazolteotl's own fight -- and her ending -- back in reach for good players.
+     The coin is flipped ONCE per encounter and cached: buildEnemySet runs again for the easy and
+     hard difficulty previews, and an uncached Math.random() there would reroll behind the
+     player's back and could disagree with what they were shown. */
+  if(!godUnlocked('xbalanque'))return true;
+  const key=(G.layer||0)+':'+(G.battleNum||0)+':'+(G._runId||'');
+  if(!G._xbalRoll||G._xbalRoll.key!==key)G._xbalRoll={key:key,val:Math.random()<0.5};
+  return G._xbalRoll.val;
 }
 function godUnlocked(id,vSrc){
   const _v=vSrc||V;
@@ -3751,7 +3894,7 @@ function dbgForceXbalanque(){
   G._noCasualtyLayers=3;
   G._layerCasualty=false;
   G._xbalanqueDone=false;
-  G._xbalanquePending=0; /* the encounter builder sets this when the boss set is assembled */
+  G._xbalanquePending=0;G._xbalRoll=null; /* v960 */ /* the encounter builder sets this when the boss set is assembled */
   try{saveRun();}catch(e){}
   notify('\u{1F406} Streak forced \u2014 survive round 1 and he appears','#c090ff');
 }
@@ -3958,6 +4101,7 @@ const EVENT_POOLS={
   5:['l5_burning_column','l5_sandstorm_path'], // L5 events
   6:['l6_arrow_rain','l6_fishers_net'], // L6 events
   7:['l7_heart_jaguar','l7_pulque_feast'], // v568: L7 events (Pass 6)
+  8:['l8_ferryman','l8_nine_holes','l8_wastewater'], // v949: L8 finally has a pool -- it had none, so L8 drew only from `universal`
   universal:['u_obsidian_mirror','u_xochipilli','l1_cornfield','l2_mixcoatl','u_patecatl','u_tonalpouhqui','u_threefold_flame'] // v380: u_pochteca removed; v384: soul-surge events
 };
 const EVENT_GOD_EXCLUSIONS={
@@ -4009,6 +4153,9 @@ const EVENT_META={
   l6_arrow_rain:{name:'The Invisible Volley',   icon:'🏹',flavor:'Unseen hands draw their bows over the open path.'},
   l6_fishers_net:{name:"Opochtli's Catch",      icon:'🕸',flavor:'A great net trawls the black water.'},
   l7_heart_jaguar:{name:'The Heart Jaguar',      icon:'🐆',flavor:"At the forest's edge, a shape uncoils from the branches — the jaguar that eats what the beasts leave behind."},
+  l8_ferryman:   {name:"The Ferryman's Toll",  icon:'🛶',flavor:'A Tlakamichin poles a reed canoe across the sewage. He does not row for free.'},
+  l8_nine_holes: {name:'The Nine Holes',        icon:'🕳',flavor:'Nine deep river holes in the black valley — the nine states of consciousness.'},
+  l8_wastewater: {name:'The Wastewater Shrine', icon:'🧂',flavor:'An altar half-drowned in filth. What rots here does not always stay rotten.'},
   l7_pulque_feast:{name:'The Pulque Feast',      icon:'🍶',flavor:'A circle of rabbits offers you a frothing gourd, singing off-key.'},
 };
 
@@ -4045,6 +4192,7 @@ function initG(){
     nextBattleNPPenalty:0, // fraction of current NP drained at next battle start (L2-2 C)
     _patronHpPenaltyNextBattle:0,
     _nextBattleNPPenalty:0,
+    _nextBattlePoison:0, _nextBattleLethargy:{}, _nineHoleDives:0, /* v949: L8 events */
     _belicCascading:false,
     _patronParalyzeOnStrike:false, // L3-2 Obsidian Forge Option B
     _xochipilliEventFight:false,   // true during Xochipilli boss battle
@@ -4077,7 +4225,8 @@ const RUN_SKIP=new Set(['units','enemies','log','battlePhase','roundNum','roundQ
   '_tecpatlSeen','_contFn','currentEvent','_xochipilliEventFight','_slowedUnits','selectedActorId',
   'pendingAction','captureTargets','captureQueue','capActive','_capturePending','_actingEnemy',
   '_targetedAllyId','_animQueue','_unitStates','captureProcessed','spoils',
-  'sacSelected','chosenDifficulty','dte','aoeSelected','aoeCap']);
+  'sacSelected','chosenDifficulty','dte','aoeSelected','aoeCap',
+  '_paraRolled']); /* v951: holds a nested Set -- see selectActor. Round-scoped, so nothing is lost by skipping it. */
 function serializeRun(){
   try{
     return JSON.stringify(G,function(k,v){
@@ -4638,6 +4787,14 @@ function surgeKeysFor(u){
   }
   if(u._captureId)k.push(u._captureId);
   if(u.id)k.push(u.id);
+  /* v971: mkCap wraps the id as 'cap_<capKey>_<slot>', and a unit that reaches here without its
+     _captureId (battle units, and anything rebuilt from a template) yields only the wrapped id
+     and the base template id -- neither of which is the surge key. Unwrap it. This is the same
+     capKey hazard that bites elsewhere: the surge store is keyed on _captureId||id, so any
+     lookup has to be able to recover that from whatever shape it is handed.
+     Symptom: the Ihiyotl/Teyolia/Tonalli row silently vanished from the unit card. */
+  const _cm=String(u.id||'').match(/^cap_(.+)_\d+$/);
+  if(_cm)k.push(_cm[1]);
   if(u.baseId)k.push(u.baseId);
   return [...new Set(k.filter(Boolean))];
 }
@@ -4677,6 +4834,49 @@ function npLevelCurve(bc,lv){
      past 90 instead of flattening, which is where the erosion was worst. */
   const lateRamp=Math.pow(1.01,Math.max(0,lv-70));
   return (bc+Math.floor(lv/2)+Math.floor(lv/20))*(lv>35?1.20:1)*(lv>20?1.25:1)*(lv>20?1.10:1)*(lv>40?1.05:1)*(lv>=60?1.05:1)*lateRamp;
+}
+/* ═══ v956: ONE model for displayed TP cost ═════════════════════════════════════════════════
+   Both card renderers hand-rolled this and both were wrong, in different ways:
+     showUnitTooltip (~16380) applied tpCostFlat but not tpCostMult, the per-element multiplier,
+       or the Lv80 step;
+     renderTraining  (~16663) applied NEITHER tpCostFlat NOR any of the rest -- which is why
+       Copal Brazier (-5 TP) and Tecuitlatl Cake never showed on the training card at all, and
+       why Teonacatl Mushroom's +50% was invisible even though battle charged it.
+   The v668 comment on renderTraining already noted a previous hand-copy had drifted; a third
+   copy would drift again. modelNpCost mirrors effectiveNpCost's LOCKED order exactly --
+   base -> xtpCostMult -> flat reductions -> floor 1 -> level gate -> element -> Lv80 -- and
+   omits only lethargy, which is battle-only. Both renderers now call it.
+   ══════════════════════════════════════════════════════════════════════════════════════════ */
+function modelNpCost(bc,level,surgeCost,element,isPatron,noOfferings){
+  const oe=noOfferings?null:getOfferingEffects();
+  const raw=Math.round(npLevelCurve(bc,level)*(getTecpatlEffects().npBaneMult||1));
+  const flat=(oe&&oe.tpCostFlat)||0;   // v958: subtracted at the very end, see below
+  const reduce=(surgeCost||0);         // surge keeps its pre-gate behaviour
+  let base=Math.max(1,raw-reduce);
+  if(oe&&oe.tpCostMult&&oe.tpCostMult!==1)base=Math.max(1,Math.round(raw*oe.tpCostMult)-reduce);
+  const lvMult=level>=50?1.5:level>=40?1.25:1.0;
+  const elM=oe?azMult(oe.tpCostMultByElement,element,isPatron):1;
+  const lv80=level>=80?1.05:1; // v577, missing from both renderers
+  /* v958: tpCostFlat comes off AFTER the level gate, not before it. Folded into the base it was
+     magnified by the Lv40/Lv50 multipliers, so Copal Brazier's printed "-5 TP cost" quietly
+     became -6 at Lv40 and -8 at Lv65. Flat means flat. */
+  return Math.max(1,Math.ceil(base*lvMult*elM*lv80)-flat);
+}
+/* Offering contribution, for the annotation beside the cost. */
+function npCostOfferingDelta(bc,level,surgeCost,element,isPatron){
+  return modelNpCost(bc,level,surgeCost,element,isPatron,false)-modelNpCost(bc,level,surgeCost,element,isPatron,true);
+}
+/* v957: v956 rendered this as a signed suffix -- "Cost: 99 -8" -- which reads as arithmetic on a
+   number that is ALREADY final, and stacked ambiguously with the level-up flash ("99 -8 -1").
+   Shown as a struck-through original instead: "107 99", the ordinary idiom for a discount, with
+   the live figure coloured green when offerings made it cheaper and red when they made it dearer.
+   Note the delta is the LEVEL-SCALED worth of the offering, not its printed value: a flat -5 is
+   subtracted from the base and the Lv50+ gate then multiplies by 1.5, so it shows as -7 or -8. */
+function npCostDisplayHtml(now,before){
+  if(!before||before===now)return String(now);
+  const cheaper=now<before;
+  return '<span style="opacity:.5;text-decoration:line-through;font-weight:400">'+before+'</span> '
+        +'<span style="color:'+(cheaper?'#70e070':'#e07070')+';font-weight:700">'+now+'</span>';
 }
 function baseNpCostFromObj(b,lv,isGod){
   const bc=isGod?(b.npCost||14):(b.npCost||9);
@@ -4807,7 +5007,14 @@ function showSurgeModal(key){
 // _bw is the unit's HP relative to its OWN cohort average, computed once at load. That way a
 // low-layer vassal pulled forward by Vassal Affinity is still "an average enemy" and pays the
 // current layer's rate — its old, smaller template HP no longer shortchanges the player.
-const LAYER_BOUNTY={1:37,2:87,3:131,4:165,5:194,6:380,7:420,8:460,9:500};
+const LAYER_BOUNTY={1:37,2:87,3:131,4:165,5:194,6:380,7:420,8:460,9:950};
+/* v943: L9 was 500. Bounty is LAYER_BOUNTY[L] x _bw, and _bw is a unit's HP relative to its OWN
+   cohort's average -- so it prices the spread WITHIN a layer and says nothing across layers.
+   The L9 roster is the returning miniboss cohort (base HP avg 452 against Layer 8's ~126), but
+   that cohort normalises to 1.0 like every other, so 3.6x the durability was paying 9% more.
+   v793 read the same 9% as the correct baseline when it stripped isMiniBoss from the pool; the
+   baseline was the thing that was wrong. 950 prices L9 kills against the time they actually
+   cost. Cross-layer pacing lives here and only here -- do not try to fix it in _bw. */
 // v658: HARD difficulty is now a per-layer HP curve instead of a flat x1.25, so the gap between
 // easy and hard widens with depth (L1 they're near-identical; by L8 hard is a different game).
 // Safe to tune freely: v657 removed HP from the reward path entirely.
@@ -4849,6 +5056,18 @@ function tplById(id){
       .forEach(arr=>{(arr||[]).forEach(t=>{if(t&&t.id)_tplById[t.id]=t;});});
   }
   return _tplById[id]||null;
+}
+/* v979: liveAd's twin for the NAME. Captured units freeze name and ad at capture time, so a
+   rename (Obsidian Flame -> Possessed Hearth) left every already-captured copy showing the old
+   name forever, even though its ability dispatched correctly. liveAd already solved this for the
+   description; nothing did it for the name.
+   Falls back to the stored name whenever no template resolves, which keeps mercs, summons and
+   rebirth units -- whose names are deliberately their own -- untouched. */
+function liveName(u){
+  if(!u)return '';
+  if(u.isGod){const g=GODS.find(x=>x.id===(u.baseGodId||String(u.id||'').replace('god_','')));if(g&&g.name)return g.name;}
+  const t=tplById(u.baseId||u.id);
+  return (t&&t.name)||u.name||'';
 }
 function liveAd(u){ // live ability description, falling back to the stored copy for gods/mercs/summons
   if(!u)return '';
@@ -5164,7 +5383,7 @@ const GOD_SELECT_DESC={
   opochtli:{passive:'Ueyiatl Tactics: Opochtli & all allies +15% CRIT at battle start',ability:'Sinistral Minacachalli',ad:'1.2×ATK (3 targets), +15% CRIT; on any crit grant ATK/MAG UP ×1 to all allies'},
   mayahuel:{passive:'Inebriated Reverie: ally DRUNK never misfires — each stack grants +5% ATK/MAG/DEF/RES',ability:'Octli Drench',ad:'1.5×MAG to 1 + 10% splash + DRUNK ×1 to ALL enemies — as Patron, also ALL allies'},
   tlaloc:{passive:"Endless Torrent: All <span class='elem-badge elem-water'>💧 Water</span> units in party +15% ATK/MAG at battle start",ability:'Tlalocan Deluge',ad:'1.35×MAG, hits up to 4 targets — first kill rises a Tlaloque ally'},
-  coatlicue:{passive:'Snake Skirt: The lowest HP ally gains 20 HP Chimalli shield at battle start',ability:'Ophidian Mother',ad:'Heal all allies 25% HP + Cleanse +10 HP Chimalli to lowest HP ally'},
+  coatlicue:{passive:'Snake Skirt: The lowest HP ally gains Chimalli worth 5% of max HP at battle start',ability:'Ophidian Mother',ad:'Heal all allies 25% HP + Cleanse + 5% max-HP Chimalli to lowest HP ally'},
   huehueteotl:{passive:'Undying Ember: Each round, a random enemy loses 10% of their max HP (ignores all defenses)',ability:'Old Fire',ad:'1.6×MAG magic + BURN ×2; Deals +40% extra damage per existing Burn stack.'},
   xolotl:{passive:'Septic Claws: All allied strikes apply Poison ×1 to enemies',ability:'Crippling Shock',ad:'0.6×MAG 4-hit to random enemies — Paralyze ×1 + Poison ×1 each unique target hit'},
   tepeyollotl:{passive:'Mountain Heart: <span class="elem-badge elem-earth">🪨 Earth</span> allies gain +30% DEF each battle (vassals and gods)',ability:'Epicenter Roar',ad:'Crushes one enemy for full damage, 10% splash to all others + Slow all'},
@@ -5367,6 +5586,9 @@ function showGodDetail(gd){
   const panel=document.getElementById('god-detail-panel');
   if(!panel)return;
   const desc=GOD_SELECT_DESC[gd.id]||{passive:gd.passive,ability:gd.ability,ad:gd.ad};
+  /* v976: god-select is where a new player meets Coatlicue's Snake Skirt, so the Chimalli pip
+     matters most here. Decorating the local copy leaves GOD_SELECT_DESC untouched. */
+  desc.passive=chimaWord(desc.passive);desc.ad=chimaWord(desc.ad);
   const typeEmoji=gd.type==='MAG'?'🪄':gd.type==='PHYS'?'🗡️':'🗡️🪄';
   const healEmoji=(gd.ad||'').toLowerCase().includes('heal')?'❤️ ':'';
   const typeLabel=gd.type==='MAG'?`<span style="font-size:10px;color:#5080d0;background:#0a0820;border-radius:3px;padding:1px 5px">${typeEmoji} MAG</span>${healEmoji?` <span style="font-size:11px">${healEmoji}</span>`:''}`:gd.type==='PHYS'?`<span style="font-size:10px;color:#c05050;background:#1a0404;border-radius:3px;padding:1px 5px">${typeEmoji} PHY</span>${healEmoji?` <span style="font-size:11px">${healEmoji}</span>`:''}`:(`<span style="font-size:10px;color:#d4af37;background:#1a1000;border-radius:3px;padding:1px 5px">${typeEmoji} MIX</span>`+` <span style="font-size:11px">${healEmoji}</span>`);
@@ -5612,7 +5834,7 @@ function buildEnemySet(bn,diff){
       const duo=[mk8(IXPUXTEQUI_TPL,0),mk8(NEXOXCHO_TPL,1)];
       const escPool=getApanoPool();
       const esc=[];
-      for(let i=0;i<3;i++){const c=escPool[Math.floor(Math.random()*escPool.length)];esc.push(mkEnemy(c,i+2,0.9,lv8));}
+      for(let i=0;i<4;i++){const c=escPool[Math.floor(Math.random()*escPool.length)];esc.push(mkEnemy(c,i+2,0.9,lv8));} /* v977: 3 -> 4 escorts, so the duo fights six-strong */
       return[...duo,...esc.filter(Boolean)];
     }
     if(isL7){
@@ -6045,7 +6267,7 @@ function mkGod(gdId,b1){
     _npBase:baseNpCostFor(baseId),_npReduce:(sb.cost+getOfferingEffects().tpCostFlat),
     isGod:true,isPatron:isP,isAlly:true,
     poisonStacks:0,burnStacks:0,paralyzStacks:0,defBuff:0,slowStacks:0,woundStacks:0,lethargyStacks:0,atkBuffStacks:0,atkBuffRounds:0,defBuffStacks:0,defBuffRounds:0,
-    armor:(()=>{const bid='god_'+gd.id;return G.unitArmor[bid]!==undefined?G.unitArmor[bid]:(G.shields[bid]||0)*G.dte.chimaArmorPerStack;})()};
+    armor:resolveArmor('god_'+gd.id,godMaxHp)}; /* v964 */
 }
 function mkCap(cu,slot,b1){
   const ck=capKey(cu); // unique key per captured instance
@@ -6068,7 +6290,7 @@ function mkCap(cu,slot,b1){
     _npBase:baseNpCostFor(ck),_npReduce:(sb.cost+getOfferingEffects().tpCostFlat),
     isGod:false,isAlly:true,
     poisonStacks:0,burnStacks:0,paralyzStacks:0,defBuff:0,slowStacks:0,woundStacks:0,lethargyStacks:0,atkBuffStacks:0,atkBuffRounds:0,defBuffStacks:0,defBuffRounds:0,
-    armor:G.unitArmor[ck]!==undefined?G.unitArmor[ck]:(G.shields[ck]||0)*G.dte.chimaArmorPerStack};
+    armor:resolveArmor(ck,baseMaxHp)}; /* v964 */
 }
 
 function renderDmap(id){
@@ -6344,23 +6566,33 @@ function evL5SandstormPath(el){
   const units=eventPartyUnits();
   const ihiLv=k=>{const s=G.surge&&G.surge[k];return s?((s.forces.ihiyotl||{}).lv||0):0;};
   const tonLv=k=>{const s=G.surge&&G.surge[k];return s?((s.forces.tonalli||{}).lv||0):0;};
+  const teyLv=k=>{const s=G.surge&&G.surge[k];return s?((s.forces.teyolia||{}).lv||0):0;}; /* v947 */
   let best=null;units.forEach(o=>{if(!best||ihiLv(o.key)>ihiLv(best.key))best=o;});
   const hasIhi=!!best&&ihiLv(best.key)>=4;
   const hasTon=units.some(o=>tonLv(o.key)>=4);
+  const hasTey=units.some(o=>teyLv(o.key)>=4); /* v947 */
   const hdr=document.createElement('div');
   hdr.innerHTML=`<div style="font-size:12px;color:#c08020;margin-bottom:.75rem;font-style:italic">A massive sandstorm blocks the road. There is no leaving Pancuetlacaloy\u00e1n \u2014 only through. The storm bows only to strength of soul.</div>`;
   el.appendChild(hdr);
-  el.appendChild(evOpt('\ud83d\udcaa','Push through','Requires a unit with Ihiyotl \u22654 \u2014 your fiercest soul gains +5 levels',
+  el.appendChild(evOpt('\ud83d\udcaa','Push through','[v947] Requires Ihiyotl \u22654 \u2014 +6000 Cacao + a random Rare offering',
     'Liver-fire against the gale.',!hasIhi,'No unit with Ihiyotl \u22654',()=>{
-      G.levels[best.key]=Math.max(1,getLevel(best.key)+5);
+      G.res.cacao+=6000;const _r=grantRandomOffering('rare');renderRes('rb-event');
       const el2=document.getElementById('event-content');
-      evResult(el2,'\ud83d\udcaa',`${best.icon} ${best.name} bulls through the wall of sand \u2014 the storm yields to burning ihiyotl.<br><em style="color:#80e080">${best.icon} ${best.name} +5 levels!</em>`,()=>afterEvent());
+      evResult(el2,'\ud83d\udcaa',`${best.icon} ${best.name} bulls through the wall of sand \u2014 and something buried surfaces in the lee of the dune.<br><em style="color:#c0844a">+6,000 Cacao</em><br>${offeringRewardLine(_r)}`,()=>afterEvent());
     }));
-  el.appendChild(evOpt('\u2728','Wait for a lull','Requires a unit with Tonalli \u22654 \u2014 all units gain +3 levels',
+  el.appendChild(evOpt('\u2728','Wait for a lull','Requires a unit with Tonalli \u22654 \u2014 all units gain +7 levels',
     'Solar patience reads the wind.',!hasTon,'No unit with Tonalli \u22654',()=>{
-      units.forEach(o=>{G.levels[o.key]=Math.max(1,getLevel(o.key)+3);});
+      units.forEach(o=>{G.levels[o.key]=Math.max(1,getLevel(o.key)+7);}); /* v947: 3 -> 7 */
       const el2=document.getElementById('event-content');
-      evResult(el2,'\u2728',`The tonalli-bright soul times the storm's breath; the whole party slips through in its shadow.<br><em style="color:#80e080">All units +3 levels!</em>`,()=>afterEvent());
+      evResult(el2,'\u2728',`The tonalli-bright soul times the storm's breath; the whole party slips through in its shadow.<br><em style="color:#80e080">All units +7 levels!</em>`,()=>afterEvent());
+    }));
+  /* v947: the third soul. Ihiyotl and Tonalli were both gated here; Teyolia was not, so the
+     encounter only ever read two of the three forces. */
+  el.appendChild(evOpt('\ud83e\udec0','Endure the crossing','Requires a unit with Teyolia \u22654 \u2014 +7000 Blood, +100 FP',
+    'Heart-soul against the long walk.',!hasTey,'No unit with Teyolia \u22654',()=>{
+      G.res.blood+=7000;G.res.flower+=100;renderRes('rb-event');
+      const el2=document.getElementById('event-content');
+      evResult(el2,'\ud83e\udec0',`Steady teyolia carries the party through hour after hour of grit, and the storm gives up what it buried.<br><em style="color:#e05050">+7,000 Blood</em> &nbsp;<em style="color:#d4af37">+100 Flowers</em>`,()=>afterEvent());
     }));
   el.appendChild(evOpt('\ud83c\udf2a\ufe0f','Surrender to the wind','All units start next battle with 0 TP \u2014 gain a random Common offering',
     'The wind takes its toll.',false,'',()=>{
@@ -6373,11 +6605,11 @@ function evL6FishersNet(el){
   const hdr=document.createElement('div');
   hdr.innerHTML=`<div style="font-size:12px;color:#80c0ff;margin-bottom:.75rem;font-style:italic">A great net trawls the black water — Opochtli's own. What it brings up is his to give.</div>`;
   el.appendChild(hdr);
-  const netCost={cacao:300,blood:150};
+  const netCost={cacao:10,blood:0}; /* v946: was 300 Cacao + 150 Blood -- the 35% miss made that a punishing stake */
   const canNet=G.res.cacao>=netCost.cacao&&G.res.blood>=netCost.blood;
   const hasVassal=G.captured.length>0;
   // Cast the net
-  el.appendChild(evOpt('🕸','Cast the net','(300 🫘 Cacao + 150 🩸 Blood) 65% → a Water vassal at patron Lv ±10 · 35% → +1 Cacao','Trawl the black water.',!canNet,'Need 300 Cacao + 150 Blood',()=>{
+  el.appendChild(evOpt('🕸','Cast the net','[v946] (10 🫘 Cacao) 65% → a Water vassal at patron Lv ±10 · 35% → +1 Cacao','Trawl the black water.',!canNet,'Need 10 Cacao',()=>{
     G.res.cacao-=netCost.cacao;G.res.blood-=netCost.blood;
     const el2=document.getElementById('event-content');
     if(Math.random()<0.65){
@@ -6423,32 +6655,42 @@ function evL6ArrowRain(el){
   el.appendChild(hdr);
   const allKeys=()=>{const ks=[];G.party.forEach(gid=>{const gd=GODS.find(g=>g.id===gid);if(gd)ks.push({k:'god_'+gid,base:gd.hp||140,mult:G.dte.godHpMult||1});});G.captured.forEach(cu=>ks.push({k:capKey(cu),base:cu.hp||50,mult:G.dte.vassalHpMult||1}));return ks;};
   // Brace behind shields
-  el.appendChild(evOpt('🛡','Brace behind shields','Next battle: all allies start with +100 HP Chimalli, but −40% TP','Shields up against the rain.',false,'',()=>{
+  el.appendChild(evOpt('🛡','Brace behind shields','[v964] +80% max-HP Chimalli (ADDS to any already queued), −40% TP','Shields up against the rain.',false,'',()=>{
     G.unitArmor=G.unitArmor||{};
-    /* v845 buff: 50 -> 100. NOTE this ASSIGNS rather than adds, so it still overwrites any
-       Chimalli already queued for the next battle instead of stacking with it. */
-    allKeys().forEach(o=>{G.unitArmor[o.k]=100;});
+    /* v946: 100 -> 500, and ADDS rather than assigns. The v845 note flagged that the old
+       assignment silently overwrote any Chimalli already queued for the next battle; braced
+       shields now stack with it, which is what the option always read as. */
+    /* mkGod/mkCap resolve armor as: unitArmor[k] if DEFINED, else shields[k]*chimaArmorPerStack.
+       So `(unitArmor[k]||0)+500` would still discard the Chimalli a unit already carries from
+       shields the first time this fires -- the same overwrite in a new shape. Seed from the
+       effective value instead. */
+    allKeys().forEach(o=>{
+      /* v964: a FRACTION now, like every other persisted shield. Still additive with whatever
+         the unit already carries -- that was the v946 fix and it still holds. */
+      G.unitArmor[o.k]=Math.min(1,armorFracFor(o.k)+0.80);
+    });
     evDrainNPAll(0.40);renderRes('rb-event');
     const el2=document.getElementById('event-content');
-    evResult(el2,'🛡',`Your party locks shields against the volley.<br><em style="color:#80c0ff">All allies +100 HP Chimalli · −40% TP next battle.</em>`,afterEvent);
+    evResult(el2,'🛡',`Your party locks shields against the volley.<br><em style="color:#80c0ff">All allies +80% max-HP Chimalli · −40% TP next battle.</em>`,afterEvent);
   }));
   // Run the gauntlet
-  el.appendChild(evOpt('🏃','Run the gauntlet','All allies start next battle at 40% HP · +3600 Blood + a random Common offering','Sprint through the arrows.',false,'',()=>{
+  el.appendChild(evOpt('🏃','Run the gauntlet','[v946] All allies to 40% HP · +7200 Blood + TWO random Common offerings','Sprint through the arrows.',false,'',()=>{
     G.unitHpOverride=G.unitHpOverride||{};
     allKeys().forEach(o=>{const mhp=allyMaxHpFor(o.k,o.base,o.mult);G.unitHpOverride[o.k]=Math.max(1,Math.round(mhp*0.40));});
-    G.res.blood+=3600;const r=grantRandomOffering('common');renderRes('rb-event'); /* v845 buff: 1800 -> 3600 */
+    G.res.blood+=7200;const r=grantRandomOffering('common');const r2=grantRandomOffering('common');renderRes('rb-event'); /* v946: 3600 -> 7200, and a second Common */
     const el2=document.getElementById('event-content');
-    evResult(el2,'🏃',`You sprint through the arrows — bloodied, but richer.<br><em style="color:#e07070">All allies → 40% HP next battle.</em><br><em style="color:#e05050">+3600 🩸 Blood</em><br>${offeringRewardLine(r)}`,afterEvent);
+    evResult(el2,'🏃',`You sprint through the arrows — bloodied, but richer.<br><em style="color:#e07070">All allies → 40% HP next battle.</em><br><em style="color:#e05050">+7200 🩸 Blood</em><br>${offeringRewardLine(r)}<br>${offeringRewardLine(r2)}`,afterEvent);
   }));
   // Tempt his aim (free 50/50)
   el.appendChild(evOpt('🎯','Tempt his aim','A 50/50 gamble — Opochtli either favors or scorns your boldness','Stand tall and dare the volley.',false,'',()=>{
     const el2=document.getElementById('event-content');
     if(Math.random()<0.5){
       const critPool=['rusty_atlatl','minacachalli','obsidian_quiver'].filter(id=>OFFERINGS[id]&&!hasOffering(id));
+      const _sg=evSurgeDeployed(3); /* v946: the favoured branch also pays surges */
       if(critPool.length){const id=critPool[Math.floor(Math.random()*critPool.length)];grantOffering(id);renderRes('rb-event');
-        evResult(el2,'🎯',`Opochtli's aim turns kind — a relic falls at your feet.<br>You gain ${OFFERINGS[id].icon} <strong>${OFFERINGS[id].name}</strong>!<br><em style="color:#c0e060">${OFFERINGS[id].desc}</em>`,afterEvent);
+        evResult(el2,'🎯',`Opochtli's aim turns kind — a relic falls at your feet.<br>You gain ${OFFERINGS[id].icon} <strong>${OFFERINGS[id].name}</strong>!<br><em style="color:#c0e060">${OFFERINGS[id].desc}</em><br><em style="color:#c0a0e0">+3 soul surges to each of your ${_sg} deployed units.</em>`,afterEvent);
       }else{const r=grantRandomOffering('uncommon');renderRes('rb-event');
-        evResult(el2,'🎯',`Opochtli's aim turns kind, but you already hold every crit relic.<br>${offeringRewardLine(r)}`,afterEvent);}
+        evResult(el2,'🎯',`Opochtli's aim turns kind, but you already hold every crit relic.<br>${offeringRewardLine(r)}<br><em style="color:#c0a0e0">+3 soul surges to each of your ${_sg} deployed units.</em>`,afterEvent);}
     }else{
       G.unitHpOverride=G.unitHpOverride||{};
       allKeys().forEach(o=>{const mhp=allyMaxHpFor(o.k,o.base,o.mult);G.unitHpOverride[o.k]=Math.max(1,Math.round(mhp*0.50));});
@@ -6465,6 +6707,7 @@ function evL6ArrowRain(el){
     l6_fishers_net:evL6FishersNet,
     l7_heart_jaguar:evL7HeartJaguar,
     l7_pulque_feast:evL7PulqueFeast,
+    l8_ferryman:evL8Ferryman,l8_nine_holes:evL8NineHoles,l8_wastewater:evL8Wastewater,
     u_tlacuilo:evUTlacuilo,u_obsidian_mirror:evUObsidianMirror,u_pochteca:evUPochteca,u_xochipilli:evUXochipilli,u_tonatiuh:evUTonatiuh,u_patecatl:evUPatecatl,u_tonalpouhqui:evUTonalpouhqui,u_threefold_flame:evUThreefoldFlame,u_midwife_shrine:evUMidwifeShrine};
   const fn=renderers[eventId];
   if(fn)fn(el);else evPlaceholder(el,eventId);
@@ -6525,19 +6768,19 @@ function evUTonalpouhqui(el){
   const hdr=document.createElement('div');
   hdr.innerHTML=`<div style="font-size:12px;color:#c0a0e0;margin-bottom:.75rem;font-style:italic">The day-keeper traces the three souls burning in your warriors. &ldquo;Show me which you have fed.&rdquo;</div>`;
   el.appendChild(hdr);
-  el.appendChild(evOpt('💪','Show your Ihiyotl',`(Needs a unit with Ihiyotl ≥4 — best: ${maxI}) — gain a random Uncommon offering`,
+  el.appendChild(evOpt('💪','Show your Ihiyotl',`(Needs a unit with Ihiyotl ≥4 — best: ${maxI}) — gain a random Rare offering`,
     'The strength-soul, seated in the liver.',maxI<4,'No unit has Ihiyotl ≥4',()=>{
-      const _r=grantRandomOffering('uncommon');renderRes('rb-event');
+      const _r=grantRandomOffering('rare');renderRes('rb-event'); /* v945: uncommon -> rare */
       evResult(document.getElementById('event-content'),'💪',`The tonalpouhqui nods at your fierce ihiyotl.<br>${offeringRewardLine(_r)}`,afterEvent);
     }));
-  el.appendChild(evOpt('🫀','Show your Teyolia',`(Needs a unit with Teyolia ≥4 — best: ${maxT}) — gain +800 Blood, +400 Cacao`,
+  el.appendChild(evOpt('🫀','Show your Teyolia',`(Needs a unit with Teyolia ≥4 — best: ${maxT}) — gain +7777 Blood, +6666 Cacao, +555 FP`,
     'The heart-soul, the seat of vitality.',maxT<4,'No unit has Teyolia ≥4',()=>{
-      G.res.blood+=800;G.res.cacao+=400;renderRes('rb-event');
-      evResult(document.getElementById('event-content'),'🫀','The day-keeper honors your steady teyolia.<br><em style="color:#e05050">+800 Blood</em> &nbsp; <em style="color:#c0844a">+400 Cacao</em>',afterEvent);
+      G.res.blood+=7777;G.res.cacao+=6666;G.res.flower+=555;renderRes('rb-event'); /* v945 */
+      evResult(document.getElementById('event-content'),'🫀','The day-keeper honors your steady teyolia.<br><em style="color:#e05050">+7,777 Blood</em> &nbsp; <em style="color:#c0844a">+6,666 Cacao</em> &nbsp; <em style="color:#d4af37">+555 Flowers</em>',afterEvent);
     }));
-  el.appendChild(evOpt('🔮','Show your Tonalli',`(Needs a unit with Tonalli ≥4 — best: ${maxN}) — 2 ${elemName} vassals join your roster, battle-scaled`,
+  el.appendChild(evOpt('🔮','Show your Tonalli',`(Needs a unit with Tonalli ≥4 — best: ${maxN}) — 3 ${elemName} vassals join your roster, battle-scaled`,
     'The day-soul, carried in the head.',maxN<4,'No unit has Tonalli ≥4',()=>{
-      const joined=grantElementVassals(2);
+      const joined=grantElementVassals(3); /* v945: 2 -> 3 */
       const names=joined.length?joined.map(j=>`${j.icon} ${j.name} (Lv${j.lv})`).join(', '):'(no vassals of your element exist)';
       evResult(document.getElementById('event-content'),'🔮',`Drawn by your radiant tonalli, kindred souls join your march.<br><em style="color:#50e090">${names}</em>`,afterEvent);
     }));
@@ -6576,12 +6819,39 @@ function evLevelAllParty(delta){
   const godIds=[G.god?'god_'+G.god.id:null,...(G.party||[]).map(id=>id.startsWith('god_')?id:'god_'+id)].filter(Boolean);
   new Set(godIds).forEach(k=>{G.levels[k]=Math.max(1,(G.levels[k]||1)+delta);});
 }
+function evRestoreHp(k){ /* v945: canonical full-HP restore -- mirrors doTemazcal (line ~15651) */
+  if(G.unitHpOverride)delete G.unitHpOverride[k];
+  if(G.unitHpRatio)delete G.unitHpRatio[k];
+  if(G.unitHpSnap&&G.unitHpSnap[k])G.unitHpSnap[k].cur=G.unitHpSnap[k].max;
+}
 function evRestoreAll(){
-  // Restore HP/NP for all captured units (applied at battle start via unitNP/unitArmor)
-  // In practice: reset stored NP so units start fresh
-  G.captured.forEach(cu=>{const k=capKey(cu);const maxNP=maxNPFor(k,cu.np||20);G.unitNP[k]=maxNP;});
-  G.party.forEach(gid=>{const gd=GODS.find(g=>g.id===gid);if(!gd)return;const k='god_'+gid;const maxNP=maxNPFor(k,gd.np||30);G.unitNP[k]=maxNP;});
+  /* v945: this now restores HP as well as TP. The comment always said "Restore HP/NP" but the
+     body only ever reset G.unitNP -- between-battle HP lives in unitHpOverride (one-shot) and
+     unitHpRatio (carryover), and neither was touched. Both callers are Cornfield branches whose
+     copy promises a full renewal, so the helper was the bug, not the callers. */
+  G.captured.forEach(cu=>{const k=capKey(cu);const maxNP=maxNPFor(k,cu.np||20);G.unitNP[k]=maxNP;evRestoreHp(k);});
+  G.party.forEach(gid=>{const gd=GODS.find(g=>g.id===gid);if(!gd)return;const k='god_'+gid;const maxNP=maxNPFor(k,gd.np||30);G.unitNP[k]=maxNP;evRestoreHp(k);});
+  if(G.god){const gk='god_'+G.god.id;const mx=maxNPFor(gk,G.god.np||30);G.unitNP[gk]=mx;evRestoreHp(gk);} /* patron is not in G.party */
   notify('All units fully restored!','#50e090');
+}
+/* v947: n bonus soul surges to the WHOLE party -- patron, ally gods and every vassal in the
+   roster. Same key set the Midwife Shrine blessing uses. Distinct from evSurgeDeployed below. */
+function evSurgeParty(n){
+  const keys=[];
+  if(G.god)keys.push('god_'+G.god.id);
+  (G.party||[]).forEach(gid=>{const k='god_'+gid;if(!keys.includes(k))keys.push(k);});
+  (G.captured||[]).forEach(cu=>{const k=capKey(cu);if(!keys.includes(k))keys.push(k);});
+  keys.forEach(k=>grantBonusSurges(k,n));
+  return keys.length;
+}
+/* v945: n bonus soul surges to every DEPLOYED unit (deplSel keys are already capKey/god_ form). */
+function evSurgeDeployed(n){
+  /* v960: G.deplSel holds the CHOSEN allies only -- the patron is deployed implicitly and is
+     never a member, so every "surges to the deployed party" event reward was silently skipping
+     the one unit the player cares about most. */
+  const ks=[...new Set([...(G.god?['god_'+G.god.id]:[]),...(G.deplSel||[])])];
+  ks.forEach(k=>grantBonusSurges(k,n));
+  return ks.length;
 }
 function evDrainNPAll(frac){
   G.captured.forEach(cu=>{const k=capKey(cu);const maxNP=maxNPFor(k,cu.np||20);const cur=G.unitNP[k]!==undefined?G.unitNP[k]:maxNP;G.unitNP[k]=Math.max(0,Math.round(cur*(1-frac)));});
@@ -6590,6 +6860,177 @@ function evDrainNPAll(frac){
 function evResult(el,icon,msg,onContinue){
   el.innerHTML=`<div style="text-align:center;padding:1.5rem 0"><div style="font-size:36px;margin-bottom:.5rem">${icon}</div><p style="font-size:13px;color:var(--am);margin-bottom:1.5rem">${msg}</p><button class="btn" style="min-width:140px" id="ev-continue-btn">Continue</button></div>`;
   document.getElementById('ev-continue-btn').onclick=onContinue;
+}
+
+
+/* ═══ v949: LAYER 8 EVENTS ═══════════════════════════════════════════════════════════════════
+   Backfill of the three events specced in the Layer 8 design doc that were never implemented.
+   Until now EVENT_POOLS stopped at layer 7, so L8 drew only from `universal`. Numbers are the
+   post-v945/948 rebalance figures, not the doc's originals -- the doc was written against the
+   pre-rebalance economy where 100 Cacao was a meaningful L8 prize.
+   ══════════════════════════════════════════════════════════════════════════════════════════ */
+
+/* Every deployed-or-rostered ally, as {key, icon, name, baseHp, baseNp, hpMult}. */
+function l8PartyRows(){
+  const rows=[];
+  const pushGod=gid=>{const g=GODS.find(x=>x.id===gid);if(g)rows.push({key:'god_'+gid,icon:g.icon,name:g.name,baseHp:g.hp||140,baseNp:g.np||30,hpMult:G.dte.godHpMult||1});};
+  if(G.god)pushGod(G.god.id);
+  (G.party||[]).forEach(gid=>{if(!G.god||gid!==G.god.id)pushGod(gid);});
+  (G.captured||[]).forEach(cu=>rows.push({key:capKey(cu),icon:cu.icon,name:cu.name,baseHp:cu.hp||50,baseNp:cu.np||20,hpMult:G.dte.vassalHpMult||1}));
+  return rows;
+}
+
+// ── L8-1: The Ferryman's Toll ────────────────────────────────────────────────
+function evL8Ferryman(el){
+  const canCacao=G.res.cacao>=666;
+  const hdr=document.createElement('div');
+  hdr.innerHTML='<div style="font-size:12px;color:#80a0c0;margin-bottom:.75rem;font-style:italic">A Tlakamichin poles a reed canoe out of the murk and waits, hand open. The far bank is a long way off, and the water moves.</div>';
+  el.appendChild(hdr);
+
+  el.appendChild(evOpt('\u{1FAD9}','Pay in cacao','[v949] (666 Cacao) +6 soul surges to every unit in the party','The ferryman counts the beans twice.',!canCacao,'Not enough Cacao (need 666)',()=>{
+    G.res.cacao-=666;
+    const _n=evSurgeParty(6);renderRes('rb-event');
+    evResult(document.getElementById('event-content'),'\u{1FAD9}',`The ferryman pockets the beans and poles you across in silence.<br><em style="color:#c0a0e0">+6 soul surges to each of your ${_n} units.</em>`,afterEvent);
+  }));
+
+  el.appendChild(evOpt('\u{1FA78}','Pay in flesh','[v949] Whole party to 60% HP next battle \u2014 a random Uncommon offering','He does not want beans. He wants what beans are worth.',false,'',()=>{
+    G.unitHpOverride=G.unitHpOverride||{};
+    l8PartyRows().forEach(o=>{const mhp=allyMaxHpFor(o.key,o.baseHp,o.hpMult);G.unitHpOverride[o.key]=Math.max(1,Math.round(mhp*0.60));});
+    const _r=grantRandomOffering('uncommon');renderRes('rb-event');
+    evResult(document.getElementById('event-content'),'\u{1FA78}',`The canoe rides low and the toll is taken from every one of you.<br><em style="color:#e07070">All units \u2192 60% HP next battle.</em><br>${offeringRewardLine(_r)}`,afterEvent);
+  }));
+
+  el.appendChild(evOpt('\u{1F30A}','Swim','[v949] Poison x2 + 0 TP next battle \u2014 +12000 Blood','The water is shallower than it looks. That is not the problem with it.',false,'',()=>{
+    evDrainNPAll(1.0);
+    G._nextBattlePoison=2;
+    G.res.blood+=12000;renderRes('rb-event');
+    evResult(document.getElementById('event-content'),'\u{1F30A}',`You wade in. Something heavy and metal turns underfoot halfway across, and you carry it out with you.<br><em style="color:#e05050">+12,000 Blood</em><br><em style="color:#90d030">All units start next battle Poisoned \u00d72, at 0 TP.</em>`,afterEvent);
+  }));
+}
+
+// ── L8-2: The Nine Holes ─────────────────────────────────────────────────────
+/* Structurally L3's Obsidian Path: repeatable within one visit, escalating toll, the event
+   re-renders itself after each dive. Cost and any Lethargy land on a NEWLY ROLLED unit each
+   dive so nothing stacks on one victim [LOCKED, L8 doc]. Rewards are cumulative. */
+function l8HoleTpCost(dive){return dive<=3?0.10:dive<=6?0.20:0.30;} /* cost bands 1-3/4-6/7-9 */
+/* v950: reward bands are 1-4 / 5-8 / 9 and deliberately OFFSET from the cost bands above --
+   dives 4 and 7 raise the toll one hole before the payout tier follows, so the descent gets
+   worse before it gets better. Straight from the L8 design doc's depth table. */
+function l8HoleBand(dive){return dive>=9?'rare':dive<=4?'shallow':'deep';}
+function evL8NineHoles(el){
+  G._nineHoleDives=G._nineHoleDives||0;
+  const dive=G._nineHoleDives+1;
+  const rows=l8PartyRows();
+  const pct=Math.round(l8HoleTpCost(dive)*100);
+
+  const hdr=document.createElement('div');
+  hdr.innerHTML=`<div style="font-size:12px;color:#a090c0;margin-bottom:.75rem;font-style:italic">Nine holes open in the riverbed, each darker than the last. <strong style="color:#d4af37">${G._nineHoleDives} of 9 descended.</strong></div>`;
+  el.appendChild(hdr);
+
+  const doDive=()=>{
+    G._nineHoleDives=dive;
+    const el2=document.getElementById('event-content');
+    if(!rows.length){evResult(el2,'\u{1F573}','There is no one left to send down.',afterEvent);return;}
+    // toll: a percentage of MAX TP, on a freshly rolled unit
+    const v=rows[Math.floor(Math.random()*rows.length)];
+    const mNp=maxNPFor(v.key,v.baseNp);
+    const cur=(G.unitNP[v.key]!==undefined)?G.unitNP[v.key]:mNp;
+    G.unitNP[v.key]=Math.max(0,Math.round(cur-mNp*l8HoleTpCost(dive)));
+
+    let line;
+    if(dive>=9){
+      line=offeringRewardLine(grantRandomOffering('rare'));
+    }else if(l8HoleBand(dive)==='shallow'){
+      const r=Math.random();
+      if(r<0.25){G.res.cacao+=1000;line='<em style="color:#c0844a">+1,000 Cacao</em>';} /* v950: 300 -> 1000 */
+      else if(r<0.50){G.res.blood+=2000;line='<em style="color:#e05050">+2,000 Blood</em>';} /* v950: 500 -> 2000 */
+      else if(r<0.75){line=offeringRewardLine(grantRandomOffering('common'));}
+      else{const w=rows[Math.floor(Math.random()*rows.length)];G._nextBattleLethargy=G._nextBattleLethargy||{};G._nextBattleLethargy[w.key]=Math.min(4,(G._nextBattleLethargy[w.key]||0)+1);
+        line=`<em style="color:#c0a040">${w.icon} ${w.name} surfaces sluggish \u2014 LETHARGY \u00d71 next battle.</em>`;}
+    }else{
+      const r=Math.random();
+      if(r<0.30){G.res.blood+=6200;line='<em style="color:#e05050">+6,200 Blood</em>';} /* v950: 1600 -> 6200 */
+      else if(r<0.60){line=offeringRewardLine(grantRandomOffering('uncommon'));}
+      else{const w=rows[Math.floor(Math.random()*rows.length)];G._nextBattleLethargy=G._nextBattleLethargy||{};G._nextBattleLethargy[w.key]=Math.min(4,(G._nextBattleLethargy[w.key]||0)+2);
+        line=`<em style="color:#c0a040">${w.icon} ${w.name} surfaces barely moving \u2014 LETHARGY \u00d72 next battle.</em>`;}
+    }
+    renderRes('rb-event');
+
+    if(dive>=9){
+      G._nineHoleDives=0;
+      evResult(el2,'\u{1F573}',`${v.icon} <strong>${v.name}</strong> takes the ninth descent (\u2212${pct}% max TP).<br>${line}<br><em style="color:#d4af37">The ninth hole has no bottom and nothing below it. You climb out.</em>`,afterEvent);
+      return;
+    }
+    // re-render for the next dive, keeping the result visible above the choices
+    el2.innerHTML='';
+    const msg=document.createElement('div');
+    msg.innerHTML=`<div style="font-size:13px;margin-bottom:.75rem"><span style="color:#e05050">${v.icon} <strong>${v.name}</strong> dives \u2014 \u2212${pct}% max TP.</span><br>${line}</div>`;
+    el2.appendChild(msg);
+    evL8NineHoles(el2);
+  };
+
+  el.appendChild(evOpt('\u{1F573}','Dive',`[v949] Hole ${dive}/9 \u2014 a random unit pays ${pct}% of max TP, then rolls the depth table`,
+    dive>=9?'The ninth hole. Whatever is down there has been down there a long time.':'The water closes over your head.',
+    !rows.length,'No units to send down',doDive));
+  el.appendChild(evOpt('\u{1F6B6}','Surface',`[v949] Keep everything earned. Resets the descent.`,'Climb out while you still can.',false,'',()=>{
+    G._nineHoleDives=0;
+    evResult(document.getElementById('event-content'),'\u{1F573}','You haul yourself onto the bank and do not look back down.',afterEvent);
+  }));
+}
+
+// ── L8-3: The Wastewater Shrine ──────────────────────────────────────────────
+/* Transmutation priority [LOCKED, L8 doc]: an offering already SPENT this run
+   (G.offeringSpent[id]) is consumed before a live one -- turning dead weight into something
+   usable is the intended feel. Note only a handful of offerings ever set that flag today. */
+function evL8Wastewater(el){
+  const wnVassals=(G.captured||[]).filter(cu=>cu.element==='water'||cu.element==='night');
+  const owned=(G.offerings||[]);
+  const upgradable=owned.filter(id=>OFFERINGS[id]&&(OFFERINGS[id].tier==='common'||OFFERINGS[id].tier==='uncommon'));
+  const hdr=document.createElement('div');
+  hdr.innerHTML='<div style="font-size:12px;color:#90b070;margin-bottom:.75rem;font-style:italic">The altar stands waist-deep in the wastewater of the Apanohuacalhuia. The filth here has been prayed over for so long it has started praying back.</div>';
+  el.appendChild(hdr);
+
+  el.appendChild(evOpt('\u{1F30A}','Sacrifice a WATER or NIGHT vassal','[v949] Patron +10 levels, everyone else +5','What the river wants, the river already half has.',!wnVassals.length,'No Water or Night vassals',()=>{
+    const el2=document.getElementById('event-content');el2.innerHTML='';
+    const h2=document.createElement('div');h2.innerHTML='<div style="font-size:14px;color:var(--am);margin-bottom:.75rem">Choose the offering:</div>';el2.appendChild(h2);
+    wnVassals.forEach(cu=>{
+      const btn=document.createElement('button');btn.className='btn';btn.style.cssText='width:100%;margin-bottom:.5rem;text-align:left;padding:8px 12px';
+      btn.innerHTML=`${cu.icon} <strong>${cu.name}</strong> <span style="font-size:11px;color:var(--td)">Lv${getLevel(capKey(cu))}</span>`;
+      btn.onclick=()=>{
+        const gone=capKey(cu);
+        G.captured=G.captured.filter(c=>capKey(c)!==gone);
+        G.deplSel=(G.deplSel||[]).filter(k=>k!==gone);
+        const gk=G.god?'god_'+G.god.id:null;
+        if(gk){G._lvRevealPend=G._lvRevealPend||{};if(G._lvRevealPend[gk]===undefined)G._lvRevealPend[gk]=getLevel(gk);G.levels[gk]=(G.levels[gk]||1)+10;}
+        (G.party||[]).forEach(gid=>{if(G.god&&gid===G.god.id)return;const k='god_'+gid;G._lvRevealPend=G._lvRevealPend||{};if(G._lvRevealPend[k]===undefined)G._lvRevealPend[k]=getLevel(k);G.levels[k]=(G.levels[k]||1)+5;});
+        G.captured.forEach(c=>evLevelUnit(c,5));
+        evResult(el2,'\u{1F30A}',`${cu.icon} <strong>${cu.name}</strong> slips under without a sound and does not come back up.<br><em style="color:#70e070">Patron +10 levels \u00b7 all other units +5 levels.</em>`,afterEvent);
+      };
+      el2.appendChild(btn);
+    });
+  }));
+
+  el.appendChild(evOpt('\u{1F9C2}','Wash an offering in the filth','[v949] A random owned Common\u2192Uncommon or Uncommon\u2192Rare. Spent offerings go first.','Some things are improved by ruin.',!upgradable.length,'Nothing you own can be washed',()=>{
+    const el2=document.getElementById('event-content');
+    const spent=upgradable.filter(id=>G.offeringSpent&&G.offeringSpent[id]);
+    const pool=spent.length?spent:upgradable;
+    const src=pool[Math.floor(Math.random()*pool.length)];
+    const upTier=OFFERINGS[src].tier==='common'?'uncommon':'rare';
+    const ownedSet=new Set(G.offerings||[]);
+    const cands=Object.keys(OFFERINGS).filter(id=>{const o=OFFERINGS[id];return o&&o.tier===upTier&&o.price&&!ownedSet.has(id)&&!(o.noStockIf&&o.noStockIf());});
+    if(!cands.length){
+      const val=upTier==='rare'?{c:600,f:20}:{c:250,f:5};
+      G.res.cacao+=val.c;G.res.flower+=val.f;renderRes('rb-event');
+      evResult(el2,'\u{1F9C2}',`The water takes ${OFFERINGS[src].icon} <strong>${OFFERINGS[src].name}</strong> \u2014 but you already hold every ${upTier} it could give back.<br><em style="color:#e0c060">+${val.c} \u{1FAD8} Cacao \u00b7 +${val.f} \u{1F33C} Flowers instead.</em>`,afterEvent);
+      return;
+    }
+    const dst=pickPreferredOffering(cands); /* v948 element preference applies here too */
+    G.offerings=(G.offerings||[]).filter(id=>id!==src);
+    if(G.offeringSpent)delete G.offeringSpent[src];
+    grantOffering(dst);renderRes('rb-event');
+    const wasSpent=spent.length>0;
+    evResult(el2,'\u{1F9C2}',`You hold ${OFFERINGS[src].icon} <strong>${OFFERINGS[src].name}</strong> under until it stops being itself.${wasSpent?'<br><em style="color:var(--td);font-size:11px">It was already spent for this run \u2014 no loss.</em>':''}<br>It surfaces as ${OFFERINGS[dst].icon} <strong>${OFFERINGS[dst].name}</strong>!<br><em style="color:#c0e060">${OFFERINGS[dst].desc}</em>`,afterEvent);
+  }));
 }
 
 // ── L1-1: The Hungry Xolo ─────────────────────────────────────────────────────
@@ -6633,7 +7074,7 @@ function evL1Cornfield(el){
     evLevelAllParty(2);renderRes('rb-event');
     const el2=document.getElementById('event-content');evResult(el2,'🌽','The goddess smiles. Your allies are renewed and strengthened!<br><em style="color:#50e090">All units +2 levels.</em>',afterEvent);
   }));
-  el.appendChild(evOpt('🌾','Offer a Crop Worker','Send a vassal to tend her cornfield — all other units gain +3 levels','Chicomecoatl values honest work over bloodshed.',false,'',()=>{
+  el.appendChild(evOpt('🌾','Offer a Crop Worker','[v945] Vassal leaves; whole party fully restored (HP+TP) + a random Common offering','Chicomecoatl values honest work over bloodshed.',false,'',()=>{
     const sacrificeable=G.captured.filter(cu=>cu&&capKey(cu));
     if(!sacrificeable.length){const el2=document.getElementById('event-content');evResult(el2,'🌸','No vassals to offer — Chicomecoatl accepts your reverence.<br><em style="color:#50e090">All units fully restored.</em>',afterEvent);evRestoreAll();return;}
     const el2=document.getElementById('event-content');el2.innerHTML='<div style="font-size:14px;color:var(--am);margin-bottom:.75rem">Choose a vassal to tend the cornfield:</div>';
@@ -6642,8 +7083,9 @@ function evL1Cornfield(el){
       btn.innerHTML=`${cu.icon} <strong>${cu.name}</strong> <span style="font-size:11px;color:var(--td)">Lv${getLevel(capKey(cu))}</span>`;
       btn.onclick=()=>{
         G.captured=G.captured.filter(c=>capKey(c)!==capKey(cu));
+        evRestoreAll(); /* v945: the promised effect, which never existed in code */
         const _r=grantRandomOffering('common');renderRes('rb-event');
-        evResult(el2,'🌽',`${cu.icon} <strong>${cu.name}</strong> sets down their weapons and joins the eternal harvest, tending Chicomecoatl's fields.<br>${offeringRewardLine(_r)}`,afterEvent);
+        evResult(el2,'🌽',`${cu.icon} <strong>${cu.name}</strong> sets down their weapons and joins the eternal harvest, tending Chicomecoatl's fields.<br><em style="color:#50e090">The goddess renews those who remain — all HP and TP restored.</em><br>${offeringRewardLine(_r)}`,afterEvent);
       };
       el2.appendChild(btn);
     });
@@ -6707,8 +7149,8 @@ function evL2EarthShrine(el){
       btn.onclick=()=>{
         G.captured=G.captured.filter(c=>capKey(c)!==capKey(cu));
         G.deplSel=G.deplSel.filter(k=>k!==capKey(cu));
-        G.res.blood+=4000;G.res.cacao+=2000;G.res.flower+=40;
-        evResult(el2,'⛩','The Earth Gods roar with approval!<br><em style="color:#e05050">+4,000 Blood</em> &nbsp;<em style="color:#c0844a">+2,000 Cacao</em> &nbsp;<em style="color:#d4af37">+40 Flowers</em>',afterEvent);
+        G.res.blood+=3200;G.res.cacao+=1600;G.res.flower+=35; /* v945 */
+        evResult(el2,'⛩','The Earth Gods roar with approval!<br><em style="color:#e05050">+3,200 Blood</em> &nbsp;<em style="color:#c0844a">+1,600 Cacao</em> &nbsp;<em style="color:#d4af37">+35 Flowers</em>',afterEvent);
       };
       el2.appendChild(btn);
     });
@@ -6726,8 +7168,8 @@ function evL2EarthShrine(el){
       btn.onclick=()=>{
         G.captured=G.captured.filter(c=>capKey(c)!==capKey(cu));
         G.deplSel=G.deplSel.filter(k=>k!==capKey(cu));
-        G.res.blood+=50;
-        evResult(el2,'😒','The gods are disappointed in your offering.<br><em style="color:#e05050">+50 Blood</em>',afterEvent);
+        G.res.blood+=1000;G.res.cacao+=500; /* v945: was +50 Blood flat -- an 80x gap against the Earth branch for identical cost */
+        evResult(el2,'😒','The gods accept, but without enthusiasm.<br><em style="color:#e05050">+1,000 Blood</em> &nbsp;<em style="color:#c0844a">+500 Cacao</em>',afterEvent);
       };
       el2.appendChild(btn);
     });
@@ -6748,12 +7190,13 @@ function buildHeartJaguarFight(){
     maxNP:Math.round(sc(46,lv)),currentNP:Math.round(sc(46,lv)),npCost:20,enemyLevel:lv,isGod:false,
     poisonStacks:0,burnStacks:0,paralyzStacks:0,defBuff:0,armor:0,slowStacks:0,woundStacks:0,lethargyStacks:0,atkBuffStacks:0,atkBuffRounds:0,defBuffStacks:0,defBuffRounds:0,critBuffStacks:0,critBuffRounds:0,fv:0};
   // v683: the carrion pack swells — 6 escorts drawn from the full L7 pool (was 2)
+  grantChimalli(jag,0.25,'Heart Jaguar'); /* v964: was a flat armor:50 in the literal */
   const _jagPool=getTeyolloPool();
-  const esc=[];for(let i=0;i<6;i++){const pk=_jagPool[Math.floor(Math.random()*_jagPool.length)];const e=mkEnemy(pk,i+1,0.9,lv);if(e)esc.push(e);}
+  const esc=[];for(let i=0;i<6;i++){const pk=_jagPool[Math.floor(Math.random()*_jagPool.length)];const e=mkEnemy(pk,i+1,0.9,lv);if(e){grantChimalli(e,0.25,'Heart Jaguar');esc.push(e);}} /* v946: pack arrives shielded */
   return[jag,...esc];
 }
 function evL7HeartJaguar(el){
-  el.appendChild(evOpt('🐆','Face the Heart Jaguar','','Fight Ocetekuani and his full carrion pack. Victory: 6,000 Blood, 3,000 Cacao, 80 FP + a random RARE offering.',false,'',()=>{
+  el.appendChild(evOpt('🐆','Face the Heart Jaguar','[v946] +8888 Blood, +7777 Cacao, +99 FP, random Rare offering','Ocetekuani and his carrion pack, every one of them shielded. What he guards, he guards well.',false,'',()=>{
     const el2=document.getElementById('event-content');
     evResult(el2,'🐆','The jaguar drops from the branches, old ribs cracking under its paws.',()=>{
       G.currentEvent='l7_heart_jaguar_fight';
@@ -6769,10 +7212,20 @@ function evL7HeartJaguar(el){
   }));
 }
 function evL7PulqueFeast(el){
-  el.appendChild(evOpt('🍶','Drink with the rabbits','','Next battle: whole party gains ATK/MAG UP ×1 — and DRUNK ×2. Under Inebriated Reverie, pure upside.',false,'',()=>{
+  el.appendChild(evOpt('🍶','Drink with the rabbits','[v947] Random: 10000 Cacao / 500 FP / 6 party surges / random Rare relic. Cost: whole party DRUNK x4 next battle.','Four hundred rabbits pass the gourd. Whatever the pulque gives, it takes the morning after.',false,'',()=>{
     const el2=document.getElementById('event-content');
-    G._pulqueFeast=true;
-    evResult(el2,'🍶','The gourd goes around. The pulque is sweet, thick, and stronger than it tastes.<br><em style="color:#d4af37">Next battle: ATK/MAG UP ×1 + DRUNK ×2 for the whole party.</em>',afterEvent);
+    G._pulqueFeast=true; // consumed at battle start -- now DRUNK x4, no ATK buff
+    /* v947: the Feast used to pay one buff stack for one battle against a real penalty, which
+       made both branches worth roughly nothing. It now rolls one of four substantial prizes and
+       charges a much steeper toll for it. */
+    let line;
+    const roll=Math.floor(Math.random()*4);
+    if(roll===0){G.res.cacao+=10000;line='<em style="color:#c0844a">+10,000 Cacao</em>';}
+    else if(roll===1){G.res.flower+=500;line='<em style="color:#d4af37">+500 Flowers</em>';}
+    else if(roll===2){const _n=evSurgeParty(6);line=`<em style="color:#c0a0e0">+6 soul surges to each of your ${_n} units.</em>`;}
+    else{line=offeringRewardLine(grantRandomOffering('rare'));}
+    renderRes('rb-event');
+    evResult(el2,'🍶',`The gourd goes around. The pulque is sweet, thick, and stronger than it tastes.<br>${line}<br><em style="color:#e0a040">Next battle: DRUNK ×4 for the whole party.</em>`,afterEvent);
   }));
   el.appendChild(evOpt('🙅','Refuse politely','','The rabbits look disappointed. Leave safely.',false,'',()=>{
     const el2=document.getElementById('event-content');
@@ -6809,12 +7262,12 @@ function evL2Mixcoatl(el){
 function evMixcoatlTribute(el2,lv){
   if(lv<=5){
     evResult(el2,'😂','"This weakling? You insult me!" Mixcoatl laughs and disappears.\n<em style="color:#e07070">No reward.</em>',afterEvent);
-  }else if(lv<=9){
-    G.res.blood+=200;G.res.flower+=10;
-    evResult(el2,'😐','Mixcoatl seems indifferent. He tosses you a modest reward and walks away.<br><em style="color:#e05050">+200 Blood</em> &nbsp;<em style="color:#d4af37">+10 Flowers</em>',afterEvent);
+  }else if(lv<=10){ /* v945: band was <=9 */
+    G.res.blood+=500;G.res.flower+=15;const _n=evSurgeDeployed(1);
+    evResult(el2,'😐',`Mixcoatl seems indifferent. He tosses you a modest reward and walks away.<br><em style="color:#e05050">+500 Blood</em> &nbsp;<em style="color:#d4af37">+15 Flowers</em><br><em style="color:#c0a0e0">+1 soul surge to each of your ${_n} deployed units.</em>`,afterEvent);
   }else if(lv<=19){
-    G.res.blood+=2500;G.res.flower+=50;
-    evResult(el2,'😏','Mixcoatl is pleased. He awards you handsomely.<br><em style="color:#e05050">+2,500 Blood</em> &nbsp;<em style="color:#d4af37">+50 Flowers</em>',afterEvent);
+    G.res.blood+=2400;G.res.flower+=40;const _n=evSurgeDeployed(3);
+    evResult(el2,'😏',`Mixcoatl is pleased. He awards you handsomely.<br><em style="color:#e05050">+2,400 Blood</em> &nbsp;<em style="color:#d4af37">+40 Flowers</em><br><em style="color:#c0a0e0">+3 soul surges to each of your ${_n} deployed units.</em>`,afterEvent);
   }else{
     // Lv 20+ — boss battle!
     evResult(el2,'⚡',`"Impressive. Now let's see how YOU fight!" — Mixcoatl's eyes flash with lightning.`,()=>{
@@ -6851,13 +7304,14 @@ function evL3ObsidianPath(el){
     G.unitHpOverride[v.key]=Math.max(Math.round(mHp*0.10),Math.round(curHp*(1-cost))); // floor at 10% max
     G.unitNP[v.key]=Math.max(0,Math.round(curNp*(1-cost)));
     if(Math.random()<findChance){
-      G.res.blood+=2000;const _r=grantRandomOffering('uncommon');G._obsidianWalks=0;renderRes('rb-event');
+      G.res.cacao+=3000;const _r=grantRandomOffering('uncommon');G._obsidianWalks=0;renderRes('rb-event'); /* v945: was +2000 Blood */
       const el2=document.getElementById('event-content');
-      evResult(el2,'✨',`${v.icon} <strong>${v.name}</strong> bears the obsidian's cut (next battle −10% HP & TP).<br><em style="color:#e05050">The golden shrine is real! +2,000 Blood</em><br>${offeringRewardLine(_r)}`,afterEvent);
+      evResult(el2,'✨',`${v.icon} <strong>${v.name}</strong> bears the obsidian's cut (next battle −10% HP & TP).<br><em style="color:#c0844a">The golden shrine is real! +3,000 Cacao</em><br>${offeringRewardLine(_r)}`,afterEvent);
     }else{
+      G.res.blood+=200;renderRes('rb-event'); /* v945: a failed walk is no longer a pure loss */
       const el2=document.getElementById('event-content');el2.innerHTML='';
       const msg=document.createElement('div');
-      msg.innerHTML=`<div style="font-size:13px;color:#e05050;margin-bottom:.75rem">${v.icon} <strong>${v.name}</strong> walks the obsidian — next battle −10% HP & TP.<br><span style="color:var(--td);font-size:12px">The shrine still glimmers ahead...</span></div>`;
+      msg.innerHTML=`<div style="font-size:13px;color:#e05050;margin-bottom:.75rem">${v.icon} <strong>${v.name}</strong> walks the obsidian — next battle −10% HP & TP.<br><em style="color:#e05050">You scrape 200 Blood from the flints.</em><br><span style="color:var(--td);font-size:12px">The shrine still glimmers ahead...</span></div>`;
       el2.appendChild(msg);
       evL3ObsidianPath(el2);
     }
@@ -7016,13 +7470,19 @@ function evUTlacuilo(el){
 }
 
 // ── U-2: The Obsidian Mirror ──────────────────────────────────────────────────
+/* v947: the Mirror is available from L1 and was never re-priced, so its flat purse swung ~90x
+   in real value across a run. Rewards now scale +10% per layer past the first (L1 x1.0,
+   L4 x1.3, L9 x1.8). The -25% max HP penalty is already a percentage and needs no scaling. */
+function mirrorScale(){return 1+0.10*Math.max(0,(G.layer||1)-1);}
 function evUObsidianMirror(el){
-  el.appendChild(evOpt('🪞','Gaze into it','60% chance: +5,000 Blood, +2,500 Cacao, +30 Flowers · 40%: random unit loses 25% max HP permanently',
+  const _ms=mirrorScale();
+  el.appendChild(evOpt('🪞','Gaze into it',`[v947] 60%: +${Math.round(5000*_ms)} Blood, +${Math.round(2500*_ms)} Cacao, +${Math.round(30*_ms)} FP (scaled x${_ms.toFixed(2)}) · 40%: random unit loses 25% max HP`,
     'The smoke swirls. Faces flash across the surface.',false,'',()=>{
       const el2=document.getElementById('event-content');
       if(Math.random()<0.60){
-        G.res.blood+=5000;G.res.cacao+=2500;G.res.flower+=30;
-        evResult(el2,'✨','The mirror reveals a path of divine fortune!<br><em style="color:#e05050">+5,000 Blood</em> &nbsp;<em style="color:#c0844a">+2,500 Cacao</em> &nbsp;<em style="color:#d4af37">+30 Flowers</em>',afterEvent);
+        const _b=Math.round(5000*_ms),_c=Math.round(2500*_ms),_f=Math.round(30*_ms);
+        G.res.blood+=_b;G.res.cacao+=_c;G.res.flower+=_f;renderRes('rb-event');
+        evResult(el2,'✨',`The mirror reveals a path of divine fortune!<br><em style="color:#e05050">+${_b.toLocaleString()} Blood</em> &nbsp;<em style="color:#c0844a">+${_c.toLocaleString()} Cacao</em> &nbsp;<em style="color:#d4af37">+${_f} Flowers</em>`,afterEvent);
       }else{
         const pool=[...G.captured.filter(cu=>(cu.currentHp??1)>0)];
         const godPool=G.party.map(id=>GODS.find(g=>g.id===id)).filter(Boolean);
@@ -7039,11 +7499,11 @@ function evUObsidianMirror(el){
         }
       }
     }));
-  el.appendChild(evOpt('💥','Shatter it','Safely destroys the mirror — gain +400 Blood.',
+  el.appendChild(evOpt('💥','Shatter it',`[v947] Safe — +${Math.round(400*_ms)} Blood (scaled x${_ms.toFixed(2)})`,
     'You smash the mirror against the obsidian floor.',false,'',()=>{
-      G.res.blood+=400;
+      const _sb=Math.round(400*_ms);G.res.blood+=_sb;renderRes('rb-event');
       const el2=document.getElementById('event-content');
-      evResult(el2,'💥','The mirror shatters into a thousand shards of smoke.<br><em style="color:#e05050">+400 Blood</em>',afterEvent);
+      evResult(el2,'💥',`The mirror shatters into a thousand shards of smoke.<br><em style="color:#e05050">+${_sb.toLocaleString()} Blood</em>`,afterEvent);
     }));
   el.appendChild(evOpt('🚶','Walk away','All units gain +25% of their max TP.','You step around the mirror without looking.',false,'',()=>{
     const all=[...G.captured,...(G.units||[])];
@@ -7167,12 +7627,15 @@ function evUTonatiuh(el){
   el.appendChild(hdr);
   // Option A: Offer blood
   const canAffordTonBlood=G.res.blood>=300;
-  el.appendChild(evOpt('🩸','Offer blood to the sun','(300 Blood) All units fully restore TP · +50 FP','The blood steams in the frozen air, rising to meet the sun.',!canAffordTonBlood,'Not enough Blood (need 300)',()=>{
+  el.appendChild(evOpt('🩸','Offer blood to the sun','[v946] (300 Blood) +4444 Cacao, +80 FP, +4 surges per deployed unit. NO unlock — that needs a fight.','The blood steams in the frozen air, rising to meet the sun.',!canAffordTonBlood,'Not enough Blood (need 300)',()=>{
+    /* v946: this branch used to set V['tonatiuh_unlocked'] outright -- 300 Blood bought the same
+       permanent patron unlock the boss fight grants, with no fight, which made both combat
+       branches pointless. Removed. The old TP restore looped G.units, which is empty between
+       battles, so it never did anything either; replaced with real rewards. */
     G.res.blood-=300;
-    G.units.forEach(u=>{u.currentNP=u.maxNP||u.currentNP;});
-    G.res.flower+=50;
-    V['tonatiuh_unlocked']=true;saveV();
-    evResult(el,'☀️','Tonatiuh smiles. The warmth fills your veins.',()=>afterEvent());
+    G.res.cacao+=4444;G.res.flower+=80;
+    const _sg=evSurgeDeployed(4);renderRes('rb-event');
+    evResult(el,'☀️',`Tonatiuh smiles. The warmth fills your veins.<br><em style="color:#c0844a">+4,444 Cacao</em> &nbsp;<em style="color:#d4af37">+80 Flowers</em><br><em style="color:#c0a0e0">+4 soul surges to each of your ${_sg} deployed units.</em>`,()=>afterEvent());
   }));
   // Option B: Offer two vassals — battle
   const vassals=G.captured.filter(c=>!c._tlacuiloRecord);
@@ -7731,7 +8194,11 @@ function renderDeployChips(){
   all.forEach(u=>{
     // Use capKey for captured units (ensures _captureId key matches G.shields)
     const shieldKey=u.isGod?u.id:(u.baseObj?capKey(u.baseObj):u.id);
-    const armorHp=G.unitArmor[shieldKey]!==undefined?G.unitArmor[shieldKey]:(G.shields[shieldKey]||0)*G.dte.chimaArmorPerStack;
+    /* v972: was resolveArmor(shieldKey,u.maxHp). Deploy-screen chips are roster/preview objects
+       with no maxHp, so this multiplied the stored FRACTION by undefined and every chip resolved
+       to 0 -- the shield numbers simply vanished from this screen. rosterArmorHp works the max HP
+       out from the roster entry itself, which is what this context needs. */
+    const armorHp=(u.maxHp?resolveArmor(shieldKey,u.maxHp):rosterArmorHp(shieldKey));
     const d=document.createElement('div');d.className='party-chip';d.dataset.punit=(u._sel||u._captureId||u.id); /* v934: the deploy screen shows chips too */
     d.style.cssText=u.isPatron?'border-color:#c0a020;background:#2a1e04;cursor:pointer':'cursor:pointer';
     const _dei=eb(u.element,true);
@@ -7869,6 +8336,32 @@ function startBattle(){
     addLog(`<span class="log-ab">🩸 The mountain's defiance: all units start Wounded ×${G._nextBattleWound}!</span>`);
     G._nextBattleWound=0;
   }
+  /* v949: Burning Column's "Walk past" has set G.nextBattleBurnStacks since it shipped, but no
+     consumer ever existed -- the promised Burn x2 never applied. Wiring it here alongside the new
+     L8 carry-outs. */
+  if(G.nextBattleBurnStacks){
+    G.units.forEach(u=>{if(u.currentHp>0)u.burnStacks=Math.min(4,(u.burnStacks||0)+G.nextBattleBurnStacks);});
+    addLog(`<span class="log-burn">🔥 The column's flames still cling — all units start Burning ×${G.nextBattleBurnStacks}!</span>`);
+    G.nextBattleBurnStacks=0;
+  }
+  // v949: Ferryman's Toll — Swim
+  if(G._nextBattlePoison){
+    G.units.forEach(u=>{if(u.currentHp>0)applyPoison(u,G._nextBattlePoison);});
+    addLog(`<span class="log-poison">🤢 The wastewater clings — all units start Poisoned ×${G._nextBattlePoison}!</span>`);
+    G._nextBattlePoison=0;
+  }
+  /* v949: Nine Holes — Lethargy is per-UNIT, not party-wide, because each dive rolls a fresh
+     victim. Keyed by roster key; the battle-unit mapping mirrors endBattle (line ~14702). */
+  if(G._nextBattleLethargy&&Object.keys(G._nextBattleLethargy).length){
+    let _lt=0;
+    G.units.forEach(u=>{
+      const key=u.baseGodId?'god_'+u.baseGodId:(u._captureId||u.baseId||u.id);
+      const st=G._nextBattleLethargy[key];
+      if(st&&u.currentHp>0){applyLethargy(u,st);_lt++;}
+    });
+    if(_lt)addLog(`<span class="log-ab">🕳 The holes take their toll — ${_lt} unit${_lt>1?'s':''} start Lethargic.</span>`);
+    G._nextBattleLethargy={};
+  }
   // L2-2 Earth Shrine C penalty: all units lose 20% current NP
   if(G._nextBattleNPPenalty){
     G.units.forEach(u=>{u.currentNP=Math.max(0,Math.round((u.currentNP||0)*(1-G._nextBattleNPPenalty)));});
@@ -7906,11 +8399,17 @@ function startBattle(){
   // Coatlicue Snake Skirt: free chimalli on random ally
   if(p.pk==='freeChimalli'){
     const aliveAllies=G.units.filter(u=>u.currentHp>0&&u.isAlly);
-    const unshielded=aliveAllies.filter(u=>(u.armor||0)<40);
+    /* v967: this threshold was a flat 40, left over from when every Chimalli grant was a small
+       integer. Since v964 shields are a PERCENTAGE of max HP and routinely run into the hundreds,
+       so "armor < 40" excluded practically the whole party. `unshielded` came back empty almost
+       every battle and the else-branch below picked a RANDOM ally -- which is why Snake Skirt kept
+       landing on a well-shielded Mimich instead of the lowest-HP unit. Same 40% intent as the
+       Ophidian Mother check, now expressed against each unit's own max HP. */
+    const unshielded=aliveAllies.filter(u=>(u.armor||0)<Math.round((u.maxHp||0)*0.40));
     const chimaTarget=unshielded.length>0
       ?unshielded.reduce((a,b)=>a.currentHp<b.currentHp?a:b)
       :aliveAllies[Math.floor(Math.random()*aliveAllies.length)];
-    if(chimaTarget){chimaTarget.armor=(chimaTarget.armor||0)+20;addLog(`<span class="log-sh">🌸 Snake Skirt: ${chimaTarget.icon} ${chimaTarget.name} +20 HP Chimalli!</span>`);}
+    if(chimaTarget){const _ss=grantChimalli(chimaTarget,p.pv||0.05,'Snake Skirt');addLog(`<span class="log-sh">🌸 Snake Skirt: ${chimaTarget.icon} ${chimaTarget.name} +${_ss} Chimalli (5%)!</span>`);}
   }
 
   // Minion Rebirth
@@ -7936,7 +8435,7 @@ function startBattle(){
   if(G.enemies&&G.enemies.some(e=>e&&e.ak==='sinistralMinacachalli'&&e.isBoss)){G.enemies.forEach(e=>{if(e)e._critBonus=(e._critBonus||0)+0.15;});}
   // Apply Enemy Chimalli penance if active
   const _ec=getTecpatlEffects().enemyChimalli;
-  if(_ec>0)G.enemies.forEach(e=>{e.armor=(e.armor||0)+_ec;});
+  if(_ec>0)G.enemies.forEach(e=>grantChimalli(e,_ec,'Enemy Chimalli penance')); /* v964 */
   // Tepeyollotl Mountain Heart: Earth escorts +20% DEF
   if(G.enemies.some(e=>e.isBoss&&e.ak==='seismicRoar')){
     G.enemies.filter(e=>e.element==='earth'&&!e.isBoss).forEach(e=>{e.def=Math.round((e.def||0)*1.20);});
@@ -8132,7 +8631,7 @@ function buildRoundQueue(){
       spawnReinforcement();
     }
     // Boss Misery Blizzard: 10% maxHP damage to all player allies at round-END (ignores armor/DEF/RES)
-    const ixqBoss=G.enemies.find(e=>e.id&&e.id.startsWith('boss_ixqui')&&e.currentHp>0);
+    const ixqBoss=G.enemies.find(e=>e.id&&e.id.startsWith('boss_ixqui')&&e.currentHp>0&&!e._summonedGod); /* v942: the id-prefix test also matched the L9 B5 raised Ixquimilli ('boss_ixqui_5_N'), firing a patron passive on a summon that is built passive-free */
     if(ixqBoss){
       const aP_mb=G.units.filter(u=>u.isAlly&&u.currentHp>0);
       aP_mb.forEach(u=>{
@@ -8228,7 +8727,7 @@ function buildRoundQueue(){
       let tot=0;
       const _hits=[];
       tg.forEach(e=>{
-        const d=Math.max(1,Math.round((e.maxHp||0)*0.15)); /* v858: 10% -> 15% */
+        const d=Math.max(1,Math.round((e.maxHp||0)*0.20)); /* v858: 10% -> 15% · v960: -> 20% */
         e.currentHp=Math.max(0,e.currentHp-d);tot+=d;
         _hits.push({id:e.id,d:d});
         if(e.currentHp<=0)handleDeath(e);
@@ -8395,8 +8894,7 @@ function processCurrentSlot(){
           G._targetedAllyId=null;
           renderBattle();
           animateActor(slot.unit.id);
-          G._animQueue.forEach(a=>animateHit(a.uid,a.dmg,a.isHeal,a.isCrit));
-          G._animQueue=[];
+          flushAnimQueue(); /* v968 */
         }
         G._actingEnemy=null;
         if(G.captureQueue.length&&!G.capActive){setTimeout(()=>processNextCap(),400);return;}
@@ -8453,7 +8951,7 @@ function fireBelicAutoAction(u,liveEnemies,allies,isEnemySide,onDone){
       const tgt=allies.reduce((a,b)=>a.currentHp/a.maxHp<b.currentHp/b.maxHp?a:b);
       const h=Math.round(tgt.maxHp*(ab==='Ancestral Storm'?0.33:0.30)*BELIC_BOOST);
       tgt.currentHp=healTo(tgt,h);
-      if(ab==='Ancestral Storm')tgt.armor=(tgt.armor||0)+15;
+      if(ab==='Ancestral Storm')grantChimalli(tgt,0.04,'Ancestral Storm');
       renderBattle();animateHit(tgt.id,h,true);
       addLog(`<span class="log-heal">&#9889; Belic Rush: ${u.icon} ${ab} &#8594; ${tgt.icon} +${h} HP!</span>`);
     }else{
@@ -8581,8 +9079,7 @@ function scheduleXochiBossSerendipity(bossUnit){
   G._animQueue=[];
   enemyActsTurn(pick);
   setTimeout(()=>{
-    G._animQueue.forEach(a=>animateHit(a.uid,a.dmg,a.isHeal,a.isCrit));
-    G._animQueue=[];
+    flushAnimQueue(); /* v968 */
     renderBattle();
   },300);
 }
@@ -8821,7 +9318,13 @@ function selectActor(unitId){
     notify('🐢 Slowed — wait for other units first!','#5080a0');return;
   }
   // PARALYZE: 10% miss per stack — rolled at most once per unit per round (v304: switching must not re-roll)
-  if(!G._paraRolled||G._paraRolled.round!==G.roundNum)G._paraRolled={round:G.roundNum,set:new Set()};
+  /* v951 CRASH FIX. This object holds a Set, and serializeRun() strips Sets wherever it finds
+     them -- including nested inside a plain object -- so a saved run restored `{round:N}` with no
+     `set` at all. When the restored round matched the live roundNum this guard passed and the
+     next line threw "Cannot read properties of undefined (reading 'has')", which killed the click
+     handler and soft-locked the battle. The instanceof test repairs runs already saved that way;
+     _paraRolled is also in RUN_SKIP now so it is never serialized again. */
+  if(!G._paraRolled||G._paraRolled.round!==G.roundNum||!(G._paraRolled.set instanceof Set))G._paraRolled={round:G.roundNum,set:new Set()};
   const _paraFresh=(u.paralyzStacks||0)>0&&!G._paraRolled.set.has(unitId);
   if(_paraFresh)G._paraRolled.set.add(unitId);
   if(_paraFresh&&Math.random()<(u.paralyzStacks||0)*0.10){
@@ -8927,20 +9430,92 @@ function fxSummon(uid){ // arrival: card pop-in + cloud puff (after the pending 
     fxMotes(uid,['☁️','✨'],'#e8e8ff','rad',4);
   },140);
 }
+/* v953 STRIKE JANK FIX. Both callers do the same thing in the same wrong order:
+       fxLunge(...)  ->  executeStrike/strikeDmg  ->  renderBattle()
+   fxLunge measured getBoundingClientRect() and started a 340ms transform straight away, and then
+   renderBattle mutated both rows a moment later. Anything that shifts layout in that render --
+   a dead target collapsing to a .slain card, the card-xl/card-lg size classes recomputing off
+   the live enemy count, a border toggling on the selected actor -- moves the target out from
+   under an animation whose offsets were measured against the OLD layout. The card lunges at
+   where the target used to be and then snaps.
+   Deferring the measurement one frame means it reads the layout the render actually produced.
+   The callers keep their order, because _fxDelayMap and fxSetCtx must still be set before damage
+   resolves -- only the visual is postponed, and the strike's own hit FX is already delayed 170ms
+   so nothing arrives early. */
+/* v954: fxLunge and fxStomp both animate `transform` on the unit card, and so does act-pulse.
+   They are declared in separate CSS rules, so whichever class lands SECOND wins the cascade and
+   RESTARTS the transform from zero -- the card is already sitting at scale(1.04) from actPulse
+   when the lunge begins, so it visibly snaps before it moves. Single-target PHYS specials show it
+   worst because animateActor fires at line ~9774, BEFORE their renderBattle, while a strike calls
+   it after. fxKin is set synchronously (fxLunge measures a frame later, which would be too late
+   to warn animateActor off) and cleared when the animation ends. */
+/* ═══ v955: kinetic FX move OFF the CSS cascade ═════════════════════════════════════════════
+   The card motion was driven by classes -- .fx-lunge / .fx-stomp / .act-pulse, all specificity
+   (0,1,0). But FIVE rules on the same elements set `animation` at (0,2,0): .uc.pulse,
+   .uc.capturable-glow, .uc.ftue-glow, .uc.active-enemy and .uc.targeted-ally. Higher specificity
+   wins regardless of source order, so a card wearing any of those glows could not move at all --
+   and .uc.active-enemy is on EVERY acting enemy, which is why enemy lunges never once played.
+   Worse, because the winner is decided by cascade, any class toggle during a render could hand
+   the transform to a different animation mid-flight and restart it, which is the snap/teleport.
+
+   el.animate() creates a script-driven animation that is not part of the cascade. Nothing can
+   outrank it, class toggles cannot interrupt it, and there is no var() inside keyframes for the
+   engine to re-resolve. The old class path stays as a fallback for engines without WAAPI.
+   Easing is per-keyframe now: ease-out on the way in, ease-in on the recovery, so the strike
+   reads as a lunge rather than a jump.
+   ══════════════════════════════════════════════════════════════════════════════════════════ */
+function fxKinetic(el,frames,ms){
+  if(!el||typeof el.animate!=='function')return null;
+  try{
+    if(el._fxAnim){try{el._fxAnim.cancel();}catch(e){}}
+    const an=el.animate(frames,{duration:ms,fill:'none'});
+    el._fxAnim=an;
+    an.onfinish=an.oncancel=()=>{if(el._fxAnim===an)el._fxAnim=null;};
+    return an;
+  }catch(e){return null;}
+}
+function fxMarkKinetic(el,ms){
+  if(!el)return;
+  el.dataset.fxKin='1';
+  setTimeout(()=>{try{delete el.dataset.fxKin;}catch(e){}},ms);
+}
 function fxLunge(attId,tgtId){
   if(!fxOn())return;
-  const a=fxCard(attId),t=fxCard(tgtId);
-  if(!a||!t)return;
-  const ra=a.getBoundingClientRect(),rt=t.getBoundingClientRect();
-  const dx=(rt.left+rt.width/2)-(ra.left+ra.width/2),dy=(rt.top+rt.height/2)-(ra.top+ra.height/2);
-  a.style.setProperty('--lx',Math.round(dx*0.6)+'px');a.style.setProperty('--ly',Math.round(dy*0.6)+'px');
-  fxClass(a,'fx-lunge',360);
+  fxMarkKinetic(fxCard(attId),400); // v954: claim the card now, before the deferred measure
+  const go=()=>{
+    const a=fxCard(attId),t=fxCard(tgtId);
+    if(!a||!t)return;
+    const ra=a.getBoundingClientRect(),rt=t.getBoundingClientRect();
+    if(!ra.width||!rt.width)return; // not laid out yet -- a lunge to (0,0) is worse than none
+    const dx=Math.round(((rt.left+rt.width/2)-(ra.left+ra.width/2))*0.6);
+    const dy=Math.round(((rt.top+rt.height/2)-(ra.top+ra.height/2))*0.6);
+    const an=fxKinetic(a,[
+      {transform:'translate(0,0) scale(1)',zIndex:30,easing:'ease-out',offset:0},
+      {transform:`translate(${dx}px,${dy}px) scale(1.04)`,zIndex:30,easing:'ease-in',offset:0.45},
+      {transform:'translate(0,0) scale(1)',zIndex:30,offset:1}
+    ],340);
+    if(!an){ // no WAAPI -- fall back to the old class path
+      a.style.setProperty('--lx',dx+'px');a.style.setProperty('--ly',dy+'px');
+      fxClass(a,'fx-lunge',360);
+    }
+  };
+  if(typeof requestAnimationFrame==='function')requestAnimationFrame(go);else go();
 }
 function fxStomp(attId,towardEnemies){
   if(!fxOn())return;
   const a=fxCard(attId);if(!a)return;
-  a.style.setProperty('--sy',(towardEnemies?-14:14)+'px');
-  fxClass(a,'fx-stomp',320);
+  fxMarkKinetic(a,360); // v954: same transform conflict as fxLunge
+  const sy=(towardEnemies?-14:14);
+  const an=fxKinetic(a,[
+    {transform:'translate(0,0) scale(1)',zIndex:30,easing:'ease-out',offset:0},
+    {transform:`translate(0,${sy}px) scale(1.05)`,zIndex:30,easing:'ease-in',offset:0.40},
+    {transform:'translate(0,3px) scale(.98)',zIndex:30,offset:0.70},
+    {transform:'translate(0,0) scale(1)',zIndex:30,offset:1}
+  ],300);
+  if(!an){ // v955 fallback
+    a.style.setProperty('--sy',sy+'px');
+    fxClass(a,'fx-stomp',320);
+  }
 }
 function fxPulse(attId,color){
   if(!fxOn())return;
@@ -8992,6 +9567,22 @@ function showOptions(){
     [{label:'Close',fn:()=>{}}]);
 }
 function cycleFxMode(){DT.fxMode=(DT.fxMode||'full')==='full'?'minimal':'full';saveDT();const b=document.getElementById('fx-btn');if(b)b.textContent='✨ FX: '+((DT.fxMode||'full')==='full'?'Full':'Minimal');notify('Battle FX: '+DT.fxMode,'#d4af37');} // v597: fx-btn may not exist (moved into Options) — the guard already handles it
+/* v968: the queue used to be flushed with a bare forEach, so every entry fired in the same tick.
+   When a multi-hit special caught the SAME unit twice -- a Patolli roll of 4 throws 3 hits, each
+   re-rolling a random target with replacement -- both damage numbers were drawn on top of each
+   other and the player saw one hit. That is what made a shattered Chimalli followed by a lethal
+   second hit look like the shield had failed.
+   Repeats of a uid are now staggered so each number is legible. Different units still animate
+   together, so nothing slows down for ordinary AoE. */
+function flushAnimQueue(){
+  const seen={};
+  (G._animQueue||[]).forEach(a=>{
+    const n=(seen[a.uid]=(seen[a.uid]||0)+1)-1;
+    if(n===0)animateHit(a.uid,a.dmg,a.isHeal,a.isCrit);
+    else setTimeout(()=>animateHit(a.uid,a.dmg,a.isHeal,a.isCrit),n*260);
+  });
+  G._animQueue=[];
+}
 function animateHit(uid,dmg,isHeal,isCrit,_pastFx){
   if(!dmg&&dmg!==0)return;
   if(dmg===0&&isHeal){animateBuff(uid);return;} // v562: legacy '+0 heal' buff markers → buff sparkle
@@ -9035,9 +9626,31 @@ function animateHit(uid,dmg,isHeal,isCrit,_pastFx){
     }
   },20);
 }
+/* v952 JANK FIX. renderBattle cleared each unit row with innerHTML='' and then re-appended the
+   very same card nodes into a freshly created .unit-row. Detaching a node from the document
+   CANCELS every CSS animation running on it, so each render killed act-pulse mid-flight.
+   Measured: animateActor fires, renderBattle lands ~12ms later, and the 300ms pulse played about
+   4% of itself before being reset -- which is exactly the "twitch instead of move" jank.
+   syncChildren leaves any node that is already in the right position ATTACHED, so only genuinely
+   reordered or removed cards are touched. Unit order is stable within a battle, so in practice
+   nothing moves and animations run to completion.
+   NOTE for future edits: never reach for innerHTML='' on a container holding animating cards. */
+function syncChildren(parent,nodes){
+  for(let i=0;i<nodes.length;i++){
+    const cur=parent.childNodes[i];
+    if(cur!==nodes[i])parent.insertBefore(nodes[i],cur||null);
+  }
+  while(parent.childNodes.length>nodes.length)parent.removeChild(parent.lastChild);
+}
 function animateActor(uid){
   const el=document.querySelector(`[data-uid="${uid}"]`);
-  if(el){el.classList.remove('act-pulse');void el.offsetWidth;el.classList.add('act-pulse');setTimeout(()=>el.classList.remove('act-pulse'),320);}
+  if(!el)return;
+  /* v954: stand down if a kinetic FX owns this card's transform. act-pulse would otherwise be
+     stacked on top of a lunge or stomp and restart it. Nothing is lost visually -- the cascade
+     already discarded actPulse in favour of the later-declared .fx-lunge rule; the only thing the
+     old code contributed was the restart. */
+  if(el.dataset.fxKin==='1'||el.classList.contains('fx-lunge')||el.classList.contains('fx-stomp'))return;
+  el.classList.remove('act-pulse');void el.offsetWidth;el.classList.add('act-pulse');setTimeout(()=>el.classList.remove('act-pulse'),320);
 }
 // ── Serendipity (Xochipilli patron passive) ───────────────────────────────────
 function openSerendipityPicker(){
@@ -9161,7 +9774,17 @@ function _aoeCapBase(actor){
    never pay the Cuauhtemoc Macuahuitl's physical recoil. Holds both ak keys and display names
    because the two call sites resolve the ability differently. SPLIT-LIST: a new non-damaging
    special has to be added here or it will start charging recoil on PHYS/MIX casters. */
-const HEAL_ABILITIES=new Set(['sheWhoEatsFilth','She Who Eats Filth', /* v878: was absent, so the action panel billed a pure heal as "MAG AoE" and priced it with a damage range */ 'ophidianMother','holyHarvest','peyoteConcoction','Chitin Shell','Bioluminescent Chorus','Gust Mend','Death Bloom','Dark Waters','Storm Mend','Stone Mend','Stone Protection','Earth Bloom','Ancestral Storm','Uapantotli']);
+const HEAL_ABILITIES=new Set(['sheWhoEatsFilth','She Who Eats Filth', /* v878: was absent, so the action panel billed a pure heal as "MAG AoE" and priced it with a damage range */ 'ophidianMother','holyHarvest','peyoteConcoction','Chitin Shell','Bioluminescent Chorus','Gust Mend','Death Bloom','Dark Waters','Storm Mend','Stone Mend','Stone Protection','Earth Bloom','Ancestral Storm','Uapantotli',
+  /* v963: nine PURE heals were still absent, so the action panel billed each of them as an
+     attack -- "MAG AoE" with an invented damage range -- exactly the bug v878 fixed for
+     She Who Eats Filth. Split-list hazard: this set is keyed on ak OR display name, so every
+     new healing ability has to be added here by hand.
+     Damage moves that merely lifesteal (Blood Drink, Heart Feast, Razor Dive, Vine Grasp, Soul
+     Drain, Life Siphon, Aurum Break, Jestress Nightmare, Primordial Hunger) stay OUT on purpose
+     -- they really do deal damage, so a range is the right thing to show. */
+  'burrMend','Burrow Mend','cleansingSteam','Cleansing Steam','folkRemedy','Folk Remedy',
+  'fumingWall','Fuming Wall','healingRite','Healing Rite','mouthOfSustenance','Mouth of Sustenance',
+  'pulqueMending','Pulque Mending','solarBloom','Solar Bloom','surgingTide','Surging Tide']);
 function specIsSupport(actor){
   if(!actor)return false;
   if(G._useOblationSpecial&&G._oblationAk)return HEAL_ABILITIES.has(G._oblationAk)||HEAL_ABILITIES.has(G._oblationAbility);
@@ -9268,6 +9891,16 @@ function doPlayerSpecial(useOblation){
         return;
       }
     }
+    /* v959 DOUBLE-CAST FIX. Every other action path flips the phase before it does any work --
+       doPlayerTarget and doPlayerAoeTarget go to 'idle'/'player_acting' on their first line,
+       doPlayerAllyTarget likewise. This branch did not: it ran TP deduction, the special, and a
+       450ms setTimeout to advanceTurn while battlePhase was STILL 'player_selected'. The guard at
+       the top of this function only tests for 'player_selected', so a second click inside that
+       window sailed straight through and cast again -- charging TP twice and applying the effect
+       twice. It only reproduced on AoE/auto specials (heals like Ophidian Mother) because those
+       are the only ones that resolve without a targeting step to change the phase first. */
+    G.pendingAction=null;
+    G.battlePhase='player_acting';
     const actorId=actor.id;
     const gd2=actor.isGod?GODS.find(g=>g.id===actor.baseGodId)||G.god:null;
     const spName2=gd2?gd2.ability:actor.ability;
@@ -9323,13 +9956,13 @@ function doPlayerAllyTarget(allyId){
   if(ab==='Stone Protection'||ab==='Stone Mend'){
     const pct=0.35+spLv*0.02;
     const h=Math.round(target.maxHp*pct);target.currentHp=healTo(target,h);
-    const chimaAmt=15+sp2;target.armor=(target.armor||0)+chimaAmt;
+    const chimaAmt=Math.max(1,Math.round((target.maxHp||0)*0.03))+sp2; /* v964 */target.armor=(target.armor||0)+chimaAmt;
     animateHit(target.id,h,true);
     addLog(`<span class="log-heal">${actor.icon} Stone Protection: +${Math.round(pct*100)}% HP + ${chimaAmt} Chimalli → ${target.icon} ${target.name}</span>`);
   }else if(ab==='Ancestral Storm'){
     const pct=0.43+spLv*0.02;
     const h=Math.round(target.maxHp*pct);target.currentHp=healTo(target,h);
-    const chimaAmt=15+sp2;target.armor=(target.armor||0)+chimaAmt;
+    const chimaAmt=Math.max(1,Math.round((target.maxHp||0)*0.04))+sp2; /* v964 */target.armor=(target.armor||0)+chimaAmt;
     animateHit(target.id,h,true);
     addLog(`<span class="log-heal">${actor.icon} Ancestral Storm: +${Math.round(pct*100)}% HP + ${chimaAmt} Chimalli → ${target.icon} ${target.name}</span>`);
   }
@@ -9781,13 +10414,13 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
       const h=Math.round(a.maxHp*healPct);a.currentHp=healTo(a,h);cleanseUnit(a);
       animateHit(a.id,h,true);
     });
-    // 10 HP Chimalli to lowest HP ally; if they already have ≥40 armor, give to a random unit instead
+    // 10% max-HP Chimalli to lowest HP ally; if they already have ≥40 armor, give to a random unit instead
     const lowestHp=aa.reduce((a,b)=>a.currentHp<b.currentHp?a:b);
-    const chimaTarget=(lowestHp.armor||0)>=40
+    const chimaTarget=(lowestHp.armor||0)>=Math.round((lowestHp.maxHp||0)*0.20) /* v964: was a flat 40 */
       ?aa[Math.floor(Math.random()*aa.length)]
       :lowestHp;
-    chimaTarget.armor=(chimaTarget.armor||0)+10;
-    addLog(`<span class="log-heal">🌸 Ophidian Mother! +${Math.round(healPct*100)}% all + cleanse + ${chimaTarget.icon} +10 Chimalli!</span>`);
+    const _om=grantChimalli(chimaTarget,0.05,'Ophidian Mother'); /* v964 */
+    addLog(`<span class="log-heal">🌸 Ophidian Mother! +${Math.round(healPct*100)}% all + cleanse + ${chimaTarget.icon} +${_om} Chimalli!</span>`);
   }
   else if(gd.ak==='holyHarvest'){
     const hpPct=0.25+healBonusPP(u);const npPct=0.10+healBonusPP(u);
@@ -10319,18 +10952,21 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     renderBattle();return;
   }
   if(ab==='Basalt Shield'){
-    u.armor=(u.armor||0)+30;animateBuff(u.id);
+    grantChimalli(u,0.12,'Basalt Shield');animateBuff(u.id);
     const _bsO=aa.filter(x=>x.id!==u.id&&x.currentHp>0);
-    if(_bsO.length){const ally=_bsO[Math.floor(Math.random()*_bsO.length)];ally.armor=(ally.armor||0)+30;animateBuff(ally.id);addLog(`<span class="log-sh">🗿 ${u.icon} Basalt Shield: +30 Chimalli to self & ${ally.icon} ${ally.name}!</span>`);}
-    else addLog(`<span class="log-sh">🗿 ${u.icon} Basalt Shield: +30 Chimalli!</span>`);
+    if(_bsO.length){const ally=_bsO[Math.floor(Math.random()*_bsO.length)];grantChimalli(ally,0.12,'Basalt Shield');animateBuff(ally.id);addLog(`<span class="log-sh">🗿 ${u.icon} Basalt Shield: Chimalli to self & ${ally.icon} ${ally.name}!</span>`);}
+    else addLog(`<span class="log-sh">🗿 ${u.icon} Basalt Shield: Chimalli up!</span>`);
     renderBattle();return;
   }
   if(ab==='Fuming Wall'){
-    u.armor=(u.armor||0)+30;
-    const _fwH=Math.round(u.maxHp*0.20);u.currentHp=healTo(u,_fwH);animateHit(u.id,_fwH,true);
+    grantChimalli(u,0.15,'Fuming Wall');
+    /* v978: was a 20% SELF heal. Now an AoE 15% heal across the whole party, on top of the
+       unchanged Chimalli. The hearth warms the house, not just itself. */
+    let _fwN=0;
+    aa.filter(x=>x.currentHp>0).forEach(x=>{const h=Math.round((x.maxHp||0)*0.15);if(h>0){x.currentHp=healTo(x,h);animateHit(x.id,h,true);_fwN++;}});
     const _fwO=aa.filter(x=>x.id!==u.id&&x.currentHp>0);
-    if(_fwO.length){const ally=_fwO[Math.floor(Math.random()*_fwO.length)];ally.armor=(ally.armor||0)+30;animateBuff(ally.id);addLog(`<span class="log-sh">🌋 ${u.icon} Fuming Wall: +30 Chimalli to self & ${ally.icon} ${ally.name} + 20% HP!</span>`);}
-    else addLog(`<span class="log-sh">🌋 ${u.icon} Fuming Wall: +30 Chimalli + 20% HP!</span>`);
+    if(_fwO.length){const ally=_fwO[Math.floor(Math.random()*_fwO.length)];grantChimalli(ally,0.15,'Fuming Wall');animateBuff(ally.id);addLog(`<span class="log-sh">🌋 ${u.icon} Fuming Wall: Chimalli to self & ${ally.icon} ${ally.name} + 15% HP to all allies!</span>`);}
+    else addLog(`<span class="log-sh">🌋 ${u.icon} Fuming Wall: Chimalli + 15% HP to ${_fwN} allies!</span>`);
     renderBattle();return;
   }
   if(ab==='Thorn Mangle'){
@@ -10340,10 +10976,15 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
       const dmg=applyArmorDamage(e,raw,false);
       if(dmg>0){e.currentHp=Math.max(0,e.currentHp-dmg);_tmT+=dmg;animateHit(e.id,dmg,false,rollCrit._lc);applyWound(e,1);onHitContact(u,e);refreshCaptureTargets();if(e.currentHp<=0)handleDeath(e);}
     });
-    u.armor=(u.armor||0)+15;animateBuff(u.id);
+    /* v975: 5% normally, doubled to 10% when Xiuhnel is on the field. Mimich and Xiuhnel are
+       hunting brothers, so the pairing bonus is deliberately a hidden mechanic -- the ability
+       text describes only the ordinary case [Genaro, v975]. */
     const _tmO=aa.filter(x=>x.id!==u.id&&x.currentHp>0);
-    if(_tmO.length){const ally=_tmO.find(x=>x.name==='Xiuhnel')||_tmO.reduce((a,b)=>a.currentHp<b.currentHp?a:b);ally.armor=(ally.armor||0)+15;animateBuff(ally.id);} // v332: guaranteed Xiuhnel, else weakest ally
-    addLog(`<span class="log-wound">🐍 ${u.icon} Thorn Mangle! ${_tmT} AoE + WOUND ×1 all + 15 Chimalli self & ally!</span>`);
+    const _tmX=_tmO.find(x=>x.name==='Xiuhnel');
+    const _tmPct=_tmX?0.10:0.05;
+    grantChimalli(u,_tmPct,'Thorn Mangle');animateBuff(u.id);
+    if(_tmO.length){const ally=_tmX||_tmO.reduce((a,b)=>a.currentHp<b.currentHp?a:b);grantChimalli(ally,_tmPct,'Thorn Mangle');animateBuff(ally.id);} // v332: guaranteed Xiuhnel, else weakest ally
+    addLog(`<span class="log-wound">🐍 ${u.icon} Thorn Mangle! ${_tmT} AoE + WOUND ×1 all + Chimalli self & ally${_tmX?' (Xiuhnel bond ×2)':''}!</span>`);
     renderBattle();return;
   }
   // HEALS
@@ -10605,12 +11246,12 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   }
   if((ab==='Stone Mend'||ab==='Stone Protection')&&aa.length){
     const tgt=aa.reduce((a,b)=>a.currentHp<b.currentHp?a:b);const pct=0.35+spLv*0.02;
-    tgt.currentHp=healTo(tgt,Math.round(tgt.maxHp*pct));const chimaAmt=15+sp2;tgt.armor=(tgt.armor||0)+chimaAmt;
+    tgt.currentHp=healTo(tgt,Math.round(tgt.maxHp*pct));const chimaAmt=Math.max(1,Math.round((tgt.maxHp||0)*0.03))+sp2; /* v964 */tgt.armor=(tgt.armor||0)+chimaAmt;
     addLog(`<span class="log-heal">${u.icon} Stone Protection: +${Math.round(pct*100)}% + ${chimaAmt} Chimalli → ${tgt.icon}</span>`);return;
   }
   if(ab==='Ancestral Storm'&&aa.length){
     const tgt=aa.reduce((a,b)=>a.currentHp<b.currentHp?a:b);const pct=0.43+spLv*0.02;
-    tgt.currentHp=healTo(tgt,Math.round(tgt.maxHp*pct));const chimaAmt=15+sp2;tgt.armor=(tgt.armor||0)+chimaAmt;
+    tgt.currentHp=healTo(tgt,Math.round(tgt.maxHp*pct));const chimaAmt=Math.max(1,Math.round((tgt.maxHp||0)*0.04))+sp2; /* v964 */tgt.armor=(tgt.armor||0)+chimaAmt;
     addLog(`<span class="log-heal">${u.icon} Ancestral Storm: +${Math.round(pct*100)}% + ${chimaAmt} Chimalli → ${tgt.icon}</span>`);return;
   }
   // BUFF
@@ -10799,16 +11440,16 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   }
   // ── L4 PLAYER ABILITIES ──
   if(ab==='Spiny Guard'){
-    u.armor=(u.armor||0)+25;
+    grantChimalli(u,0.1,'Spiny Guard');
     const others=aa.filter(a=>a.id!==u.id&&a.currentHp>0&&a.isAlly);
-    if(others.length){const ally=others[Math.floor(Math.random()*others.length)];ally.armor=(ally.armor||0)+25;addLog(`<span class="log-heal">🦎 Spiny Guard: ${u.icon} +25 Chimalli + ${ally.icon} ${ally.name} +25 Chimalli!</span>`);}
-    else addLog(`<span class="log-heal">🦎 Spiny Guard: ${u.icon} +25 Chimalli!</span>`);
+    if(others.length){const ally=others[Math.floor(Math.random()*others.length)];grantChimalli(ally,0.1,'Spiny Guard');addLog(`<span class="log-heal">🦎 Spiny Guard: ${u.icon} Chimalli + ${ally.icon} ${ally.name} Chimalli!</span>`);}
+    else addLog(`<span class="log-heal">🦎 Spiny Guard: ${u.icon} Chimalli up!</span>`);
     return;
   }
   if(ab==='Burrow Mend'){
     aa.forEach(a=>{const h=Math.round(a.maxHp*0.22);a.currentHp=healTo(a,h);animateHit(a.id,h,true);});
     const others=aa.filter(a=>a.currentHp>0);
-    if(others.length){const ally=others[Math.floor(Math.random()*others.length)];ally.armor=(ally.armor||0)+20;addLog(`<span class="log-heal">🦡 Burrow Mend: AoE +22% HP + ${ally.icon} +20 Chimalli!</span>`);}
+    if(others.length){const ally=others[Math.floor(Math.random()*others.length)];grantChimalli(ally,0.07,'Burrow Mend');addLog(`<span class="log-heal">🦡 Burrow Mend: AoE +22% HP + ${ally.icon} Chimalli!</span>`);}
     else addLog(`<span class="log-heal">🦡 Burrow Mend: AoE +22% HP!</span>`);
     return;
   }
@@ -10989,11 +11630,11 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     applyWound(t,1);addLog(`<span class="log-wound">⚔️ Heavy Cleave! ${h||0} + WOUND ×${t.woundStacks}!</span>`);return;
   }
   if(ab==='Spiny Guard'){
-    u.armor=(u.armor||0)+25;
+    grantChimalli(u,0.1,'Spiny Guard');
     const others=aa.filter(a=>a.id!==u.id&&a.currentHp>0&&a.isAlly);
-    if(others.length){const ally=others[Math.floor(Math.random()*others.length)];ally.armor=(ally.armor||0)+25;
-      addLog(`<span class="log-heal">🦎 Spiny Guard: ${u.icon} +25 Chimalli + ${ally.icon} ${ally.name} +25 Chimalli!</span>`);}
-    else addLog(`<span class="log-heal">🦎 Spiny Guard: ${u.icon} +25 Chimalli!</span>`);
+    if(others.length){const ally=others[Math.floor(Math.random()*others.length)];grantChimalli(ally,0.1,'Spiny Guard');
+      addLog(`<span class="log-heal">🦎 Spiny Guard: ${u.icon} Chimalli + ${ally.icon} ${ally.name} Chimalli!</span>`);}
+    else addLog(`<span class="log-heal">🦎 Spiny Guard: ${u.icon} Chimalli up!</span>`);
     renderBattle();return;
   }
   // L4/L5 AoE player-side handlers
@@ -11317,7 +11958,7 @@ function enemyActsTurn(u){
   }
   // Ixquimilli boss: always target healers first (lowest HP healer if multiple)
   let lowestAlly;
-  if(u.isBoss&&u.id&&u.id.startsWith('boss_ixqui')){
+  if(u.isBoss&&!u._summonedGod&&u.id&&u.id.startsWith('boss_ixqui')){ /* v944: her hunt-the-healer AI is part of her own encounter; the prefix also matches the L9 B5 raised 'boss_ixqui_5_N' */
     const allyUnits=aa.filter(a=>a.isAlly&&a.currentHp>0);
     const healers=allyUnits.filter(a=>a.ability&&isHealAbl(a.ability));
     if(healers.length){lowestAlly=healers.reduce((a,b)=>a.currentHp<b.currentHp?a:b);}
@@ -11380,7 +12021,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   {const _fxT=(aa&&aa.length)?aa.filter(x=>x.currentHp>0).reduce((m,x)=>!m||x.currentHp<m.currentHp?x:m,null):null;fxKickoff(u,_fxT,isAoeOrAutoSpecial(u));} // v556: enemy special kinetics
   // Ixquimilli boss: prioritize healers as target
   let lowestAlly;
-  if(u.isBoss&&u.id&&u.id.startsWith('boss_ixqui')){
+  if(u.isBoss&&!u._summonedGod&&u.id&&u.id.startsWith('boss_ixqui')){ /* v944: her hunt-the-healer AI is part of her own encounter; the prefix also matches the L9 B5 raised 'boss_ixqui_5_N' */
     const allyUnits=aa.filter(a=>a.isAlly&&a.currentHp>0);
     const healers=allyUnits.filter(a=>a.ability&&isHealAbl(a.ability));
     lowestAlly=healers.length?healers.reduce((a,b)=>a.currentHp<b.currentHp?a:b):(allyUnits.length?allyUnits.reduce((a,b)=>a.currentHp<b.currentHp?a:b):null);
@@ -11505,7 +12146,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     hitTargets.forEach(id=>{const a=aa.find(x=>x.id===id&&x.currentHp>0);if(a){applyParalyze(a,1);applyPoison(a,1);}});
     addLog(`<span class="log-thunder">🐕 Crippling Shock! ${hitCount} hits — Paralyze ×1 + Poison ×1 all!</span>`);
     // Xolotl rage phase: ≤25% HP → ATK/MAG × 1.3
-    if(u.isBoss&&!u._raged&&u.currentHp<=u.maxHp*0.25){
+    if(u.isBoss&&!u._summonedGod&&!u._raged&&u.currentHp<=u.maxHp*0.25){ /* v944: see Ixquimilli */
       u._raged=true;u.atk=Math.round((u.atk||0)*1.3);u.mag=Math.round((u.mag||0)*1.3);
       addLog(`<span class="log-thunder">🐕 Xolotl ENRAGES — the hound from the underworld awakens!</span>`);
     }
@@ -11569,7 +12210,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
       aa.filter(a=>a.currentHp>0).forEach(a=>applySlowToUnit(a,preArmorMap.get(a.id)||0));
       addLog(`<span class="log-thunder">🐆 Epicenter Roar! 1.8×ATK + 40% splash + all Slowed!</span>`);
       // Rage phase for Tepeyollotl boss ≤30%
-      if(u.isBoss&&!u._raged&&u.currentHp<=u.maxHp*0.30){u._raged=true;u.atk=Math.round(u.atk*1.3);addLog(`<span class="log-thunder">🐆 Tepeyollotl ENRAGES — the mountain shakes!</span>`);}
+      if(u.isBoss&&!u._summonedGod&&!u._raged&&u.currentHp<=u.maxHp*0.30){u._raged=true;u.atk=Math.round(u.atk*1.3); /* v944: see Ixquimilli */addLog(`<span class="log-thunder">🐆 Tepeyollotl ENRAGES — the mountain shakes!</span>`);}
     }
     return;
   }
@@ -11986,7 +12627,11 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     applyLethargy(lowestAlly,2); // boss version: Lethargy ×2 + Wound ×1
     addLog(`<span class="log-wound">🧊 Frost Macuahuitl! ${h||0} + WOUND ×${lowestAlly.woundStacks} + Lethargy ×2!</span>`);
     // Ixquimilli rage: ≤30% HP → ATK ×1.25
-    if(u.isBoss&&!u._raged&&u.currentHp<=u.maxHp*0.30){
+    /* v944: rage belongs to a genuine boss ENCOUNTER, not to the template. isBoss rides the
+         {...tpl} spread into every Mictlantecuhtli summon and every L9 B5 raised god, so these
+         four bosses were enraging as summons -- the same shape v762 already guarded for the
+         obsidianStorm passive hook. */
+      if(u.isBoss&&!u._summonedGod&&!u._raged&&u.currentHp<=u.maxHp*0.30){
       u._raged=true;u.atk=Math.round((u.atk||0)*1.25);
       addLog(`<span class="log-ab">🧊 Ixquimilli RAGES — the blizzard intensifies!</span>`);
     }
@@ -12003,7 +12648,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     });
     addLog(`<span class="log-wound">🦋 Obsidian Storm! AoE ${hits} + WOUND ×1 all!</span>`);
     // Rage phase at ≤33%
-    if(u.isBoss&&!u._raged&&u.currentHp<=u.maxHp*0.33){
+    if(u.isBoss&&!u._summonedGod&&!u._raged&&u.currentHp<=u.maxHp*0.33){ /* v944: see Ixquimilli */
       u._raged=true;u.atk=Math.round(u.atk*1.4);u.mag=Math.round((u.mag||0)*1.4);u._rageWound=true;
       addLog(`<span class="log-thunder">🦋 ITZPAPALOTL'S WINGS SHATTER INTO BLADES — the mountain erupts!</span>`);
     }
@@ -12029,8 +12674,8 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     // Use aa (friendly side) if available; fall back to ae for pure-enemy context
     const friendlySide=aa.filter(x=>x.id!==u.id&&x.currentHp>0&&(u.isAlly?x.isAlly:!x.isAlly));
     const others=friendlySide.length?friendlySide:ae.filter(x=>x.id!==u.id);
-    if(others.length){const ally=others[Math.floor(Math.random()*others.length)];ally.armor=(ally.armor||0)+30;addLog(`<span class="log-heal">🗿 Basalt Shield: ${u.icon} +30 Chimalli + ${ally.icon} +30 Chimalli!</span>`);}
-    else addLog(`<span class="log-heal">🗿 Basalt Shield: ${u.icon} +30 Chimalli!</span>`);
+    if(others.length){const ally=others[Math.floor(Math.random()*others.length)];grantChimalli(ally,0.12,'Basalt Shield');addLog(`<span class="log-heal">🗿 Basalt Shield: ${u.icon} Chimalli + ${ally.icon} Chimalli!</span>`);}
+    else addLog(`<span class="log-heal">🗿 Basalt Shield: ${u.icon} Chimalli up!</span>`);
     return;
   }
   if(ak==='aurumBreak'&&lowestAlly){
@@ -12109,10 +12754,11 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
       const h=applyArmorDamage(a,dmg,true);
       if(h>0){a.currentHp=Math.max(0,a.currentHp-h);total+=h;G._animQueue.push({uid:a.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,a);applyWound(a,1);if(a.currentHp<=0)handleDeath(a);}
     });
-    const chimaAmt=15;u.armor=(u.armor||0)+chimaAmt;
-    // Grant Chimalli to both Xiuhnel and Mimich if present
+    /* v975: same Xiuhnel pairing rule as the player side. */
     const partner=G.enemies.find(e=>(e.name==='Xiuhnel'||e.name==='Mimich')&&e.id!==u.id&&e.currentHp>0);
-    if(partner)partner.armor=(partner.armor||0)+chimaAmt;
+    const _tmPct=(partner&&partner.name==='Xiuhnel')?0.10:0.05;
+    const chimaAmt=grantChimalli(u,_tmPct,'Thorn Mangle');
+    if(partner)grantChimalli(partner,_tmPct,'Thorn Mangle');
     addLog(`<span class="log-wound">🐍 Thorn Mangle: ${total} AoE + WOUND×1 all + ${chimaAmt} Chimalli self${partner?' & '+partner.name:''}!</span>`);return;
   }
   // Regular enemy abilities — HEALS target ae (enemy's own side)
@@ -12121,7 +12767,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     const tgt=ae.reduce((a,b)=>a.currentHp<b.currentHp?a:b);
     const h=Math.round(tgt.maxHp*(ab==='Stone Protection'?0.25:0.25));
     tgt.currentHp=healTo(tgt,h);
-    const chimaAmt=ab==='Stone Protection'?10:10;
+    const chimaAmt=Math.max(1,Math.round((tgt.maxHp||0)*0.03)); /* v964: was a flat 10 */
     tgt.armor=(tgt.armor||0)+chimaAmt;
     addLog(`<span class="log-heal">🗻 ${ab}: ${tgt.icon} +${h} HP + ${chimaAmt} Chimalli!</span>`);
     G._animQueue.push({uid:tgt.id,dmg:h,isHeal:true});return;
@@ -12133,7 +12779,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   if(ab==='Ancestral Storm'&&ae.length){
     const tgt=ae.reduce((a,b)=>a.currentHp<b.currentHp?a:b);
     const h=Math.round(tgt.maxHp*.33);tgt.currentHp=healTo(tgt,h);
-    tgt.armor=(tgt.armor||0)+15; // chimalli — no cleanse
+    grantChimalli(tgt,0.04,'Ancestral Storm'); // chimalli — no cleanse
     G._animQueue.push({uid:tgt.id,dmg:h,isHeal:true});
     addLog(`<span class="log-heal">🌩 Ancestral Storm: ${tgt.icon} +${h} HP + 15 Chimalli!</span>`);return;
   }
@@ -12149,7 +12795,10 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
         const live=aa.filter(a=>a.currentHp>0);if(!live.length)break;
         const t=live[Math.floor(Math.random()*live.length)];
         const d=Math.max(1,Math.round(bpn(u)*(((u.mag||0)*mults[roll]-(t.res||0)*0.4))));
-        const h=applyArmorDamage(t,d,true);if(h>0){t.currentHp=Math.max(0,t.currentHp-h);G._animQueue.push({uid:t.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,t);if(t.currentHp<=0)handleDeath(t);}
+        const h=applyArmorDamage(t,d,true);
+        /* v968: this branch logged nothing per hit, so three hits read as one line. */
+        addLog(`<span class="log-dmg">\u{1F3AD} Patolli hit ${i+1}/${n} \u2192 ${t.icon} ${t.name}: ${h>0?h:'absorbed by Chimalli'}</span>`);
+        if(h>0){t.currentHp=Math.max(0,t.currentHp-h);G._animQueue.push({uid:t.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,t);if(t.currentHp<=0)handleDeath(t);}
       }
     }else{
       aa.forEach(a=>{const d=Math.max(1,Math.round(bpn(u)*(((u.mag||0)*mults[roll]-(a.res||0)*0.4))));const h=applyArmorDamage(a,d,true);if(h>0){a.currentHp=Math.max(0,a.currentHp-h);G._animQueue.push({uid:a.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,a);if(a.currentHp<=0)handleDeath(a);}});
@@ -12314,7 +12963,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
       if(!live.length)break;
       const tgt=live[Math.floor(Math.random()*live.length)];
       const isG=isGodTarget(tgt); if(isG)godHits++; /* v909: was isGod only -- missed layer bosses and summoned gods */
-      const dmg=critify(Math.max(1,Math.round((u.atk||0)*0.5*(isG?2:1)-(tgt.def||0)*0.4)),u,true);
+      const dmg=critify(Math.max(1,Math.round((u.atk||0)*0.75*(isG?2.5:1)-(tgt.def||0)*0.4)),u,true);
       const h=applyArmorDamage(tgt,dmg,true);onHitContact(u,tgt);
       if(h>0){tgt.currentHp=Math.max(0,tgt.currentHp-h);tot+=h;hits++;G._animQueue.push({uid:tgt.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});if(tgt.currentHp<=0)handleDeath(tgt);}
     }
@@ -12459,16 +13108,16 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   }
   // ── L4 ENEMY ABILITIES ──
   if(ak==='spinyGuard'&&ae.length){
-    u.armor=(u.armor||0)+25;
+    grantChimalli(u,0.1,'Spiny Guard');
     const others=ae.filter(x=>x.id!==u.id&&x.currentHp>0);
-    if(others.length){const ally=others[Math.floor(Math.random()*others.length)];ally.armor=(ally.armor||0)+25;addLog(`<span class="log-heal">🦎 Spiny Guard: ${u.icon} +25 Chimalli + ${ally.icon} ${ally.name} +25 Chimalli!</span>`);}
-    else addLog(`<span class="log-heal">🦎 Spiny Guard: ${u.icon} +25 Chimalli!</span>`);
+    if(others.length){const ally=others[Math.floor(Math.random()*others.length)];grantChimalli(ally,0.1,'Spiny Guard');addLog(`<span class="log-heal">🦎 Spiny Guard: ${u.icon} Chimalli + ${ally.icon} ${ally.name} Chimalli!</span>`);}
+    else addLog(`<span class="log-heal">🦎 Spiny Guard: ${u.icon} Chimalli up!</span>`);
     return;
   }
   if(ak==='burrMend'&&ae.length){
     ae.forEach(e=>{const h=Math.round(e.maxHp*0.22);e.currentHp=healTo(e,h);G._animQueue.push({uid:e.id,dmg:h,isHeal:true});});
     const others=ae.filter(e=>e.currentHp>0);
-    if(others.length){const ally=others[Math.floor(Math.random()*others.length)];ally.armor=(ally.armor||0)+20;addLog(`<span class="log-heal">🦡 Burrow Mend: AoE +22% HP + ${ally.icon} ${ally.name} +20 Chimalli!</span>`);}
+    if(others.length){const ally=others[Math.floor(Math.random()*others.length)];grantChimalli(ally,0.07,'Burrow Mend');addLog(`<span class="log-heal">🦡 Burrow Mend: AoE +22% HP + ${ally.icon} ${ally.name} Chimalli!</span>`);}
     else addLog(`<span class="log-heal">🦡 Burrow Mend: All allies +22% HP!</span>`);
     return;
   }
@@ -12585,11 +13234,12 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     addLog(`<span class="log-ab">🔥 Ash Surge: 1.1×MAG AoE ${total} + Burn ×1 all!</span>`);return;
   }
   if(ak==='fumingWall'&&ae.length){
-    u.armor=(u.armor||0)+30;
-    const h=Math.min(20,u.maxHp-u.currentHp);if(h>0){u.currentHp+=h;G._animQueue.push({uid:u.id,dmg:h,isHeal:true});}
+    grantChimalli(u,0.15,'Fuming Wall');
+    /* v978: mirrors the player side -- AoE 15% instead of a flat 20 HP on itself. */
+    ae.filter(x=>x.currentHp>0).forEach(x=>{const h=Math.min(Math.round((x.maxHp||0)*0.15),(x.maxHp||0)-(x.currentHp||0));if(h>0){x.currentHp+=h;G._animQueue.push({uid:x.id,dmg:h,isHeal:true});}});
     const others=ae.filter(x=>x.id!==u.id&&x.currentHp>0);
-    if(others.length){const ally=others[Math.floor(Math.random()*others.length)];ally.armor=(ally.armor||0)+30;addLog(`<span class="log-heal">🌋 Fuming Wall: +30 Chimalli self + ${ally.icon} ${ally.name} +30 Chimalli + heal 20 HP!</span>`);}
-    else addLog(`<span class="log-heal">🌋 Fuming Wall: +30 Chimalli self + heal 20 HP!</span>`);
+    if(others.length){const ally=others[Math.floor(Math.random()*others.length)];grantChimalli(ally,0.15,'Fuming Wall');addLog(`<span class="log-heal">🌋 Fuming Wall: Chimalli self + ${ally.icon} ${ally.name} + 15% HP to all allies!</span>`);}
+    else addLog(`<span class="log-heal">🌋 Fuming Wall: Chimalli self + 15% HP to all allies!</span>`);
     return;
   }
   if(ak==='solarCrush'&&aa.length){
@@ -12766,15 +13416,24 @@ function effectiveNpCost(unit){
   const lthMult=1+0.30*(unit.lethargyStacks||0);
   const lv=unit.level||unit.enemyLevel||getLevel((unit.baseGodId?'god_'+unit.baseGodId:(unit._captureId||unit.baseId||unit.id)))||1;
   const lvMult=lv>=50?1.5:lv>=40?1.25:1.0; // smoother gate: 40+→×1.25, 50+→×1.5
-  let base=unit.npCost||10;
-  // v374: Teonacatl Mushroom — locked TP cost order: base → ×1.5 → flat reductions → floor 1 (players only)
   const _oeTp=getOfferingEffects();
-  if(_oeTp.tpCostMult&&_oeTp.tpCostMult!==1&&unit._npBase!=null){
-    base=Math.max(1,Math.round(unit._npBase*_oeTp.tpCostMult)-(unit._npReduce||0));
+  /* v958: flat offering reductions (Copal Brazier, Tecuitlatl Cake) move to the END of the chain
+     so they take off a true flat amount instead of being magnified by the Lv40/Lv50 gate. Only
+     allies carry _npBase, so enemies are untouched. Order is now:
+       base -> xtpCostMult -> surge -> floor 1 -> lethargy/level/element/Lv80 -> flat -> floor 1 */
+  const _isModelled=(unit._npBase!=null);
+  const _flat=_isModelled?(_oeTp.tpCostFlat||0):0;
+  let base;
+  if(_isModelled){
+    const _surgeRed=Math.max(0,(unit._npReduce||0)-(_oeTp.tpCostFlat||0)); // _npReduce = surge + flat
+    const _raw=(_oeTp.tpCostMult&&_oeTp.tpCostMult!==1)?Math.round(unit._npBase*_oeTp.tpCostMult):unit._npBase;
+    base=Math.max(1,_raw-_surgeRed);
+  }else{
+    base=unit.npCost||10;
   }
   const _natM=unit.isAlly?azMult(_oeTp.tpCostMultByElement,unit.element,unit.isPatron):1; // v567: Centeōtl Cob · v639: azure-aware
   const _lv80M=((unit.level||getLevel(capKey(unit))||1)>=80)?1.05:1; // v577: +5% TP cost past Lv80
-  return Math.max(1,Math.ceil(base*lthMult*lvMult*_natM*_lv80M));
+  return Math.max(1,Math.ceil(base*lthMult*lvMult*_natM*_lv80M)-_flat);
 }
 
 // v313 (item 6): distinct visuals for Chimalli — blue absorb pop vs red HP damage, shatter on break
@@ -13315,6 +13974,43 @@ function animateArmorShatter(uid){
     document.body.appendChild(fl);setTimeout(()=>fl.remove(),350);
   },30);
 }
+/* ═══ v964: CHIMALLI IS A PERCENTAGE ═════════════════════════════════════════════════════════
+   Every grant used to be a flat integer while HP compounds at 4%/level, so the Altar's 20-per-
+   stack was 12% of a Lv5 god and 0.5% of a Lv85 one. All grant sites now route through
+   grantChimalli() and are a fraction of the RECIPIENT's max HP [Genaro, v964]. No cap for now --
+   deliberately left open to playtest whether stacking is broken.
+   The choke point matters as much as the numbers: the old scatter is exactly why the next shield
+   ability would have been added flat and gone unnoticed. Add new sources HERE. */
+function grantChimalli(u,pct,src){
+  if(!u||!(pct>0))return 0;
+  const add=Math.max(1,Math.round((u.maxHp||0)*pct));
+  u.armor=(u.armor||0)+add;
+  return add;
+}
+/* Purchased armour persists between battles, stored as a FRACTION of max HP rather than an
+   absolute -- an absolute goes stale the moment the unit levels or an offering moves max HP, the
+   same trap the HP-persistence ruling already covers.
+   MIGRATION: pre-v964 saves hold absolutes (20/40/60). Any stored value > 1 is treated as legacy
+   and ignored, so the shield re-resolves from the stack count in G.shields. Self-healing. */
+function armorFracFor(key){
+  const v=G.unitArmor?G.unitArmor[key]:undefined;
+  if(v!==undefined&&v<=1)return v;
+  return (G.shields&&G.shields[key]||0)*(G.dte.chimaArmorPerStack||0);
+}
+function resolveArmor(key,maxHp){return Math.round((maxHp||0)*armorFracFor(key));}
+/* v966: the roster screens (altar, party chips, training card) were printing the raw FRACTION --
+   "0.1 HP armor", "0.11917098445595854". Chimalli is stored as a fraction of max HP since v964,
+   but every display should show the shield in HP. rosterArmorHp resolves a roster key without
+   needing a battle unit: it works out that unit's max HP the same way the Temazcal screen does. */
+function rosterMaxHpFor(key){
+  if(String(key).startsWith('god_')){
+    const gd=GODS.find(g=>'god_'+g.id===key);
+    return gd?allyMaxHpFor(key,gd.hp||140,G.dte.godHpMult||1):0;
+  }
+  const cu=(G.captured||[]).find(c=>capKey(c)===key);
+  return cu?allyMaxHpFor(key,cu.hp||50,G.dte.vassalHpMult||1):0;
+}
+function rosterArmorHp(key){return Math.round(rosterMaxHpFor(key)*armorFracFor(key));}
 function applyArmorDamage(target,dmg,isEnemyAttacking){
   target._armorJustBroke=false; // v327: reset per hit — see shatter branch below
   if((target.armor||0)>0){
@@ -13322,7 +14018,14 @@ function applyArmorDamage(target,dmg,isEnemyAttacking){
       target._armorJustBroke=true; // v327: this hit was absorbed by the shield — its statuses are blocked too
       addLog(`<span class="log-sh">🛡 ${target.name}'s Chimalli shattered! (${target.armor} absorbed)</span>`);
       animateArmorBreak(target.id);animateArmorShatter(target.id); // v313 + v400 shatter
-      target.armor=0; // v332: shield break no longer cleanses existing status (only blocks the breaking hit's new status via _armorJustBroke)
+      /* v965: OVERFLOW REVERTED [Genaro]. v964 made the surplus carry through to HP; the ruling
+         is that Chimalli keeps full nuke negation -- any single blow, however large, is absorbed
+         entirely and the shield shatters. Status immunity for that hit rides on _armorJustBroke
+         above and is unaffected either way.
+         Consequence to keep in view now that grants are percentages: a 40% shield negates a hit
+         that would have killed outright, so Chimalli is "N free hits" rather than extra effective
+         HP, and the Chimalli-destroyers (Death Screech, Mystical Shots) are the counterplay. */
+      target.armor=0; // v332: break no longer cleanses existing status (only blocks this hit's new status via _armorJustBroke)
       return 0; // chimalli fully absorbs the hit — shield breaks
     }else{
       target.armor=Math.round(target.armor-dmg);
@@ -13902,12 +14605,12 @@ function handleDeath(dead){
     }
     if(dead.id.startsWith('jag_ocetekuani')){
       // v568: Heart Jaguar rewards (locked §7.1) — no capture; the jaguar dies unbowed
-      G.res.blood+=6000;G.res.cacao+=3000;G.res.flower+=80; // v683: doubled — bigger fight, bigger purse
+      G.res.blood+=8888;G.res.cacao+=7777;G.res.flower+=99; // v946: repriced against L7 income
       const _hjRares=Object.keys(OFFERINGS).filter(id=>{const o=OFFERINGS[id];return o&&o.tier==='rare'&&o.price&&!(G.offerings||[]).includes(id)&&!(o.noStockIf&&o.noStockIf());});
       let _hjTxt='';
       if(_hjRares.length){const rid=_hjRares[Math.floor(Math.random()*_hjRares.length)];G.offerings.push(rid);_hjTxt=` · 🎁 ${OFFERINGS[rid].icon} ${OFFERINGS[rid].name}`;}
-      notify(`🐆 The Heart Jaguar falls! +6000 🩸 +3000 🫘 +80 ✿${_hjTxt}`,'#d4af37');
-      addLog(`<span class="log-gain">🐆 Ocetekuani slain — +6000 🩸 +3000 🫘 +80 ✿${_hjTxt}</span>`);
+      notify(`🐆 The Heart Jaguar falls! +8888 🩸 +7777 🫘 +99 ✿${_hjTxt}`,'#d4af37');
+      addLog(`<span class="log-gain">🐆 Ocetekuani slain — +8888 🩸 +7777 🫘 +99 ✿${_hjTxt}</span>`);
       G._heartJaguarFight=false;
     }
     if(dead.id.startsWith('boss_xochi')){
@@ -13977,6 +14680,7 @@ function slowBadge(uid){
 }
 
 function armorBadge(armor){if(!armor)return'';return`<div style="margin-top:3px;font-size:10px;color:#60c0e0;font-weight:500">🛡 ${Math.round(armor)}</div>`;}
+function remedyBadge(amt){if(!amt)return'';return`<div style="margin-top:2px"><span class="burn-pip" style="color:#e0d060;border-color:#6a6020;background:#141200">\u2695\uFE0F +${amt} DEF/RES</span></div>`;} /* v961 */
 function turquoiseBadge(amt){if(!amt)return'';return`<div style="margin-top:2px"><span class="burn-pip" style="color:#40d0d0;border-color:#1a6a6a;background:#001414">🐍 +${amt} DEF/RES</span></div>`;}
 
 /* v816: single source for a unit card's displayed level. mkUnitCard honoured u.level while the
@@ -14045,10 +14749,10 @@ function mkUnitCard(u){
   d.className=cls+' '+_tierCls+(_cardSz?' '+_cardSz:'')+_slowCls;
   const _armPct=u.maxHp>0?Math.min(100,Math.round((u.armor||0)/u.maxHp*100)):0;
   d.innerHTML=`<div class="uc-art"><div class="${u.isAlly?'uc-icon':''}">${unitIconHtml(u,_iconSz)}</div></div><div class="uc-body">
-    <div class="uc-name" style="color:${u.isGod?'#c8a050':'var(--tx)'}">${u.name} <span class="unit-lv" style="font-size:9px;color:var(--td)">Lv${lv}</span>${typeTag}</div>
+    <div class="uc-name" style="color:${u.isGod?'#c8a050':'var(--tx)'}">${liveName(u)} <span class="unit-lv" style="font-size:9px;color:var(--td)">Lv${lv}</span>${typeTag}</div>
     <div class="bar-row"><span class="bar-icon">❤️</span><div class="bar-wrap${(u.armor||0)>0?' has-shield':''}"><div class="bar-fill" style="width:${pct}%;background:var(--hp)"></div><div class="bar-armor" style="width:${_armPct}%${(u.armor||0)>0?'':';display:none'}"></div><div class="bar-lbl">${fmtN(u.currentHp)}/${fmtN(u.maxHp)}</div><div class="bar-shield-badge"${(u.armor||0)>0?'':' style="display:none"'}>🛡 ${Math.round(u.armor||0)}</div></div></div>
     <div class="bar-row"><span class="bar-icon">✨</span><div class="bar-wrap" style="background:#110820"><div class="bar-fill" style="width:${npPct}%;background:linear-gradient(90deg,#5a208a,#9050c0)"></div><div class="bar-lbl">${Math.round(curNP)}/${maxNP}${lthTagCard}</div></div></div>
-    <div class="status-row">${pPips(u.poisonStacks,true)}${bPips(u.burnStacks)}${paraPips(u.paralyzStacks||0)}${slowBadge(u.id)}${woundBadge(u.woundStacks||0)}${lethargyBadge(u.lethargyStacks||0)}${drunkBadge(u.drunkStacks||0)}${atkBuffBadge(u.atkBuffStacks||0,u.atkBuffRounds||0)}${defBuffBadge(u.defBuffStacks||0,u.defBuffRounds||0)}${critBuffBadge(u.critBuffStacks||0,u.critBuffRounds||0)}${turquoiseBadge(u._turquoise||0)}</div>
+    <div class="status-row">${pPips(u.poisonStacks,true)}${bPips(u.burnStacks)}${paraPips(u.paralyzStacks||0)}${slowBadge(u.id)}${woundBadge(u.woundStacks||0)}${lethargyBadge(u.lethargyStacks||0)}${drunkBadge(u.drunkStacks||0)}${atkBuffBadge(u.atkBuffStacks||0,u.atkBuffRounds||0)}${defBuffBadge(u.defBuffStacks||0,u.defBuffRounds||0)}${critBuffBadge(u.critBuffStacks||0,u.critBuffRounds||0)}${turquoiseBadge(u._turquoise||0)}${remedyBadge(u._remedy||0)}</div>
     ${isTargetedByEnemy?'<div style="font-size:10px;color:#e07070;margin-top:2px">⚠ Targeted!</div>':isSlowWaiting?'<div style="font-size:10px;color:#5080a0;margin-top:2px">🐢 Waiting (Slowed)</div>':acted?'<div style="font-size:10px;color:#4a3a10;margin-top:2px">✓ Acted</div>':''} <!-- v611: 'Tap to select' removed — footer isn't reconciled by the in-place patcher, so it showed stale/inconsistently --></div>`;
   setCardIconBtn(d,u); // v353: icon = detail button (only while selected)
   return d;
@@ -14090,7 +14794,12 @@ function renderBattle(){
   const er=document.getElementById('erow');
   // Patch existing enemy cards in-place to avoid icon flicker
   const _erOldCards=new Map([...er.querySelectorAll('.uc[data-uid]')].map(el=>[el.dataset.uid,el]));
-  er.innerHTML='';
+  /* v952: only the Cipactli branch still hard-clears. It swaps in two grid sub-containers and is
+     the most fragile render path in the file, so it keeps the old behaviour; every ordinary
+     battle now reconciles and keeps its animations. See syncChildren. */
+  const _erSync=!G._cipactliPhase;
+  const _erBuilt=[];
+  if(!_erSync)er.innerHTML='';
   /* v784: during phase 2 the row hosts two sub-containers instead of a flat list. Anything
      whose id marks it a Cipactli part goes left; Mictlantecuhtli and every summon go right. */
   let _cipWrap=null,_hostWrap=null;
@@ -14126,7 +14835,7 @@ function renderBattle(){
       d.dataset.uid=e.id;
       const label=st==='captured'?'<span style="color:#50c080;font-size:10px">✦ Captured</span>':st==='reanimated'?'<span style="color:#d4af37;font-size:10px">\u{1F480} Reanimated</span>':st==='defeated'?'<span style="color:#e8c040;font-size:10px">◈ Defeated</span>':'<span style="color:#e05050;font-size:10px">✕ Slain</span>'; // v813
       d.innerHTML=`<div style="font-size:18px">${e.icon}</div><div style="font-size:12px">${e.name}</div>${label}`;
-      _placeCip(d,e);_dest(e).appendChild(d);return; // v784/v786: slain cards keep their cell, so a downed limb leaves a real gap in the body
+      if(_erSync){_erBuilt.push(d);return;} /* v952 */ _placeCip(d,e);_dest(e).appendChild(d);return; // v784/v786: slain cards keep their cell, so a downed limb leaves a real gap in the body
     }
     const pp=Math.round(e.currentHp/e.maxHp*100),em=ELEM_META[e.element];
     const npPct=e.maxNP>0?Math.round(e.currentNP/e.maxNP*100):0;
@@ -14188,26 +14897,35 @@ function renderBattle(){
       else if(_isAoe)_existingEnemy.onclick=()=>doPlayerAoeTarget(e.id);
       else if(_isQS)_existingEnemy.onclick=()=>{doPlayerStrike();doPlayerTarget(e.id);};
       else _existingEnemy.onclick=null;
-      _placeCip(_existingEnemy,e);_dest(e).appendChild(_existingEnemy); // v784/v786
+      if(_erSync)_erBuilt.push(_existingEnemy);
+      else{_placeCip(_existingEnemy,e);_dest(e).appendChild(_existingEnemy);} // v784/v786
     }else{
-      _placeCip(d,e);_dest(e).appendChild(d); // v784/v786
+      if(_erSync)_erBuilt.push(d);
+      else{_placeCip(d,e);_dest(e).appendChild(d);} // v784/v786
     }
   });
+  if(_erSync)syncChildren(er,_erBuilt); // v952
   // Party — patron + allies in one row
   const ps=document.getElementById('party-section');
   const _psOldCards=new Map([...ps.querySelectorAll('.uc[data-uid]')].map(el=>[el.dataset.uid,el]));
-  ps.innerHTML='';
   const allUnits=[...G.units].sort((a,b)=>(b.isPatron?1:0)-(a.isPatron?1:0)||(b.isGod?1:0)-(a.isGod?1:0));
+  if(!allUnits.length)ps.innerHTML='';
   if(allUnits.length){
-    const al=document.createElement('div');al.className='row-lbl';al.textContent='Your Party';ps.appendChild(al);
-    const ar=document.createElement('div');ar.className='unit-row';
+    /* v952: reuse the existing label and row instead of rebuilding them, so the cards inside
+       are never re-parented. See syncChildren. */
+    let al=ps.querySelector(':scope > .row-lbl');
+    if(!al){al=document.createElement('div');al.className='row-lbl';}
+    al.textContent='Your Party';
+    let ar=ps.querySelector(':scope > .unit-row');
+    if(!ar){ar=document.createElement('div');ar.className='unit-row';}
+    const _psBuilt=[];
     allUnits.forEach(u=>{
       // Try in-place bar patch first to avoid icon flicker; fall back to full rebuild
       const _pct=Math.round(u.currentHp/u.maxHp*100);
       const _np=u.currentNP||0,_mnp=u.maxNP||1,_npPct=Math.round(_np/_mnp*100);
       const existing=_psOldCards.get(u.id);
       if(existing&&!existing.classList.contains('fallen-ally')&&u.currentHp>0){
-        patchBarsOnEl(existing,_pct,`${Math.round(u.currentHp)}/${u.maxHp}`,_npPct,`${Math.round(_np)}/${_mnp}`,pPips(u.poisonStacks,true)+bPips(u.burnStacks)+paraPips(u.paralyzStacks||0)+slowBadge(u.id)+woundBadge(u.woundStacks||0)+lethargyBadge(u.lethargyStacks||0)+drunkBadge(u.drunkStacks||0)+atkBuffBadge(u.atkBuffStacks||0,u.atkBuffRounds||0)+defBuffBadge(u.defBuffStacks||0,u.defBuffRounds||0)+critBuffBadge(u.critBuffStacks||0,u.critBuffRounds||0)+turquoiseBadge(u._turquoise||0),u.armor||0,u.maxHp);
+        patchBarsOnEl(existing,_pct,`${Math.round(u.currentHp)}/${u.maxHp}`,_npPct,`${Math.round(_np)}/${_mnp}`,pPips(u.poisonStacks,true)+bPips(u.burnStacks)+paraPips(u.paralyzStacks||0)+slowBadge(u.id)+woundBadge(u.woundStacks||0)+lethargyBadge(u.lethargyStacks||0)+drunkBadge(u.drunkStacks||0)+atkBuffBadge(u.atkBuffStacks||0,u.atkBuffRounds||0)+defBuffBadge(u.defBuffStacks||0,u.defBuffRounds||0)+critBuffBadge(u.critBuffStacks||0,u.critBuffRounds||0)+turquoiseBadge(u._turquoise||0)+remedyBadge(u._remedy||0),u.armor||0,u.maxHp);
         const isSel=u.id===G.selectedActorId;
         const isAct=G.actedIds.has(u.id);
         const isAllyTarget=G.battlePhase==='player_ally_targeting'&&u.isAlly&&u.currentHp>0;
@@ -14227,12 +14945,13 @@ function renderBattle(){
         else if(isSelectable||isSel){existing.onclick=()=>{selectActor(u.id);if(u.isPatron)triggerPatronTurnPassive(u);};}
         else{existing.onclick=null;}
         setCardIconBtn(existing,u); // v353: icon = detail button (only while selected)
-        ar.appendChild(existing);
+        _psBuilt.push(existing); // v952: collected, not appended -- see syncChildren
       }else{
-        ar.appendChild(mkUnitCard(u));
+        _psBuilt.push(mkUnitCard(u));
       }
     });
-    ps.appendChild(ar);
+    syncChildren(ar,_psBuilt);
+    syncChildren(ps,[al,ar]);
   }
   // Action message
   const amEl=document.getElementById('action-msg');
@@ -14472,7 +15191,7 @@ function renderActionPanel(){
       ?'<div style="font-size:10px;color:'+specCostCol+';margin-top:1px">'+specLine2+'</div>'
       :'<div style="font-size:10px;color:'+specCostCol+';margin-top:1px">Cost '+effCost+' ✨</div>';
     el.innerHTML=`<div class="act-panel">
-      <div class="act-panel-title">⚔️ ${actor.icon} ${actor.name} — choose action</div>
+      <div class="act-panel-title">⚔️ ${actor.icon} ${liveName(actor)} — choose action</div>
       <div class="act-btns">
         <button class="btn btn-strike" onclick="doPlayerStrike()" style="line-height:1.35">
           <div>💥 Strike ${strikeEmoji}</div>${strikeSub}
@@ -14590,8 +15309,8 @@ function endBattle(win){
       else{const _cuS=G.captured.find(c=>capKey(c)===key);if(_cuS)_rmS=allyMaxHpFor(key,_cuS.hp||50,G.dte.vassalHpMult||1);}
       G.unitHpSnap=G.unitHpSnap||{};G.unitHpSnap[key]={cur:Math.max(1,Math.round(u.currentHp)),max:Math.max(1,Math.round(u.maxHp)),rosterMax:_rmS||Math.max(1,Math.round(u.maxHp))};
       if((u.armor||0)>0){
-        // Armor survived — persist remaining HP and shield count
-        G.unitArmor[key]=u.armor;
+        // v964: persist as a FRACTION of max HP, not an absolute — see armorFracFor
+        G.unitArmor[key]=Math.min(1,(u.armor||0)/Math.max(1,u.maxHp||1));
       } else {
         // FIX v42: armor broke (or was never present) — always wipe shields
         // The old guard (else if unitArmor!==undefined) missed the first-battle case
@@ -14699,7 +15418,16 @@ function endBattle(win){
   }
   /* v835: a phase-2 clear ends the run, so the spoils tally is noise. Show the conquest reveal
      instead; it hands off to showEnding() when dismissed. */
-  if(G.layer===9&&G._cipactliPhase&&G.battleNum>=8){showConquest();return;}
+  if(G.layer===9&&G._cipactliPhase&&G.battleNum>=8){
+    /* v974 CRITICAL FIX. G._endingLayer is set in exactly ONE place -- afterSpoils() -- and this
+       branch returns before showSpoils() ever runs, so the phase-2 clear never updated it. The
+       snapshot kept its last value (8, from the Apanohualoyan clear), so the Continue on MICTLAN
+       CONQUERED handed showEnding() a stale 8: it rendered the LAYER 8 ending, under the Layer 8
+       title, with the Layer 8 "Enter Layer 9" button -- which dropped the player back into L9
+       after they had already finished the game. */
+    G._endingLayer=9;
+    showConquest();return;
+  }
   showSpoils();
 }
 
@@ -14785,6 +15513,12 @@ function showSpoils(){
         // v348: unfold the total one bonus at a time — base → Hard → Perfect → Blessed Crops → Offerings
         const steps=[];
         if(isHard)steps.push({bm:1.2,cm:1.2,bl:'(+20% Hard)',cl:'(+20% Hard)',src:'\u{1F525} Hard Path \u2014 +20% Blood & Cacao'}); /* v905 */
+        /* v960: Bloodlust/Blood Surge were already being applied -- G.dte.bloodBonus multiplies
+           every kill in handleDeath -- but that happens BEFORE this breakdown is assembled, so
+           the node never got a line and looked broken. Shown here as an attribution only: the
+           multiplier is 1 so nothing is counted twice. */
+        {const _blPct=Math.round(((DT.unlocked.has('bloodlust')?0.10:0)+(DT.unlocked.has('bloodlust2')?0.15:0))*100);
+         if(_blPct>0)steps.push({bm:1,cm:1,bl:'(+'+_blPct+'% \u{1F5E1}\uFE0F)',cl:'',src:'\u{1F5E1}\uFE0F Bloodlust \u2014 +'+_blPct+'% Blood'});}
         /* v935: Ometeotl's blessing, if the player chose the god he marked. */
         if(G.god&&isBlessedGod(G.god.id))steps.push({bm:1.05,cm:1.05,bl:'(+5% \u2726)',cl:'(+5% \u2726)',src:'\u2726 Ometeotl Blessing \u2014 +5% Blood & Cacao'});
         /* v903: conditional spoils offerings. Multiplied across every owned copy the same way the
@@ -14961,6 +15695,10 @@ function showEnding(){
   DT.blessedGod=null;try{saveDT();}catch(e){}
   const gd=G.god;
   const _eLayer=(G._endingLayer!=null?G._endingLayer:G.layer); // v572: use the frozen cleared-layer snapshot
+  /* v974: consume the snapshot. It is a one-shot handoff from the clear that produced it, and
+     leaving it set meant any later path that reached this screen without going through
+     afterSpoils() inherited a stale layer. Falling back to G.layer is always correct. */
+  G._endingLayer=null;
   const isL2=_eLayer===2;
   const isL3=_eLayer===3;
   const isL4=_eLayer===4;const isL5=_eLayer===5;
@@ -15910,7 +16648,7 @@ function renderPartyChips(){
     const sh=G.shields[u.id]||0;
     // Use persisted armor HP if available (reflects post-battle damage)
     const armorKey=u.isGod?u.id:(u.baseObj&&u.baseObj._captureId?u.baseObj._captureId:u.id);
-    const shHp=G.unitArmor[armorKey]!==undefined?G.unitArmor[armorKey]:(sh*G.dte.chimaArmorPerStack);
+    const shHp=rosterArmorHp(armorKey); /* v966: absolute HP, was the raw fraction */
     const d=document.createElement('div');d.className='party-chip';d.dataset.punit=(u._sel||u._captureId||u.id); /* v932 · v934: _sel is the deplSel key, which is what the pulse set is built from */
     d.style.cssText=u.isPatron?'border-color:#c0a020;background:#2a1e04;cursor:pointer':'cursor:pointer';
     const _sei=eb(u.element,true);
@@ -15937,13 +16675,19 @@ function showUnitTooltip(u){
   const sb=surgeBonus(_tk);
   const hp=scA(bo.hp||100,lv)+sb.hp,atk=scA(bo.atk||0,lv)+sb.atk,mag=scA(bo.mag||0,lv)+sb.mag,def=scA(bo.def||0,lv)+sb.def,res=scA(bo.res||0,lv)+sb.res,np=scA(bo.np||20,lv)+sb.tp;
   const _tpLvMult=lv>=50?1.5:lv>=40?1.25:1;
-  const npCostAtLv=Math.ceil(Math.max(1,baseNpCostFromObj(bo,lv,!!u.isGod)-sb.cost-getOfferingEffects().tpCostFlat)*_tpLvMult); // v428: match in-battle effectiveNpCost (was crude fallback)
+  const _bcTT=u.isGod?(bo.npCost||14):(bo.npCost||9); // v956
+  const npCostAtLv=modelNpCost(_bcTT,lv,sb.cost,u.element,u.isPatron);
+  const _npPlainTT=modelNpCost(_bcTT,lv,sb.cost,u.element,u.isPatron,true); // v957: pre-offering figure
   /* v927: every other stat on this card shows its delta, but the special's TP cost showed only the
      final number -- so Copal Brazier, Centeotl Cob and a Tonalli surge were all invisible unless
      you happened to remember the unmodified figure. _tpLvMult carries the element-scoped
      multipliers, sb.cost the surge, tpCostFlat the offerings; comparing against the untouched
      curve captures all three in one number. */
   const npCostRaw=Math.ceil(baseNpCostFromObj(bo,lv,!!u.isGod));
+  /* v958: no longer displayed. It compared npCostRaw -- the curve WITHOUT the Lv40/Lv50
+     multiplier -- against the fully scaled npCostAtLv, so it never measured a saving at all and
+     only produced a number by coincidence. That is why it showed "-1" on Coatlicue and nothing
+     on anyone else. The struck-through figure now carries the real offering saving. */
   const _npSaved=Math.max(0,npCostRaw-npCostAtLv);
   const typeLabel=bo.type==='MAG'?'Magical':bo.type==='MIX'?'MIX':'Physical';
   /* v822: surgeForceBadge() existed since v326 but was never called from anywhere -- which is why
@@ -16033,7 +16777,7 @@ function showUnitTooltip(u){
     _row('res','🔯','RES',gs(res,T.res)),
     _row('crit','🎯','CRIT',(_critPct>0.101?'<span style="color:#60d080;font-weight:600">'+Math.round(_critPct*100)+'%</span>':Math.round(_critPct*100)+'%'))
   ].filter(Boolean).join('');
-  const _pv=(bo.passive||'');const _pi=_pv.indexOf(':'); // v621: the passive's name gets patron-gold prominence
+  const _pv=chimaWord(bo.passive||'');const _pi=_pv.indexOf(':'); /* v976 */ // v621: the passive's name gets patron-gold prominence
   /* v772: the oblated passive now sits directly beneath the native one and borrows its exact
      layout -- bold name, italic body -- differing only in the ✟ marker and purple tint, so an
      inherited passive reads as a peer of the god's own rather than as a footnote. It was
@@ -16041,8 +16785,8 @@ function showUnitTooltip(u){
   const _ov=(u.isPatron&&G._oblationPassive)?G._oblationPassive:'';const _oi=_ov.indexOf(':');
   const patronLine=u.isPatron?('<div style="margin-top:4px"><span style="color:#d4af37;font-weight:700;font-size:13.5px">⭐ '+(_pi>0?_pv.slice(0,_pi):_pv)+(_pi>0?':':'')+'</span> <em style="color:#a08040;font-size:11px">'+(_pi>0?_pv.slice(_pi+1).trim():'')+'</em></div>'
     +(_ov?('<div style="margin-top:3px"><span style="color:#a060e0;font-weight:700;font-size:13.5px">✟ '+(_oi>0?_ov.slice(0,_oi):_ov)+(_oi>0?':':'')+'</span> <em style="color:#8a6ab0;font-size:11px">'+(_oi>0?_ov.slice(_oi+1).trim():'')+'</em></div>'):'')):'';
-  const _adTxt=(((unitDefById((bo&&bo.id)||u.id)||bo).ad)||'');
-  const abilLine=bo.ability?('<div class="tc-spec"><span class="tc-spec-name">🔮 '+bo.ability+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(_adTxt)+'</span></span><span class="tc-cost" '+statAttrs('cost')+'>✨ Cost: '+npCostAtLv+(_npSaved>0?'<span style="color:#60c080;font-size:11px;font-weight:400;margin-left:3px">−'+_npSaved+'</span>':'')+'</span></div><div class="tc-desc">'+_adTxt+'</div>'):'';
+  const _adTxt=chimaWord(((unitDefById((bo&&bo.id)||u.id)||bo).ad)||''); /* v976 */
+  const abilLine=bo.ability?('<div class="tc-spec"><span class="tc-spec-name">🔮 '+bo.ability+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(_adTxt)+'</span></span><span class="tc-cost" '+statAttrs('cost')+'>✨ Cost: '+npCostDisplayHtml(npCostAtLv,_npPlainTT)+'</span></div><div class="tc-desc">'+_adTxt+'</div>'):'';
   const _oblCostLv=Math.ceil(oblationCostAtLv(lv)*_tpLvMult); // v773: same curve as npCostAtLv above, so the card matches what battle charges
   /* v771: the oblated special now mirrors the native special's markup (tc-spec + tc-cost +
      tc-desc) rather than being a cramped one-liner, so the two read as peers. The cost was
@@ -16051,7 +16795,7 @@ function showUnitTooltip(u){
   const oblLine=(u.isPatron&&G._oblationAk&&G._oblationAbility)?('<div class="tc-spec" style="margin-top:4px;border-top:0.5px dashed #4a2a6a;padding-top:5px"><span class="tc-spec-name" style="color:#a060e0">✟ '+G._oblationAbility+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(G._oblationAd||'')+'</span></span><span class="tc-cost" '+statAttrs('cost')+'>✨ Cost: '+_oblCostLv+'</span></div><div class="tc-desc">'+(G._oblationAd||'')+'</div>'):'';
   const offSec=_ol.affecting.length?('<div style="margin-top:6px;border-top:0.5px solid var(--br);padding-top:6px"><div style="font-size:10px;color:var(--td);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">🪶 Offerings boosting this unit</div>'+_ol.affecting.map(id=>{const o=OFFERINGS[id];return '<div style="font-size:11px;color:#c0e060;margin-bottom:2px">'+o.icon+' '+o.name+': <span style="color:var(--td)">'+o.desc+'</span></div>';}).join('')+'</div>'):'';
   const cardBody='<div class="train-card'+(u.isPatron?' tc-patron':'')+'" style="text-align:left;max-width:360px;margin:0 auto">'
-    +'<div class="tc-head"><div class="tc-name">'+u.name+(u.isPatron?' ⭐':u.isGod?' ✦':'')
+    +'<div class="tc-head"><div class="tc-name">'+liveName(u)+(u.isPatron?' ⭐':u.isGod?' ✦':'')
       +((u.isPatron&&(G._oblationGodName||(G._oblationHistory&&G._oblationHistory.length&&G._oblationHistory[G._oblationHistory.length-1].name)))?' <span style="font-style:italic;font-weight:400;font-size:13px;color:#a060e0">'+(G._oblationGodName||G._oblationHistory[G._oblationHistory.length-1].name)+'</span>':'')+'</div>' /* v771/v774: _oblationGodName only exists from v770, so fall back to the history entry for runs oblated before it */ // v629: ⭐ patron / ✦ ally god, matching the party chips
     /* v940: the v934 pip landed on mkUnitCard only. showUnitTooltip builds its own header, which
        is why the training card showed "Patron God" and this modal did not. Same three states,
@@ -16220,9 +16964,13 @@ function renderTraining(){
       return Math.round(npLevelCurve(bc,level)*(getTecpatlEffects().npBaneMult||1)); // v668: shares baseNpCostFromObj's curve — the v343 hand-copy had drifted
     };
     const _lvCostMult=(L)=>L>=50?1.5:L>=40?1.25:1.0; // v343: mirror effectiveNpCost's level multiplier
-    const npCostNow=Math.ceil(Math.max(1,calcBattleNpCost(lv)-sbT.cost)*_lvCostMult(lv)); // v343: equals actual battle cost (effectiveNpCost)
-    const npCostNext=Math.ceil(Math.max(1,calcBattleNpCost(lv2)-sbT.cost)*_lvCostMult(lv2));
-    const shKey=u.isGod?u.id:capKey(u);const sh=G.shields[shKey]||0,shHp=G.unitArmor[shKey]!==undefined?G.unitArmor[shKey]:sh*G.dte.chimaArmorPerStack;
+    /* v956: was Math.ceil(max(1,calcBattleNpCost(lv)-sbT.cost)*_lvCostMult(lv)) -- no offering
+       terms at all, so TP-cost offerings were invisible on this card. */
+    const _bcTR=u.isGod?(GODS.find(g=>'god_'+g.id===uk||g.id===uk.replace('god_',''))?.npCost||14):(u.npCost||9);
+    const npCostNow=modelNpCost(_bcTR,lv,sbT.cost,u.element,u.isPatron);
+    const npCostNext=modelNpCost(_bcTR,lv2,sbT.cost,u.element,u.isPatron);
+    const _npPlainTR=modelNpCost(_bcTR,lv,sbT.cost,u.element,u.isPatron,true); // v957: pre-offering figure
+    const shKey=u.isGod?u.id:capKey(u);const sh=G.shields[shKey]||0,shHp=rosterArmorHp(shKey); /* v966 */
     const cfp=!u.isGod?sacFPAtLv(u,lv):0,nfp=!u.isGod?sacFPAtLv(u,lv+1):0;
     const isDeployed=G.deplSel.includes(capKey(u)); // v665: see _isDep — clones share .id with their original
     G._tcModal=G._tcModal||{};G._tcModal[uk]={id:uk,name:u.name,icon:u.icon,element:u.element,level:lv,isPatron:!!isPatronRow,isGod:!!u.isGod,_captureId:u._captureId,_isHiredMerc:u._isHiredMerc,baseObj:u.isGod?(GODS.find(g=>'god_'+g.id===uk)||u):u}; // v643: modal payload for the art click
@@ -16235,7 +16983,7 @@ function renderTraining(){
       atk:u.type==='MIX'?(scA(u.atk||0,lv)-scA(u.atk||0,L0)):(isPrim?0:cp-(scA(p0,L0)+sbPrim)),
       mag:u.type==='MIX'?(scA(u.mag||0,lv)-scA(u.mag||0,L0)):(isPrim?cp-(scA(p0,L0)+sbPrim):0),
       def:cd2-(scA(u.def,L0)+sbT.def),res:cr-(scA(u.res||5,L0)+sbT.res),
-      lv:lv-L0,cost:npCostNow-Math.ceil(Math.max(1,calcBattleNpCost(L0)-sbT.cost)*_lvCostMult(L0))};})():null;
+      lv:lv-L0,cost:npCostNow-modelNpCost(_bcTR,L0,sbT.cost,u.element,u.isPatron)};})():null; // v956
     // v313: ▲ priority — (1) force-gain flash right after a pick, (2) hidden while a surge choice is
     // pending (leveling is blocked), (3) otherwise the classic next-level growth preview returns.
     const sg=(cur,nxt,dKey)=>{
@@ -16275,8 +17023,8 @@ function renderTraining(){
     const forcesRow=_fParts.length?('<div class="tc-forces">'+_fParts.join(' · ')+'</div>'):'';
     const costFlash=(fl&&fl.cost>0)?('<span class="stat-up-glow"> ▼−'+fl.cost+'</span>'):((lvf&&lvf.cost>0)?('<span class="stat-up-glow-red"> +'+lvf.cost+'</span>'):'');
     const specBlock=u.ability?('<div class="tc-spec"><span class="tc-spec-name">🔮 '+u.ability+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(liveAd(u))+'</span></span>'
-      +'<span class="tc-cost" '+statAttrs('cost')+'>✨ Cost: <span data-stat="cost">'+npCostNow+costFlash+'</span></span></div>'
-      +'<div class="tc-desc">'+liveAd(u)+'</div>'):'';
+      +'<span class="tc-cost" '+statAttrs('cost')+'>✨ Cost: <span data-stat="cost">'+npCostDisplayHtml(npCostNow,_npPlainTR)+costFlash+'</span></span></div>'
+      +'<div class="tc-desc">'+chimaWord(liveAd(u))+'</div>'):''; /* v976 */
     /* v774: renderTraining is a SEPARATE renderer from showUnitTooltip -- the oblation lines
        added there in v771/v772 never appeared here, which is why the training card showed
        neither. Mirrors the native specBlock exactly, with the cost on the shared
@@ -16290,7 +17038,7 @@ function renderTraining(){
       :('<span data-stat="'+(isPrim?'mag':'atk')+'" '+statAttrs(isPrim?'mag':'atk')+'>'+primEmoji+' <b>'+(isPrim?'MAG':'ATK')+'</b> '+sg(cp,np_,isPrim?'mag':'atk')+'</span>');
     const d=document.createElement('div');d.className='train-card'+(isPatronRow?' tc-patron':'');d.dataset.uk=uk; // v313: hover targeting · v612: patron flair
     d.innerHTML='<div class="tc-head">'
-      +'<div class="tc-name">'+u.name+(u.isPatron?' ⭐':u.isGod?' ✦':'')
+      +'<div class="tc-name">'+liveName(u)+(u.isPatron?' ⭐':u.isGod?' ✦':'')
       +((u.isPatron&&(G._oblationGodName||(G._oblationHistory&&G._oblationHistory.length&&G._oblationHistory[G._oblationHistory.length-1].name)))?' <span style="font-style:italic;font-weight:400;font-size:13px;color:#a060e0">'+(G._oblationGodName||G._oblationHistory[G._oblationHistory.length-1].name)+'</span>':'') /* v774 */
       +(isDeployed?' <span class="tc-dep">Deployed</span>':'')+(shHp?' <span style="font-size:10px;color:#60c0e0;font-weight:400">🛡 '+shHp+' HP</span>':'')+'</div>' // v617: Deployed pill rides with the name
       +'<div class="tc-meta"><div class="tc-lv">Level <span data-lvnum>'+lv+'</span>'+(lvf&&lvf.lv>0?' <span class="stat-up-glow">+'+lvf.lv+'</span>':'')+'</div>'
@@ -16392,7 +17140,7 @@ function renderMercs(){
     const _wouldBond=G.god&&(u.element===G.god.element||(hasPassive('azureZephyr')&&(u.element==='fire'||u.element==='wind')));
     const _mm=ELEM_META[u.element];
     const _chip=(_wouldBond&&_mm)?('<span class="elem-badge '+_mm.cls+'" style="animation:elemSynPulse .8s ease-in-out infinite alternate" '+SYN_ATTRS.replace('style="','style="display:inline-block;')+'>'+_mm.icon+' '+_mm.label+'</span>'):eb(u.element);
-    card.innerHTML='<div class="tc-name">'+u.name+' <span style="color:var(--am);font-size:12px">Lv '+lv+'</span></div>'
+    card.innerHTML='<div class="tc-name">'+liveName(u)+' <span style="color:var(--am);font-size:12px">Lv '+lv+'</span></div>'
       +'<div style="margin-top:2px">'+_chip+'</div>'
       +'<div class="tc-mid"><div class="tc-art">'+unitIconHtml(u,60)+'</div><div class="tc-stats">'
       +'<span data-stat="hp" '+statAttrs('hp')+'>❤️ <b>HP</b> '+hp+'</span>'
@@ -16400,7 +17148,7 @@ function renderMercs(){
       +(_altarOn?'<span class="tc-sacpill">Sacrifice: '+sacFPAtLv(u,lv)+' ✿</span>':'')
       +'</div></div>'
       +'<div class="tc-spec"><span class="tc-spec-name">🔮 '+u.ability+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(u.ad)+'</span></span></div>'
-      +'<div class="tc-desc">'+u.ad+'</div>'
+      +'<div class="tc-desc">'+chimaWord(u.ad)+'</div>' /* v976 */
       +'<div class="tc-action">'+(hired?'<div style="text-align:center;font-size:12px;color:#50c080;padding:6px">Hired ✦</div>':'<button class="btn btn-ca'+((ftueGateActive()&&G._ftueDidTemazcal&&!G._ftueDidMerc&&canAfford)?' tab-pulse':'')+'" onclick="doHireMerc(\''+u.id+'\')" '+(canAfford?'':'disabled')+' style="width:100%;font-size:15px">Hire <span style="font-size:13px;opacity:.9">🫘 '+tier.cost+'</span></button>') /* v652: FTUE glow on affordable hires */+'</div>';
     el.appendChild(card);
   });
@@ -16543,12 +17291,11 @@ function doRecruitGod(godId){
     [{label:'⚔ Welcome',fn:()=>{}}]),60);
 }
 function doBuyShield(tid,tn){
-  const cost=shCost();const aps=G.dte.chimaArmorPerStack;const maxArmor=2*aps;
+  const cost=shCost();const aps=G.dte.chimaArmorPerStack;const maxArmor=(G.dte.chimaMaxStacks||2)*aps; /* v975: slot count is a DT upgrade */
   if(G.res.flower<cost){notify('Not enough Flowers!','#e05050');return;}
-  const curArmor=G.unitArmor[tid]!==undefined?G.unitArmor[tid]:(G.shields[tid]||0)*aps;
-  if(curArmor>=maxArmor){notify('Max armor already!','#e05050');return;}
+  const curArmor=armorFracFor(tid);
+  if(curArmor>=maxArmor-1e-9){notify('Max armor already!','#e05050');return;}
   G.res.flower-=cost;
-  // Add one stack of armor HP, capped at max
   G.unitArmor[tid]=Math.min(maxArmor,curArmor+aps);
   G.shields[tid]=Math.round(G.unitArmor[tid]/aps);
   G.shieldsBought++;
@@ -16648,7 +17395,7 @@ function doSacredOblation(godId){
       if(!G._oblationHistory)G._oblationHistory=[];
       if(g.pk==='snakeSkirt'){const aa=G.units?G.units.filter(u=>u.isAlly&&u.currentHp>0):[];
         const lowest=aa.length?aa.reduce((a,b)=>a.currentHp<b.currentHp?a:b):null;
-        if(lowest){lowest.armor=(lowest.armor||0)+20;notify(g.icon+' Snake Skirt: +20 Chimalli to '+lowest.name,'#50c080');}}
+        if(lowest){const _sk=grantChimalli(lowest,0.05,'Snake Skirt');notify(g.icon+' Snake Skirt: +'+_sk+' Chimalli to '+lowest.name,'#50c080');}}
       G._oblationHistory.push({pk:g.pk,pv:g.pv||0,ak:g.ak,ad:g.ad,ability:g.ability,passive:g.passive||'',icon:g.icon,name:g.name,npCost:g.npCost||20});
       G._oblationPk=g.pk;G._oblationPv=g.pv||0;
       G._oblationAk=g.ak;G._oblationAd=g.ad;
@@ -16711,7 +17458,7 @@ function renderAltar(){
     if(!sorted.length){const ne=document.createElement('div');ne.style.cssText='font-size:12px;color:var(--td)';ne.textContent='No units available for sacrifice.';sacEl.appendChild(ne);}
     const sgrid=document.createElement('div');sgrid.className='sac-grid';sacEl.appendChild(sgrid);
     sorted.forEach(cu=>{
-      const fv=sacFP(cu),ck=capKey(cu),sh=G.shields[ck]||0,shHp=sh*G.dte.chimaArmorPerStack;
+      const fv=sacFP(cu),ck=capKey(cu),sh=G.shields[ck]||0,shHp=rosterArmorHp(ck); /* v972: was sh*chimaArmorPerStack, i.e. the raw fraction */
       const isSel=G.sacSelected.has(ck);
       const spAmt=spareEnabled?spareAmt(cu):0;
       const mercy=hasPassive('divinityMercy');
@@ -16747,7 +17494,7 @@ function renderAltar(){
         +'<div class="tc-mid"><div class="tc-art">'+godIconHtml(gd,72)+'</div></div>'
         +'<div style="font-size:11px;color:#c8a060;font-style:italic;text-align:center">'+gd.flavor+'</div>'
         +'<div class="tc-spec"><span class="tc-spec-name">🔮 '+gd.ability+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(gd.ad)+'</span></span></div>'
-        +'<div class="tc-desc">'+gd.ad+'</div>'
+        +'<div class="tc-desc">'+chimaWord(gd.ad)+'</div>' /* v976 */
         +'<div class="tc-action"><button class="btn btn-fl" onclick="doRecruitGod(\''+gd.id+'\')" '+(G.res.flower>=rcG?'':'disabled')+' style="width:100%;font-size:15px">Recruit <span style="font-size:13px;opacity:.9">✿ '+rcG+(rcG===0?' · her gift':'')+'</span></button></div>';
       ggrid.appendChild(card);
     });
@@ -16799,16 +17546,18 @@ function renderAltar(){
   const gspSection=document.getElementById('altar-god-specials-section');
   if(gspSection)gspSection.style.display='none';
 
-  const cost=shCost();const aps=G.dte.chimaArmorPerStack;const maxArmorHp=2*aps;
+  const cost=shCost();const aps=G.dte.chimaArmorPerStack;const maxArmorHp=(G.dte.chimaMaxStacks||2)*aps; /* v975 */
   const targets=[];
   const chimaEligible=(ck)=>{
-    const curArmor=G.unitArmor[ck]!==undefined?G.unitArmor[ck]:(G.shields[ck]||0)*aps;
-    return curArmor<maxArmorHp;
+    /* v966: must go through armorFracFor. Reading G.unitArmor directly meant a pre-v964 save
+       (absolutes like 60) compared 60 < 0.3 and reported every unit as already maxed, locking
+       Chimalli purchases for the whole run. */
+    return armorFracFor(ck)<maxArmorHp-1e-9;
   };
-  G.party.forEach(gdId=>{const gd=GODS.find(g=>g.id===gdId);if(gd&&chimaEligible('god_'+gd.id))targets.push({id:'god_'+gd.id,name:gd.name,icon:gd.icon,sh:G.shields['god_'+gd.id]||0});});
-  G.captured.forEach(cu=>{const ck=capKey(cu);if(chimaEligible(ck))targets.push({id:ck,name:cu.name,icon:cu.icon,sh:G.shields[ck]||0});});
+  G.party.forEach(gdId=>{const gd=GODS.find(g=>g.id===gdId);if(gd&&chimaEligible('god_'+gd.id))targets.push({id:'god_'+gd.id,name:gd.name,icon:gd.icon,sh:G.shields['god_'+gd.id]||0,mx:rosterMaxHpFor('god_'+gd.id)});});
+  G.captured.forEach(cu=>{const ck=capKey(cu);if(chimaEligible(ck))targets.push({id:ck,name:cu.name,icon:cu.icon,sh:G.shields[ck]||0,mx:rosterMaxHpFor(ck)});});
   if(!targets.length){shEl.innerHTML='<div style="font-size:12px;color:var(--td)">All units have maximum armor.</div>';}
-  else{const info=document.createElement('div');info.style.cssText='font-size:12px;color:var(--td);margin-bottom:.6rem';info.innerHTML=`Protects your HP <strong>and blocks new status effects</strong> while it holds. Purchase ${aps} HP armor, up to ${maxArmorHp} HP total. <span style="color:#60c0e0;font-weight:500">✿ ${cost}</span> each${G.dte.chimaImmune?' <span style="color:#b090e0;font-size:11px">(Status immune!)</span>':''}`;shEl.appendChild(info);const grid=document.createElement('div');grid.style.cssText='display:flex;gap:8px;flex-wrap:wrap';targets.forEach(t=>{const b=document.createElement('button');b.className='btn btn-shield';b.style.cssText='display:flex;align-items:center;gap:6px;font-size:12px';b.innerHTML=`${t.icon} ${t.name} <span style="color:var(--td);font-size:10px">(🛡 ${t.sh*aps}/${maxArmorHp} HP)</span>`;b.disabled=G.res.flower<cost;b.onclick=()=>doBuyShield(t.id,t.name);grid.appendChild(b);});shEl.appendChild(grid);}
+  else{const info=document.createElement('div');info.style.cssText='font-size:12px;color:var(--td);margin-bottom:.6rem';info.innerHTML=`Protects your HP <strong>and blocks new status effects</strong> while it holds. Purchase ${Math.round(aps*100)}% of max HP per stack, up to ${Math.round(maxArmorHp*100)}%. <span style="color:#60c0e0;font-weight:500">✿ ${cost}</span> each${G.dte.chimaImmune?' <span style="color:#b090e0;font-size:11px">(Status immune!)</span>':''}`;shEl.appendChild(info);const grid=document.createElement('div');grid.style.cssText='display:flex;gap:8px;flex-wrap:wrap';targets.forEach(t=>{const b=document.createElement('button');b.className='btn btn-shield';b.style.cssText='display:flex;align-items:center;gap:6px;font-size:12px';b.innerHTML=`${t.icon} ${t.name} <span style="color:var(--td);font-size:10px">(🛡 ${rosterArmorHp(t.id)}/${Math.round((t.mx||0)*maxArmorHp)} HP)</span>`;b.disabled=G.res.flower<cost;b.onclick=()=>doBuyShield(t.id,t.name);grid.appendChild(b);});shEl.appendChild(grid);}
 }
 function toggleTemazcalWarn(){ // v511: some strategies (e.g. Cihuacoatl) WANT wounded units — let players silence the nag
   V['temazcal_warn_off']=!V['temazcal_warn_off'];saveV();
