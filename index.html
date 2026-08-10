@@ -254,6 +254,7 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .tc-spec{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:12.5px}
 .tc-spec-name{color:#6090e0;font-weight:600}
 .chima-pip{white-space:nowrap;border-bottom:1px dotted #3a6a8a}
+.sac-pip{white-space:nowrap;border-bottom:1px dotted #6a5a20}
 .tc-cost{font-size:11px;color:#c0a0e0;background:#1a0a2a;border:0.5px solid #503070;border-radius:8px;padding:1px 7px;white-space:nowrap}
 .tc-desc{font-size:11.5px;color:var(--td);line-height:1.35}
 .tc-sacpill{font-size:10px;color:#b09030;margin-top:2px}
@@ -833,18 +834,18 @@ function fmtCost(c){if(c>=1000)return (c/1000).toFixed(c%1000===0?0:1).replace(/
 /* v830: Teotlan Champions. Chapter-keyed at the top level so a future chapter is a new key
    rather than a migration. Each chapter keeps TWO views, per ruling: a rolling log of the last
    20 clears, and a best-per-patron record ranked on penance, recency breaking ties. */
-let DT={teotl:0,unlocked:new Set(),tecpatl_level:0,tecpatl_seen:new Set(),godTecpatl:{},champions:{}};
+let DT={teotl:0,unlocked:new Set(),tecpatl_level:0,tecpatlBeaten:0,tecpatl_seen:new Set(),godTecpatl:{},champions:{}}; /* v990: tecpatlBeaten = highest penance actually cleared */
 const CHAMPIONS_RECENT_CAP=20;
 function loadDT(){
   try{
     const d=localStorage.getItem('teotlan_dt');
-    if(d){const p=JSON.parse(d);DT.teotl=p.teotl||0;DT.unlocked=new Set(p.unlocked||[]);DT.tecpatl_level=p.tecpatl_level||0;DT.tecpatl_seen=new Set(p.tecpatl_seen||[]);DT.godTecpatl=p.godTecpatl||{};DT.champions=p.champions||{};DT.blessedGod=p.blessedGod||null;} // v830 · v937: loadDT rebuilds DT from a fixed whitelist, so anything absent here is silently dropped on reload -- which is exactly how the blessing vanished
+    if(d){const p=JSON.parse(d);DT.teotl=p.teotl||0;DT.unlocked=new Set(p.unlocked||[]);DT.tecpatl_level=p.tecpatl_level||0;DT.tecpatlBeaten=p.tecpatlBeaten||0;DT.tecpatl_seen=new Set(p.tecpatl_seen||[]);DT.godTecpatl=p.godTecpatl||{};DT.champions=p.champions||{};DT.blessedGod=p.blessedGod||null;} // v830 · v937: loadDT rebuilds DT from a fixed whitelist, so anything absent here is silently dropped on reload -- which is exactly how the blessing vanished
     // v303 migration: dmg_preview became Strike Boost's prereq — grant it free to saves that already own strike_boost
     if(DT.unlocked.has('strike_boost')&&!DT.unlocked.has('dmg_preview'))DT.unlocked.add('dmg_preview');
     // No auto-unlocks: player must interact with Divinity Tree
   }catch(e){DT={teotl:0,unlocked:new Set(),champions:{}}} // v830
 }
-function saveDT(){try{localStorage.setItem('teotlan_dt',JSON.stringify({teotl:DT.teotl,unlocked:[...DT.unlocked],tecpatl_level:DT.tecpatl_level,tecpatl_seen:[...DT.tecpatl_seen],godTecpatl:DT.godTecpatl,champions:DT.champions,blessedGod:DT.blessedGod||null}));}catch(e){}}
+function saveDT(){try{localStorage.setItem('teotlan_dt',JSON.stringify({teotl:DT.teotl,unlocked:[...DT.unlocked],tecpatl_level:DT.tecpatl_level,tecpatlBeaten:DT.tecpatlBeaten||0,tecpatl_seen:[...DT.tecpatl_seen],godTecpatl:DT.godTecpatl,champions:DT.champions,blessedGod:DT.blessedGod||null}));}catch(e){}}
 loadDT();
 
 // ── OFFERINGS (v346) — Slay-the-Spire "relic" model: held = effect active for the run, ──
@@ -1148,7 +1149,12 @@ function applyTamales(u,oe){
    NOTE: Llorona Tear and Snake Scale deliberately do NOT use this -- they target the lowest-LEVEL
    vassal via weakestDeployedVassal(), which is a different rule and stays as it is. */
 function weakestAlly(pool){
-  if(!pool||!pool.length)return null;
+  /* v988: the Sacrifice Slot victim rides along at battle start purely so the rite can be seen, and
+     being a low-level throwaway it is usually the weakest unit on the field -- so the Remedy, the
+     Turquoise Pectoral and friends piled onto a unit that dies seconds later, wasting the relic for
+     the whole fight. Never a valid recipient. */
+  pool=(pool||[]).filter(u=>u&&!u._sacVictim);
+  if(!pool.length)return null;
   return pool.reduce((a,b)=>{
     const ah=a.maxHp||0,bh=b.maxHp||0;
     if(ah!==bh)return ah<bh?a:b;
@@ -1249,7 +1255,7 @@ function applyOfferings(){
   /* v881: Tecciztecatl Conch — Chimalli to EVERY unit of an element (Moctezuma Shield picks one at random). */
   Object.keys(oe.startChimalliByElement||{}).forEach(el=>{
     const amt=oe.startChimalliByElement[el];if(!(amt>0))return;
-    const hit=(G.units||[]).filter(u=>u&&u.isAlly&&u.currentHp>0&&u.element===el);
+    const hit=(G.units||[]).filter(u=>u&&u.isAlly&&u.currentHp>0&&u.element===el&&!u._sacVictim); /* v988 */
     hit.forEach(u=>grantChimalli(u,amt,'Tecciztecatl Conch')); /* v964 */
     if(hit.length)addLog(`<span class="log-sh">\u{1F41A} Tecciztecatl Conch: ${hit.length} ${el.toUpperCase()} unit${hit.length>1?'s':''} +${amt} HP Chimalli</span>`);
   });
@@ -1259,9 +1265,9 @@ function applyOfferings(){
      unlocks protection for whoever actually needs it. The old form asked for two DAY units and
      then healed one of those same two, which is why it read as doing nothing on a mixed party. */
   (oe.weakestElemDefRes||[]).forEach(w=>{
-    const gate=(G.units||[]).filter(u=>u&&u.isAlly&&u.currentHp>0&&u.element===w.element);
+    const gate=(G.units||[]).filter(u=>u&&u.isAlly&&u.currentHp>0&&u.element===w.element&&!u._sacVictim); /* v988 */
     if(gate.length<(w.minCount||1))return;
-    const pool=w.anyElement?(G.units||[]).filter(u=>u&&u.isAlly&&u.currentHp>0):gate;
+    const pool=w.anyElement?(G.units||[]).filter(u=>u&&u.isAlly&&u.currentHp>0&&!u._sacVictim):gate;
     if(!pool.length)return;
     const t=weakestAlly(pool); if(!t)return; /* v962 */
     t.def=(t.def||0)+w.amount;t.res=(t.res||0)+w.amount;
@@ -1272,12 +1278,12 @@ function applyOfferings(){
   });
   // v370: Moctezuma Shield — one random living ally gets Chimalli (5% of max HP since v975; independent of Snake Skirt, can stack)
   if(oe.startChimalliRandom>0){
-    const _msA=(G.units||[]).filter(u=>u.isAlly&&u.currentHp>0);
-    if(_msA.length){const _mt=_msA[Math.floor(Math.random()*_msA.length)];grantChimalli(_mt,oe.startChimalliRandom,'Moctezuma Shield');addLog(`<span class="log-sh">🛡 Moctezuma Shield: ${_mt.icon} ${_mt.name} +${oe.startChimalliRandom} HP Chimalli!</span>`);}
+    const _msA=(G.units||[]).filter(u=>u.isAlly&&u.currentHp>0&&!u._sacVictim); /* v988 */
+    if(_msA.length){const _mt=_msA[Math.floor(Math.random()*_msA.length)];const _msN=grantChimalli(_mt,oe.startChimalliRandom,'Moctezuma Shield');addLog(`<span class="log-sh">🛡 Moctezuma Shield: ${_mt.icon} ${_mt.name} +${_msN} Chimalli!</span>`);}
   }
   // v370: Turquoise Serpent Pectoral — flat +DEF/+RES to the single weakest (lowest DEF+RES) ally; dies with the unit, re-picks next battle
   if(oe.weakestFlatDefRes>0){
-    const _tsA=(G.units||[]).filter(u=>u.isAlly&&u.currentHp>0);
+    const _tsA=(G.units||[]).filter(u=>u.isAlly&&u.currentHp>0&&!u._sacVictim); /* v988 */
     if(_tsA.length){const _wt=weakestAlly(_tsA);_wt.def=(_wt.def||0)+oe.weakestFlatDefRes;_wt.res=(_wt.res||0)+oe.weakestFlatDefRes;_wt._turquoise=oe.weakestFlatDefRes;if(_wt._mask2rBase){_wt._mask2rBase.def+=oe.weakestFlatDefRes;_wt._mask2rBase.res+=oe.weakestFlatDefRes;}addLog(`<span class="log-sh">🐍 Turquoise Serpent: ${_wt.icon} ${_wt.name} +${oe.weakestFlatDefRes} DEF & RES!</span>`);}
   }
   if((G.offerings||[]).length)addLog(`<span class="log-god">🪶 Offerings active: ${G.offerings.length}</span>`);
@@ -1605,6 +1611,23 @@ function chimaTip(e){
 function chimaTipTap(e){if(e&&e.stopPropagation)e.stopPropagation();chimaTip(e);setTimeout(()=>{document.addEventListener('click',relicTipHide,{once:true});},50);}
 /* Wraps every standalone "Chimalli" in a display string. Skips text that already carries a pip so
    repeated renders cannot nest them. */
+/* v982: Sacrifice Slot pip. Same surface and same hover+tap pair as the Chimalli pip. */
+const SAC_ATTRS='style="cursor:help" onmouseenter="sacTip(event)" onmouseleave="relicTipHide()" ontouchstart="sacTipTap(event)" onclick="event.stopPropagation();sacTipTap(event)"';
+function sacTip(e){
+  const tt=document.getElementById('relic-tooltip');if(!tt)return;
+  tt.innerHTML='<div style="font-weight:700;color:#d4af37;margin-bottom:3px">\u{1F5E1} Sacrifice Slot</div>'
+    +'<div style="font-size:12px">An extra slot beside your party. The unit placed here is sacrificed at the start of the next battle, granting a special benefit. It does not void a Perfect Battle.</div>';
+  tt.style.display='block';
+  const x=(e.clientX!==undefined?e.clientX:(e.touches&&e.touches[0]?e.touches[0].clientX:0));
+  const y=(e.clientY!==undefined?e.clientY:(e.touches&&e.touches[0]?e.touches[0].clientY:0));
+  tt.style.left=Math.min(x+12,window.innerWidth-216)+'px';tt.style.top=Math.min(y+14,window.innerHeight-120)+'px';
+}
+function sacTipTap(e){if(e&&e.stopPropagation)e.stopPropagation();sacTip(e);setTimeout(()=>{document.addEventListener('click',relicTipHide,{once:true});},50);}
+function sacWord(txt){
+  if(!txt||String(txt).indexOf('sac-pip')>=0)return txt;
+  return String(txt).replace(/\bSacrifice Slot\b/g,
+    '<span class="sac-pip" '+SAC_ATTRS+'><span style="color:#d4af37">\u{1F5E1}</span> Sacrifice Slot</span>');
+}
 function chimaWord(txt){
   if(!txt||String(txt).indexOf('chima-pip')>=0)return txt;
   return String(txt).replace(/\bChimalli\b/g,
@@ -2349,7 +2372,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v979'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v990'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -2465,7 +2488,7 @@ const GODS=[
     ability:'Old Fire',ad:'1.6×MAG magic + BURN ×2; Deals +40% extra damage per existing Burn stack.',ak:'oldFire'},
   {id:'xolotl',name:'Xolotl',flavor:'Dog God of Thunder and Disease',element:'thunder',icon:'🐕',
     type:'MIX',hp:145,atk:20,mag:14,def:9,res:7,np:32,npCost:20,
-    passive:'Septic Claws: all ally strikes apply Poison ×1 (5% maxHP/turn per stack, max 4)',pk:'septicClaws',pv:.02,
+    passive:'Septic Claws: all ally strikes apply Poison ×1 (5% maxHP/turn per stack, max 4). Poisoned enemies take +5% damage per stack.',pk:'septicClaws',pv:.02,
     ability:'Crippling Shock',ad:'0.6×MAG 4-hit to random enemies — Paralyze ×1 + Poison ×1 each unique target hit',ak:'cripplingShock',
     locked:true,unlockCriteria:'Conquer Itzucuintlan'},
   {id:'tepeyollotl',name:'Tepeyollotl',flavor:'Jaguar God of Earthquakes',element:'earth',icon:'🐆',
@@ -2500,7 +2523,7 @@ const GODS=[
     locked:true,unlockCriteria:'Defeat the ruler of Cehuélōyān'},
   {id:'tonatiuh',name:'Tonatiuh',flavor:'Shining God of the Fifth Sun',element:'day',icon:'☀️',
     type:'MIX',magStrike:true,hp:150,atk:18,mag:18,def:9,res:9,np:35,npCost:22,
-    passive:'Solar Sacrifice: Once per round, sacrifice a vassal to deal damage equal to its HP to one enemy. Ignores DEF/RES and Chimalli. Does not void Perfect Battle.',pk:'solarSacrifice',pv:1,
+    passive:'Solar Sacrifice: Grants +1 Sacrifice Slot \u2014 the unit sacrificed at battle start gives the whole party ATK/MAG UP \u00d72 and DEF/RES UP \u00d72.',pk:'solarSacrifice',pv:1,
     ability:'Aurum Break',ad:'1.5×ATK to 1 enemy; heals lowest HP ally for all damage dealt',ak:'aurumBreak',
     locked:true,unlockCriteria:'Win the event "The Sun\'s Demand"'},
   {id:'malinalxochitl',name:'Malinalxochitl',flavor:'Sorcerer Goddess of the Desert',element:'fire',icon:'🌵',
@@ -2914,7 +2937,7 @@ const TONATIUH_DAY_CAPS=[
   {id:'dy5',name:'Dawn Archer',icon:'🏹',element:'day',type:'PHYS',hp:90,atk:18,mag:0,def:8,res:6,np:50,npCost:14,ability:'Sacred Arrow',ad:'Multi 4-hit 0.7×ATK to random enemies + Slow · 5% recoil',ak:'sacredArrow',acd:13,fv:5},
   {id:'dy6',name:'Jaguar Knight',icon:'🐆',element:'day',type:'PHYS',hp:115,atk:16,mag:0,def:13,res:8,np:26,npCost:10,ability:'Solar Pounce',ad:'1.6×ATK to 2 enemies + Burn ×1 + Lethargy ×1 · 5% recoil',ak:'solarPounce',acd:12,fv:5},
   {id:'dy7',name:'Temazcal Midwife',icon:'🔆',element:'day',type:'MAG',hp:82,atk:0,mag:15,def:6,res:9,np:26,npCost:14,ability:'Cleansing Steam',ad:'Heal all allies 30% HP + cleanse · 5% recoil',ak:'cleansingSteam',acd:12,fv:4},
-  {id:'dy8',name:'Sunray Oracle',icon:'🌞',element:'day',type:'MAG',hp:78,atk:0,mag:16,def:5,res:10,np:24,npCost:13,ability:'Prism Volley',ad:'Multi 5-hit 0.5×MAG to random enemies + Slow · 5% recoil',ak:'prismVolley',acd:11,fv:4},
+  {id:'dy8',name:'Sunray Oracle',icon:'🌞',element:'day',type:'MAG',hp:78,atk:0,mag:16,def:5,res:10,np:24,npCost:13,ability:'Prism Daze',ad:'0.85×MAG to 5 enemies + Slow · 5% recoil',ak:'prismVolley',acd:11,fv:4},
 ];
 function tonatiuhUnlocked(){return !!V['tonatiuh_unlocked'];}
 function teyolloPoolOpen(){return (G&&(G.layer||1)>=7)||hasV('teyollo_seen');} // v545/v554: L7 gate — 'teyollo_seen' set by enterLayer7; deliberately NOT a 'layer7_' flag (those mean CLEARED and drive layer7Unlocked)
@@ -4182,6 +4205,7 @@ function initG(){
     roundNum:0,roundQueue:[],qIdx:0,
     actedIds:new Set(),nextRoundSlowIds:new Set(),thisRoundSlowTail:[],slowedThisRound:new Set(),
     tecpatl:0,tecpatl_mods:[],_tecpatlSeen:false,_contFn:null,
+    sacSlot:null, /* v982: Tonatiuh's Sacrifice Slot -- capture key of the unit to be consumed at the START of the next battle. Deliberately NOT in RUN_SKIP: it is set on the deploy screen and read one screen later. */
     // ── Event system state ──
     eventHistory:[],       // event IDs seen this run — no repeats
     xochipilliGames:[],    // Xochipilli game IDs played this run (max 3 before battle)
@@ -4461,7 +4485,8 @@ function capKey(cu){return cu._captureId||cu.id;}
    which is deterministic given deployment order. Shared by Llorona Tear and Snake Scale rather
    than each re-deriving it. */
 function weakestDeployedVassal(){
-  const pool=(G.units||[]).filter(u=>u&&u.isAlly&&!u.isGod&&u.currentHp>0);
+  /* v988: the Sacrifice Slot victim is not a real party member -- see weakestAlly. */
+  const pool=(G.units||[]).filter(u=>u&&u.isAlly&&!u.isGod&&u.currentHp>0&&!u._sacVictim);
   if(!pool.length)return null;
   let best=pool[0],bestLv=getLevel(capKey(best));
   pool.forEach(u=>{const lv=getLevel(capKey(u));if(lv<bestLv){best=u;bestLv=lv;}});
@@ -4970,7 +4995,18 @@ function surgePick(key,force){
     f.tp=add(prev.tp,scA(b.np||20,lv),pt,b.np||20);
     f.cost=prev.cost+Math.max(1,Math.floor(baseNpCostFor(key)*pc)); // additive reduction off surge-free base cost; consumer floors final cost at 1
   }
-  if(s.pending){s.pending=false;s.claimedUpTo=lv;}else{s.bonus=(s.bonus||0)-1;s.bonusSpent=(s.bonusSpent||0)+1;} // v508: milestone first, then bonus \u00b7 v526: spent bonuses tracked (excluded from sac/spare refunds)
+  if(s.pending){
+    /* v990: claiming used to set claimedUpTo straight to the CURRENT level, swallowing every
+       milestone the unit had jumped past. A +10 event reward crosses two milestones and paid one
+       surge. Any extras beyond the one being claimed now become bonus surges, which the Tianguis
+       already knows how to hand out. Affects every multi-level reward: Wastewater +10, Sandstorm
+       +7, Mountain Toll and Burning Column +5, the Cornfield +2. */
+    /* count milestones in (claimedUpTo, lv], not the raw level gap -- (lv-claimed)/5 under-counts
+       whenever claimedUpTo is not itself a multiple of 5 (Lv18 -> Lv25 crosses 20 AND 25). */
+    const _missed=Math.max(0,(Math.floor(lv/5)-Math.floor(Math.max(0,s.claimedUpTo||0)/5))-1);
+    if(_missed>0)s.bonus=(s.bonus||0)+_missed;
+    s.pending=false;s.claimedUpTo=lv;
+  }else{s.bonus=(s.bonus||0)-1;s.bonusSpent=(s.bonusSpent||0)+1;} // v508: milestone first, then bonus \u00b7 v526: spent bonuses tracked (excluded from sac/spare refunds)
   // v325: every displayed number is arithmetically true — the flash shows the ACTUAL stat change
   // (new bonus − replaced bonus); accumulated totals live on the force badge instead.
   G._surgeFlash={key,deltas:{atk:(f.atk||0)-prev.atk,mag:(f.mag||0)-prev.mag,hp:(f.hp||0)-prev.hp,def:(f.def||0)-prev.def,res:(f.res||0)-prev.res,tp:(f.tp||0)-prev.tp,cost:(f.cost||0)-prev.cost}};
@@ -5069,6 +5105,31 @@ function liveName(u){
   const t=tplById(u.baseId||u.id);
   return (t&&t.name)||u.name||'';
 }
+/* v988: ONE robust template resolver. v987 resolved the live ability with
+      unitDefById(u.baseObj?.id || u.baseId || u.id)
+   which works only while baseId survives. A battle unit built by mkCap has its id WRAPPED as
+   'cap_<capKey>_<slot>', and older roster entries carry no baseId at all -- so the lookup hit the
+   wrapped id, missed, and silently fell back to the FROZEN ability name. That is why Prism Daze
+   stayed dead on an existing save even after the v987 fix.
+   Unwraps the cap_ form, then recovers the template id from the capture key itself (keys embed it:
+   dbg_<tpl>_<n>, tonal_<tpl>_<rand>), and finally tries tplById. */
+function baseTplOf(u){
+  if(!u||u.isGod)return null;
+  const direct=(u.baseObj&&u.baseObj.id)||u.baseId||u.id;
+  let t=unitDefById(direct);
+  if(t)return t;
+  const m=String(u.id||'').match(/^cap_(.+)_\d+$/);
+  const ck=u._captureId||(m?m[1]:null);
+  if(ck){
+    const cu=(G.captured||[]).find(c=>capKey(c)===ck);
+    if(cu){t=unitDefById(cu.baseId||cu.id);if(t)return t;}
+    const parts=String(ck).split('_');
+    for(let i=0;i<parts.length;i++){t=unitDefById(parts[i]);if(t)return t;}
+  }
+  if(typeof tplById==='function'){t=tplById(direct);if(t)return t;}
+  return null;
+}
+function liveAbility(u){const t=baseTplOf(u);return (t&&t.ability)||(u&&u.ability)||'';}
 function liveAd(u){ // live ability description, falling back to the stored copy for gods/mercs/summons
   if(!u)return '';
   const bid=u.baseId||u.id;
@@ -5385,7 +5446,7 @@ const GOD_SELECT_DESC={
   tlaloc:{passive:"Endless Torrent: All <span class='elem-badge elem-water'>💧 Water</span> units in party +15% ATK/MAG at battle start",ability:'Tlalocan Deluge',ad:'1.35×MAG, hits up to 4 targets — first kill rises a Tlaloque ally'},
   coatlicue:{passive:'Snake Skirt: The lowest HP ally gains Chimalli worth 5% of max HP at battle start',ability:'Ophidian Mother',ad:'Heal all allies 25% HP + Cleanse + 5% max-HP Chimalli to lowest HP ally'},
   huehueteotl:{passive:'Undying Ember: Each round, a random enemy loses 10% of their max HP (ignores all defenses)',ability:'Old Fire',ad:'1.6×MAG magic + BURN ×2; Deals +40% extra damage per existing Burn stack.'},
-  xolotl:{passive:'Septic Claws: All allied strikes apply Poison ×1 to enemies',ability:'Crippling Shock',ad:'0.6×MAG 4-hit to random enemies — Paralyze ×1 + Poison ×1 each unique target hit'},
+  xolotl:{passive:'Septic Claws: All allied strikes apply Poison ×1 to enemies. Poisoned enemies take +5% damage per stack.',ability:'Crippling Shock',ad:'0.6×MAG 4-hit to random enemies — Paralyze ×1 + Poison ×1 each unique target hit'},
   tepeyollotl:{passive:'Mountain Heart: <span class="elem-badge elem-earth">🪨 Earth</span> allies gain +30% DEF each battle (vassals and gods)',ability:'Epicenter Roar',ad:'Crushes one enemy for full damage, 10% splash to all others + Slow all'},
   itzpapalotl:{passive:'Deadly Butterfly: Enemies that hit any <span class="elem-badge elem-night">🌑 Night</span> ally or Itzpapalotl gain WOUND ×1',ability:'Obsidian Storm',ad:'1.25×ATK, hits up to 5 targets + WOUND ×1 each hit'},
   chicomecoatl:{passive:'Blessed Crops: +5% bonus Blood/Cacao in spoils per <span class="elem-badge elem-nature">🌿 Nature</span> ally in party',ability:'Holy Harvest',ad:'AoE heal 25% HP + cleanse + restore 10% TP to all allies'},
@@ -5528,7 +5589,7 @@ function renderGods(){
   const mpEl=document.getElementById('god-max-penance');
   if(mpEl){
     const hasPenanceRun=tecpatlPenanceUnlocked()&&Object.values(DT.godTecpatl||{}).some(v=>v>0);
-    if(DT.tecpatl_level>0&&hasPenanceRun){mpEl.innerHTML=`🗡️ Max Penance Reached: <strong style="color:#c03030">${DT.tecpatl_level}</strong>`;mpEl.style.display='block';}
+    if(DT.tecpatl_level>0&&hasPenanceRun){mpEl.innerHTML=`🗡️ Max Penance Beaten: <strong style="color:#c03030">${DT.tecpatlBeaten||0}</strong>`; /* v990 */mpEl.style.display='block';}
     else{mpEl.style.display='none';}
   }
   // Show Tlacuilo recorded vassal banner if one is waiting
@@ -5588,7 +5649,7 @@ function showGodDetail(gd){
   const desc=GOD_SELECT_DESC[gd.id]||{passive:gd.passive,ability:gd.ability,ad:gd.ad};
   /* v976: god-select is where a new player meets Coatlicue's Snake Skirt, so the Chimalli pip
      matters most here. Decorating the local copy leaves GOD_SELECT_DESC untouched. */
-  desc.passive=chimaWord(desc.passive);desc.ad=chimaWord(desc.ad);
+  desc.passive=sacWord(chimaWord(desc.passive));desc.ad=sacWord(chimaWord(desc.ad));
   const typeEmoji=gd.type==='MAG'?'🪄':gd.type==='PHYS'?'🗡️':'🗡️🪄';
   const healEmoji=(gd.ad||'').toLowerCase().includes('heal')?'❤️ ':'';
   const typeLabel=gd.type==='MAG'?`<span style="font-size:10px;color:#5080d0;background:#0a0820;border-radius:3px;padding:1px 5px">${typeEmoji} MAG</span>${healEmoji?` <span style="font-size:11px">${healEmoji}</span>`:''}`:gd.type==='PHYS'?`<span style="font-size:10px;color:#c05050;background:#1a0404;border-radius:3px;padding:1px 5px">${typeEmoji} PHY</span>${healEmoji?` <span style="font-size:11px">${healEmoji}</span>`:''}`:(`<span style="font-size:10px;color:#d4af37;background:#1a1000;border-radius:3px;padding:1px 5px">${typeEmoji} MIX</span>`+` <span style="font-size:11px">${healEmoji}</span>`);
@@ -8303,12 +8364,45 @@ function startBattle(){
   if(G._tlacuiloVassalPending){delete V['tlacuilo_vassal'];saveV();G._tlacuiloVassalPending=false;}
   G.selectedActorId=null;G.captureTargets=new Set();G._slowedUnits=new Map();G.aoeSelected=[];G.aoeCap=0;
 
+  /* v984: the sacrificed unit now WALKS ONTO THE FIELD and is killed on screen before round 1,
+     instead of vanishing between screens [Genaro]. It is built into G.units like any ally, marked
+     _sacVictim, and removed by runSacrificeRite() before buildRoundQueue() -- so it never takes a
+     turn and never reaches the casualty ledger. Perfect Battle is untouched for the same reason
+     as v982: nothing that dies here goes through handleDeath. */
+  let _sacVictimKey=null;
+  if(G.sacSlot&&hasPassive('solarSacrifice')){
+    const _sc=(G.captured||[]).find(c=>capKey(c)===G.sacSlot);
+    if(_sc)_sacVictimKey=capKey(_sc);
+    G.sacSlot=null; // one battle only, cleared whether or not the unit was still there
+  }
   const allies=[mkGod(G.god.id,false)];
   G.deplSel.forEach((sid,i)=>{
     if(sid.startsWith('god_')){const u=mkGod(sid.replace('god_',''),false);if(u)allies.push(u);}
     else{const cu=G.captured.find(c=>c._captureId===sid||c.id===sid);if(cu)allies.push(mkCap(cu,i,false));}
   });
+  /* v984: the victim rides along as an ordinary ally card until the rite resolves. */
+  if(_sacVictimKey){
+    const _vc=(G.captured||[]).find(c=>capKey(c)===_sacVictimKey);
+    if(_vc&&!allies.some(u=>(u._captureId||u.id)===_sacVictimKey)){
+      const _vu=mkCap(_vc,allies.length,false);
+      if(_vu){_vu._sacVictim=true;allies.push(_vu);}
+    }
+  }
   G.units=allies;
+  if(false){ /* v984: superseded by runSacrificeRite() */
+    G.units.forEach(u=>{if(u.isAlly&&u.currentHp>0){applyAtkBuff(u,2);applyDefBuff(u,2);}});
+    addLog(`<span class="log-gain">\u{1F5E1} ${_sacName} is given to the Fifth Sun \u2014 the party gains ATK/MAG UP \u00d72 and DEF/RES UP \u00d72!</span>`);
+    /* v983: the buff landed silently before -- nothing but a log line. Banner first, then a
+       staggered buff flash down the party so it reads as the sacrifice feeding each unit in turn.
+       Deferred so the battle screen has rendered and the cards exist to animate. */
+    const _sfIds=G.units.filter(u=>u.isAlly&&u.currentHp>0).map(u=>u.id);
+    setTimeout(()=>{
+      try{
+        notify('\u{1F5E1} '+_sacName+' given to the Fifth Sun \u2014 the party is empowered!','#ffd060');
+        _sfIds.forEach((id,i)=>setTimeout(()=>{try{animateBuff(id);}catch(e){}},i*140));
+      }catch(e){}
+    },420);
+  }
   if(G.nextBattleWound){G.units.forEach(u=>{if(u.isAlly&&u.currentHp>0)applyWound(u,G.nextBattleWound);});G.nextBattleWound=0;} // Pass 7: L6 event Wound
   if(G.nextBattleDefBuff){G.units.forEach(u=>{if(u.isAlly&&u.currentHp>0){u.defBuffStacks=Math.min(4,(u.defBuffStacks||0)+G.nextBattleDefBuff);u.defBuffRounds=buffDur(u);}});G.nextBattleDefBuff=0;} // Pass 7: L6 event DEF/RES-UP
   G.unitHpPenalty={}; // reset AFTER mkCap has applied penalties
@@ -8466,7 +8560,50 @@ function startBattle(){
       [{label:'Face them',fn:_taunt}],_taunt);
     return;
   }
+  /* v984: the sacrifice resolves BEFORE the round begins, mirroring the L9 taunt gate above --
+     buildRoundQueue() fires start-of-round passives, so running it first would start the fight
+     underneath the rite. */
+  if((G.units||[]).some(u=>u&&u._sacVictim)){
+    renderBattle();
+    runSacrificeRite(()=>buildRoundQueue());
+    return;
+  }
   buildRoundQueue();
+}
+/* v984: the Sacrifice Slot rite. The victim is on the field as a normal card; it bleeds, dies and
+   is removed, then the surviving party lights up. Nothing routes through handleDeath, so no
+   casualty is recorded and a Perfect Battle survives. */
+function runSacrificeRite(done){
+  const v=(G.units||[]).find(u=>u&&u._sacVictim);
+  if(!v){if(done)done();return;}
+  const name=(typeof liveName==='function'?liveName(v):v.name);
+  const vid=v.id;
+  notify('\u{1F5E1} '+name+' is given to the Fifth Sun...','#ffd060');
+  addLog(`<span class="log-ab">\u{1F5E1} ${v.icon||''} ${name} steps forward and offers itself to the Fifth Sun.</span>`);
+  setTimeout(()=>{
+    try{
+      /* the blood: the card's own hit/shatter FX, then a heavy strike flash */
+      animateHit(vid,Math.round(v.maxHp||1),false,true);
+      if(typeof animateArmorShatter==='function')animateArmorShatter(vid);
+      if(typeof fxCard==='function'){const c=fxCard(vid);if(c&&typeof fxClass==='function')fxClass(c,'fx-shake',420);}
+      if(typeof enemySlainFx==='function')enemySlainFx(vid); /* v984: the real blood-spray FX */
+    }catch(e){}
+  },380);
+  setTimeout(()=>{
+    try{
+      const _vk=v._captureId||v.baseId||v.id;
+      G.units=(G.units||[]).filter(u=>u&&u.id!==vid);
+      G.captured=(G.captured||[]).filter(c=>capKey(c)!==_vk);
+      G.deplSel=(G.deplSel||[]).filter(k=>k!==_vk);
+      const alive=(G.units||[]).filter(u=>u.isAlly&&u.currentHp>0);
+      alive.forEach(u=>{applyAtkBuff(u,2);applyDefBuff(u,2);});
+      addLog(`<span class="log-gain">\u2600\ufe0f The sun drinks deep \u2014 the party gains ATK/MAG UP \u00d72 and DEF/RES UP \u00d72!</span>`);
+      renderBattle();
+      notify('\u2600\ufe0f The party is empowered!','#ffd060');
+      alive.forEach((u,i)=>setTimeout(()=>{try{animateBuff(u.id);}catch(e){}},i*140));
+    }catch(e){}
+    setTimeout(()=>{try{if(done)done();}catch(e){}},260);
+  },1150);
 }
 
 
@@ -8940,7 +9077,8 @@ const BELIC_HEAL_ABILS=new Set(['Ancestral Storm','Storm Mend','Gust Mend','Holy
 function fireBelicAutoAction(u,liveEnemies,allies,isEnemySide,onDone){
   onDone=onDone||function(){};
   if(!liveEnemies.length){onDone();return;}
-  const ab=u.ability||'';
+  /* v987: same stale-snapshot hazard as fireUnitSpecial above. */
+  const ab=u.isGod?(u.ability||''):liveAbility(u); /* v988 */
   const hasNP=(u.currentNP||0)>=enemyNpCost(u);
   const anyDamaged=allies.some(a=>a.currentHp<a.maxHp&&a.currentHp>0);
 
@@ -9733,7 +9871,7 @@ function fireSerendipityBonus(unitId){
 }
 
 const AOE_CAP={deluge:4,obsidianStorm:5,sinistralMinacachalli:3,mictlanClaspPlayer:6}; // v811: at 6 or fewer living foes it fires on everything automatically; above that the player picks 6
-const AOE_CAP_AB={'Searing Stings':4,'Writhing Bloom':4,'Filthwater Plume':5,'Drowning Grasp':2,'Colony Sting':5,'Voltaic Discharge':2,'Jestress Nightmare':5,'Atlatl Rush':2,'Toxic Bloom':3,'Arrow Rain':5,'Net Cast':5,'Mystical Shots':4,'Coil Crush':3,'Tremor':3,'Withering Touch':4,'Shard Breath':4,'Tectonic Slam':5,'Howling Gust':3,'Murk':3,'Magma Burst':3,'Septic Howl':3,'Collapse':5,'Haunt':5,'Solar Crush':2,'Pollen Burst':2,'Craft Shard':4,'Permafrost':2,'Biting Draft':4,'Howling Chill':3,'Ash Surge':5,'Sandblast':5,'Howling Drift':5,'Virulent Gale':5,'Ancient Crush':4,'Thorn Mangle':3,'Iceburn Storm':5,'Death Screech':3,'Solar Pounce':2,'Sun Dive':5,'Carrion Breath':4,'Five-Rabbit Haze':5};
+const AOE_CAP_AB={'Prism Daze':5, /* v986 */ 'Searing Stings':4,'Writhing Bloom':4,'Filthwater Plume':5,'Drowning Grasp':2,'Colony Sting':5,'Voltaic Discharge':2,'Jestress Nightmare':5,'Atlatl Rush':2,'Toxic Bloom':3,'Arrow Rain':5,'Net Cast':5,'Mystical Shots':4,'Coil Crush':3,'Tremor':3,'Withering Touch':4,'Shard Breath':4,'Tectonic Slam':5,'Howling Gust':3,'Murk':3,'Magma Burst':3,'Septic Howl':3,'Collapse':5,'Haunt':5,'Solar Crush':2,'Pollen Burst':2,'Craft Shard':4,'Permafrost':2,'Biting Draft':4,'Howling Chill':3,'Ash Surge':5,'Sandblast':5,'Howling Drift':5,'Virulent Gale':5,'Ancient Crush':4,'Thorn Mangle':3,'Iceburn Storm':5,'Death Screech':3,'Solar Pounce':2,'Sun Dive':5,'Carrion Breath':4,'Five-Rabbit Haze':5};
 // v664: enemy AoE specials now honour the same per-ability target caps as their player versions
 // (AOE_CAP_AB, from the v419 AoE rework). Enemies had never been capped and still hit the whole party.
 // LAYER BOSSES ARE EXEMPT — they keep hitting everyone.
@@ -9768,7 +9906,9 @@ function _aoeCapBase(actor){
   // not the patron's native one (else oblated AoE mis-routes and hits everyone).
   if(actor.isGod&&G._useOblationSpecial&&G._oblationAk)return AOE_CAP[G._oblationAk]||0;
   if(actor.isGod){const gd=GODS.find(g=>g.id===actor.baseGodId);return (gd&&AOE_CAP[gd.ak])||0;}
-  return AOE_CAP_AB[actor.ability]||0;
+  /* v987: live ability name -- a captured unit freezes its ability at capture time, so after a
+     rename the cap lookup missed and the AoE silently collapsed to a single target. */
+  return AOE_CAP_AB[liveAbility(actor)]||0; /* v988 */
 }
 /* v855: support/heal specials -- these deal NO damage, so they use neither ATK nor MAG and must
    never pay the Cuauhtemoc Macuahuitl's physical recoil. Holds both ak keys and display names
@@ -9794,7 +9934,9 @@ function specIsSupport(actor){
 function specIsMagic(actor){
   if(!actor)return false;
   const gd=actor.isGod?GODS.find(g=>g.id===actor.baseGodId):null;
-  const ak=gd?gd.ak:'';const ab=actor.ability||'';
+  /* v987: live ability name -- a captured unit's stored one freezes at capture time, so after a
+     rename this misclassified the special and mis-routed its targeting. */
+  const ak=gd?gd.ak:'';const ab=actor.isGod?(actor.ability||''):liveAbility(actor); /* v988 */
   const ATK=new Set(['obsidianStorm','aurumBreak','frostMacuahuitl',
     'Obsidian Storm','Coil Crush','Withering Touch','Tremor','Shard Breath','Tectonic Slam','Solar Crush','Aurum Break','Frost Macuahuitl','Atlatl Rush','Searing Stings']);
   const MAG=new Set(['deluge','featherEmbrace','cripplingShock','oldFire',
@@ -9809,11 +9951,13 @@ function isAoeOrAutoSpecial(actor){
   const gd=actor.isGod?GODS.find(g=>g.id===actor.baseGodId):null;
   // v535: oblated specials route on the oblated ak, so a single-target oblated special
   // (e.g. a patron holding Cihuacoatl's kit) no longer forces the AoE/auto path.
-  const ak=(actor.isGod&&G._useOblationSpecial&&G._oblationAk)?G._oblationAk:(gd?.ak||'');const ab=actor.ability||'';
+  /* v987: same live resolution -- this one decides whether the special even prompts for a target,
+     so a stale name sent a renamed AoE down the single-target path. */
+  const ak=(actor.isGod&&G._useOblationSpecial&&G._oblationAk)?G._oblationAk:(gd?.ak||'');const ab=actor.isGod?(actor.ability||''):liveAbility(actor); /* v988 */
   if(actor.isGod)return[/* v919: Godbane Blowgun re-rolls a random living target for each of its 5 darts, so it needs no target prompt -- without this it fell through to the single-target path and asked the player to pick one. */'godbaneBlowgun','deluge','ophidianMother','cripplingShock','obsidianStorm','holyHarvest','patolliGamble','miseryBlizzard','torridTornado','torridTornadoBoss','peyoteConcoction','sheWhoEatsFilth','sinistralMinacachalli','cihuateteoFury','mictlanClaspPlayer'].includes(ak); // v811: Mictlan Clasp is a 6-target AoE -- absent from this list it fell through to the single-target path and asked for a target // v713: sheWhoEatsFilth is a party heal — it was falling through to the targeted path
   const aoeOrAuto=new Set(['Searing Stings','Writhing Bloom','Filthwater Plume','Drowning Grasp','Chitin Shell','Colony Sting','Voltaic Discharge','Bioluminescent Chorus','Jestress Nightmare','Atlatl Rush','Howling Gust','Magma Burst','Septic Howl','Murk','Thunder Crash','Collapse','Tremor','Death Bloom','Dark Waters','Earth Bloom','Gust Mend','Storm Mend',
     'Pollen Burst','Withering Touch','Uapantotli','Coil Crush','Toxic Bloom','Feeding Frenzy','Arrow Rain','Net Cast','Trident Lunge','Healing Rite','Mystical Shots','Surging Tide',
-    'Craft Shard','Biting Draft','Permafrost','Iceburn Storm','Howling Chill','Burrow Mend','Ball Strike','Sun Dive','Sacred Arrow','Cleansing Steam','Prism Volley','Solar Pounce',
+    'Craft Shard','Biting Draft','Permafrost','Iceburn Storm','Howling Chill','Burrow Mend','Ball Strike','Sun Dive','Sacred Arrow','Cleansing Steam','Prism Daze','Solar Pounce',
     'Obsidian Storm','Shard Breath','Tectonic Slam','Haunt','Godbane Blowgun', /* v919 */
     // L4/L5 AoE abilities
     'Ash Surge','Solar Crush','Sandblast','Howling Drift','Virulent Gale','Death Screech','Fuming Wall','Wind Rush',
@@ -9951,8 +10095,7 @@ function doPlayerAllyTarget(allyId){
      v690 fixed the same stale-snapshot class for `ad` by preferring the live template; this is
      that fix applied to the dispatch name. Gods keep their own ability; falls back to the stored
      value whenever the template can't be resolved. */
-  const _abTpl=actor.isGod?null:unitDefById((actor.baseObj&&actor.baseObj.id)||actor.baseId||actor.id);
-  const ab=(_abTpl&&_abTpl.ability)||actor.ability;const spLv=getSpecialLevel(actor);const sp2=Math.floor(spLv/2);
+  const ab=actor.isGod?actor.ability:liveAbility(actor);const spLv /* v988 */=getSpecialLevel(actor);const sp2=Math.floor(spLv/2);
   if(ab==='Stone Protection'||ab==='Stone Mend'){
     const pct=0.35+spLv*0.02;
     const h=Math.round(target.maxHp*pct);target.currentHp=healTo(target,h);
@@ -10932,7 +11075,12 @@ function fireMultiHit(actor,ae,hits,dmgPerHit,isAoeLogic,onDone){
 
 
 function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
-  const ab=u.ability||'';
+  /* v987 CRITICAL FIX. This dispatched on u.ability -- the snapshot FROZEN at capture time. Renaming
+     an ability (Prism Volley -> Prism Daze in v986) therefore broke it for every unit already in the
+     roster: the stale name matched no branch, so the special fell through and did nothing.
+     The same fix already exists at the ~10050 dispatcher; this one was missed. Resolve the name from
+     the live template, falling back to the stored value for gods, mercs and summons that have none. */
+  const ab=u.isGod?(u.ability||''):liveAbility(u); /* v988 */
   const spLv=getSpecialLevel(u.baseId||u.id);const sp2=spLv*2;
   // ft = forced target from player selection; fall back to lowest HP enemy
   const t=ft||(ae.length?ae.reduce((a,b)=>a.currentHp<b.currentHp?a:b):null);
@@ -11541,22 +11689,23 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     addLog(`<span class="log-heal">🔆 Cleansing Steam! All allies +30% HP + cleanse \u2014 ${totCS} restored</span>`);
     applyDayRecoil(u);return;
   }
-  if(ab==='Prism Volley'){
-    // v528: Multi 5-hit 0.6×MAG to random enemies · recoil (Ball Strike pattern)
-    G._multiHitPending=true;let totalPV=0;let hPV=0;
-    function pvHit(){
-      const live=ae.filter(e=>e.currentHp>0);
-      if(hPV>=5||!live.length){G._multiHitPending=false;addLog(`<span class="log-ab">🌞 Prism Volley! ${totalPV} across ${hPV} rays + Slow all hit!</span>`);applyDayRecoil(u);return;}
-      const tgt=live[Math.floor(Math.random()*live.length)];
-      const dmg=Math.max(1,Math.round(bpn(u)*(Math.round((u.mag||0)*0.5)-(tgt.res||0)*0.4))); // v737: 0.6->0.5, Slow added
+  if(ab==='Prism Daze'){
+    /* v986: was Prism Volley -- five rays that each re-rolled a random target, so they routinely
+       stacked two or three onto the same enemy. Now a true AoE: one pass over up to FIVE DISTINCT
+       enemies at 0.85xMAG, Slow on each, same 5% Day recoil. No multi-hit pending flag, because
+       nothing is sequenced any more. */
+    let totalPV=0;let hPV=0;
+    ae.filter(e=>e.currentHp>0).slice(0,5).forEach(tgt=>{
+      const dmg=Math.max(1,Math.round(bpn(u)*(Math.round((u.mag||0)*0.85)-(tgt.res||0)*0.4)));
       const paPV=tgt.armor||0; // preArmorAE invariant: Slow checks pre-hit armor
       const h=applyArmorDamage(tgt,dmg,false);
       if(h>0){tgt.currentHp=Math.max(0,tgt.currentHp-h);totalPV+=h;animateHit(tgt.id,h,false,rollCrit._lc);onHitContact(u,tgt);
         applySlowToUnit(tgt,paPV);
         refreshCaptureTargets();if(tgt.currentHp<=0)handleDeath(tgt);}
-      hPV++;setTimeout(pvHit,160);
-    }
-    pvHit();return;
+      hPV++;
+    });
+    addLog(`<span class="log-ab">🌞 Prism Daze! ${totalPV} across ${hPV} enemies + Slow!</span>`);
+    applyDayRecoil(u);return;
   }
   if(ab==='Sacred Arrow'){
     // v527: summon removed — now Multi 4-hit 0.7×ATK to random enemies + Slow each · recoil (Ball Strike pattern)
@@ -12555,17 +12704,15 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     applyDayRecoil(u);return;
   }
   if(ak==='prismVolley'&&aa.length){
-    // v528: Multi 5-hit 0.6×MAG to random player units · recoil
+    /* v986: mirrors the player side -- AoE over up to five DISTINCT allies at 0.85xMAG. */
     let totalPV=0;
-    for(let i=0;i<5;i++){
-      const live=aa.filter(a=>a.currentHp>0);if(!live.length)break;
-      const tgt=live[Math.floor(Math.random()*live.length)];
-      const dmg=critify(Math.max(1,Math.round(Math.round((u.mag||0)*0.5)-(tgt.res||0)*0.4)),u,false); // v737: 0.6->0.5, Slow added
+    aa.filter(a=>a.currentHp>0).slice(0,5).forEach(tgt=>{
+      const dmg=critify(Math.max(1,Math.round(Math.round((u.mag||0)*0.85)-(tgt.res||0)*0.4)),u,false);
       const paPV=tgt.armor||0;
       const h=applyArmorDamage(tgt,dmg,true);
       if(h>0){tgt.currentHp=Math.max(0,tgt.currentHp-h);totalPV+=h;G._animQueue.push({uid:tgt.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,tgt);applySlowToUnit(tgt,paPV);if(tgt.currentHp<=0)handleDeath(tgt);}
-    }
-    addLog(`<span class="log-ab">🌞 Prism Volley! ${totalPV} across the rays + Slow!</span>`);
+    });
+    addLog(`<span class="log-ab">🌞 Prism Daze! ${totalPV} across the party + Slow!</span>`);
     applyDayRecoil(u);return;
   }
   if(ak==='sacredArrow'&&aa.length){
@@ -12781,7 +12928,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     const h=Math.round(tgt.maxHp*.33);tgt.currentHp=healTo(tgt,h);
     grantChimalli(tgt,0.04,'Ancestral Storm'); // chimalli — no cleanse
     G._animQueue.push({uid:tgt.id,dmg:h,isHeal:true});
-    addLog(`<span class="log-heal">🌩 Ancestral Storm: ${tgt.icon} +${h} HP + 15 Chimalli!</span>`);return;
+    addLog(`<span class="log-heal">🌩 Ancestral Storm: ${tgt.icon} +${h} HP + ${chimaAmt} Chimalli!</span>`);return; /* v986: was a hardcoded 15 -- the grant has been 4% of max HP since v975 */
   }
   if(ab==='Patolli Gamble'&&aa.length){
     const roll=Math.floor(Math.random()*6)+1;
@@ -14036,6 +14183,16 @@ function applyArmorDamage(target,dmg,isEnemyAttacking){
   // WOUND multiplier: +10% per stack (max 4)
   const wStacks=Math.min(4,target.woundStacks||0);
   if(wStacks>0)dmg=Math.round(dmg*(1+0.10*wStacks));
+  /* v981: Septic Claws now also AMPLIFIES. +5% damage per Poison stack on the victim -- Wound's
+     shape at half the rate, sitting at the same choke point so every source inherits it: strikes,
+     specials, the poison tick itself, recoil and the calendar pulse.
+     PLAYER ONLY. hasPassive() reads the patron (and any oblated passive) and is player-scoped by
+     construction, so the Xolotl BOSS gets nothing from this -- his enemy-side poison application
+     runs through enemySepticClawsActive(), which is deliberately untouched. */
+  if(!target.isAlly&&hasPassive('septicClaws')){
+    const _pS=Math.min(4,target.poisonStacks||0);
+    if(_pS>0)dmg=Math.round(dmg*(1+0.05*_pS));
+  }
   /* v882: Nappatecuhtli Reed. Sits beside Wound because this is the one choke point every point of
      damage passes through, so "from every source" is literally true -- strikes, specials, poison,
      recoil and the calendar pulse all inherit it. Enemies only, matching the offering text. */
@@ -14538,8 +14695,9 @@ function handleDeath(dead){
     if(dead.id.startsWith('boss_itzpap')){const k='layer3_'+G.god.id;
       const wasL3Locked=!layer3Unlocked();V[k]=true;saveV();
       if(wasL3Locked){setTimeout(()=>showMo('🦋','New Patron Unlocked!',`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'itzpapalotl',icon:'🦋',name:'Itzpapalotl',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#b090ff;margin:.5rem 0 .25rem">Itzpapalotl</div><div style="font-size:12px;color:#9070d0;margin-bottom:.75rem">Obsidian Butterfly</div><div style="font-size:12px;color:var(--td);line-height:1.6">She can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs.</div></div>`,[{label:'The Butterfly Spreads Her Wings',fn:()=>{}}]),400);}
-      // Unlock next Tecpatl level if this was the max
-      if((G.tecpatl||0)>=DT.tecpatl_level){DT.tecpatl_level=Math.min(20,(DT.tecpatl_level||0)+1);}
+      /* v990: the ceiling used to rise on the L3, L4 and L5 boss kills, so a run that died in
+         Mictlan still handed out a higher penance next time. It now moves ONLY on a full Mictlan
+         clear, and tracks the highest penance actually BEATEN [Genaro, v990]. */
       // Final record update: use mods count as ground truth
       if(G.god){const gid=G.god.id;DT.godTecpatl[gid]=Math.max(DT.godTecpatl[gid]||0,(G.tecpatl_mods||[]).length);}
       saveDT();}
@@ -14573,9 +14731,11 @@ function handleDeath(dead){
       const _bossWasLocked=!(isMal?malinalxochitlUnlocked():xiuhtecuhtliUnlocked());
       V[k]=true;saveV();
       G._scaldingMiasmaActive=false;G._enemyMiasma=false;
-      if((G.tecpatl||0)>=DT.tecpatl_level){DT.tecpatl_level=Math.min(20,(DT.tecpatl_level||0)+1);}
+      /* v986: the notice below fired on EVERY L5 clear, even when the level did not move -- it only
+     rises if you carried penances up to your current ceiling. Track it and say so honestly. */
+  const _tecpatlRose=false; // v990: the ceiling no longer moves here -- see the L9 clear
       if(G.god){const gid=G.god.id;DT.godTecpatl[gid]=Math.max(DT.godTecpatl[gid]||0,(G.tecpatl_mods||[]).length);}
-      saveDT();notify('Pancuetlacaloyán conquered! Tecpatl Penance deepens.','#ff8040');
+      saveDT();notify(_tecpatlRose?'Pancuetlacaloyán conquered! Tecpatl Penance deepens.':'Pancuetlacaloyán conquered!','#ff8040'); /* v986 */
       const unlocked=isMal?malinalxochitlUnlocked():xiuhtecuhtliUnlocked();
       // unlocked will now be true since we just set k; check if it was locked before
       const bossGodId=isMal?'malinalxochitl':'xiuhtecuhtli';
@@ -14587,8 +14747,7 @@ function handleDeath(dead){
     }
     // L4 boss victory flag
     if(dead.id.startsWith('boss_ixqui')){const k='layer4_'+G.god.id;
-      const wasIxqLocked=!ixquimilliUnlocked();V[k]=true;saveV();
-      if((G.tecpatl||0)>=DT.tecpatl_level){DT.tecpatl_level=Math.min(20,(DT.tecpatl_level||0)+1);}
+      const wasIxqLocked=!ixquimilliUnlocked();V[k]=true;saveV(); /* v990: ceiling bump removed */
       if(G.god){const gid=G.god.id;DT.godTecpatl[gid]=Math.max(DT.godTecpatl[gid]||0,(G.tecpatl_mods||[]).length);}
       saveDT();notify('Cehuélōyān conquered!','#80c8ff');
       if(wasIxqLocked){setTimeout(()=>showMo('🧊','New Patron Unlocked!',`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'ixquimilli',icon:'🧊',name:'Ixquimilli',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#80c8ff;margin:.5rem 0 .25rem">Ixquimilli</div><div style="font-size:12px;color:#60a0d0;margin-bottom:.75rem">Punisher God of Ice</div><div style="font-size:12px;color:var(--td);line-height:1.6">He can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs.</div></div>`,[{label:'Endure the Cold',fn:()=>{}}]),400);}
@@ -14991,9 +15150,11 @@ function renderActionPanel(){
   // Clear for any non-interactive phases — prevents stale Cancel button from targeting phase
   if(!['player_choose','player_selected','player_targeting','player_ally_targeting','player_aoe_targeting'].includes(G.battlePhase)){el.innerHTML='';return;}
   if(G.battlePhase==='player_choose'){
-    // Solar Sacrifice button: shown when Tonatiuh is patron and sacrifice not used this round
+    /* v983: the once-per-round in-battle Solar Sacrifice is RETIRED. Tonatiuh's sacrifice now
+       happens entirely through the Sacrifice Slot at battle start, so this button and its two
+       handlers are gone. Kept the variable so the Serendipity block below still concatenates. */
     let serendipityBtn='';
-    if(hasPassive('solarSacrifice')&&!G._solarSacrificeUsed){
+    if(false){
       const sacVassals=G.units.filter(u=>!u.isGod&&u.currentHp>0);
       if(sacVassals.length)serendipityBtn=`<button class="btn" onclick="doSolarSacrifice()" style="margin-top:6px;width:100%;font-size:11px;background:#1a1000;border-color:#c08000;color:#ffd060">☀️ Solar Sacrifice — sacrifice a vassal for damage <span style="font-size:9px;color:#a06000">(1/round)</span></button>`;
     }
@@ -15158,7 +15319,7 @@ function renderActionPanel(){
     const godSpecFlat={'seismicRoar':8,'ophidianMother':0,'deluge':0,'tlalocanDeluge':0,'featherEmbrace':0,'oldFire':20,'cripplingShock':0,'riverJudge':0,'obsidianStorm':14,'holyHarvest':0,'zappingStrike':0,'aurumBreak':0,'frostMacuahuitl':0};
     const godSpecMult={'deluge':1.35,'tlalocanDeluge':1.35,'obsidianStorm':1.25,'aurumBreak':1.5,'frostMacuahuitl':1.5,'cihuateteoFury':0.6,'cripplingShock':0.6,'featherEmbrace':1.5,'godbaneBlowgun':0.5,'mictlanClaspPlayer':0.5,'octliDrench':1.5,'oldFire':1.6,'seismicRoar':1.5,'sinistralMinacachalli':1.2,'zappingStrike':1.1}; /* v924: 12 patron abilities were missing, previewing at 1.0x */
     // Vassal ability mult overrides (for abilities that use a mult formula instead of base+flat)
-    const vassalSpecMult={'Rain Drop':1.3,'Soul Drain':1.3,'Life Siphon':1.35,'Coil Crush':1.4,'Wail':1.5,'Thorn Lash':1.5,'Vine Grasp':1.3,'Blood Drink':1.8,'Glass Cut':1.6,'Pollen Burst':1.1,'Ball Strike':0.55,'War Rhythm':1.2,'Heavy Cleave':1.3,'Razor Dive':1.3,'Haunt':1.3,'Venom Shade':1.3,'Thorn Mangle':1.5,'Ancient Crush':1.4,'Iceburn Storm':1.1,'Death Screech':1.4,'Shard Breath':1.2,'Tremor':1.3,'Withering Touch':1.25,'Tectonic Slam':1.05,'Howling Gust':1.4,'Murk':1.2,'Magma Burst':1.2,'Septic Howl':1.25,'Collapse':1.2,'Haunt':1.1,'Frost Macuahuitl':1.5,'Solar Crush':1.6,'Craft Shard':1.1,'Permafrost':1.6,'Biting Draft':1.2,'Howling Chill':1.05,'Ash Surge':1.1,'Sandblast':1.1,'Howling Drift':1.1,'Virulent Gale':1.1,'Obsidian Blade':2.0,'Sun Dive':1.25,'Solar Pounce':1.6,'Sacred Arrow':0.7,'Prism Volley':0.5,'Filthwater Plume':0.75,'Drowning Grasp':1.5,'Writhing Bloom':1.2,'Colony Sting':0.9,'Voltaic Discharge':1.5,'Gnaw the Fallen':1.9,'Abyssal Lure':1.3,'Fang Flash':1.3,'Descent from the Trees':1.5,'Jestress Nightmare':1.1,'Arrow Rain':0.9,'Atlatl Rush':1.4,'Atlatl Throw':1.6,'Bone Shard':1.7,'Carrion Breath':1.3,'Copper Axe':1.7,'Diving Gust':1.6,'Dolphin Dash':1.2,'Electro Bite':1.4,'Five-Rabbit Haze':0.9,'Flint Sting':1.6,'Gale Strike':1.9,'Gar Chomp':1.5,'Heart Feast':1.7,'Hollow Blow':1.2,'Lava Fang':1.7,'Lightning Fang':1.4,'Marlin Pierce':1.6,'Mystical Shots':1.2,'Net Cast':0.8,'Open the Chest':1.7,'Pack Surge':1.2,'River Poison':1.2,'Rot Gore':1.8,'Scorching Bite':1.3,'Searing Stings':1.1,'Seismic Bolt':1.6,'Shadow Cut':1.5,'Stale Gust':1.2,'Static Bite':1.3,'Tainted Draught':1.2,'Thunder Yip':1.6,'Toxic Bloom':1.2,'Venom Coil':1.5,'Wind Rush':1.3};
+    const vassalSpecMult={'Rain Drop':1.3,'Soul Drain':1.3,'Life Siphon':1.35,'Coil Crush':1.4,'Wail':1.5,'Thorn Lash':1.5,'Vine Grasp':1.3,'Blood Drink':1.8,'Glass Cut':1.6,'Pollen Burst':1.1,'Ball Strike':0.55,'War Rhythm':1.2,'Heavy Cleave':1.3,'Razor Dive':1.3,'Haunt':1.3,'Venom Shade':1.3,'Thorn Mangle':1.5,'Ancient Crush':1.4,'Iceburn Storm':1.1,'Death Screech':1.4,'Shard Breath':1.2,'Tremor':1.3,'Withering Touch':1.25,'Tectonic Slam':1.05,'Howling Gust':1.4,'Murk':1.2,'Magma Burst':1.2,'Septic Howl':1.25,'Collapse':1.2,'Haunt':1.1,'Frost Macuahuitl':1.5,'Solar Crush':1.6,'Craft Shard':1.1,'Permafrost':1.6,'Biting Draft':1.2,'Howling Chill':1.05,'Ash Surge':1.1,'Sandblast':1.1,'Howling Drift':1.1,'Virulent Gale':1.1,'Obsidian Blade':2.0,'Sun Dive':1.25,'Solar Pounce':1.6,'Sacred Arrow':0.7,'Prism Daze':0.5,'Filthwater Plume':0.75,'Drowning Grasp':1.5,'Writhing Bloom':1.2,'Colony Sting':0.9,'Voltaic Discharge':1.5,'Gnaw the Fallen':1.9,'Abyssal Lure':1.3,'Fang Flash':1.3,'Descent from the Trees':1.5,'Jestress Nightmare':1.1,'Arrow Rain':0.9,'Atlatl Rush':1.4,'Atlatl Throw':1.6,'Bone Shard':1.7,'Carrion Breath':1.3,'Copper Axe':1.7,'Diving Gust':1.6,'Dolphin Dash':1.2,'Electro Bite':1.4,'Five-Rabbit Haze':0.9,'Flint Sting':1.6,'Gale Strike':1.9,'Gar Chomp':1.5,'Heart Feast':1.7,'Hollow Blow':1.2,'Lava Fang':1.7,'Lightning Fang':1.4,'Marlin Pierce':1.6,'Mystical Shots':1.2,'Net Cast':0.8,'Open the Chest':1.7,'Pack Surge':1.2,'River Poison':1.2,'Rot Gore':1.8,'Scorching Bite':1.3,'Searing Stings':1.1,'Seismic Bolt':1.6,'Shadow Cut':1.5,'Stale Gust':1.2,'Static Bite':1.3,'Tainted Draught':1.2,'Thunder Yip':1.6,'Toxic Bloom':1.2,'Venom Coil':1.5,'Wind Rush':1.3};
     /* v924: the preview multiplier table had drifted badly out of step with the handlers.
        35 vassal abilities were absent, so the action panel priced each of them at 1.0xATK
        while the battle handler used the real figure -- Copper Axe showed 178-182 next to a
@@ -15426,6 +15587,12 @@ function endBattle(win){
        title, with the Layer 8 "Enter Layer 9" button -- which dropped the player back into L9
        after they had already finished the game. */
     G._endingLayer=9;
+    /* v990: THE penance unlock. Beating Mictlan at penance N records N as beaten and opens N+1.
+       Math.max means a lesser run can never walk the ceiling back down. */
+    {const _beat=(G.tecpatl||0);
+     DT.tecpatlBeaten=Math.max(DT.tecpatlBeaten||0,_beat);
+     DT.tecpatl_level=Math.min(20,Math.max(DT.tecpatl_level||0,_beat+1));
+     saveDT();}
     showConquest();return;
   }
   showSpoils();
@@ -15519,6 +15686,11 @@ function showSpoils(){
            multiplier is 1 so nothing is counted twice. */
         {const _blPct=Math.round(((DT.unlocked.has('bloodlust')?0.10:0)+(DT.unlocked.has('bloodlust2')?0.15:0))*100);
          if(_blPct>0)steps.push({bm:1,cm:1,bl:'(+'+_blPct+'% \u{1F5E1}\uFE0F)',cl:'',src:'\u{1F5E1}\uFE0F Bloodlust \u2014 +'+_blPct+'% Blood'});}
+        /* v986: Theobroma Desire / Cacao Flow had the same problem Bloodlust did -- G.dte.cacaoBonus
+           multiplies every kill in handleDeath, which happens BEFORE this breakdown is assembled, so
+           the nodes were invisible and looked broken. Attribution only; the multiplier is 1. */
+        {const _cbPct=Math.round(((DT.unlocked.has('theobroma')?0.10:0)+(DT.unlocked.has('theobroma2')?0.15:0))*100);
+         if(_cbPct>0)steps.push({bm:1,cm:1,bl:'',cl:'(+'+_cbPct+'% \u{1F36B})',src:'\u{1F36B} '+(DT.unlocked.has('theobroma2')?'Cacao Flow':'Theobroma Desire')+' \u2014 +'+_cbPct+'% Cacao'});}
         /* v935: Ometeotl's blessing, if the player chose the god he marked. */
         if(G.god&&isBlessedGod(G.god.id))steps.push({bm:1.05,cm:1.05,bl:'(+5% \u2726)',cl:'(+5% \u2726)',src:'\u2726 Ometeotl Blessing \u2014 +5% Blood & Cacao'});
         /* v903: conditional spoils offerings. Multiplied across every owned copy the same way the
@@ -15928,8 +16100,11 @@ function enterLayer9(){
   G._contFn=()=>{
     G._contFn=null;
     const goToStory=()=>{showScr('screen-story');runStory(storyLinesL9());}; /* v872: patron-aware */
-    if(G.tecpatl>0)showMictlanMap(()=>showPenancePick(goToStory));
-    else showMictlanMap(goToStory);
+    /* v980: penances are chosen ONCE, at the start of the run [Genaro]. This used to interrupt
+       every layer transition with another Tecpatl Tribute pick. The run-start chain in
+       chainPick() still deals out one card per penance level, so the total number of modifiers
+       a run carries is unchanged -- they are all handed out up front instead of drip-fed. */
+    showMictlanMap(goToStory);
   };
   showShop();
   const cont=document.getElementById('continue-btn');
@@ -15940,8 +16115,11 @@ function enterLayer8(){
   G._contFn=()=>{
     G._contFn=null;
     const goToStory=()=>{showScr('screen-story');runStory(STORY_LINES_L8);};
-    if(G.tecpatl>0)showMictlanMap(()=>showPenancePick(goToStory));
-    else showMictlanMap(goToStory);
+    /* v980: penances are chosen ONCE, at the start of the run [Genaro]. This used to interrupt
+       every layer transition with another Tecpatl Tribute pick. The run-start chain in
+       chainPick() still deals out one card per penance level, so the total number of modifiers
+       a run carries is unchanged -- they are all handed out up front instead of drip-fed. */
+    showMictlanMap(goToStory);
   };
   showShop();
   const cont=document.getElementById('continue-btn');
@@ -15953,8 +16131,11 @@ function enterLayer7(){
   G._contFn=()=>{
     G._contFn=null;
     const goToStory=()=>{showScr('screen-story');runStory(STORY_LINES_L7);};
-    if(G.tecpatl>0)showMictlanMap(()=>showPenancePick(goToStory));
-    else showMictlanMap(goToStory);
+    /* v980: penances are chosen ONCE, at the start of the run [Genaro]. This used to interrupt
+       every layer transition with another Tecpatl Tribute pick. The run-start chain in
+       chainPick() still deals out one card per penance level, so the total number of modifiers
+       a run carries is unchanged -- they are all handed out up front instead of drip-fed. */
+    showMictlanMap(goToStory);
   };
   showShop();
   const cont=document.getElementById('continue-btn');
@@ -15965,8 +16146,11 @@ function enterLayer6(){
   G._contFn=()=>{
     G._contFn=null;
     const goToStory=()=>{showScr('screen-story');runStory(STORY_LINES_L6);};
-    if(G.tecpatl>0)showMictlanMap(()=>showPenancePick(goToStory));
-    else showMictlanMap(goToStory);
+    /* v980: penances are chosen ONCE, at the start of the run [Genaro]. This used to interrupt
+       every layer transition with another Tecpatl Tribute pick. The run-start chain in
+       chainPick() still deals out one card per penance level, so the total number of modifiers
+       a run carries is unchanged -- they are all handed out up front instead of drip-fed. */
+    showMictlanMap(goToStory);
   };
   showShop();
   const cont=document.getElementById('continue-btn');
@@ -15977,8 +16161,11 @@ function enterLayer5(){
   G._contFn=()=>{
     G._contFn=null;
     const goToStory=()=>{showScr('screen-story');runStory(STORY_LINES_L5);};
-    if(G.tecpatl>0)showMictlanMap(()=>showPenancePick(goToStory));
-    else showMictlanMap(goToStory);
+    /* v980: penances are chosen ONCE, at the start of the run [Genaro]. This used to interrupt
+       every layer transition with another Tecpatl Tribute pick. The run-start chain in
+       chainPick() still deals out one card per penance level, so the total number of modifiers
+       a run carries is unchanged -- they are all handed out up front instead of drip-fed. */
+    showMictlanMap(goToStory);
   };
   showShop();
   const cont=document.getElementById('continue-btn');
@@ -15989,8 +16176,11 @@ function enterLayer4(){
   G._contFn=()=>{
     G._contFn=null;
     const goToStory=()=>{showScr('screen-story');runStory(STORY_LINES_L4);};
-    if(G.tecpatl>0)showMictlanMap(()=>showPenancePick(goToStory));
-    else showMictlanMap(goToStory);
+    /* v980: penances are chosen ONCE, at the start of the run [Genaro]. This used to interrupt
+       every layer transition with another Tecpatl Tribute pick. The run-start chain in
+       chainPick() still deals out one card per penance level, so the total number of modifiers
+       a run carries is unchanged -- they are all handed out up front instead of drip-fed. */
+    showMictlanMap(goToStory);
   };
   showShop();
   const cont=document.getElementById('continue-btn');
@@ -16002,8 +16192,11 @@ function enterLayer3(){
     G._contFn=null;
     const goToStory=()=>{showScr('screen-story');runStory(STORY_LINES_L3);};
     // Between layers: pick a NEW modifier card (not re-choose difficulty level)
-    if(G.tecpatl>0)showMictlanMap(()=>showPenancePick(goToStory));
-    else showMictlanMap(goToStory);
+    /* v980: penances are chosen ONCE, at the start of the run [Genaro]. This used to interrupt
+       every layer transition with another Tecpatl Tribute pick. The run-start chain in
+       chainPick() still deals out one card per penance level, so the total number of modifiers
+       a run carries is unchanged -- they are all handed out up front instead of drip-fed. */
+    showMictlanMap(goToStory);
   };
   showShop();
   const cont=document.getElementById('continue-btn');
@@ -16015,8 +16208,11 @@ function enterLayer2(){
     G._contFn=null;
     const goToStory=()=>{showScr('screen-story');runStory();};
     // Between layers: pick a NEW modifier card (not re-choose difficulty level)
-    if(G.tecpatl>0)showMictlanMap(()=>showPenancePick(goToStory));
-    else showMictlanMap(goToStory);
+    /* v980: penances are chosen ONCE, at the start of the run [Genaro]. This used to interrupt
+       every layer transition with another Tecpatl Tribute pick. The run-start chain in
+       chainPick() still deals out one card per penance level, so the total number of modifiers
+       a run carries is unchanged -- they are all handed out up front instead of drip-fed. */
+    showMictlanMap(goToStory);
   };
   showShop();
   const cont=document.getElementById('continue-btn');
@@ -16663,6 +16859,27 @@ d.innerHTML=`<div style="margin-bottom:1px">${unitIconHtml(u,28)}</div><div styl
     btn.innerHTML='<div style="font-size:20px">+</div><div style="font-size:10px;color:var(--td)">Available Slot</div>';
     btn.onclick=()=>showEditPartyModal();el.appendChild(btn);
   }
+  /* v982: Tonatiuh's Sacrifice Slot. An EXTRA chip beyond the normal slots -- the unit here is
+     consumed at battle start, so it never grants a fighting-strength advantage. Only rendered for
+     a Tonatiuh patron, and only ever filled by an explicit click, never automatically. */
+  if(hasPassive('solarSacrifice')){
+    const sc=document.createElement('div');sc.className='party-chip';
+    const sacCu=G.sacSlot?(G.captured||[]).find(c=>capKey(c)===G.sacSlot):null;
+    if(!sacCu&&G.sacSlot)G.sacSlot=null; // the unit left the roster some other way
+    else if(sacCu&&(G.deplSel||[]).includes(G.sacSlot)){G.sacSlot=null;} /* v983: never both */
+    if(sacCu){
+      sc.style.cssText='cursor:pointer;border-color:#c03030;background:#2a0808';
+      sc.innerHTML=`<div style="margin-bottom:1px">${unitIconHtml(sacCu,28)}</div>`
+        +`<div style="font-size:11px;font-weight:500;color:#e08080">\u{1F5E1} ${liveName(sacCu)}</div>`
+        +`<div style="font-size:10px;color:var(--td)">Lv${getLevel(capKey(sacCu))} \u00b7 tap to clear</div>`;
+      sc.onclick=()=>{G.sacSlot=null;renderPartyChips();};
+    }else{
+      sc.style.cssText='cursor:pointer;opacity:.75;border-style:dashed;border-color:#8a3030;display:flex;flex-direction:column;align-items:center;justify-content:center';
+      sc.innerHTML='<div style="font-size:20px;color:#c06060">\u{1F5E1}</div><div style="font-size:10px;color:var(--td)">Sacrifice Slot</div>';
+      sc.onclick=()=>showSacSlotModal();
+    }
+    el.appendChild(sc);
+  }
   if(all.length===1){const note=document.createElement('div');note.style.cssText='font-size:11px;color:var(--td);align-self:center';note.textContent='No allies selected.';el.appendChild(note);}
 }
 
@@ -16777,7 +16994,7 @@ function showUnitTooltip(u){
     _row('res','🔯','RES',gs(res,T.res)),
     _row('crit','🎯','CRIT',(_critPct>0.101?'<span style="color:#60d080;font-weight:600">'+Math.round(_critPct*100)+'%</span>':Math.round(_critPct*100)+'%'))
   ].filter(Boolean).join('');
-  const _pv=chimaWord(bo.passive||'');const _pi=_pv.indexOf(':'); /* v976 */ // v621: the passive's name gets patron-gold prominence
+  const _pv=sacWord(chimaWord(bo.passive||''));const _pi=_pv.indexOf(':'); /* v976 · v982 */ // v621: the passive's name gets patron-gold prominence
   /* v772: the oblated passive now sits directly beneath the native one and borrows its exact
      layout -- bold name, italic body -- differing only in the ✟ marker and purple tint, so an
      inherited passive reads as a peer of the god's own rather than as a footnote. It was
@@ -16821,6 +17038,33 @@ function showUnitTooltip(u){
     [{label:'Close',fn:()=>{}}]);
 }
 
+/* v983: the Sacrifice Slot, shown inside Edit Party as well as on the deploy row. The effect line
+   is driven by sacSlotEffectText() so a future god with its own sacrifice payoff only needs a new
+   branch there -- the surrounding wording stays generic. */
+function sacSlotEffectText(){
+  if(hasPassive('solarSacrifice'))return 'Solar Sacrifice Effect: all party units gain ATK/MAG UP \u00d72 and DEF/RES UP \u00d72.';
+  return '';
+}
+function buildSacSlotRow(){
+  if(!hasPassive('solarSacrifice'))return '';
+  const cu=G.sacSlot?(G.captured||[]).find(c=>capKey(c)===G.sacSlot):null;
+  const inner=cu
+    ?`<span style="display:inline-flex;align-items:center">${unitIconHtml(cu,26)}</span>
+       <div style="flex:1"><div style="font-size:12px;font-weight:500;color:#e08080">${liveName(cu)}</div>
+       <div style="font-size:10px;color:var(--td)">Lv${getLevel(capKey(cu))}</div></div>
+       <button class="btn" onclick="G.sacSlot=null;refreshEditParty();" style="font-size:10px;padding:3px 9px">Clear</button>`
+    :`<div style="flex:1"><div style="font-size:12px;font-weight:500;color:#c06060">\u{1F5E1} Sacrifice Slot</div>
+       <div style="font-size:10px;color:var(--td)">Empty</div></div>
+       <button class="btn" onclick="showSacSlotModal();" style="font-size:10px;padding:3px 9px;border-color:#8a3030;color:#e08080">SET UNIT</button>`;
+  /* v984: the explainer lines lived here AND in the picker modal; kept only in the picker. */
+  return `<div style="display:flex;align-items:center;gap:8px;padding:6px 5px;margin-bottom:8px;border:0.5px dashed #8a3030;border-radius:6px;background:#1a0808">${inner}</div>`;
+}
+function refreshEditParty(){
+  const c=document.getElementById('edit-party-content');
+  if(c){c.innerHTML=buildEditPartyRows();}
+  if(document.getElementById('mo-body'))showEditPartyModal();
+  renderPartyChips();
+}
 function buildEditPartyRows(){
   const ma=getMaxAllies();const pg=G.god;
   const patronRow=pg?`<div data-punit="god_${pg.id}" style="display:flex;align-items:center;gap:8px;padding:5px 4px;border-bottom:0.5px solid var(--br);background:#1e1604;border-radius:4px;margin-bottom:2px"><span style="display:inline-flex;align-items:center">${godIconHtml(pg,28)}</span><div style="flex:1"><div style="font-size:12px;font-weight:500;color:#d4af37">${pg.name} <span style="font-size:9px;color:#806030">★ Patron</span>${calcSynergy().count>0?' <span '+SYN_ATTRS.replace('style="','style="font-size:9px;color:#d4af37;background:#1e1604;border:0.5px solid #5a4a10;border-radius:8px;padding:1px 5px;')+'>\u{1F517} +'+Math.round(calcSynergy().pct*100)+'%</span>':''}</div><div style="font-size:10px;color:var(--td)">Lv${getLevel('god_'+pg.id)} · ${pg.type||'PHY'}</div></div><span style="font-size:10px;color:#504030;padding:3px 8px">Always in</span></div>`:'';
@@ -16831,9 +17075,12 @@ function buildEditPartyRows(){
     const disabled=!inParty&&slotsFull;
     const lv=getLevel(uid);
     const uType=u.type||(u.mag>0?'MAG':'PHY');
+    /* v984: deploying a unit that is sitting in the Sacrifice Slot clears the slot on the spot.
+       Previously both showed it until the modal was reopened. Deployment wins -- you cannot
+       fight with a unit you have already promised to the sun. */
     const addFn=inParty
       ?`G.deplSel=G.deplSel.filter(x=>x!=='${uid}');`
-      :`if(G.deplSel.length<${ma})G.deplSel.push('${uid}');else{notify('Max ${ma} slots!','#e05050');return;}`;
+      :`if(G.deplSel.length<${ma}){G.deplSel.push('${uid}');if(G.sacSlot==='${uid}')G.sacSlot=null;}else{notify('Max ${ma} slots!','#e05050');return;}`;
     const elemHtml=ELEM_META[u.element]?('<span class="elem-badge '+ELEM_META[u.element].cls+'" style="font-size:9px">'+ELEM_META[u.element].icon+' '+ELEM_META[u.element].label+'</span>'):'';
     const _synMatch=calcSynergy().count>0&&G.god&&(u.element===G.god.element||(hasPassive('azureZephyr')&&(u.element==='fire'||u.element==='wind'))); // v640
     const synPill=_synMatch?('<span '+SYN_ATTRS.replace('style="','style="font-size:9px;color:#d4af37;background:#1e1604;border:0.5px solid #5a4a10;border-radius:6px;padding:1px 5px;')+'>🔗 +'+Math.round((calcSynergy().pct)*100)+'%</span>'):''; // v647: total
@@ -16846,10 +17093,31 @@ function buildEditPartyRows(){
   }).join('');
   return patronRow+allyRows;
 }
+/* v982: picker for the Sacrifice Slot. Lists every captured vassal, deployed or not -- the slot is
+   independent of deployment. Explicit click only. */
+function showSacSlotModal(){
+  /* v983 BUG FIX: the picker listed the whole roster, so a DEPLOYED unit could also be dropped in
+     the sacrifice slot -- it then vanished mid-deploy and the party silently shrank. A unit is
+     either fighting or being given up, never both. */
+  const pool=(G.captured||[]).filter(cu=>!(G.deplSel||[]).includes(capKey(cu)));
+  if(!pool.length){notify('No undeployed vassals to sacrifice.','#e05050');return;}
+  const rows=pool.map(cu=>{
+    const k=capKey(cu);
+    return `<button class="btn" style="width:100%;margin-bottom:.4rem;text-align:left;padding:7px 11px" onclick="G.sacSlot='${k}';G._moDismiss=null;hideMo();renderPartyChips();if(document.getElementById('edit-party-content'))showEditPartyModal();">`
+      +`${cu.icon} <strong>${liveName(cu)}</strong> <span style="font-size:11px;color:var(--td)">Lv${getLevel(k)}</span></button>`;
+  }).join('');
+  /* v983: generic wording + a per-god effect line, so another god's Sacrifice Slot only needs its
+     own branch in sacSlotEffectText(). */
+  showMo('\u{1F5E1}','Sacrifice Slot',
+    '<div style="font-size:11px;color:var(--td);margin-bottom:.2rem">This unit will be sacrificed at the start of the next battle.</div>'
+    +(sacSlotEffectText()?'<div style="font-size:11px;color:#c0a060;margin-bottom:.6rem">'+sacSlotEffectText()+'</div>':'<div style="margin-bottom:.6rem"></div>')
+    +rows,
+    [{label:'Cancel',fn:()=>{}}]);
+}
 function showEditPartyModal(){
   if(ftueGateActive()&&G._ftueNeedsParty&&!G._ftueDidParty){G._ftueDidParty=true;setTimeout(ftueGateUpdate,0);} // v306
   const ma=getMaxAllies();
-  const content=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div id="party-slot-counter" style="font-size:11px;color:var(--td)">Slots: ${G.deplSel.length}/${ma}. Patron always deploys.</div><button class="btn" onclick="doAutoEquip()" style="font-size:10px;padding:3px 9px;margin-left:auto">⚡ Auto-Equip</button></div><div id="edit-party-content" style="max-height:55vh;overflow-y:auto">${buildEditPartyRows()}</div>`;
+  const content=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div id="party-slot-counter" style="font-size:11px;color:var(--td)">Slots: ${G.deplSel.length}/${ma}. Patron always deploys.</div><button class="btn" onclick="doAutoEquip()" style="font-size:10px;padding:3px 9px;margin-left:auto">⚡ Auto-Equip</button></div>${buildSacSlotRow()}<div id="edit-party-content" style="max-height:55vh;overflow-y:auto">${buildEditPartyRows()}</div>`;
   showMo('⚔','Edit Party',content,[{label:'Done',fn:()=>{renderPartyChips();renderAltar();if(document.getElementById('training-list'))renderTraining();if(document.getElementById('synergy-panel'))renderSynPanel();if(typeof renderDeployChips==='function'&&document.getElementById('screen-deploy')&&document.getElementById('screen-deploy').style.display!=='none')renderDeployChips();}}]); // v646: refresh deployment-aware surfaces after party edits
 }
 // v305 (6C): fill all slots greedily — ally gods first, then vassals, level descending within each group.
@@ -17441,7 +17709,9 @@ function renderAltar(){
   else{
     G.sacSelected=G.sacSelected||new Set();
     // v635: deployed units leave the list (a blurb explains why); the rest become selectable cards
-    const _dep=(cu)=>G.deplSel.includes(capKey(cu));
+    /* v984: a unit sitting in the Sacrifice Slot is already spoken for, so it leaves the Altar
+       list exactly like a deployed one. One predicate drives the grid, the count and the blurb. */
+    const _dep=(cu)=>G.deplSel.includes(capKey(cu))||(G.sacSlot&&capKey(cu)===G.sacSlot);
     const deployedCount=G.captured.filter(_dep).length;
     const sorted=G.captured.filter(cu=>!_dep(cu)).sort((a,b)=>getLevel(capKey(b))-getLevel(capKey(a)));
     const spareEnabled=G.dte&&G.dte.godlyCompassion;
