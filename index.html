@@ -411,6 +411,25 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .fx-part{animation:fxPart .85s ease-out forwards;position:fixed;pointer-events:none;z-index:1000} /* v560: slowed so the element reads */
 @keyframes fxSummonIn{0%{transform:scale(.5);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1);opacity:1}}
 .fx-summon{animation:fxSummonIn .4s ease-out}
+
+/* ═══ v995: Sacred Oblation picker ═══════════════════════════════════════════
+   Was a stacked flex list with an 18px emoji and 10px passive/special lines, so a
+   player choosing what to oblate could not read what they were choosing (Arnold,
+   Aug 10). Now a card grid with the real pixel-art portrait; the passive and
+   special lines carry specAttrs(), reusing the existing floating #relic-tooltip
+   so the full effect text is one hover (or tap) away and nothing can clip it. */
+.so-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:6px}
+.so-card{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 6px;
+  background:#150d00;border:0.5px solid #6a5200;border-radius:8px;text-align:center}
+.so-card.so-locked{opacity:.45}
+.so-art{height:46px;display:flex;align-items:center;justify-content:center}
+.so-name{font-size:12px;font-weight:600;color:var(--tx);line-height:1.2}
+.so-lv{font-size:10px;color:var(--td);font-weight:400}
+.so-line{font-size:11px;line-height:1.3;margin-top:1px;border-bottom:0.5px dotted transparent}
+.so-line:hover{border-bottom-color:currentColor}
+.so-pass{color:#a0c060}
+.so-spec{color:#60a0d0}
+.so-btn{font-size:11px;padding:4px 10px;border-color:#d4af37;color:#d4af37;margin-top:5px;width:100%}
 </style>
 <div style="position:relative">
 <div id="notif" class="notif"></div>
@@ -2372,7 +2391,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v990'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v996'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -4434,7 +4453,31 @@ function unitNPCost(u){
   return Math.round((base+Math.floor(lv/2)+Math.floor(lv/20))*highLvMult);
 }
 // v309: ALLY growth curve — flat 4% per level. The 5-level milestone bumps are replaced by Soul Surge.
+/* v993: scA is now the FLAT curve ONLY. It survives because Soul Surge snapshots are defined
+   against a surge-free, milestone-free base (see surgePick's v333 note) and must stay that way
+   until the capstone build rules on it. Every site that builds or displays a real ally stat uses
+   scR instead. If you are adding a new ally stat calculation, you almost certainly want scR. */
 function scA(base,lv){return Math.round(base*Math.pow(1.04,lv-1));}
+/* ═══ v993: ROLE-AWARE ALLY GROWTH ═══
+   Allies grew on a flat 1.04^(lv-1) while enemies (sc) carried an extra 1.08 per 10 levels. That
+   milestone term is the whole late-game divergence: by Lv70 enemies were 58.7% ahead of allies on
+   identical base stats, which is why L7-L8 vassals died in 2-3 hits (Arnold, Aug 10 playtest).
+   Allies now carry their own milestone term. Gods 1.07, vassals 1.06, enemies unchanged at 1.08 --
+   so gods close most of the gap, vassals close about two-thirds, and descending still bites.
+   Mini-boss captures are vassals here; their separation from ordinary vassals is handled by base
+   stats and blood cost, not by the curve.
+      lv        20     30     40     50     60     70     74
+      god 1.07  1.070  1.145  1.225  1.311  1.403  1.501  1.606
+      vas 1.06  1.060  1.124  1.191  1.262  1.338  1.419  1.504
+      enm 1.08  1.080  1.166  1.260  1.360  1.469  1.587  1.714
+   ONE constant each -- retune here and nowhere else. */
+const ALLY_MILESTONE={god:1.07,vassal:1.06};
+function growthMult(lv,isGod){return Math.pow(isGod?ALLY_MILESTONE.god:ALLY_MILESTONE.vassal,Math.floor((Math.max(1,lv||1)-1)/10));}
+function scR(base,lv,isGod){return Math.round(base*Math.pow(1.04,Math.max(1,lv||1)-1)*growthMult(lv,isGod));}
+/* Both of these take a surge KEY, and keys are 'god_<id>' for gods and a capture id otherwise --
+   the same test baseNpCostFor already uses. Deriving the role in here keeps ~30 call sites
+   correct without touching any of them. */
+function isGodKey(key){return String(key||'').startsWith('god_');}
 // sc() below is the ENEMY curve.
 function sc(base,lv){
   // v317 BALANCE TEST: +4% per level, +8% milestone every 10 levels (was every 5) —
@@ -4930,8 +4973,8 @@ function baseNpCostFor(key){
   const b=unitBaseFor(key);if(!b)return 10;
   return baseNpCostFromObj(b,getLevel(key),String(key).startsWith('god_'));
 }
-function maxNPFor(key,baseNp){return Math.round(scA(baseNp,getLevel(key)))+surgeBonus(key).tp;}
-function allyMaxHpFor(key,baseHp,mult){return Math.round(scA(baseHp,getLevel(key))*(mult||1))+surgeBonus(key).hp;}
+function maxNPFor(key,baseNp){return scR(baseNp,getLevel(key),isGodKey(key))+surgeBonus(key).tp;} /* v993 */
+function allyMaxHpFor(key,baseHp,mult){return Math.round(scR(baseHp,getLevel(key),isGodKey(key))*(mult||1))+surgeBonus(key).hp;} /* v993 */
 // v514: current roster HP for a unit between battles. Precedence: absolute override (event
 // penalties/heals — always pre-offering scale) → persisted RATIO from the last battle → full.
 // Ratios are scale-free, which fixes the v511–v513 bug where offering-multiplied battle HP was
@@ -5351,10 +5394,29 @@ function getAllyPool(){
   const caps=G.captured.map(cu=>{const eid=cu._captureId||cu.id;return{id:cu.id,_captureId:cu._captureId,name:cu.name,icon:cu.icon,element:cu.element,type:cu.type,atk:cu.atk,mag:cu.mag,np:cu.np,ability:cu.ability,ad:cu.ad,isGod:false,capData:cu,level:getLevel(eid)};});
   return[...gods.sort((a,b)=>b.level-a.level),...caps.sort((a,b)=>b.level-a.level)];
 }
-function autoSel(){G.deplSel=getAllyPool().slice(0,getMaxAllies()).map(u=>u._captureId||u.id);}
+/* v992: Hollow Warrior and Hollow Breath are the two weakest units in the game (55/40 HP,
+   8 ATK / 7 MAG) but they win every auto-fill tie: on Layer 1 nearly everything is Lv1-8, so
+   ties are constant, Array.sort is stable, and the tutorial pair sits at the HEAD of G.captured
+   because they are captured in B1. They are now sorted LAST for auto-fill purposes only --
+   never filtered out, so they still take a slot when nothing else is available. Deliberately
+   applied here rather than inside getAllyPool, which also feeds the Edit Party list where the
+   roster should stay in its normal order. */
+function isTutorialUnit(u){
+  if(!u)return false;
+  const cd=u.capData||u;
+  if(cd.tutorial)return true;
+  const bid=cd.baseId||cd.id||'';
+  const def=(typeof unitDefById==='function')?unitDefById(bid):null; /* old saves whose entry predates the flag */
+  return !!(def&&def.tutorial);
+}
+function autoFillPool(){
+  const pool=getAllyPool();
+  return[...pool.filter(u=>!isTutorialUnit(u)),...pool.filter(isTutorialUnit)];
+}
+function autoSel(){G.deplSel=autoFillPool().slice(0,getMaxAllies()).map(u=>u._captureId||u.id);}
 function smartAutoSel(){
   // Preserve existing deplSel where units are still alive/in roster; only fill empty slots
-  const pool=getAllyPool();
+  const pool=autoFillPool();
   const validIds=new Set(pool.map(u=>u._captureId||u.id));
   // Remove dead or removed units from existing selection
   G.deplSel=G.deplSel.filter(sid=>validIds.has(sid));
@@ -6312,8 +6374,8 @@ function mkGod(gdId,b1){
   const lv=getLevel('god_'+gd.id);const isP=gd.id===G.god.id;
   const baseId='god_'+gd.id;
   const sb=surgeBonus(baseId); // v309: Soul Surge flat bonuses
-  const maxNP=Math.round(scA(gd.np||30,lv))+sb.tp;
-  const godMaxHp=Math.round(scA(gd.hp,lv)*(G.dte.godHpMult||1))+sb.hp;
+  const maxNP=scR(gd.np||30,lv,true)+sb.tp; /* v993 */
+  const godMaxHp=Math.round(scR(gd.hp,lv,true)*(G.dte.godHpMult||1))+sb.hp; /* v993 */
   const overrideHpG=G.unitHpOverride?G.unitHpOverride[baseId]:undefined;
   const ratioHpG=G.unitHpRatio?G.unitHpRatio[baseId]:undefined;
   // v514: absolute override (event penalty, pre-offering scale) consumed once; else persisted ratio
@@ -6321,8 +6383,8 @@ function mkGod(gdId,b1){
   if(overrideHpG!==undefined)delete G.unitHpOverride[baseId];
   return{...gd,id:baseId,baseGodId:gd.id,level:lv,
     maxHp:godMaxHp,currentHp:godStartHp,
-    atk:scA(gd.atk||0,lv)+sb.atk,mag:scA(gd.mag||0,lv)+sb.mag,
-    def:scA(gd.def,lv)+sb.def,res:scA(gd.res||5,lv)+sb.res,
+    atk:scR(gd.atk||0,lv,true)+sb.atk,mag:scR(gd.mag||0,lv,true)+sb.mag, /* v993 */
+    def:scR(gd.def,lv,true)+sb.def,res:scR(gd.res||5,lv,true)+sb.res,
     maxNP,currentNP:getUnitNP(baseId,maxNP),
     npCost:Math.max(1,baseNpCostFor(baseId)-sb.cost-getOfferingEffects().tpCostFlat),
     _npBase:baseNpCostFor(baseId),_npReduce:(sb.cost+getOfferingEffects().tpCostFlat),
@@ -6334,9 +6396,9 @@ function mkCap(cu,slot,b1){
   const ck=capKey(cu); // unique key per captured instance
   const lv=getLevel(ck);
   const sb=surgeBonus(ck); // v309: Soul Surge flat bonuses
-  const maxNP=Math.round(scA(cu.np||20,lv))+sb.tp;
+  const maxNP=scR(cu.np||20,lv,false)+sb.tp; /* v993 */
   const hpPenalty=G.unitHpPenalty&&G.unitHpPenalty[ck]?G.unitHpPenalty[ck]:0;
-  const baseMaxHp=Math.round(scA(cu.hp,lv)*(G.dte.vassalHpMult||1))+sb.hp;
+  const baseMaxHp=Math.round(scR(cu.hp,lv,false)*(G.dte.vassalHpMult||1))+sb.hp; /* v993 */
   const overrideHp=G.unitHpOverride?G.unitHpOverride[ck]:undefined;
   const ratioHp=G.unitHpRatio?G.unitHpRatio[ck]:undefined;
   // v514: absolute override (event penalty, pre-offering scale) consumed once; else persisted ratio
@@ -6344,8 +6406,8 @@ function mkCap(cu,slot,b1){
   if(overrideHp!==undefined)delete G.unitHpOverride[ck]; // consume once
   return{...cu,id:'cap_'+(cu._captureId||cu.id)+'_'+slot,baseId:cu.id,_captureId:cu._captureId,level:lv,
     maxHp:baseMaxHp,currentHp:startHp,
-    atk:scA(cu.atk||0,lv)+sb.atk,mag:scA(cu.mag||0,lv)+sb.mag,
-    def:scA(cu.def,lv)+sb.def,res:scA(cu.res||4,lv)+sb.res,
+    atk:scR(cu.atk||0,lv,false)+sb.atk,mag:scR(cu.mag||0,lv,false)+sb.mag, /* v993 */
+    def:scR(cu.def,lv,false)+sb.def,res:scR(cu.res||4,lv,false)+sb.res,
     maxNP,currentNP:getUnitNP(ck,maxNP),
     npCost:Math.max(1,baseNpCostFor(ck)-sb.cost-getOfferingEffects().tpCostFlat),
     _npBase:baseNpCostFor(ck),_npReduce:(sb.cost+getOfferingEffects().tpCostFlat),
@@ -10993,7 +11055,9 @@ function spawnReinforcement(){
 function spawnTlaloque(enemyLv){
   const lv=enemyLv||1;
   const baseHp=45,baseMag=16,baseDef=3,baseRes=5,baseNP=15;
-  const maxHp=scA(baseHp,lv),mag=scA(baseMag,lv),def=scA(baseDef,lv),res=scA(baseRes,lv),maxNP=scA(baseNP,lv);
+  /* v993: vassal curve — a Tlaloque joins G.captured, so mkCap rebuilds it on the vassal curve
+     next battle. Spawning it flat made it weaker on the turn it appeared than ever after. */
+  const maxHp=scR(baseHp,lv,false),mag=scR(baseMag,lv,false),def=scR(baseDef,lv,false),res=scR(baseRes,lv,false),maxNP=scR(baseNP,lv,false);
   const captureId='tlaloque_'+Date.now()+'_'+Math.random().toString(36).slice(2,5);
   // Use captureId as the entry's id so deplSel lookups match directly
   const rosterEntry={
@@ -11035,7 +11099,7 @@ function spawnTlaloqueAsSpoil(enemyLv){
   G.captured.push(rosterEntry);
   G.levels[captureId]=lv;
   if(!G._spoilIdx)G._spoilIdx=0;
-  G.spoils.captured.push({unit:{...rosterEntry,maxHp:scA(45,lv),enemyLevel:lv,element:'water'},blood:0,cacao:0,tlaloqueJoin:true,_idx:++G._spoilIdx});
+  G.spoils.captured.push({unit:{...rosterEntry,maxHp:scR(45,lv,false),enemyLevel:lv,element:'water'},blood:0,cacao:0,tlaloqueJoin:true,_idx:++G._spoilIdx});
   addLog(`<span class="log-water">🌧 Party was full — Tlaloque (Lv${lv}) will join after battle!</span>`);
 }
 
@@ -12926,7 +12990,14 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   if(ab==='Ancestral Storm'&&ae.length){
     const tgt=ae.reduce((a,b)=>a.currentHp<b.currentHp?a:b);
     const h=Math.round(tgt.maxHp*.33);tgt.currentHp=healTo(tgt,h);
-    grantChimalli(tgt,0.04,'Ancestral Storm'); // chimalli — no cleanse
+    /* v994 CRITICAL FREEZE FIX. v986 replaced a hardcoded 15 in the log below with ${chimaAmt}
+       but never captured grantChimalli's return, and the nearest `const chimaAmt` (Stone
+       Protection, ~14 lines up) is block-scoped to its own if -- so this threw ReferenceError
+       every single time an enemy Storm Ancestor fired Ancestral Storm. The throw unwound
+       enemyFireSpecial -> enemyActsTurn -> the setTimeout chain in processCurrentSlot, so no
+       further timer was ever scheduled and battlePhase stayed 'enemy_acting' forever: a total
+       input lock. Storm Ancestor is a Layer 2 (TEPEME) enemy, so this reached every run from L2 on. */
+    const chimaAmt=grantChimalli(tgt,0.04,'Ancestral Storm'); // chimalli — no cleanse
     G._animQueue.push({uid:tgt.id,dmg:h,isHeal:true});
     addLog(`<span class="log-heal">🌩 Ancestral Storm: ${tgt.icon} +${h} HP + ${chimaAmt} Chimalli!</span>`);return; /* v986: was a hardcoded 15 -- the grant has been 4% of max HP since v975 */
   }
@@ -13474,12 +13545,12 @@ function triggerPatronTurnPassive(actor){
 function mkGodOrCap(cu,idx,lv){
   // Builds a live battle unit from a cap template at given level
   ensureBountyWeights(); // v663: see mkEnemy
-  const maxNP=Math.round(scA(cu.np||20,lv));
+  const maxNP=scR(cu.np||20,lv,false); /* v993: summoned allies ride the vassal curve */
   return{...cu,id:'day_'+cu.id+'_'+Math.random().toString(36).slice(2,5),
     baseId:cu.id,_captureId:'day_'+cu.id+'_summon',
-    maxHp:Math.round(scA(cu.hp,lv)),currentHp:Math.round(scA(cu.hp,lv)),
-    atk:Math.round(scA(cu.atk||0,lv)),mag:Math.round(scA(cu.mag||0,lv)),
-    def:Math.round(scA(cu.def||5,lv)*0.6),res:Math.round(scA(cu.res||4,lv)*0.6),
+    maxHp:scR(cu.hp,lv,false),currentHp:scR(cu.hp,lv,false), /* v993 */
+    atk:scR(cu.atk||0,lv,false),mag:scR(cu.mag||0,lv,false),
+    def:Math.round(scR(cu.def||5,lv,false)*0.6),res:Math.round(scR(cu.res||4,lv,false)*0.6),
     maxNP,currentNP:maxNP,npCost:effectiveNpCost(cu),
     isGod:false,isAlly:true,
     poisonStacks:0,burnStacks:0,paralyzStacks:0,defBuff:0,armor:0,slowStacks:0,woundStacks:0,lethargyStacks:0,atkBuffStacks:0,atkBuffRounds:0,defBuffStacks:0,defBuffRounds:0,fv:cu.fv||5};
@@ -13610,6 +13681,45 @@ function animateArmorHit(uid,dmg){
     el.style.cssText='color:#60c0e0;font-size:13px;left:'+(r.left+r.width/2-22)+'px;top:'+(r.top+6)+'px;';
     document.body.appendChild(el);setTimeout(()=>el.remove(),900);
   },30);
+}
+/* v996: the oblation splash. sacrificeFx and enemySlainFx both anchor to a card's rect, but an
+   oblation is confirmed from a modal that showMo has already torn down by the time the action
+   callback runs -- there is no card left to measure. So this one anchors to the viewport centre
+   and spawns body-level at position:fixed, which also means renderAltar() cannot interrupt it.
+   Reuses the existing sac-flash / blood-stain / blood-spray / blood-drop classes. */
+function oblationFx(godName){
+  const cx=window.innerWidth/2, cy=window.innerHeight*0.42;
+  const size=Math.max(180,Math.min(340,window.innerWidth*0.42));
+  const flash=document.createElement('div');flash.className='sac-flash';
+  flash.style.cssText='left:'+(cx-size/2)+'px;top:'+(cy-size*0.35)+'px;width:'+size+'px;height:'+(size*0.7)+'px;';
+  document.body.appendChild(flash);setTimeout(function(){flash.remove();},450);
+  const stain=document.createElement('div');stain.className='blood-stain';
+  stain.style.cssText='left:'+cx+'px;top:'+cy+'px;width:'+size*0.8+'px;height:'+size*0.8+'px;';
+  document.body.appendChild(stain);setTimeout(function(){stain.remove();},1050);
+  const n=26, spread=size*0.62;
+  for(let i=0;i<n;i++){
+    const ang=(Math.PI*2*i)/n+(Math.random()*0.5-0.25);
+    const mag=spread*(0.45+Math.random()*0.8);
+    const d=document.createElement('div');d.className='blood-spray';
+    d.style.cssText='left:'+(cx+(Math.random()*2-1)*6)+'px;top:'+(cy+(Math.random()*2-1)*6)+'px;'
+      +'--dx:'+(Math.cos(ang)*mag).toFixed(1)+'px;'
+      +'--dy:'+(Math.sin(ang)*mag*0.72+mag*0.45).toFixed(1)+'px;'   /* biased downward: gravity */
+      +'--dur:'+(0.6+Math.random()*0.45).toFixed(2)+'s;animation-delay:'+(Math.random()*0.12).toFixed(2)+'s;';
+    document.body.appendChild(d);setTimeout(function(){d.remove();},1300);
+  }
+  for(let i=0;i<16;i++){
+    const d=document.createElement('div');d.className='blood-drop';
+    d.style.cssText='left:'+(cx+(Math.random()*2-1)*size*0.3)+'px;top:'+(cy+Math.random()*14)+'px;'
+      +'--dx:'+((Math.random()*2-1)*size*0.16).toFixed(1)+'px;--dy:'+(size*0.5+Math.random()*70).toFixed(1)+'px;'
+      +'--dur:'+(0.7+Math.random()*0.5).toFixed(2)+'s;animation-delay:'+(0.05+Math.random()*0.22).toFixed(2)+'s;';
+    document.body.appendChild(d);setTimeout(function(){d.remove();},1500);
+  }
+  if(godName){
+    const lbl=document.createElement('div');lbl.className='dmg-pop';
+    lbl.textContent=godName;
+    lbl.style.cssText='color:#d4af37;font-weight:800;font-size:20px;white-space:nowrap;left:'+(cx-70)+'px;top:'+(cy-size*0.3)+'px;text-shadow:0 0 12px #8a0d1c,0 1px 3px #000;';
+    document.body.appendChild(lbl);setTimeout(function(){lbl.remove();},1200);
+  }
 }
 /* v846: blood spill for a sacrificed unit. Takes the capKey, reads the altar card's rect BEFORE
    the caller re-renders, and spawns everything on document.body so the effect survives the card
@@ -15804,7 +15914,11 @@ function afterSpoils(){
   });
   G._rebirthBaseId=null;G._rebirthBaseId2=null;
   G.pendingEvent=null;G._pendingEventRolled=(G.battleNum>=8); // at B8: keep rolled=true so no event fires
-  if((G.layer||1)<=1)G.deplSel=[]; // v340: only auto-rebuild the party on Layer 1; L2+ keeps the player's manual team and only fills empty slots
+  /* v992: the Layer 1 wipe is gone. It cleared deplSel after EVERY L1 battle and let
+     smartAutoSel refill by level-descending, which silently undid the player's chosen team --
+     the fire-synergy complaint from the Aug 10 playtest. smartAutoSel already never displaces
+     a selected unit (it only fills empty slots), so removing the wipe makes L1 behave like
+     L2+. Run start still fills the opening party, because deplSel is empty there anyway. */
   smartAutoSel();G.chosenDifficulty=null;G.pendingEnemies=null;showShop();
 }
 
@@ -16240,7 +16354,7 @@ function showPenanceLevel(onDoneOverride){
   function render(){
     const chosen=G._penanceLvlChosen||0;
     const mult=Math.pow(1.2,chosen).toFixed(3);
-    const infoText=chosen===0?'<span style="color:#5a4a40">No modifiers — normal difficulty.</span>':`<span style="color:#7a5050">All ${chosen} modifier${chosen!==1?'s':''} will be chosen at the start. One additional will be chosen per layer completed.</span>`;
+    const infoText=chosen===0?'<span style="color:#5a4a40">No modifiers — normal difficulty.</span>':`<span style="color:#7a5050">All ${chosen} modifier${chosen!==1?'s':''} will be chosen at the start.</span>`;
     const btnLabel=chosen>0?'🗡️ Offer the Blade →':'Begin without Penance →';
     const btnStyle=`padding:12px;background:${chosen>0?'#2a0808':'#0e1a0e'};border-color:${chosen>0?'#8b2020':'#2a5a2a'};color:${chosen>0?'#e05050':'#50c080'};font-size:14px`;
     el.innerHTML=`
@@ -16290,7 +16404,7 @@ function updatePenanceDisplay(){
   const btn=document.getElementById('penance-confirm-btn');
   if(d)d.textContent=chosen;
   if(m)m.textContent='TEOTL ×'+mult;
-  if(info)info.innerHTML=chosen===0?'<span style="color:#5a4a40">No modifiers — normal difficulty.</span>':`<span style="color:#7a5050">All ${chosen} modifier${chosen!==1?'s':''} will be chosen at the start. One additional will be chosen per layer completed.</span>`;
+  if(info)info.innerHTML=chosen===0?'<span style="color:#5a4a40">No modifiers — normal difficulty.</span>':`<span style="color:#7a5050">All ${chosen} modifier${chosen!==1?'s':''} will be chosen at the start.</span>`;
   if(btn){
     btn.textContent=chosen>0?'🗡️ Offer the Blade →':'Begin without Penance →';
     btn.style.background=chosen>0?'#2a0808':'#0e1a0e';
@@ -16890,7 +17004,8 @@ function showUnitTooltip(u){
      mkUnitCard but NOT in this scope -- referencing it here would have thrown. */
   const _sk=u.isGod?((u.id&&u.id.indexOf('god_')===0)?u.id:'god_'+(u.baseGodId||(G.god&&G.god.id)||'')):_tk;
   const sb=surgeBonus(_tk);
-  const hp=scA(bo.hp||100,lv)+sb.hp,atk=scA(bo.atk||0,lv)+sb.atk,mag=scA(bo.mag||0,lv)+sb.mag,def=scA(bo.def||0,lv)+sb.def,res=scA(bo.res||0,lv)+sb.res,np=scA(bo.np||20,lv)+sb.tp;
+  const _uG=!!u.isGod; /* v993: mirror mkGod/mkCap -- a flat tooltip over a curved stat is the classic create-vs-patch lie */
+  const hp=scR(bo.hp||100,lv,_uG)+sb.hp,atk=scR(bo.atk||0,lv,_uG)+sb.atk,mag=scR(bo.mag||0,lv,_uG)+sb.mag,def=scR(bo.def||0,lv,_uG)+sb.def,res=scR(bo.res||0,lv,_uG)+sb.res,np=scR(bo.np||20,lv,_uG)+sb.tp;
   const _tpLvMult=lv>=50?1.5:lv>=40?1.25:1;
   const _bcTT=u.isGod?(bo.npCost||14):(bo.npCost||9); // v956
   const npCostAtLv=modelNpCost(_bcTT,lv,sb.cost,u.element,u.isPatron);
@@ -17221,10 +17336,11 @@ function renderTraining(){
     const isPrim=u.type==='MAG';
     const primStat=isPrim?u.mag:u.atk;const primEmoji=isPrim?'🪄':'🗡️';
     const sbPrim=isPrim?sbT.mag:sbT.atk;
-    const cr=scA(u.res||5,lv)+sbT.res,cr2=scA(u.res||5,lv+1)+sbT.res;
-    const cp=scA(primStat||0,lv)+sbPrim,ch=scA(u.hp,lv)+sbT.hp,cd2=scA(u.def,lv)+sbT.def;
-    const np=scA(u.np||20,lv)+sbT.tp,np2=scA(u.np||20,lv+1)+sbT.tp;
-    const np_=scA(primStat||0,lv+1)+sbPrim,nh=scA(u.hp,lv+1)+sbT.hp,nd=scA(u.def,lv+1)+sbT.def;
+    const _uG=!!u.isGod; /* v993: role for scR, used by every stat line and delta below */
+    const cr=scR(u.res||5,lv,_uG)+sbT.res,cr2=scR(u.res||5,lv+1,_uG)+sbT.res;
+    const cp=scR(primStat||0,lv,_uG)+sbPrim,ch=scR(u.hp,lv,_uG)+sbT.hp,cd2=scR(u.def,lv,_uG)+sbT.def;
+    const np=scR(u.np||20,lv,_uG)+sbT.tp,np2=scR(u.np||20,lv+1,_uG)+sbT.tp;
+    const np_=scR(primStat||0,lv+1,_uG)+sbPrim,nh=scR(u.hp,lv+1,_uG)+sbT.hp,nd=scR(u.def,lv+1,_uG)+sbT.def;
     const baseNpCost=u.isGod?(GODS.find(g=>'god_'+g.id===u.id||g.id===u.id.replace('god_',''))?.npCost||14):(u.npCost||9);
     const lv2=lv+1;
     const calcBattleNpCost=(level)=>{
@@ -17247,10 +17363,10 @@ function renderTraining(){
     // v605: level-up reveal — gains accumulated since the pre-burst baseline level flash briefly, then settle
     const _lvfRec=(G._lvFlash&&G._lvFlash[uk]&&(Date.now()-G._lvFlash[uk].t)<2600)?G._lvFlash[uk]:null;
     const lvf=(_lvfRec&&!fl)?(()=>{const L0=_lvfRec.fromLv,p0=primStat||0;return{
-      hp:ch-(scA(u.hp,L0)+sbT.hp),tp:np-(scA(u.np||20,L0)+sbT.tp),
-      atk:u.type==='MIX'?(scA(u.atk||0,lv)-scA(u.atk||0,L0)):(isPrim?0:cp-(scA(p0,L0)+sbPrim)),
-      mag:u.type==='MIX'?(scA(u.mag||0,lv)-scA(u.mag||0,L0)):(isPrim?cp-(scA(p0,L0)+sbPrim):0),
-      def:cd2-(scA(u.def,L0)+sbT.def),res:cr-(scA(u.res||5,L0)+sbT.res),
+      hp:ch-(scR(u.hp,L0,_uG)+sbT.hp),tp:np-(scR(u.np||20,L0,_uG)+sbT.tp), /* v993 */
+      atk:u.type==='MIX'?(scR(u.atk||0,lv,_uG)-scR(u.atk||0,L0,_uG)):(isPrim?0:cp-(scR(p0,L0,_uG)+sbPrim)),
+      mag:u.type==='MIX'?(scR(u.mag||0,lv,_uG)-scR(u.mag||0,L0,_uG)):(isPrim?cp-(scR(p0,L0,_uG)+sbPrim):0),
+      def:cd2-(scR(u.def,L0,_uG)+sbT.def),res:cr-(scR(u.res||5,L0,_uG)+sbT.res),
       lv:lv-L0,cost:npCostNow-modelNpCost(_bcTR,L0,sbT.cost,u.element,u.isPatron)};})():null; // v956
     // v313: ▲ priority — (1) force-gain flash right after a pick, (2) hidden while a surge choice is
     // pending (leveling is blocked), (3) otherwise the classic next-level growth preview returns.
@@ -17302,7 +17418,7 @@ function renderTraining(){
       +'<span class="tc-cost" '+statAttrs('cost')+'>\u2728 Cost: '+_oblCostTC+'</span></div>'
       +'<div class="tc-desc">'+(G._oblationAd||'')+'</div>'):'';
     const statMid=u.type==='MIX'
-      ?('<span data-stat="atk" '+statAttrs('atk')+'>🗡️ <b>ATK</b> '+sg(scA(u.atk||0,lv)+sbT.atk,scA(u.atk||0,lv+1)+sbT.atk,'atk')+'</span><span data-stat="mag" '+statAttrs('mag')+'>🪄 <b>MAG</b> '+sg(scA(u.mag||0,lv)+sbT.mag,scA(u.mag||0,lv+1)+sbT.mag,'mag')+'</span>')
+      ?('<span data-stat="atk" '+statAttrs('atk')+'>🗡️ <b>ATK</b> '+sg(scR(u.atk||0,lv,_uG)+sbT.atk,scR(u.atk||0,lv+1,_uG)+sbT.atk,'atk')+'</span><span data-stat="mag" '+statAttrs('mag')+'>🪄 <b>MAG</b> '+sg(scR(u.mag||0,lv,_uG)+sbT.mag,scR(u.mag||0,lv+1,_uG)+sbT.mag,'mag')+'</span>')
       :('<span data-stat="'+(isPrim?'mag':'atk')+'" '+statAttrs(isPrim?'mag':'atk')+'>'+primEmoji+' <b>'+(isPrim?'MAG':'ATK')+'</b> '+sg(cp,np_,isPrim?'mag':'atk')+'</span>');
     const d=document.createElement('div');d.className='train-card'+(isPatronRow?' tc-patron':'');d.dataset.uk=uk; // v313: hover targeting · v612: patron flair
     d.innerHTML='<div class="tc-head">'
@@ -17396,8 +17512,10 @@ function renderMercs(){
     const tier=u._tier||{lv:1,cost:30};
     const canAfford=G.res.cacao>=tier.cost&&!hired;
     const lv=tier.lv;
-    const hp=Math.round((u.hp||0)*Math.pow(1.04,lv-1));
-    const tpMax=Math.round(scA(u.np||20,lv));
+    /* v993: was an inline hand-copy of the flat curve, so the hire card undersold every merc
+       against what mkCap actually builds. Mercs are vassals. */
+    const hp=scR(u.hp||0,lv,false);
+    const tpMax=scR(u.np||20,lv,false);
     const primEmoji=u.type==='MAG'?'🪄':'🗡️';
     const card=document.createElement('div');
     // v632: training-card anatomy — HP/TP/type/element/special only (+ flowers when the altar exists)
@@ -17643,9 +17761,9 @@ function doSacredOblation(godId){
   const lv=getLevel('god_'+godId)||1;
   const req=oblationLvReq();
   if(lv<req){notify('God must be at least Lv'+req+' to oblate!','#e07070');return;}
-  showMo('✟','Sacred Oblation',
+  showMo('','Sacred Oblation', /* v996: cross dropped -- the title already says it */
     `<div style="font-size:13px;line-height:1.7;color:var(--td)">
-      <div style="text-align:center;margin-bottom:.75rem"><span style="font-size:28px">${g.icon}</span>
+      <div style="text-align:center;margin-bottom:.75rem"><div style="height:60px;display:flex;align-items:center;justify-content:center">${godIconHtml(g,56)}</div>
         <div style="font-size:15px;font-weight:600;color:#d4af37;margin-top:4px">${g.name}</div></div>
       <div style="background:#1a0e00;border:0.5px solid #8a6a00;border-radius:8px;padding:.6rem;margin-bottom:.5rem">
         <div style="font-size:11px;color:#a0c060;font-weight:600;margin-bottom:3px">○ Patron Passive</div>
@@ -17653,7 +17771,7 @@ function doSacredOblation(godId){
       <div style="background:#1a0e00;border:0.5px solid #8a6a00;border-radius:8px;padding:.6rem;margin-bottom:.75rem">
         <div style="font-size:11px;color:#60b0ff;font-weight:600;margin-bottom:3px">◆ Special: ${g.ability}</div>
         <div style="font-size:11px;color:var(--td)">${g.ad||'—'}</div></div>
-      <div style="font-size:12px;color:#e07070">Both will transfer to <strong>${G.god.name}</strong> for this run. ${g.name} will be sacrificed permanently.</div>
+      <div style="font-size:12px;color:#e07070">Both will transfer to <strong>${G.god.name}</strong> for this run. ${g.name} will be sacrificed.</div>
     </div>`,
     [{label:'Confirm Oblation',fn:()=>{
       G.party=G.party.filter(id=>id!==godId);
@@ -17670,10 +17788,12 @@ function doSacredOblation(godId){
       G._oblationAbility=g.ability;G._oblationPassive=g.passive||'';
       G._oblationIcon=g.icon;G._oblationNpCost=g.npCost||20;
       G._oblationGodName=g.name; /* v770: needed by the patron card line */
+      G._oblationGodId=g.id; /* v996: lets the spent notice resolve the pixel-art portrait */
       saveRun();
       notify('✟ Sacred Oblation: '+g.name+' sacrificed — '+G.god.name+' gains their power!','#d4af37');
       addLog('<span style="color:#d4af37">♦ Sacred Oblation: '+g.name+' consumed — '+G.god.name+' inherits '+g.ability+'!</span>');
       renderPartyChips();renderAltar();
+      oblationFx(g.name); /* v996: after the re-render -- body-level fixed, so nothing clips it */
     }},{label:'Cancel',fn:()=>{}}]);
 }
 function renderAltar(){
@@ -17784,27 +17904,43 @@ function renderAltar(){
   if(hasSO&&G._oblationAk){
     const soDone=document.createElement('div');
     soDone.style.cssText='margin-top:.75rem;padding:.6rem;background:#1a1200;border:0.5px solid #8a6a00;border-radius:8px;opacity:.85';
-    soDone.innerHTML='<div style="font-size:11px;color:#d4af37;font-weight:600;margin-bottom:4px">\u271f Sacred Oblation \u2014 spent</div>'
-      +'<div style="font-size:10px;color:var(--td)">'+(G._oblationIcon||'')+' <strong>'+(G._oblationGodName||'An ally god')+'</strong> was given to '+G.god.name+' this run.</div>'
-      +'<div style="font-size:10px;color:#a0c060;margin-top:3px">\u25cb '+((G._oblationPassive||'').split(':')[0]||'\u2014')+'</div>'
-      +'<div style="font-size:10px;color:#60a0d0;margin-top:1px">\u25c6 '+(G._oblationAbility||'\u2014')+'</div>'
-      +'<div style="font-size:10px;color:#806040;margin-top:4px">Only one oblation may be made per run.</div>';
+    /* v996: was five 10px lines that read as fine print. Bigger type, the wording Genaro
+       specified, and the portrait resolved through the stored god id (falling back to name for
+       saves made before v996, then to the raw emoji). */
+    const _og=GODS.find(x=>x.id===G._oblationGodId)||GODS.find(x=>x.name===G._oblationGodName)||null;
+    const _oArt=_og?godIconHtml(_og,22):(G._oblationIcon||'');
+    const _oPassRaw=G._oblationPassive||'';const _oCut=_oPassRaw.indexOf(':');
+    const _oPassName=_oCut>0?_oPassRaw.slice(0,_oCut):(_oPassRaw||'\u2014');
+    const _oPassDesc=(_oCut>0?_oPassRaw.slice(_oCut+1).trim():_oPassRaw)||'\u2014';
+    soDone.innerHTML='<div style="font-size:13px;line-height:1.5"><span style="color:#d4af37;font-weight:600">Sacred Oblation:</span> '
+      +_oArt+' <strong>'+(G._oblationGodName||'An ally god')+'</strong> was given to <strong>'+G.god.name+'</strong> this run.</div>'
+      +'<div style="font-size:13px;color:#d4af37;font-weight:600;margin-top:7px">Gained:</div>'
+      +'<div style="font-size:12px;color:#a0c060;margin-top:2px" '+specAttrs(_oPassName,_oPassDesc)+'>\u25cb '+_oPassName+'</div>'
+      +'<div style="font-size:12px;color:#60a0d0;margin-top:2px" '+specAttrs(G._oblationAbility||'\u2014',G._oblationAd||'\u2014')+'>\u25c6 '+(G._oblationAbility||'\u2014')+'</div>'
+      +'<div style="font-size:11px;color:#806040;margin-top:6px">Only one oblation may be made per run.</div>';
     godEl.appendChild(soDone);
   }
   else if(hasSO&&soGods.length){
     const soDiv=document.createElement('div');soDiv.style.cssText='margin-top:.75rem;padding:.6rem;background:#1a1200;border:0.5px solid #8a6a00;border-radius:8px';
     let soHtml='<div style="font-size:11px;color:#d4af37;font-weight:600;margin-bottom:4px">✟ Sacred Oblation</div>'
       +'<div style="font-size:10px;color:var(--td);margin-bottom:6px">Sacrifice an ally god to grant their patron ability <em>and</em> special to '+G.god.name+' for this run. Requires Lv'+lvReq+'.</div>';
+    /* v995: g.passive is 'Name: effect text' -- the row shows the name, the tooltip the effect.
+       Split on the FIRST colon only; several passive descriptions contain further colons. */
+    soHtml+='<div class="so-grid">';
     soGods.forEach(g=>{
       const canOblate=g._lv>=lvReq;
-      soHtml+='<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-top:0.5px solid #3a2a00;'+(canOblate?'':'opacity:0.5;')+'">';
-      soHtml+='<span style="font-size:18px;margin-top:2px">'+g.icon+'</span>';
-      soHtml+='<div style="flex:1"><div style="font-size:12px;font-weight:600">'+g.name+' <span style="font-size:10px;color:var(--td)">Lv'+g._lv+'</span></div>';
-      soHtml+='<div style="font-size:10px;color:#a0c060;margin-top:1px">○ '+(g.passive.split(':')[0]||g.passive)+'</div>';
-      soHtml+='<div style="font-size:10px;color:#60a0d0;margin-top:1px">◆ '+g.ability+'</div></div>';
-      soHtml+='<button class="btn" style="font-size:11px;padding:4px 10px;border-color:#d4af37;color:#d4af37;flex-shrink:0" '+(canOblate?'onclick="doSacredOblation(\''+g.id+'\')"':'disabled')+'>† Oblate</button>';
+      const _pRaw=g.passive||'';const _pCut=_pRaw.indexOf(':');
+      const _pName=_pCut>0?_pRaw.slice(0,_pCut):(_pRaw||'\u2014');
+      const _pDesc=(_pCut>0?_pRaw.slice(_pCut+1).trim():_pRaw)||'\u2014';
+      soHtml+='<div class="so-card'+(canOblate?'':' so-locked')+'">';
+      soHtml+='<div class="so-art">'+godIconHtml(g,44)+'</div>';
+      soHtml+='<div class="so-name">'+g.name+' <span class="so-lv">Lv'+g._lv+'</span></div>';
+      soHtml+='<div class="so-line so-pass" '+specAttrs(_pName,_pDesc)+'>\u25cb '+_pName+'</div>';
+      soHtml+='<div class="so-line so-spec" '+specAttrs(g.ability||'\u2014',g.ad||'\u2014')+'>\u25c6 '+(g.ability||'\u2014')+'</div>';
+      soHtml+='<button class="btn so-btn" '+(canOblate?'onclick="doSacredOblation(\''+g.id+'\')"':'disabled')+'>\u2020 Oblate</button>';
       soHtml+='</div>';
     });
+    soHtml+='</div>';
     if(G._oblationHistory&&G._oblationHistory.length){
       soHtml+='<div style="margin-top:6px;padding-top:6px;border-top:0.5px solid #5a4a00;font-size:10px;color:#d4af37;font-weight:600">Inherited Powers:</div>';
       G._oblationHistory.forEach(ob=>{soHtml+='<div style="font-size:10px;color:var(--td);margin-top:3px">'+ob.icon+' <strong>'+ob.name+'</strong>: ○ '+ob.passive+' · ◆ '+ob.ability+'</div>';});
