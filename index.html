@@ -359,6 +359,12 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .crit-flash{animation:critFlash .4s ease;}
 @keyframes critFlash{0%{transform:scale(1)}20%{transform:scale(1.18)}60%{transform:scale(1.05)}100%{transform:scale(1)}}.act-pulse{animation:actPulse .3s ease}
 .heal-flash{animation:healFlash .4s ease}
+/* v1026: the status callout. The badge animation says WHICH status a unit now carries; this says
+   THAT ONE JUST LANDED, in the same visual language as the damage number so the two read as one
+   event. Offset below the damage number so they never overlap, and staggered when a single AoE
+   afflicts several targets at once. */
+@keyframes stCallout{0%{opacity:0;transform:translateY(6px) scale(.6)}15%{opacity:1;transform:translateY(-2px) scale(1.18)}25%{transform:translateY(-4px) scale(1)}55%{opacity:1;transform:translateY(-9px) scale(1)}100%{opacity:0;transform:translateY(-30px) scale(.95)}}
+.st-callout{position:fixed;font-size:13px;font-weight:800;letter-spacing:.4px;pointer-events:none;z-index:9999;animation:stCallout 1.26s ease-out forwards;text-shadow:0 1px 3px #000c,0 0 8px currentColor;white-space:nowrap}
 .dmg-pop{position:fixed;font-size:15px;font-weight:700;pointer-events:none;z-index:9999;animation:dmgFloat .9s ease-out forwards;text-shadow:0 1px 3px #000a;white-space:nowrap}
 @keyframes reviveBurst{0%{transform:scale(.9);box-shadow:0 0 0 0 rgba(255,215,120,0)}25%{transform:scale(1.07);box-shadow:0 0 18px 6px rgba(255,215,120,.6)}60%{box-shadow:0 0 12px 3px rgba(120,220,140,.5)}100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,215,120,0)}}
 .revive-burst{animation:reviveBurst 1.1s ease-out}
@@ -430,6 +436,62 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .so-pass{color:#a0c060}
 .so-spec{color:#60a0d0}
 .so-btn{font-size:11px;padding:4px 10px;border-color:#d4af37;color:#d4af37;margin-top:5px;width:100%}
+
+/* ═══ v1025: STATUS AFFLICTION FX ═══════════════════════════════════════════════
+   Two playtesters could not tell when a status landed (Aug 10 notes). The animation is on the
+   BADGE, not the card: four overlapping card-level auras turn to mush, whereas four badges each
+   doing their own micro-motion in the status row compose cleanly at any count and stay readable.
+   Each motion reads as the thing it is -- Burn flares, Poison seeps down, Paralyze jolts and
+   freezes, Wound cuts sideways, Lethargy sags, Drunk wobbles, Slow stutters. All respect fxOn(),
+   so Minimal FX and prefers-reduced-motion skip them. */
+@keyframes stPop{0%{transform:scale(.4);opacity:0}45%{transform:scale(1.35);opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes stBurn{0%{transform:scale(.4) translateY(7px);opacity:0;filter:brightness(2.6)}35%{transform:scale(2.1) translateY(-5px);opacity:1;filter:brightness(2.2) drop-shadow(0 0 7px #ff7a20)}65%{transform:scale(1.4) translateY(-1px);filter:brightness(1.5) drop-shadow(0 0 4px #ff7a20)}100%{transform:scale(1);filter:brightness(1)}}
+@keyframes stPoison{0%{transform:scale(.4) translateY(-11px);opacity:0}35%{transform:scale(2.0) translateY(5px);opacity:1;filter:drop-shadow(0 0 7px #90d030)}65%{transform:scale(1.35) translateY(-2px);filter:drop-shadow(0 0 4px #90d030)}100%{transform:scale(1) translateY(0)}}
+@keyframes stPara{0%{transform:scale(.4);opacity:0;filter:brightness(3.4)}16%{transform:scale(2.1) translateX(-7px);opacity:1;filter:brightness(2.6) drop-shadow(0 0 8px #ffe040)}28%{transform:scale(2.0) translateX(7px)}40%{transform:scale(1.8) translateX(-5px)}52%{transform:scale(1.7) translateX(5px)}68%{transform:scale(1.35) translateX(0);filter:brightness(1.8) drop-shadow(0 0 4px #ffe040)}100%{transform:scale(1);filter:brightness(1)}}
+@keyframes stWound{0%{transform:scale(.4) translateX(-18px) skewX(-26deg);opacity:0}32%{transform:scale(2.1) translateX(7px) skewX(14deg);opacity:1;filter:drop-shadow(0 0 8px #ff4040)}62%{transform:scale(1.4) translateX(-2px) skewX(0);filter:drop-shadow(0 0 4px #ff4040)}100%{transform:scale(1) translateX(0)}}
+@keyframes stLeth{0%{transform:scale(.4) translateY(-13px);opacity:0}40%{transform:scale(1.95) translateY(7px);opacity:1;filter:drop-shadow(0 0 7px #c080ff)}68%{transform:scale(1.35) translateY(2px);filter:drop-shadow(0 0 4px #c080ff)}100%{transform:scale(1) translateY(0)}}
+@keyframes stDrunk{0%{transform:scale(.4) rotate(-22deg);opacity:0}28%{transform:scale(2.0) rotate(17deg);opacity:1;filter:drop-shadow(0 0 7px #e0a040)}48%{transform:scale(1.7) rotate(-13deg)}68%{transform:scale(1.4) rotate(8deg);filter:drop-shadow(0 0 4px #e0a040)}85%{transform:scale(1.15) rotate(-4deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes stSlow{0%{transform:scale(.4);opacity:0}22%{transform:scale(2.05);opacity:1;filter:drop-shadow(0 0 8px #60c0c0)}34%{transform:scale(2.0)}54%{transform:scale(2.0)}70%{transform:scale(1.45);filter:drop-shadow(0 0 4px #60c0c0)}82%{transform:scale(1.45)}100%{transform:scale(1)}}
+.st-fx-burn    span{animation:stBurn   .60s cubic-bezier(.2,.9,.3,1) both}
+.st-fx-poison  span{animation:stPoison .62s cubic-bezier(.3,.8,.4,1) both}
+.st-fx-paralyze span{animation:stPara  .70s cubic-bezier(.2,1,.3,1) both}
+.st-fx-wound   span{animation:stWound  .55s cubic-bezier(.2,.9,.3,1) both}
+.st-fx-lethargy span{animation:stLeth  .75s cubic-bezier(.4,.6,.5,1) both}
+.st-fx-drunk   span{animation:stDrunk  .80s cubic-bezier(.3,.8,.4,1) both}
+.st-fx-slow    span{animation:stSlow   .85s steps(1,end) both}
+.st-fx-generic span{animation:stPop    .50s cubic-bezier(.2,.9,.3,1) both}
+
+/* ═══ v1032: SACRED OBLATION TRANSFER ══════════════════════════════════════════
+   The v996 blood splash said "something died" but not WHAT happened. This shows both gods: the
+   sacrificed one dims, drains and collapses while its power crosses to the patron, who flares.
+   Full-screen fixed overlay so no re-render can clip it; dismisses itself. */
+@keyframes oblFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes oblFadeOut{from{opacity:1}to{opacity:0}}
+@keyframes oblGiverDie{0%{filter:none;transform:scale(1)}
+  30%{filter:brightness(1.5) saturate(1.4)}
+  55%{filter:grayscale(.55) brightness(.8);transform:scale(.97)}
+  100%{filter:grayscale(1) brightness(.35);transform:scale(.9) translateY(10px);opacity:.25}}
+@keyframes oblTakerRise{0%{transform:scale(1);filter:none}
+  50%{transform:scale(1);filter:none}
+  68%{transform:scale(1.22);filter:brightness(1.9) drop-shadow(0 0 22px #d4af37)}
+  100%{transform:scale(1.06);filter:brightness(1.15) drop-shadow(0 0 12px #d4af37)}}
+@keyframes oblMote{0%{opacity:0;transform:translate(0,0) scale(.5)}
+  12%{opacity:1;transform:translate(calc(var(--mx)*.15),calc(var(--my)*.15 - 14px)) scale(1)}
+  100%{opacity:0;transform:translate(var(--mx),var(--my)) scale(.35)}}
+@keyframes oblArc{0%{opacity:0;transform:scaleX(0)}25%{opacity:.9;transform:scaleX(1)}100%{opacity:0;transform:scaleX(1)}}
+.obl-ov{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at center,#1a0a0acc 0%,#000000ee 70%);animation:oblFadeIn .28s ease-out both;pointer-events:none}
+.obl-row{display:flex;align-items:center;gap:clamp(18px,7vw,70px)}
+.obl-fig{display:flex;flex-direction:column;align-items:center;gap:7px}
+.obl-name{font-size:12px;font-weight:700;letter-spacing:.4px;text-shadow:0 1px 4px #000}
+.obl-giver{animation:oblGiverDie 2.0s ease-in .35s both}
+.obl-taker{animation:oblTakerRise 2.0s ease-out .35s both}
+.obl-arc{height:2px;width:clamp(40px,12vw,120px);transform-origin:left center;
+  background:linear-gradient(90deg,#8a0d1c00,#d4af37,#8a0d1c00);animation:oblArc 1.5s ease-out .5s both}
+.obl-mote{position:absolute;width:6px;height:6px;border-radius:50%;background:#d4af37;
+  box-shadow:0 0 8px #d4af37,0 0 16px #8a0d1c;animation:oblMote 1.25s ease-out both}
+.obl-title{position:absolute;top:16%;left:0;right:0;text-align:center;font-size:15px;font-weight:800;
+  color:#d4af37;letter-spacing:1.5px;text-shadow:0 0 14px #8a0d1c,0 1px 4px #000;animation:oblFadeIn .5s ease-out both}
 </style>
 <div style="position:relative">
 <div id="notif" class="notif"></div>
@@ -864,13 +926,13 @@ const CHAMPIONS_RECENT_CAP=20;
 function loadDT(){
   try{
     const d=localStorage.getItem('teotlan_dt');
-    if(d){const p=JSON.parse(d);DT.teotl=p.teotl||0;DT.unlocked=new Set(p.unlocked||[]);DT.tecpatl_level=p.tecpatl_level||0;DT.tecpatlBeaten=p.tecpatlBeaten||0;DT.tecpatl_seen=new Set(p.tecpatl_seen||[]);DT.godTecpatl=p.godTecpatl||{};DT.champions=p.champions||{};DT.blessedGod=p.blessedGod||null;} // v830 · v937: loadDT rebuilds DT from a fixed whitelist, so anything absent here is silently dropped on reload -- which is exactly how the blessing vanished
+    if(d){const p=JSON.parse(d);DT.teotl=p.teotl||0;DT.unlocked=new Set(p.unlocked||[]);DT.tecpatl_level=p.tecpatl_level||0;DT.tecpatlBeaten=p.tecpatlBeaten||0;DT.tecpatl_seen=new Set(p.tecpatl_seen||[]);DT.godTecpatl=p.godTecpatl||{};DT.champions=p.champions||{};DT.blessedGod=p.blessedGod||null;DT.blessedUsed=!!p.blessedUsed;} /* v1019 */ // v830 · v937: loadDT rebuilds DT from a fixed whitelist, so anything absent here is silently dropped on reload -- which is exactly how the blessing vanished
     // v303 migration: dmg_preview became Strike Boost's prereq — grant it free to saves that already own strike_boost
     if(DT.unlocked.has('strike_boost')&&!DT.unlocked.has('dmg_preview'))DT.unlocked.add('dmg_preview');
     // No auto-unlocks: player must interact with Divinity Tree
   }catch(e){DT={teotl:0,unlocked:new Set(),champions:{}}} // v830
 }
-function saveDT(){try{localStorage.setItem('teotlan_dt',JSON.stringify({teotl:DT.teotl,unlocked:[...DT.unlocked],tecpatl_level:DT.tecpatl_level,tecpatlBeaten:DT.tecpatlBeaten||0,tecpatl_seen:[...DT.tecpatl_seen],godTecpatl:DT.godTecpatl,champions:DT.champions,blessedGod:DT.blessedGod||null}));}catch(e){}}
+function saveDT(){try{localStorage.setItem('teotlan_dt',JSON.stringify({teotl:DT.teotl,unlocked:[...DT.unlocked],tecpatl_level:DT.tecpatl_level,tecpatlBeaten:DT.tecpatlBeaten||0,tecpatl_seen:[...DT.tecpatl_seen],godTecpatl:DT.godTecpatl,champions:DT.champions,blessedGod:DT.blessedGod||null,blessedUsed:!!DT.blessedUsed}));}catch(e){}}
 loadDT();
 
 // ── OFFERINGS (v346) — Slay-the-Spire "relic" model: held = effect active for the run, ──
@@ -1004,7 +1066,7 @@ const OFFERINGS={
   sak_tahn_waax:{name:'Sak Tahn Waax Calendar',tier:'rare',icon:'\u{1F4C5}',price:600,priceType:'cacao',flowerPrice:20,desc:'Every 12 rounds, deal 20% of max HP to all enemies \u2014 the count carries between battles',flavor:'A Maya long-count wheel, patient as erosion. It does not care which fight you are in.'},
   // Event-exclusive — Patecatl's Apothecary (migrated from runBoosts)
   sacred_atole:{name:'Sacred Atole',tier:'event',icon:'🌽',desc:'Party +25% max HP',flavor:'Warmth settles into your bones.',eff:{hpMult:1.25}},
-  tecuitlatl_cake:{name:'Tecuitlatl Cake',tier:'event',icon:'🍵',desc:'+20% max TP, −5 TP cost',flavor:'Your spirit quickens.',eff:{tpMult:1.20,tpCostFlat:5}},
+  tecuitlatl_cake:{name:'Tecuitlatl Cake',tier:'event',icon:'🍵',desc:'+20% max TP, −10% TP cost',flavor:'Your spirit quickens.',eff:{tpMult:1.20,tpCostMult:0.90}},
   warriors_xocolatl:{name:"Warrior's Xocolatl",tier:'event',icon:'🍫',desc:'Battle-start ATK/MAG UP ×1',flavor:'Fire kindles in your blood.',eff:{battleStartAtkBuff:true}},
   // Event-exclusive — Teocuitlapizque Forge
   obsidian_edge:{name:'Obsidian Edge',tier:'event',icon:'🗡',desc:'Party +25% ATK',flavor:'A blade of black itztli, hungry for war.',eff:{atkMult:1.25}},
@@ -1237,7 +1299,9 @@ function applyOfferings(){
     if(!u.isAlly)return;
     let hpM=oe.hpMult; if(!u.isGod)hpM*=oe.vassalHpMult;
     if(hpM!==1){const nm=Math.round(u.maxHp*hpM);const ratio=u.maxHp>0?u.currentHp/u.maxHp:1;u.maxHp=nm;u.currentHp=Math.min(nm,Math.round(nm*ratio));}
-    if(oe.tpMult!==1){u.maxNP=Math.round((u.maxNP||0)*oe.tpMult);if((u.currentNP||0)>u.maxNP)u.currentNP=u.maxNP;}
+    /* v1021: was raising the ceiling and leaving current TP behind, so a max-TP relic silently
+       started every unit BELOW full. Ratio-preserving now: full stays full. */
+    if(oe.tpMult!==1&&u.maxNP){const _r0=u.maxNP>0?(u.currentNP||0)/u.maxNP:1;u.maxNP=Math.round(u.maxNP*oe.tpMult);u.currentNP=Math.min(u.maxNP,Math.round(u.maxNP*_r0));}
     /* v807: Cucurbita Pumpkin. Flat, so it lands AFTER tpMult -- otherwise the multiplier would
        scale the bonus too and a +10 would silently become +13 with Xocolatl. */
     if(oe.tpFlat>0){u.maxNP=(u.maxNP||0)+oe.tpFlat;u.currentNP=Math.min(u.maxNP,(u.currentNP||0)+oe.tpFlat);}
@@ -1681,9 +1745,95 @@ function pipTap(e,kind,stacks,ally,rounds){
   if(e&&e.stopPropagation)e.stopPropagation();
   statusTipTap(e,kind,stacks,ally,rounds);
 }
+/* v1025: afflictions are announced on the badge that represents them.
+   The queue exists because the applicators run DURING damage resolution, before renderBattle has
+   drawn the badge -- firing immediately would find nothing. Each entry waits for the badge to
+   appear (a few animation frames), then plays once. Deliberately one-shot on the afflicting turn
+   only: a persistent ambient tell on top of this would be visual noise once a unit carries three
+   or four statuses at once. */
+const ST_FX_CLASS={burn:'st-fx-burn',poison:'st-fx-poison',paralyze:'st-fx-paralyze',wound:'st-fx-wound',lethargy:'st-fx-lethargy',drunk:'st-fx-drunk',slow:'st-fx-slow'};
+/* v1026: label, colour and the stack field to read for each status. Slow has no stack counter --
+   it is a duration in _slowedUnits -- so it prints without a multiplier. */
+const ST_FX_META={
+  burn:    {label:'BURN',    col:'#ff8a30', k:'burnStacks'},
+  poison:  {label:'POISON',  col:'#a0e040', k:'poisonStacks'},
+  paralyze:{label:'PARALYZE',col:'#ffe040', k:'paralyzStacks'},
+  wound:   {label:'WOUND',   col:'#ff5a5a', k:'woundStacks'},
+  lethargy:{label:'LETHARGY',col:'#c080ff', k:'lethargyStacks'},
+  drunk:   {label:'DRUNK',   col:'#e0a040', k:'drunkStacks'},
+  slow:    {label:'SLOWED',  col:'#70d0d0', k:null}
+};
+let _stCalloutN=0,_stCalloutT=0;
+/* v1028: the callout generalised. Afflictions, cleanses, shields and restores now speak the same
+   visual language, which is the point -- a player who has learned to read "BURN x2" reads
+   "CLEANSED" without being taught it twice. Takes a card RESOLVER rather than a unit id so the
+   Temazcal, whose cards are shop rows rather than battle units, can use it too. */
+/* v1029: per-target vertical slots. Callouts landing on the SAME card inside a short window
+   stack downward instead of overlapping; different cards are independent, so a six-target AoE
+   still spreads horizontally rather than building one tall column. The window is keyed off the
+   callout lifetime (1.26s) so a slot is only reused once the previous label has cleared. */
+const _CO_SLOT_H=17, _CO_WINDOW=1500;
+const _coSlots=new Map();
+function _coTakeSlot(key){
+  if(!key)return 0;
+  const now=Date.now();
+  const rec=_coSlots.get(key);
+  if(!rec||now-rec.t>_CO_WINDOW){_coSlots.set(key,{n:1,t:now});return 0;}
+  rec.t=now;
+  const slot=rec.n++;
+  return slot%5;                    /* wrap at 5 so a heavily-stacked unit cannot run off the card */
+}
+function fxCallout(resolve,label,col,delayBase,key){
+  if(typeof fxOn==='function'&&!fxOn())return;
+  if(label==null||label==='')return;
+  const now=Date.now();
+  if(now-_stCalloutT>700)_stCalloutN=0;
+  _stCalloutT=now;
+  const slot=_stCalloutN++;
+  const _slot=_coTakeSlot(key);   /* claimed NOW, in call order, so the labels read top-to-bottom */
+  setTimeout(()=>{
+    const el=(typeof resolve==='function')?resolve():resolve;
+    if(!el||!el.getBoundingClientRect)return;
+    const r=el.getBoundingClientRect();
+    if(!r.width&&!r.height)return;               /* card torn out by a re-render before we got here */
+    const pop=document.createElement('div');
+    pop.className='st-callout';
+    pop.textContent=(typeof label==='function')?label():label; /* v1028: lazy, so stack counts read post-increment */
+    pop.style.cssText=`color:${col};left:${r.left+r.width/2-40}px;top:${r.top+30+_slot*_CO_SLOT_H}px`; /* v1029 */
+    document.body.appendChild(pop);
+    setTimeout(()=>{try{pop.remove();}catch(e){}},1380);
+  },(delayBase==null?260:delayBase)+slot*110);
+}
+/* Reads the stack count lazily inside the callback so it reflects the value AFTER the applicator
+   incremented it. 260ms lands just past the damage number: cause reads before effect. */
+function statusCallout(unit,kind){
+  if(!unit||!kind)return;
+  const meta=ST_FX_META[kind];if(!meta)return;
+  fxCallout(()=>((typeof fxCard==='function')?fxCard(unit.id):null),
+            ()=>meta.label+((meta.k&&(unit[meta.k]||0)>1)?(' \u00d7'+(unit[meta.k]||0)):''),
+            meta.col,260,unit.id);
+}
+function statusFx(unit,kind){
+  if(!unit||!kind)return;
+  if(typeof fxOn==='function'&&!fxOn())return;
+  statusCallout(unit,kind); /* v1026: the floating "BURN \u00d72" over the target */
+  const uid=unit.id;const cls=ST_FX_CLASS[kind]||'st-fx-generic';
+  let tries=0;
+  const tick=()=>{
+    if(++tries>24)return;                                  /* ~0.4s of frames, then give up quietly */
+    const card=(typeof fxCard==='function')?fxCard(uid):null;
+    const badge=card&&card.querySelector(`[data-st="${kind}"]`);
+    if(!badge){requestAnimationFrame(tick);return;}
+    badge.classList.remove(cls);void badge.offsetWidth;    /* restart if it is already mid-play */
+    badge.classList.add(cls);
+    setTimeout(()=>{try{badge.classList.remove(cls);}catch(e){}},900);
+  };
+  requestAnimationFrame(tick);
+}
 function pipAttrs(kind,stacks,ally,rounds){ // shared handlers for every status pip — stacks drive the computed text
   const n=stacks||1;const a=ally?1:0;const rd=parseInt(rounds,10)||0; /* v900 */ // v714: ally flag so Poison can read as a heal under Unclean Purification
-  return `style="cursor:help" onmouseenter="statusTip(event,'${kind}',${n},${a},${rd})" onmousemove="statusTip(event,'${kind}',${n},${a},${rd})" onmouseleave="relicTipHide()" ontouchstart="statusTipTap(event,'${kind}',${n},${a},${rd})" onclick="pipTap(event,'${kind}',${n},${a},${rd})"`;
+  /* v1025: data-st lets statusFx locate this exact badge after the repaint. */
+  return `data-st="${kind}" style="cursor:help" onmouseenter="statusTip(event,'${kind}',${n},${a},${rd})" onmousemove="statusTip(event,'${kind}',${n},${a},${rd})" onmouseleave="relicTipHide()" ontouchstart="statusTipTap(event,'${kind}',${n},${a},${rd})" onclick="pipTap(event,'${kind}',${n},${a},${rd})"`;
 }
 function relicTipHide(){const tt=document.getElementById('relic-tooltip');if(tt)tt.style.display='none';}
 // v615: stat tooltips on training cards — same hover/tap behavior as status pips, same #relic-tooltip
@@ -2143,13 +2293,29 @@ function _champOfferingsHtml(ids){
 }
 function _champCard(e){
   const st=e.stats||{};
-  const pen=e.penance>0?`<span style="color:#e08080">\u{1F5E1} Penance ${e.penance}</span>`:'<span style="color:var(--td)">No penance</span>';
+  const pen=e.penance>0?`<span style="color:#e08080">\u{1F5E1} Penance ${e.penance}${e.penanceMult?` \u00d7${(+e.penanceMult).toFixed(2)}`:''}</span>`:'<span style="color:var(--td)">No penance</span>';
+  /* v1023: the history card is its own renderer -- v1016/v1017 added these to the CONQUERED screen
+     only, so a saved champion showed a bare "Penance 3" and no oblation at all. Both read
+     defensively: records written before v1016/v1017 simply omit the rows. */
+  const penMods=(e.penanceMods&&e.penanceMods.length)
+    ? '<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:6px">'
+      +e.penanceMods.map(l=>`<span style="font-size:9.5px;color:#e08080;border:0.5px solid #6a2020;border-radius:6px;padding:1px 6px">${l}</span>`).join('')
+      +'</div>'
+    : '';
+  const oblLine=e.oblationGodName?(()=>{
+      const _og=(typeof GODS!=='undefined')&&(GODS.find(x=>x.id===e.oblationGod)||GODS.find(x=>x.name===e.oblationGodName));
+      const _art=_og?godIconHtml(_og,18):'';
+      return `<div style="margin-top:6px;font-size:10.5px;color:#a060e0;font-weight:600;display:inline-flex;align-items:center;gap:5px">`
+        +`\u2020 Sacred Oblation: ${_art} <strong style="color:#d4af37">${e.oblationGodName}</strong></div>`;
+    })():'';
   const diff=e.difficulty==='hard'?'<span style="color:#ff8040">Hard</span>':'<span style="color:var(--td)">Standard</span>';
   return `<div style="border:0.5px solid #8a6a00;border-radius:12px;padding:.8rem 1rem;margin-bottom:.7rem;background:linear-gradient(180deg,#1a1200,#120c02)">
     <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap">
       <div style="font-size:15px;color:#d4af37;font-weight:700">${e.patronIcon||''} ${e.patronName||e.patron}</div>
       <div style="font-size:10px;color:var(--td)">${_champFmtDate(e.date)} \u00b7 ${diff} \u00b7 ${pen}</div>
     </div>
+    ${penMods}
+    ${oblLine}
     ${_champPartyHtml(e.party)}
     <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:10px;color:var(--td)">
       <span>\u2694 ${e.battles||0} battles</span>
@@ -2420,7 +2586,7 @@ function getTecpatlEffects(){
     npBaneMult:     has('np_bane_2')?1.20:has('np_bane_1')?1.10:1.0,
     tianguisSkip:   has('tianguis_3')?0.30:has('tianguis_2')?0.20:has('tianguis_1')?0.10:0,
     ambushChance:   has('ambush_3')?0.30:has('ambush_2')?0.20:has('ambush_1')?0.10:0,
-    teotlMult:      penanceTeotlMult((G.tecpatl_mods||[]).length), // v1004: 1.1× per modifier (was 1.2×) · v1013: via the shared helper
+    teotlMult:      penanceTeotlMult((G.tecpatl_mods||[]).length), // v1004: per modifier · v1013: shared helper · v1023: additive
   };
 }
 
@@ -2436,13 +2602,17 @@ function getTecpatlEffects(){
    display sites -- so v1004's 1.2 -> 1.1 change moved the payout but left every on-screen figure
    reading the old rate. A player with two modifiers saw "x1.44" while actually banking x1.21.
    PENANCE_TEOTL_RATE is now the only place the number exists; retune here and every reader follows. */
-const PENANCE_TEOTL_RATE=1.1;
+/* v1023: ADDITIVE, not compounding. 1.1 / 1.2 / 1.3 / 1.4 ... rather than 1.1 / 1.21 / 1.33.
+   Compounding made each extra modifier worth MORE than the last, which pushed play toward maximum
+   penance; a flat step keeps every modifier worth exactly the same. Still the single source of
+   truth for the rate -- getTecpatlEffects and all three display sites read penanceTeotlMult(). */
+const PENANCE_TEOTL_STEP=0.1;
 /* v1014: New Fire Knife moved from a flat +30 ATK/MAG to +30%. The flat value was written out
    longhand in three places (reverieRecalc, the modal preview, the buffs strip) -- one constant
    now, so a retune moves all three. Percentage keeps it relevant at depth: +30 was a third of a
    Lv20 fire unit's ATK and rounding error by Lv80. */
 const FIRE_KNIFE_MULT=1.30;
-function penanceTeotlMult(n){return Math.pow(PENANCE_TEOTL_RATE,Math.max(0,n||0));}
+function penanceTeotlMult(n){return 1+PENANCE_TEOTL_STEP*Math.max(0,n||0);}
 const LAYER_BOSS_TEOTL=[
   {layer:1,teotl:5, test:id=>id==='boss'||id.indexOf('boss_xolotl')===0},
   {layer:2,teotl:10,test:id=>id.indexOf('boss_tepy')===0},
@@ -2513,7 +2683,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1018'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1034'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -3010,7 +3180,7 @@ const OBSIDIAN_CAPS=[
   {id:'oe5',name:'Basalt Colossus',icon:'⛰️',element:'earth',type:'PHYS',hp:170,atk:23,mag:0,def:26,res:9,np:28,npCost:25,ability:'Tectonic Slam',ad:'0.9×ATK, 5 targets + Slow ×1',ak:'tectonicSlam',acd:15,fv:6},
   // NIGHT
   {id:'on1',name:'Umbral Shard',icon:'🌑',element:'night',type:'PHYS',hp:85,atk:24,mag:0,def:6,res:3,np:18,npCost:14,ability:'Shadow Cut',ad:'1.5×ATK + WOUND ×2',ak:'shadowCut',acd:10,fv:4},
-  {id:'on2',name:'Obsidian Wraith',icon:'👁️',element:'night',type:'MAG',hp:82,atk:0,mag:30,def:5,res:6,np:20,npCost:30,ability:'Haunt',ad:'0.9×MAG, 5 targets + WOUND ×1 + Poison ×1 each',ak:'haunt',acd:10,fv:4},
+  {id:'on2',name:'Obsidian Wraith',icon:'👁️',element:'night',type:'MAG',hp:82,atk:0,mag:30,def:5,res:6,np:24,npCost:20,ability:'Haunt',ad:'0.9×MAG, 5 targets + WOUND ×1 + Poison ×1 each',ak:'haunt',acd:10,fv:4},
   {id:'on3',name:'Dusk Serpent',icon:'🐍',element:'night',type:'PHYS',hp:110,atk:26,mag:0,def:9,res:4,np:22,npCost:14,ability:'Venom Shade',ad:'1.3×ATK + Poison ×2 + WOUND ×1',ak:'venomShade',acd:11,fv:4},
   {id:'on4',name:'Night Blade',icon:'🗡️',element:'night',type:'PHYS',hp:78,atk:35,mag:0,def:5,res:3,np:18,npCost:16,ability:'Razor Dive',ad:'1.3×ATK + WOUND ×1 + self heals damage dealt',ak:'razorDive',acd:9,fv:4},
   {id:'on5',name:'Void Titan',icon:'🌚',element:'night',type:'PHYS',hp:150,atk:32,mag:0,def:14,res:6,np:28,npCost:30,ability:'Dark Crush',ad:'6-hit multi (ATK×0.3 each) + Slow ×1 + WOUND ×1',ak:'darkCrush',acd:14,fv:5},
@@ -3338,6 +3508,11 @@ MINIBOSS_CAP_STATS['nexoxcho']={hp:190,atk:0,mag:22,def:10,res:14,np:44,npCost:3
 MINIBOSS_CAP_STATS['tlacateocotl']={hp:175,atk:0,mag:20,def:10,res:12,np:44,npCost:36,fv:7,ability:'Death Screech',ad:'1.4×MAG, 3 targets + destroys Chimalli + Burn ×1 + Wound ×1',ak:'deathScreech',type:'MAG',element:'wind'};
 MINIBOSS_CAP_STATS['ometochtli']={hp:188,atk:0,mag:19,def:12,res:12,np:44,npCost:34,fv:7,ability:'Drunken Revel',ad:'0.3×MAG to 6 targets + DRUNK ×2 each + summon 1 Centzon Totochtin',ak:'drunkenRevel',type:'MAG',element:'nature'};
 
+/* v1024: this list existed as THREE identical local copies (resolveCap, fireGodSpecial,
+   processNextCap), two of which were already commented SPLIT-LIST. Block scoping meant the
+   fireGodSpecial copy was not visible inside the Mictlan Clasp branch, which is why the Clasp
+   could not resolve a mini-boss species at all. One definition now; add new mini-bosses here. */
+const MINIBOSS_TEMPLATES=[XOCHITONAL_TPL,QUINAMETZIN_TPL,XIUHNEL_TPL,MIMICH_TPL,MICTLAMPEHECATL_TPL,TLACATEOCOTL_TPL,AMIMITL_TPL,ATLAUA_TPL,ACUECUEYOTL_TPL,OMETOCHTLI_TPL,IXPUXTEQUI_TPL,NEXOXCHO_TPL];
 const MALINALXOCHITL_BOSS_TPL={id:'boss_mal',name:'Malinalxochitl',flavor:'Sorcerer Goddess of the Desert',icon:'🌵',isBoss:true,isAlly:false,element:'fire',type:'MAG',
   ability:'Fiery Stinger',ad:'1.3×MAG to 1 enemy + 0.4×MAG splash + Burn ×2 all targets',ak:'fieryStinger',
   hp:720,atk:0,mag:32,def:10,res:16,np:55,npCost:22,fv:0};
@@ -4230,7 +4405,7 @@ function debugTeotl(n=50){DT.teotl+=(n||50);saveDT();notify(`+${n} TEOTL added (
 function debugSetBlessing(id){
   if(!DT.unlocked.has('ometeotl_blessing')){notify('Ometeotl Blessing is not unlocked.','#e07070');return;}
   if(id&&!GODS.some(g=>g.id===id)){notify('No god with id '+id,'#e07070');return;}
-  DT.blessedGod=id||null;
+  DT.blessedGod=id||null;DT.blessedUsed=false; /* v1019: a hand-set blessing is pending, not spent */
   if(typeof G!=='undefined'&&G)G._blessedGodId=id||null; /* v937 freeze: keep the in-run answer in step */
   try{saveDT();}catch(e){}
   try{renderGods();}catch(e){}
@@ -4243,17 +4418,17 @@ function debugCycleBlessing(){
   const i=pool.findIndex(g=>g.id===DT.blessedGod);
   debugSetBlessing(pool[(i+1)%pool.length].id);
 }
-function debugRerollBlessing(){DT.blessedGod=null;if(typeof G!=='undefined'&&G)G._blessedGodId=null;try{rollOmeteotlBlessing();renderGods();}catch(e){}
+function debugRerollBlessing(){DT.blessedGod=null;DT.blessedUsed=false;if(typeof G!=='undefined'&&G)G._blessedGodId=null;try{rollOmeteotlBlessing();renderGods();}catch(e){}
   const gd=GODS.find(g=>g.id===DT.blessedGod);notify(gd?('\u2726 Rerolled: '+gd.name):'No blessing','#a888e0');}
 /* Distribution test: rolls N times over the live unlocked pool and reports which gods came up.
    Answers "does it skip gods?" directly rather than by feel. Restores the real blessing after. */
 function debugBlessingTest(n=2000){
   const pool=GODS.filter(g=>!(g.locked&&!godUnlocked(g.id)));
   if(!pool.length){notify('No unlocked gods.','#e07070');return;}
-  const saved=DT.blessedGod,counts={};
+  const saved=DT.blessedGod,savedUsed=DT.blessedUsed,counts={};
   pool.forEach(g=>counts[g.id]=0);
-  for(let i=0;i<n;i++){DT.blessedGod=null;rollOmeteotlBlessing();if(counts[DT.blessedGod]!==undefined)counts[DT.blessedGod]++;}
-  DT.blessedGod=saved;try{saveDT();}catch(e){}
+  for(let i=0;i<n;i++){DT.blessedGod=null;DT.blessedUsed=false;rollOmeteotlBlessing();if(counts[DT.blessedGod]!==undefined)counts[DT.blessedGod]++;}
+  DT.blessedGod=saved;DT.blessedUsed=savedUsed;try{saveDT();}catch(e){}
   const exp=n/pool.length;
   const rows=pool.map(g=>{const c=counts[g.id];return {name:g.name,c,pct:(c/n*100).toFixed(1),dev:Math.round((c-exp)/exp*100)};})
                  .sort((a,b)=>b.c-a.c);
@@ -4489,15 +4664,7 @@ function hasRunSave(){
   try{const raw=localStorage.getItem('teotlan_run'); if(!raw)return false;
     const o=JSON.parse(raw); return !!(o&&o.v===RUN_SAVE_VERSION&&o.g);}catch(e){return false;}
 }
-/* v1018: clearRun is the ONE thing every run-end path calls -- victory (showEnding), defeat
-   (screen-defeat) and abandon alike -- so the blessing reroll belongs here rather than in
-   showEnding, which only a WON run reaches. Before this, losing or abandoning left DT.blessedGod
-   set in localStorage and rollOmeteotlBlessing() short-circuits on a still-valid god, so the same
-   god stayed blessed run after run until the player finally won one. */
-function clearRun(){
-  try{localStorage.removeItem('teotlan_run');}catch(e){}
-  DT.blessedGod=null;try{saveDT();}catch(e){}
-}
+function clearRun(){try{localStorage.removeItem('teotlan_run');}catch(e){}}
 /* v844: one-time repair for minibosses captured through the pre-v843 Feather Embrace path.
    Those entries carry baseId = the BATTLE INSTANCE id ('tlacateocotl_5_ab3'), which missed the
    MINIBOSS_CAP_STATS lookup at capture time -- so they were frozen with the {hp:150, mag:<enemy
@@ -4704,6 +4871,46 @@ function scR(base,lv,isGod){return Math.round(base*Math.pow(1.04,Math.max(1,lv||
    the same test baseNpCostFor already uses. Deriving the role in here keeps ~30 call sites
    correct without touching any of them. */
 function isGodKey(key){return String(key||'').startsWith('god_');}
+/* ═══ v1030: CROSS-TYPE OBLATION ═══
+   A pure PHYS god has mag:0 and a pure MAG god has atk:0 -- literally zero, not merely low. So an
+   oblated special that scales off the stat the patron lacks used to deal 1 damage, and v535 papered
+   over it with a hidden "patron's primary / 2" substitution written directly onto the unit mid-cast
+   and restored afterwards. That was invisible to the player, sourced the number from an unrelated
+   stat, and leaked: the override sat between six early returns in fireGodSpecial.
+   The patron now genuinely becomes MIX and inherits 75% of the ORIGINAL OWNER's base for the
+   missing stat, scaled to the patron's own level. One resolver, called by mkGod, the tooltip, the
+   training card and the damage preview, so none of them can disagree. */
+const OBLATION_CROSS_PCT=0.75;
+/* Which stat the oblated ability scales from. The explicit sets are the exceptions -- MIX gods whose
+   type does not settle it, e.g. Itzpapalotl is MIX but Obsidian Storm is an ATK move. Every other
+   god is pure PHYS or pure MAG and its own type answers the question, which is why a bare set of 8
+   used to misclassify the remaining 12 by falling through to the PATRON's type. */
+const OBL_ATK_AK=new Set(['obsidianStorm','aurumBreak','frostMacuahuitl']);
+const OBL_MAG_AK=new Set(['deluge','tlalocanDeluge','featherEmbrace','cripplingShock','oldFire']);
+function oblationSpecStat(ak){
+  const k=ak||G._oblationAk;if(!k)return null;
+  if(OBL_ATK_AK.has(k))return 'atk';
+  if(OBL_MAG_AK.has(k))return 'mag';
+  const g=GODS.find(x=>x.ak===k);if(!g)return null;
+  if(g.type==='PHYS')return 'atk';
+  if(g.type==='MAG')return 'mag';
+  return g.magStrike?'mag':'atk';
+}
+/* Returns {stat,value,fromGod} when the patron needs a stat it does not have, else null.
+   `base` is the patron's TEMPLATE (GODS entry), lv its level. */
+function oblationCrossStat(base,lv){
+  if(!G._oblationAk||!base)return null;
+  /* v1031: a support special does not scale off a damage stat, so granting one is pointless --
+     oblating Ophidian Mother onto a MAG patron was handing it ATK it would never use, and
+     turning it MIX (which changes strike behaviour and the Burn rule) for nothing. Uses the
+     same HEAL_ABILITIES set specIsSupport consults, so the two can never disagree. */
+  if(typeof HEAL_ABILITIES!=='undefined'&&(HEAL_ABILITIES.has(G._oblationAk)||HEAL_ABILITIES.has(G._oblationAbility)))return null;
+  const need=oblationSpecStat();if(!need)return null;
+  if(((need==='atk'?base.atk:base.mag)||0)>=5)return null;   /* patron already fields that stat */
+  const og=GODS.find(x=>x.ak===G._oblationAk);if(!og)return null;
+  const ob=(need==='atk'?og.atk:og.mag)||0;if(!ob)return null;
+  return {stat:need,value:Math.max(1,Math.round(scR(ob,lv,true)*OBLATION_CROSS_PCT)),fromGod:og};
+}
 /* v1000: every god's flavor line names it a God or a Goddess ("Mother Goddess of Earth",
    "Old God of Fire"), so gender is already in the data and needs no new field. Tested
    goddess-FIRST because "goddess" contains "god" -- the naive order would call Coatlicue male.
@@ -4805,6 +5012,7 @@ function smPoisonOnBurn(target,isBossSide){
 // v303 (12): active Chimalli (armor>0) blocks NEW status applications; existing statuses persist.
 function applyBurn(target,stacks){
   if((target.armor||0)>0||target._armorJustBroke)return false; // v327: shatter blocks same-hit statuses
+  statusFx(target,'burn'); /* v1025 */
   target.burnStacks=Math.min(4,(target.burnStacks||0)+stacks);
   smPoisonOnBurn(target,false);
   maybeStatusTut('burn',target); // v583
@@ -4836,12 +5044,14 @@ function statusCount(u){
 }
 function applyPoison(target,stacks,bypassArmor){
   if(!bypassArmor&&((target.armor||0)>0||target._armorJustBroke))return false;
+  statusFx(target,'poison'); /* v1025: only past the armour guard, so a blocked hit stays silent */
   target.poisonStacks=Math.min(4,(target.poisonStacks||0)+stacks);
   maybeStatusTut('poison',target); // v583
   return true;
 }
 function applyParalyze(target,stacks){
   if((target.armor||0)>0||target._armorJustBroke)return false;
+  statusFx(target,'paralyze'); /* v1025 */
   target.paralyzStacks=Math.min(4,(target.paralyzStacks||0)+stacks);
   maybeStatusTut('paralyze',target); // v583
   return true;
@@ -4874,6 +5084,7 @@ function applyDrunk(target,stacks,friendly){
   // the Chimalli gate; a friendly buff shouldn't be blocked by the recipient's own shield. Offensive
   // drunk onto the OPPOSING side still respects the shield.
   if(!friendly&&((target.armor||0)>0||target._armorJustBroke))return false;
+  statusFx(target,'drunk'); /* v1025 */
   target.drunkStacks=Math.min(4,(target.drunkStacks||0)+stacks);
   reverieRecalc(target);
   return true;
@@ -5281,7 +5492,7 @@ function rosterCurHp(key,maxHp){
 function surgePreview(key,force){
   // v333: shows exactly what THIS pick will add — a flat snapshot of the current surge-free stat
   // (scA(base,level), prior surges excluded) times the force-level %. Mirrors surgePick precisely.
-  const b=unitBaseFor(key);if(!b)return{lv:1,txt:''};
+  const b=surgeBaseFor(key);if(!b)return{lv:1,txt:''}; /* v1032: preview must match surgePick */
   const lv=getLevel(key);const s=ensureSurge(key);
   const f=s.forces[force];const nl=f.lv+1;
   const inc=(snap,pct,baseV)=>{const v=Math.floor(snap*pct);return v>0?v:((baseV||0)>0?1:0);};
@@ -5304,9 +5515,23 @@ function surgePreview(key,force){
   const allZero=parts.every(x=>x.startsWith('+0 ')||x.startsWith('−0 '));
   return{lv:nl,txt:allZero?'No gain yet — grows as you level':parts.join(' ')};
 }
+/* v1032: the surge reads a unit's TEMPLATE, and a cross-oblated patron's template still has 0 in
+   the granted slot -- so Ihiyotl granted nothing on that side and the picker showed only "+295 ATK"
+   on a unit that fields real MAG. The granted stat's base-equivalent is the oblated god's own base
+   times OBLATION_CROSS_PCT, which is exactly what the surge should treat as its base. One helper,
+   used by both surgePick and its preview, so the two cannot disagree. */
+function surgeBaseFor(key){
+  const b=unitBaseFor(key);if(!b)return b;
+  if(!isGodKey(key)||!G._oblationAk)return b;
+  if(('god_'+(G.god&&G.god.id))!==key)return b;      /* only the patron holds an oblation */
+  const x=oblationCrossStat(b,getLevel(key));if(!x)return b;
+  const og=x.fromGod;if(!og)return b;
+  const addBase=Math.max(1,Math.round(((x.stat==='atk'?og.atk:og.mag)||0)*OBLATION_CROSS_PCT));
+  return {...b,[x.stat]:((b[x.stat]||0)+addBase)};
+}
 function surgePick(key,force){
   const s=ensureSurge(key);if(!s.pending&&!((s.bonus||0)>0))return; // v508: bonus surges also valid
-  const b=unitBaseFor(key);if(!b)return;
+  const b=surgeBaseFor(key);if(!b)return; /* v1032 */
   const lv=getLevel(key);
   const f=s.forces[force];
   const prev={atk:f.atk||0,mag:f.mag||0,hp:f.hp||0,def:f.def||0,res:f.res||0,tp:f.tp||0,cost:f.cost||0};
@@ -5912,12 +6137,20 @@ function unitIconHtml(u,size){
    anything stored there would not survive the choice it is supposed to influence.
    Only unlocked gods are eligible [Genaro's ruling]; a blessing on a card the player cannot pick
    would be pure taunt. Cleared when a run ends, so the next visit rerolls. */
+/* v1019: CONSUME-ON-COMMIT. Two failed attempts frame this. Originally the blessing cleared only
+   in showEnding(), so a lost or abandoned run kept the same god forever (v1018 report). v1018 moved
+   the clear into clearRun(), but doStartNewRun() calls clearRun() -- that is the menu -> god-select
+   path -- so it rerolled every time the screen was opened (v1019 report).
+   The rule that satisfies both: a blessing is SPENT when a patron is confirmed, and only a spent
+   blessing rerolls. Merely looking at god select, backing out and returning shows the same god;
+   finishing, losing or abandoning a run all spend it, because all three had to pass confirmGod. */
 function rollOmeteotlBlessing(){
   if(!DT.unlocked.has('ometeotl_blessing')){DT.blessedGod=null;return;}
-  if(DT.blessedGod&&GODS.some(g=>g.id===DT.blessedGod))return; /* already rolled for this run */
+  if(DT.blessedGod&&GODS.some(g=>g.id===DT.blessedGod)&&!DT.blessedUsed)return; /* still pending -- keep it */
   const pool=GODS.filter(g=>!(g.locked&&!godUnlocked(g.id)));
   if(!pool.length){DT.blessedGod=null;return;}
   DT.blessedGod=pool[Math.floor(Math.random()*pool.length)].id;
+  DT.blessedUsed=false; /* v1019: fresh and unspent */
   try{saveDT();}catch(e){}
 }
 /* v937: during a run the answer is whatever was frozen at confirmGod; on the god-select screen
@@ -6060,6 +6293,10 @@ function confirmGod(){
      would reroll it out from under an in-progress run. G is written by saveRun, so stamping it
      here makes it survive quit-and-resume and immune to rerolls. */
   G._blessedGodId=(DT.unlocked.has('ometeotl_blessing')&&DT.blessedGod)?DT.blessedGod:null;
+  /* v1019: the blessing is spent the moment a patron is committed. G._blessedGodId above is the
+     frozen in-run answer, so marking it spent here cannot disturb the run it belongs to -- it
+     only tells the NEXT visit to god select to roll again. */
+  DT.blessedUsed=true;try{saveDT();}catch(e){}
   G._preRunV={...V};
   injectTlacuiloVassal(); // ensure vassal is in G.captured before smartAutoSel fills deplSel
   setRecordedVassals(G._tlacuiloUninjected||[]); // v503: consume only successfully injected records — never destroy ones that failed to restore
@@ -6679,7 +6916,7 @@ function mkGod(gdId,b1){
   // v514: absolute override (event penalty, pre-offering scale) consumed once; else persisted ratio
   const godStartHp=Math.max(1,Math.min(godMaxHp,overrideHpG!==undefined?overrideHpG:Math.round(godMaxHp*(ratioHpG!==undefined?ratioHpG:1))));
   if(overrideHpG!==undefined)delete G.unitHpOverride[baseId];
-  return{...gd,id:baseId,baseGodId:gd.id,level:lv,
+  const _u={...gd,id:baseId,baseGodId:gd.id,level:lv,
     maxHp:godMaxHp,currentHp:godStartHp,
     atk:scR(gd.atk||0,lv,true)+sb.atk,mag:scR(gd.mag||0,lv,true)+sb.mag, /* v993 */
     def:scR(gd.def,lv,true)+sb.def,res:scR(gd.res||5,lv,true)+sb.res,
@@ -6689,6 +6926,23 @@ function mkGod(gdId,b1){
     isGod:true,isPatron:isP,isAlly:true,
     poisonStacks:0,burnStacks:0,paralyzStacks:0,defBuff:0,slowStacks:0,woundStacks:0,lethargyStacks:0,atkBuffStacks:0,atkBuffRounds:0,defBuffStacks:0,defBuffRounds:0,
     armor:resolveArmor('god_'+gd.id,godMaxHp)}; /* v964 */
+  /* v1030: the real MIX flip. Applied AFTER the literal so the granted stat is not overwritten by
+     it, and so the type change is visible to everything downstream -- the MIX burn penalty, the
+     stat row, primStat. magStrike is forced on when a MAG patron flips, because primStat reads
+     type==='MAG'||magStrike: without it a MAG god turned MIX would suddenly STRIKE off its new,
+     smaller ATK instead of its own MAG, which is not a trade the player agreed to. */
+  if(isP){
+    const _x=oblationCrossStat(gd,lv);
+    if(_x){
+      const _wasMag=(_u.type==='MAG')||!!_u.magStrike;
+      _u._oblOrigType=_u.type; /* v1032: specIsMagic must keep classifying the NATIVE special by this */
+      _u[_x.stat]=(_u[_x.stat]||0)+_x.value;
+      _u.type='MIX';
+      if(_wasMag)_u.magStrike=true;
+      _u._oblCross={stat:_x.stat,value:_x.value,from:_x.fromGod&&_x.fromGod.name};
+    }
+  }
+  return _u;
 }
 function mkCap(cu,slot,b1){
   const ck=capKey(cu); // unique key per captured instance
@@ -7135,12 +7389,27 @@ function evL6ArrowRain(el){
   showScr('screen-event');
 }
 // Helper: build an event option card
+/* v1022: evOpt accepted a costHtml argument and never rendered it, so 48 of the 67 event options
+   in the game carried text the player never saw. Only the COST is wanted on the card, not the
+   effect -- but these strings are prose and mix the two freely ("Poison x2 + 0 TP next battle
+   \u2014 +12000 Blood"), so there is no general way to split them. The one convention that IS
+   consistent: an explicit price is written as a LEADING parenthesised group, "(666 Cacao)". That
+   is what gets shown; everything else renders nothing rather than guessing wrong and printing an
+   effect as though it were a price.
+   Twelve options currently qualify. The remaining costs are embedded mid-sentence and would each
+   need rewriting to the same convention before they can display -- see the note to Genaro. */
+function evCostOnly(t){
+  const raw=String(t==null?'':t).replace(/^\s*\[v\d+\]\s*/,''); /* strip the bare [vNNN] authoring marker */
+  const m=raw.match(/^\s*(\([^)]*\))/);
+  return m?m[1]:'';
+}
 function evOpt(icon,label,costHtml,descHtml,disabled,disabledMsg,onClick){
+  const _cost=evCostOnly(costHtml);
   const d=document.createElement('div');
   d.style.cssText='background:var(--bm);border:0.5px solid var(--br);border-radius:10px;padding:.75rem;margin-bottom:.6rem';
   const btnCls=disabled?'btn':'btn';
   const btnStyle=disabled?'width:100%;margin-top:.5rem;opacity:0.45;cursor:not-allowed':'width:100%;margin-top:.5rem';
-  d.innerHTML=`<div style="display:flex;align-items:flex-start;gap:8px"><span style="font-size:18px">${icon}</span><div style="flex:1"><div style="font-size:13px;font-weight:500;color:var(--am);margin-bottom:2px">${label}</div><div style="font-size:11px;color:var(--td)">${descHtml}</div>${disabled&&disabledMsg?`<div style="font-size:10px;color:#e07070;margin-top:2px">${disabledMsg}</div>`:''}</div></div><button class="${btnCls}" style="${btnStyle}" ${disabled?'disabled':''}>${disabled?(disabledMsg||'Cannot choose'):'Choose'}</button>`;
+  d.innerHTML=`<div style="display:flex;align-items:flex-start;gap:8px"><span style="font-size:18px">${icon}</span><div style="flex:1"><div style="font-size:13px;font-weight:500;color:var(--am);margin-bottom:2px">${label}${_cost?` <span style="font-size:11px;color:#d4af37;font-weight:600">${_cost}</span>`:''}</div><div style="font-size:11px;color:var(--td)">${descHtml}</div>${disabled&&disabledMsg?`<div style="font-size:10px;color:#e07070;margin-top:2px">${disabledMsg}</div>`:''}</div></div><button class="${btnCls}" style="${btnStyle}" ${disabled?'disabled':''}>${disabled?(disabledMsg||'Cannot choose'):'Choose'}</button>`;
   if(!disabled)d.querySelector('button').onclick=onClick;
   return d;
 }
@@ -8850,7 +9119,8 @@ function startBattle(){
   applyOfferings();
   if(G.runBoosts){
     if(G.runBoosts.hp)G.units.forEach(u=>{const nm=Math.round(u.maxHp*1.25);const ratio=u.maxHp>0?u.currentHp/u.maxHp:1;u.maxHp=nm;u.currentHp=Math.min(nm,Math.round(nm*ratio));});
-    if(G.runBoosts.tp)G.units.forEach(u=>{u.maxNP=Math.round((u.maxNP||0)*1.20);if((u.currentNP||0)>u.maxNP)u.currentNP=u.maxNP;});
+    /* v1021: same fix as oe.tpMult above -- a +20% TP boost must not leave the unit at 83% of it. */
+  if(G.runBoosts.tp)G.units.forEach(u=>{if(!u.maxNP)return;const _r0=(u.currentNP||0)/u.maxNP;u.maxNP=Math.round(u.maxNP*1.20);u.currentNP=Math.min(u.maxNP,Math.round(u.maxNP*_r0));});
     if(G.runBoosts.atk)G.units.forEach(u=>{applyAtkBuff(u,1);});
     const _rbLog=[G.runBoosts.hp?'+25% HP':'',G.runBoosts.tp?'+20% TP':'',G.runBoosts.atk?'ATK/MAG UP':''].filter(Boolean).join(' · ');
     if(_rbLog)addLog(`<span class="log-god">🍶 Apothecary blessing: ${_rbLog}!</span>`);
@@ -9673,7 +9943,16 @@ function refreshCaptureTargets(){
   G.captureTargets=new Set();
 }
 
+/* v1025: Slow commits in five separate branches and returns nothing, so a per-branch FX call
+   would be five edits with a sixth branch waiting to be missed. The wrapper compares the slow
+   state before and after instead -- if the unit came out slowed and was not before, it landed. */
 function applySlowToUnit(target,hadArmorBefore){
+  const _wasSlowed=!!(target&&G._slowedUnits&&G._slowedUnits.get(target.id));
+  const _r=_applySlowCore(target,hadArmorBefore);
+  if(target&&!_wasSlowed&&G._slowedUnits&&G._slowedUnits.get(target.id))statusFx(target,'slow');
+  return _r;
+}
+function _applySlowCore(target,hadArmorBefore){
   if(!target||target.currentHp<=0)return;
   // Chimalli blocks slow — check pre-hit armor so a breaking shield still protects
   if((hadArmorBefore||target.armor||0)>0)return;
@@ -10338,7 +10617,11 @@ function specIsMagic(actor){
     'Howling Gust','Murk','Magma Burst','Septic Howl','Pollen Burst','Craft Shard','Collapse','Haunt','Permafrost','Biting Draft','Howling Chill','Ash Surge','Sandblast','Howling Drift','Virulent Gale','Writhing Bloom','Filthwater Plume']);
   if(ATK.has(ak)||ATK.has(ab))return false;
   if(MAG.has(ak)||MAG.has(ab))return true;
-  return actor.type==='MAG'||actor.type==='MIX';
+  /* v1032: read the PRE-OBLATION type. A cross-type oblation turns the patron MIX so it can
+     field the borrowed ability, but that must not re-classify its own special -- Tepeyollotl's
+     Epicenter Roar is 1.5xATK and was resolving as MAG purely because the unit had become MIX. */
+  const _t=actor._oblOrigType||actor.type;
+  return _t==='MAG'||_t==='MIX';
 }
 function isAoeOrAutoSpecial(actor){
   if(!actor)return true;
@@ -10650,7 +10933,7 @@ function resolveCap(enemyId,doCapture){
   const dead=G.enemies.find(u=>u.id===enemyId);
   document.getElementById('cap-area').innerHTML='';
   const allCaps=[...MICTLAN_CAPS,...TEPEME_CAPS,...OBSIDIAN_CAPS,...NATURE_CAPS,...HUMANITY_CAPS,...CEHUYLOAN_WATER_CAPS,...CEHUYLOAN_WIND_CAPS,...TONATIUH_DAY_CAPS,...PANCUET_FIRE_CAPS,...PANCUET_WIND_CAPS,...TEMIMINA_WATER_CAPS,...TEMIMINA_HUMAN_CAPS,...TEYOLLO_NATURE_CAPS,...TEYOLLO_DAY_CAPS,...APANO_NIGHT_CAPS,...APANO_THUNDER_CAPS];
-  const minibossTemplates=[XOCHITONAL_TPL,QUINAMETZIN_TPL,XIUHNEL_TPL,MIMICH_TPL,MICTLAMPEHECATL_TPL,TLACATEOCOTL_TPL,AMIMITL_TPL,ATLAUA_TPL,ACUECUEYOTL_TPL,OMETOCHTLI_TPL,IXPUXTEQUI_TPL,NEXOXCHO_TPL]; // v723: added L8 duo (split list — see v548)
+  const minibossTemplates=MINIBOSS_TEMPLATES; /* v1024 */ // v723: added L8 duo (split list — see v548)
   const base=dead?(allCaps.find(c=>c.name===dead.name)||minibossTemplates.find(t=>t.name===dead.name)):null;
   const mercy=hasPassive('divinityMercy');
   if(doCapture&&base&&dead){
@@ -10795,16 +11078,13 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
   // Sacred Oblation: temporarily override ak with oblated ability
   const _origAk=gd.ak;
   const _origAtk=u.atk; const _origMag=u.mag;
+  /* v1030: the v535 stat substitution is GONE. It wrote patron-primary/2 onto the unit here and
+     relied on the restore at the end of this function -- but six early returns sit between the two,
+     so any path taking one leaked the doctored stat for the rest of the battle. The patron now
+     carries a real MIX stat from mkGod, so there is nothing to substitute. The ak swap stays: it is
+     what routes this call to the oblated ability. */
   if(G._useOblationSpecial&&G._oblationAk){
     gd.ak=G._oblationAk;
-    // If the oblated ability uses a stat the patron doesn't have (0), substitute patron's
-    // primary stat ÷2 so the ability does something meaningful instead of dealing 1 damage.
-    const oblGod=GODS.find(g=>g.ak===G._oblationAk);
-    const oblIsPhys=oblGod&&oblGod.type==='PHYS';
-    const oblIsMag=oblGod&&oblGod.type==='MAG';
-    const patronIsPhys=u.type==='PHYS'; const patronIsMag=u.type==='MAG';
-    if(oblIsPhys&&!patronIsPhys&&(u.atk||0)<5) u.atk=Math.round((u.mag||0)/2);
-    if(oblIsMag&&!patronIsMag&&(u.mag||0)<5) u.mag=Math.round((u.atk||0)/2);
   }
   G._useOblationSpecial=false;
   if(gd.ak==='featherEmbrace'&&pickT){
@@ -10829,7 +11109,7 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
            - baseId was set to the instance id, so liveAd()'s cap-stats lookup missed too and the
              roster card quoted the BOSS ad text (1.6xMAG AoE) instead of the vassal's 3-target one.
          Resolving the real template fixes stats and description together. */
-      const minibossTemplates=[XOCHITONAL_TPL,QUINAMETZIN_TPL,XIUHNEL_TPL,MIMICH_TPL,MICTLAMPEHECATL_TPL,TLACATEOCOTL_TPL,AMIMITL_TPL,ATLAUA_TPL,ACUECUEYOTL_TPL,OMETOCHTLI_TPL,IXPUXTEQUI_TPL,NEXOXCHO_TPL]; // SPLIT-LIST: mirrors the array in renderSpoils
+      const minibossTemplates=MINIBOSS_TEMPLATES; /* v1024: see the shared MINIBOSS_TEMPLATES */
       const base=allCaps.find(c=>c.name===pickT.name)
         ||minibossTemplates.find(t=>t.name===pickT.name)
         ||(pickT.isMiniBoss?{id:pickT.id,name:pickT.name,hp:pickT.maxHp,fv:0,...pickT}:null);
@@ -10947,13 +11227,27 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
            path and is flushed at a point this never reaches, so the numbers never appeared. */
         try{animateHit(tgt.id,dmgMC,false);}catch(e){}
         if(!fatalMC)return;
-        if(tgt.isGod||tgt.isBoss){handleDeath(tgt);return;}
-        const baseMC=allCapsMC.find(c=>c.name===tgt.name)||(tgt.isMiniBoss?{id:tgt.id,name:tgt.name,hp:tgt.maxHp,fv:0,...tgt}:null);
+        /* v1023: mini-bosses raise even when they also carry isBoss. The L9 taunt builds its
+           summons from *_BOSS_TPL, so isBoss rides along incidentally and this guard was
+           swallowing every L9 raise. The true layer boss is isBoss WITHOUT isMiniBoss and is
+           still exempt, as are real gods. */
+        if(tgt.isGod||(tgt.isBoss&&!tgt.isMiniBoss)){handleDeath(tgt);return;}
+        /* v1024: mirror the canonical two-source species lookup used by resolveCap (line ~10560)
+           and Feather Embrace. Mini-boss species show up on L9 as ordinary enemies with no
+           isMiniBoss flag, and their templates are in minibossTemplates rather than any *_CAPS
+           array -- so both branches missed and the raise silently became a plain kill. */
+        const baseMC=allCapsMC.find(c=>c.name===tgt.name)
+          ||MINIBOSS_TEMPLATES.find(t=>t.name===tgt.name)
+          ||(tgt.isMiniBoss?{id:tgt.id,name:tgt.name,hp:tgt.maxHp,fv:0,...tgt}:null);
         if(!baseMC){handleDeath(tgt);return;}
         G.captureProcessed.add(tgt.id);
         G._unitStates[tgt.id]='reanimated'; // v813: its own state -- these were never captured, they were killed and raised
         const cidMC=`${baseMC.id}_${Date.now()}_${Math.random().toString(36).slice(2,5)}`;
-        const statsMC=tgt.isMiniBoss?(MINIBOSS_CAP_STATS[baseMC.id]||{hp:150,atk:baseMC.atk||0,mag:baseMC.mag||0,def:baseMC.def||10,res:baseMC.res||8,np:30,npCost:12,fv:5}):{};
+        /* v1024: key the stat band on the RESOLVED SPECIES, not on the enemy's isMiniBoss flag.
+           An L9 Xochitonal carries no flag, so it would otherwise have been raised on its raw
+           boss statline instead of the v1001 playable band. */
+        const _isMbSpecies=!!(MINIBOSS_CAP_STATS&&MINIBOSS_CAP_STATS[baseMC.id])||!!tgt.isMiniBoss;
+        const statsMC=_isMbSpecies?(MINIBOSS_CAP_STATS[baseMC.id]||{hp:150,atk:baseMC.atk||0,mag:baseMC.mag||0,def:baseMC.def||10,res:baseMC.res||8,np:30,npCost:12,fv:5}):{};
         G.captured.push({...baseMC,...statsMC,id:cidMC,_captureId:cidMC,baseId:baseMC.id,
           level:tgt.enemyLevel||1,isMiniBoss:false,isBoss:false,isAlly:false,isUndead:true});
         G.levels[cidMC]=tgt.enemyLevel||1;
@@ -10963,9 +11257,18 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
            the unitBounty capture rate, and gives the row the red 'killed' pill with the Reanimated
            badge beside it rather than a green 'captured'. */
         if(!G._spoilIdx)G._spoilIdx=0;
-        const _rmB=Math.round((tgt.maxHp||0)*0.45*G.dte.bloodBonus*getLayerResMult());
-        const _rmC=Math.round((tgt.maxHp||0)*0.27*getLayerResMult());
-        G.spoils.killed.push({unit:tgt,blood:_rmB,cacao:_rmC,reanimated:true,_idx:++G._spoilIdx});
+        /* v1021: mirror handleDeath's multipliers. A raise IS a kill (see v814 above), so the
+           kill-reward offerings must apply to it -- they were being dropped entirely. */
+        const _rmVv=(hasOffering('vulture_vessel')&&tgt._killerAlly&&tgt._killerElem==='nature')?1.15:1;
+        const _rmBa=1+(((tgt.woundStacks||0)>0)?(getOfferingEffects().bloodyArrow||0):0);
+        const _rmCb=1+(((tgt.burnStacks||0)>0)?(getOfferingEffects().burnCacaoBonus||0):0);
+        const _rmB=Math.round((tgt.maxHp||0)*0.45*G.dte.bloodBonus*getLayerResMult()*_rmVv*_rmBa);
+        const _rmC=Math.round((tgt.maxHp||0)*0.27*getLayerResMult()*_rmVv*_rmCb);
+        const _rmBoosts=[];
+        if(_rmVv>1)_rmBoosts.push({icon:'\u{1F3FA}',label:'Vulture Vessel',pct:Math.round((_rmVv-1)*100),col:'#c0a060',res:'both'});
+        if(_rmBa>1)_rmBoosts.push({icon:'\u{1FA78}',label:'Bloody Arrow',pct:Math.round((_rmBa-1)*100),col:'#e07070',res:'blood'});
+        if(_rmCb>1)_rmBoosts.push({icon:'\u{1F3F9}',label:'Camaxtli Memento',pct:Math.round((_rmCb-1)*100),col:'#e0a060',res:'cacao'});
+        G.spoils.killed.push({unit:tgt,blood:_rmB,cacao:_rmC,reanimated:true,boosts:_rmBoosts,_idx:++G._spoilIdx});
         if(G.runStats)G.runStats.slain++; // v829: a reanimation is a killing
         /* v813: the raise IS the kill, so Undead Forces may claim it -- but it is a slaying, not a
            capture, which is why this fires here rather than in creditEnemyDefeat. */
@@ -13993,8 +14296,8 @@ function healTo(unit,amt){
       if(_ok)a=Math.round(a*(1+_hp));}}
   return Math.min(unit.maxHp,(unit.currentHp||0)+a);
 }
-function applyWound(unit,stacks,bypassArmor){if(!bypassArmor&&((unit.armor||0)>0||unit._armorJustBroke))return false;unit.woundStacks=Math.min(4,(unit.woundStacks||0)+stacks);return true;} /* v998: see applyPoison */
-function applyLethargy(unit,stacks,bypassArmor){if(!bypassArmor&&((unit.armor||0)>0||unit._armorJustBroke))return false;unit.lethargyStacks=Math.min(4,(unit.lethargyStacks||0)+stacks);return true;} /* v998: see applyPoison */
+function applyWound(unit,stacks,bypassArmor){if(!bypassArmor&&((unit.armor||0)>0||unit._armorJustBroke))return false;statusFx(unit,'wound'); /* v1025 */unit.woundStacks=Math.min(4,(unit.woundStacks||0)+stacks);return true;} /* v998: see applyPoison */
+function applyLethargy(unit,stacks,bypassArmor){if(!bypassArmor&&((unit.armor||0)>0||unit._armorJustBroke))return false;statusFx(unit,'lethargy'); /* v1025 */unit.lethargyStacks=Math.min(4,(unit.lethargyStacks||0)+stacks);return true;} /* v998: see applyPoison */
 // v535: oblated specials store a flat npCost captured at oblation time; scale it like effectiveNpCost
 // (lethargy ×1.30/stack on the patron, level gate 40+→×1.25 / 50+→×1.5) so it isn't frozen at low cost.
 /* v773: the oblated special now costs what a native special of the same base would.
@@ -14081,6 +14384,37 @@ function animateArmorHit(uid,dmg){
    callback runs -- there is no card left to measure. So this one anchors to the viewport centre
    and spawns body-level at position:fixed, which also means renderAltar() cannot interrupt it.
    Reuses the existing sac-flash / blood-stain / blood-spray / blood-drop classes. */
+/* v1032: the transfer overlay. Takes the two GODS entries so it can show real portraits -- the
+   giver dims and drains, the taker flares as the motes arrive. Falls back to the v996 blood splash
+   (below) if either portrait cannot be resolved, so this can never leave the player with nothing. */
+function oblationTransferFx(giver,taker,onDone){
+  if(typeof fxOn==='function'&&!fxOn()){if(onDone)onDone();return;}
+  if(!giver||!taker){oblationFx(giver&&giver.name);if(onDone)onDone();return;}
+  const ov=document.createElement('div');ov.className='obl-ov';
+  ov.innerHTML='<div class="obl-title">\u2020 SACRED OBLATION</div>'
+    +'<div class="obl-row">'
+      +'<div class="obl-fig obl-giver"><div>'+godIconHtml(giver,84)+'</div><div class="obl-name" style="color:#c06060">'+giver.name+'</div></div>'
+      +'<div class="obl-arc"></div>'
+      +'<div class="obl-fig obl-taker"><div>'+godIconHtml(taker,84)+'</div><div class="obl-name" style="color:#d4af37">'+taker.name+'</div></div>'
+    +'</div>';
+  document.body.appendChild(ov);
+  /* motes cross from the giver to the taker, measured after layout so they track the real gap */
+  setTimeout(function(){
+    const figs=ov.querySelectorAll('.obl-fig');
+    if(figs&&figs.length===2){
+      const a=figs[0].getBoundingClientRect(),b=figs[1].getBoundingClientRect();
+      const dx=(b.left+b.width/2)-(a.left+a.width/2);
+      for(let i=0;i<18;i++){
+        const m=document.createElement('div');m.className='obl-mote';
+        m.style.cssText='left:'+(a.left+a.width/2)+'px;top:'+(a.top+a.height/2+(Math.random()*40-20))+'px;'
+          +'--mx:'+dx+'px;--my:'+(Math.random()*36-18)+'px;animation-delay:'+(0.5+i*0.045).toFixed(2)+'s;';
+        ov.appendChild(m);
+      }
+    }
+  },40);
+  setTimeout(function(){ov.style.animation='oblFadeOut .45s ease-in both';},2350);
+  setTimeout(function(){try{ov.remove();}catch(e){}if(onDone)onDone();},2800);
+}
 function oblationFx(godName){
   const cx=window.innerWidth/2, cy=window.innerHeight*0.42;
   const size=Math.max(180,Math.min(340,window.innerWidth*0.42));
@@ -14269,6 +14603,20 @@ function _fxRect(card){
   if(!el)return null;
   const r=el.getBoundingClientRect();
   return (r.width&&r.height)?r:null;
+}
+/* v1028: RESTORED over a Temazcal row. Unlike a battle card, this row is destroyed by the
+   renderTemazcal() that follows immediately -- so the rect is measured NOW and frozen into a stub
+   the callout can read later, rather than resolving a selector that will have gone stale. */
+/* v1034: currently UNUSED -- healFx prints the Temazcal's RESTORED label itself. Kept because it
+   is the only helper that can place a callout on a card a re-render is about to tear out. */
+function tzCallout(sel,delay){
+  if(typeof fxOn==='function'&&!fxOn())return;
+  const el=(typeof sel==='string')?document.querySelector(sel):sel;
+  if(!el||!el.getBoundingClientRect)return;
+  const r=el.getBoundingClientRect();
+  if(!r.width&&!r.height)return;
+  const frozen={getBoundingClientRect:()=>r};
+  fxCallout(frozen,'\u2764\ufe0f RESTORED','#9ad8b0',(delay||0)+120,String(sel));
 }
 function healFx(card,delay){
   const r=_fxRect(card);if(!r)return;
@@ -14636,6 +14984,9 @@ function grantChimalli(u,pct,src){
   if(!u||!(pct>0))return 0;
   const add=Math.max(1,Math.round((u.maxHp||0)*pct));
   u.armor=(u.armor||0)+add;
+  /* v1028: every Chimalli grant in the game funnels through here -- passives, offerings, specials
+     and events alike -- so one call covers all of them. */
+  fxCallout(()=>((typeof fxCard==='function')?fxCard(u.id):null),'\u{1F6E1} CHIMALLI +'+add,'#8ac0ff',300,u.id);
   return add;
 }
 /* Purchased armour persists between battles, stored as a FRACTION of max HP rather than an
@@ -14748,6 +15099,9 @@ function applyArmorDamage(target,dmg,isEnemyAttacking){
 }
 
 function cleanseUnit(u){
+  /* v1028: count what is actually on the unit BEFORE the strip, so the callout only fires when a
+     cleanse had something to remove. A "CLEANSED" over a clean unit is noise. */
+  const _cleansedBefore=(typeof statusCount==='function')?statusCount(u):0;
   // v712: Unclean Purification — ally Poison is a benefit, so nothing may strip it (incl. her own heal).
   const _upKeep=(u.isAlly?hasPassive('uncleanPurification'):bossHasPassive('uncleanPurification'))?(u.poisonStacks||0):null; // v729: same exemption on the boss side
   // Scalding Miasma: if active, only remove 1 poison stack from the opposing side instead of clearing all
@@ -14790,6 +15144,11 @@ function cleanseUnit(u){
   // back into the normal-speed pool on the very next player slot. Queue rebuild was
   // causing qIdx misalignment (cleanseUnit sets qIdx=0, advanceTurn then does qIdx++,
   // skipping slot 0 and causing enemies to act before remaining un-acted players).
+  /* v1028: announce only a cleanse that removed something. Sits at the END so the comparison sees
+     the fully-stripped unit, and so an early return added later cannot fire it spuriously. */
+  if(_cleansedBefore>0&&(typeof statusCount==='function')&&statusCount(u)<_cleansedBefore){
+    fxCallout(()=>((typeof fxCard==='function')?fxCard(u.id):null),'CLEANSED','#70e0b0',300,u.id);
+  }
 }
 
 // Spoils basis: maxHp × optional spoilMult (tutorial enemies pay out like the old B1 roster despite lower HP)
@@ -15373,7 +15732,7 @@ function processNextCap(){
     G.capActive=false;processNextCap();return;
   }
   const allCaps=[...MICTLAN_CAPS,...TEPEME_CAPS,...OBSIDIAN_CAPS,...NATURE_CAPS,...HUMANITY_CAPS,...CEHUYLOAN_WATER_CAPS,...CEHUYLOAN_WIND_CAPS,...TONATIUH_DAY_CAPS,...PANCUET_FIRE_CAPS,...PANCUET_WIND_CAPS,...TEMIMINA_WATER_CAPS,...TEMIMINA_HUMAN_CAPS,...TEYOLLO_NATURE_CAPS,...TEYOLLO_DAY_CAPS,...APANO_NIGHT_CAPS,...APANO_THUNDER_CAPS];
-  const minibossTemplates=[XOCHITONAL_TPL,QUINAMETZIN_TPL,XIUHNEL_TPL,MIMICH_TPL,MICTLAMPEHECATL_TPL,TLACATEOCOTL_TPL,AMIMITL_TPL,ATLAUA_TPL,ACUECUEYOTL_TPL,OMETOCHTLI_TPL,IXPUXTEQUI_TPL,NEXOXCHO_TPL]; // v723: added L8 duo (split list — see v548)
+  const minibossTemplates=MINIBOSS_TEMPLATES; /* v1024 */ // v723: added L8 duo (split list — see v548)
   const base=allCaps.find(c=>c.name===dead.name)||minibossTemplates.find(t=>t.name===dead.name);
   triggerCaptureWindow(dead,base,null);
 }
@@ -15924,7 +16283,7 @@ function renderActionPanel(){
           <div>🔮 ${specLabel||'Special'} ${isHealSpec?'❤️':specIsMagic(actor)?'🪄':'🗡️'}</div>
           ${specSub}
         </button>
-        ${(()=>{if(!(actor.isGod&&G._oblationAk&&actor.id===('god_'+G.god?.id)))return '';const oblCost=oblationNpCost(actor);const canOb=actor.currentNP>=oblCost;const oblLabel=G._oblationAbility||'Oblated';return '<button class=\"btn btn-special\" onclick=\"doPlayerSpecial(true)\"'+(canOb?'':' disabled')+' style=\"line-height:1.35;opacity:'+(canOb?1:0.45)+'\"><div>✟ '+oblLabel+'</div><div style=\"font-size:10px;color:#a060e0;margin-top:1px\">Cost '+oblCost+' ✨</div></button>';})()}
+        ${(()=>{if(!(actor.isGod&&G._oblationAk&&actor.id===('god_'+G.god?.id)))return '';const oblCost=oblationNpCost(actor);const canOb=actor.currentNP>=oblCost;const oblLabel=G._oblationAbility||'Oblated';/* v1030: estimate the OBLATED special exactly as the native one is estimated a few lines above. Now that the v1030 MIX flip gives the patron a REAL stat for the borrowed ability, the same base*mult-def arithmetic applies with no special-casing. */var _oblSub='';try{var _oak=G._oblationAk;var _oMag=(oblationSpecStat(_oak)==='mag');var _obase=_oMag?(actor.mag||0):(actor.atk||0);var _ot=(typeof ae!=='undefined'&&ae&&ae.length)?ae[0]:null;var _odef=_ot?(_oMag?(_ot.res||0):(_ot.def||0)):0;var _oboost=G.dte.specialBoostMult||1;var _OGM={'deluge':1.35,'tlalocanDeluge':1.35,'obsidianStorm':1.25,'aurumBreak':1.5,'frostMacuahuitl':1.5,'cihuateteoFury':0.6,'cripplingShock':0.6,'featherEmbrace':1.5,'godbaneBlowgun':0.5,'mictlanClaspPlayer':0.5,'octliDrench':1.5,'oldFire':1.6,'seismicRoar':1.5,'sinistralMinacachalli':1.2,'zappingStrike':1.1};var _OGF={'seismicRoar':8,'oldFire':20,'obsidianStorm':14};var _omult=_OGM[_oak]||1;var _oflat=(_OGF[_oak]!==undefined?_OGF[_oak]:0);/* mixBurnPenalty/burnPenalty are block-scoped to the estimate branch above and are NOT visible here -- referencing them threw into the catch and the preview silently degraded to a bare cost. Computed inline instead, matching that branch's rule: MIX takes the reduced penalty. */var _obp=((actor.burnStacks||0)>0)?(1-Math.min(actor.burnStacks,4)*(actor.type==='MIX'?0.15:0.15)):1;if(/heal|cleanse|restore/i.test(String(G._oblationAd||''))){_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">💚 Heal · '+oblCost+' ✨</div>';}else if(_ot){var _olo=Math.max(1,Math.round(((_obase*_omult)+_oflat-_odef*0.4-2)*_oboost*_obp));var _ohi=Math.max(1,Math.round(((_obase*_omult)+_oflat-_odef*0.4+2)*_oboost*_obp));_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">~'+_olo+'–'+_ohi+' '+(_oMag?'🪄 MAG':'🗡️ ATK')+' · '+oblCost+' ✨</div>';}}catch(e){}if(!_oblSub)_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">Cost '+oblCost+' ✨</div>';return '<button class=\"btn btn-special\" onclick=\"doPlayerSpecial(true)\"'+(canOb?'':' disabled')+' style=\"line-height:1.35;opacity:'+(canOb?1:0.45)+'\"><div>✟ '+oblLabel+'</div>'+_oblSub+'</button>';})()}
         <button class="btn" onclick="G.selectedActorId=null;G.battlePhase='player_choose';renderBattle();" style="font-size:11px">↩ Back</button>
       </div>
       ${specDesc?`<div style="font-size:11px;color:#5a7a9a;margin-top:6px;padding-top:5px;border-top:0.5px solid #2a3a4a">🔮 ${isHealSpec?'❤️':specIsMagic(actor)?'🪄':'🗡️'} <em>${specLabel}</em>: ${specDesc}</div>`:''}
@@ -16214,11 +16573,8 @@ function showConquest(){
             const _pRaw=entry.oblationPassive||'';const _pCut=_pRaw.indexOf(':');
             const _pName=_pCut>0?_pRaw.slice(0,_pCut):_pRaw;
             return `<div style="text-align:center;margin:-2px 0 8px">`
-              +`<div style="font-size:10px;color:#a060e0;font-weight:600;margin-bottom:3px">\u2020 Sacred Oblation</div>`
-              +`<div style="font-size:11px;color:var(--td);line-height:1.5">${_art} <strong style="color:#d4af37">${entry.oblationGodName}</strong> was given to <strong>${entry.patronName||'the patron'}</strong>`
-              +(_pName?` <span style="color:#a0c060">\u25cb ${_pName}</span>`:'')
-              +(entry.oblationAbility?` <span style="color:#60a0d0">\u25c6 ${entry.oblationAbility}</span>`:'')
-              +`</div></div>`;
+              +`<div style="font-size:11px;color:#a060e0;font-weight:600;display:inline-flex;align-items:center;gap:5px">`
+              +`\u2020 Sacred Oblation: ${_art} <strong style="color:#d4af37">${entry.oblationGodName}</strong></div></div>`;
           })()
         :''}
       <div id="conq-party" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:96px"></div>
@@ -16360,7 +16716,10 @@ function showSpoils(){
     /* v1015: the chip showed only "+20%" with no indication of WHICH resource it lifted. The
      resource emoji now rides along: blood, cacao, or both. */
   const _resIco={blood:'\u{1FA78}',cacao:'\u{1FAD8}',both:'\u{1FA78}\u{1FAD8}'};
-  const bt=(e.boosts||[]).map(b=>`<span style="font-size:10px;color:${b.col};margin-left:4px" title="${b.label}">${b.icon} +${b.pct}% ${_resIco[b.res||'both']}</span>`).join('');
+  /* v1021: Bloody Arrow's own icon IS the blood drop, so appending the resource emoji rendered
+     "\u{1FA78} +20% \u{1FA78}". Suppress the suffix whenever it would repeat the relic's icon. */
+  const bt=(e.boosts||[]).map(b=>{const _ri=_resIco[b.res||'both'];const _sfx=(_ri&&_ri!==b.icon)?(' '+_ri):'';
+    return `<span style="font-size:10px;color:${b.col};margin-left:4px" title="${b.label}">${b.icon} +${b.pct}%${_sfx}</span>`;}).join('');
     const lt=e.type==='captured'?`<span style="font-size:10px;color:var(--td);margin-left:2px">Lv${e.unit.enemyLevel||1}</span>`:'';
     /* v813: Reanimated reads as its own outcome. These units were killed by Mictlan Clasp and
        raised, not spared and captured, so labelling them "captured" misrepresented what happened. */
@@ -16466,10 +16825,10 @@ function runTeotlReveal(earned,opts){
   nextRow();
 }
 function showEnding(){
-  /* v935: the run is over -- drop the blessing so the next visit to god select rerolls it.
-     Deliberately here rather than in initG(): initG runs when a patron is CHOSEN, which would
-     clear the very blessing that choice was made for. */
-  DT.blessedGod=null;try{saveDT();}catch(e){}
+  /* v935 · v1019: no longer nulls the blessing here. confirmGod already marked it spent, so the
+     next god-select rerolls on its own -- and leaving the value intact means the ending screen can
+     still say who was blessed. */
+  DT.blessedUsed=true;try{saveDT();}catch(e){}
   const gd=G.god;
   const _eLayer=(G._endingLayer!=null?G._endingLayer:G.layer); // v572: use the frozen cleared-layer snapshot
   /* v974: consume the snapshot. It is a one-shot handoff from the clear that produced it, and
@@ -17178,8 +17537,8 @@ function doTemazcal(unitId){
     else{const cu=G.captured.find(c=>(c._captureId||c.id)===unitId);if(cu)maxHp=allyMaxHpFor(unitId,cu.hp||50,G.dte.vassalHpMult||1);}
     if(maxHp>0){if(G.unitHpOverride)delete G.unitHpOverride[unitId];if(G.unitHpRatio)delete G.unitHpRatio[unitId];if(G.unitHpSnap&&G.unitHpSnap[unitId])G.unitHpSnap[unitId].cur=G.unitHpSnap[unitId].max;} // v514: full = no override, no ratio · v515: snap shows full too
   }
-  healFx('[data-tzk="'+String(unitId).replace(/"/g,'')+'"]'); /* v866: BEFORE renderTemazcal() tears the card out */
-  notify('🌿 TP & HP restored!','#9050c0');renderRes('rb-shop');renderTemazcal();
+  healFx('[data-tzk="'+String(unitId).replace(/"/g,'')+'"]'); /* v866: BEFORE renderTemazcal() tears the card out · v1034: healFx already prints its own RESTORED label (v869) -- the v1028 tzCallout here was a duplicate and has been removed */
+  notify('🫘 −'+cost+' Cacao','#9050c0'); /* v1033: the card callout already says RESTORED */renderRes('rb-shop');renderTemazcal();
   if(document.getElementById('mercs-list'))renderMercs(); /* v652: hire buttons reflect the cacao just spent */
   if(ftueGateActive()&&!G._ftueDidTemazcal){G._ftueDidTemazcal=true;renderMercs();renderTemazcal();ftueGateUpdate();} /* v305/v307 · v653: re-render temazcal AFTER the flag flips — the earlier render in this function ran pre-flag and left the other units greyed */
 }
@@ -17196,8 +17555,8 @@ function doTemazcalAll(){ // v417: restore every unit's TP for the sum of indivi
   G.res.cacao-=total;
   G.unitHpOverride=G.unitHpOverride||{};
   tasks.forEach(t=>{G.unitNP[t.id]=t.maxNP;if(t.hp>0){if(G.unitHpOverride)delete G.unitHpOverride[t.id];if(G.unitHpRatio)delete G.unitHpRatio[t.id];if(G.unitHpSnap&&G.unitHpSnap[t.id])G.unitHpSnap[t.id].cur=G.unitHpSnap[t.id].max;}});
-  tasks.forEach(function(t,i){healFx('[data-tzk="'+String(t.id).replace(/"/g,'')+'"]',i*90);}); /* v866: stagger so a full party reads as a sweep */
-  notify('🌿 All TP restored! ('+tasks.length+' units · '+total+' 🫘)','#9050c0');
+  tasks.forEach(function(t,i){healFx('[data-tzk="'+String(t.id).replace(/"/g,'')+'"]',i*90);}); /* v866: stagger so a full party reads as a sweep · v1034: healFx prints RESTORED itself */
+  notify('🫘 −'+total+' Cacao · '+tasks.length+' units','#9050c0'); /* v1033: per-card callouts say RESTORED */
   renderRes('rb-shop');renderTemazcal();if(document.getElementById('mercs-list'))renderMercs(); /* v652 */
   if(ftueGateActive()&&!G._ftueDidTemazcal){G._ftueDidTemazcal=true;renderMercs();ftueGateUpdate();}
 }
@@ -17496,7 +17855,11 @@ function showUnitTooltip(u){
   const _sk=u.isGod?((u.id&&u.id.indexOf('god_')===0)?u.id:'god_'+(u.baseGodId||(G.god&&G.god.id)||'')):_tk;
   const sb=surgeBonus(_tk);
   const _uG=!!u.isGod; /* v993: mirror mkGod/mkCap -- a flat tooltip over a curved stat is the classic create-vs-patch lie */
-  const hp=scR(bo.hp||100,lv,_uG)+sb.hp,atk=scR(bo.atk||0,lv,_uG)+sb.atk,mag=scR(bo.mag||0,lv,_uG)+sb.mag,def=scR(bo.def||0,lv,_uG)+sb.def,res=scR(bo.res||0,lv,_uG)+sb.res,np=scR(bo.np||20,lv,_uG)+sb.tp;
+  let hp=scR(bo.hp||100,lv,_uG)+sb.hp,atk=scR(bo.atk||0,lv,_uG)+sb.atk,mag=scR(bo.mag||0,lv,_uG)+sb.mag,def=scR(bo.def||0,lv,_uG)+sb.def,res=scR(bo.res||0,lv,_uG)+sb.res,np=scR(bo.np||20,lv,_uG)+sb.tp;
+  /* v1030: mirror mkGod's cross-type MIX flip, or the tooltip shows 0 MAG on a patron that
+     fields a real one in battle. */
+  const _ttX=(u.isPatron&&u.isGod)?oblationCrossStat(bo,lv):null;
+  if(_ttX){if(_ttX.stat==='atk')atk+=_ttX.value;else mag+=_ttX.value;}
   const _tpLvMult=lv>=50?1.5:lv>=40?1.25:1;
   const _bcTT=u.isGod?(bo.npCost||14):(bo.npCost||9); // v956
   const npCostAtLv=modelNpCost(_bcTT,lv,sb.cost,u.element,u.isPatron);
@@ -17611,11 +17974,12 @@ function showUnitTooltip(u){
   const _adTxt=chimaWord(((unitDefById((bo&&bo.id)||u.id)||bo).ad)||''); /* v976 */
   const abilLine=bo.ability?('<div class="tc-spec"><span class="tc-spec-name">🔮 '+bo.ability+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(_adTxt)+'</span></span><span class="tc-cost" '+statAttrs('cost')+'>✨ Cost: '+npCostDisplayHtml(npCostAtLv,_npPlainTT)+'</span></div><div class="tc-desc">'+_adTxt+'</div>'):'';
   const _oblCostLv=oblationCostAtLv(lv,u); /* v997: gate is inside now -- multiplying by _tpLvMult here would apply it twice */
+  const _oblPlainLv=modelNpCost(G._oblationNpCost||20,lv,0,u&&u.element,u?!!u.isPatron:true,true); /* v1021: pre-offering figure, see renderTraining */
   /* v771: the oblated special now mirrors the native special's markup (tc-spec + tc-cost +
      tc-desc) rather than being a cramped one-liner, so the two read as peers. The cost was
      already level-scaled via _oblCostLv -- it just was not presented like the real one. The
      oblated PASSIVE moved up beside the native passive; see the card head below. */
-  const oblLine=(u.isPatron&&G._oblationAk&&G._oblationAbility)?('<div class="tc-spec" style="margin-top:4px;border-top:0.5px dashed #4a2a6a;padding-top:5px"><span class="tc-spec-name" style="color:#a060e0">✟ '+G._oblationAbility+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(G._oblationAd||'')+'</span></span><span class="tc-cost" '+statAttrs('cost')+'>✨ Cost: '+_oblCostLv+'</span></div><div class="tc-desc">'+(G._oblationAd||'')+'</div>'):'';
+  const oblLine=(u.isPatron&&G._oblationAk&&G._oblationAbility)?('<div class="tc-spec" style="margin-top:4px;border-top:0.5px dashed #4a2a6a;padding-top:5px"><span class="tc-spec-name" style="color:#a060e0">✟ '+G._oblationAbility+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(G._oblationAd||'')+'</span></span><span class="tc-cost" '+statAttrs('cost')+'>✨ Cost: '+npCostDisplayHtml(_oblCostLv,_oblPlainLv)+'</span></div><div class="tc-desc">'+(G._oblationAd||'')+'</div>'):'';
   const offSec=_ol.affecting.length?('<div style="margin-top:6px;border-top:0.5px solid var(--br);padding-top:6px"><div style="font-size:10px;color:var(--td);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">🪶 Offerings boosting this unit</div>'+_ol.affecting.map(id=>{const o=OFFERINGS[id];return '<div style="font-size:11px;color:#c0e060;margin-bottom:2px">'+o.icon+' '+o.name+': <span style="color:var(--td)">'+o.desc+'</span></div>';}).join('')+'</div>'):'';
   const cardBody='<div class="train-card'+(u.isPatron?' tc-patron':'')+'" style="text-align:left;max-width:360px;margin:0 auto">'
     +'<div class="tc-head"><div class="tc-name">'+liveName(u)+(u.isPatron?' ⭐':u.isGod?' ✦':'')
@@ -17824,7 +18188,11 @@ function renderTraining(){
     if(!sgT.pending&&lv>=nextSurgeAt(sgT.claimedUpTo))sgT.pending=true; // v313: catches event-reward level-ups
     const isPatronRow=uk===('god_'+G.god.id);
     const capped=!isPatronRow&&lv>=getLevel('god_'+G.god.id); // v309: patron level cap
-    const isPrim=u.type==='MAG';
+    /* v1030: a cross-type oblation makes the patron MIX, so the card must present it as MIX. */
+    const _trX=(u.isPatron&&u.isGod)?oblationCrossStat(u,lv):null;
+    const _trType=_trX?'MIX':u.type;
+    const _xAtk=(_trX&&_trX.stat==='atk')?_trX.value:0,_xMag=(_trX&&_trX.stat==='mag')?_trX.value:0;
+    const isPrim=_trType==='MAG';
     const primStat=isPrim?u.mag:u.atk;const primEmoji=isPrim?'🪄':'🗡️';
     const sbPrim=isPrim?sbT.mag:sbT.atk;
     const _uG=!!u.isGod; /* v993: role for scR, used by every stat line and delta below */
@@ -17855,8 +18223,14 @@ function renderTraining(){
     const _lvfRec=(G._lvFlash&&G._lvFlash[uk]&&(Date.now()-G._lvFlash[uk].t)<2600)?G._lvFlash[uk]:null;
     const lvf=(_lvfRec&&!fl)?(()=>{const L0=_lvfRec.fromLv,p0=primStat||0;return{
       hp:ch-(scR(u.hp,L0,_uG)+sbT.hp),tp:np-(npMaxFor(u.np||20,L0,_uG)+sbT.tp), /* v1004 */
-      atk:u.type==='MIX'?(scR(u.atk||0,lv,_uG)-scR(u.atk||0,L0,_uG)):(isPrim?0:cp-(scR(p0,L0,_uG)+sbPrim)),
-      mag:u.type==='MIX'?(scR(u.mag||0,lv,_uG)-scR(u.mag||0,L0,_uG)):(isPrim?cp-(scR(p0,L0,_uG)+sbPrim):0),
+      /* v1031: branch on _trType, not u.type. A cross-oblated patron's TEMPLATE still says
+         MAG/PHYS while the card renders MIX, so this fell into the single-stat branch with
+         isPrim already false -- both deltas computed to 0 and the level-up arrows vanished. */
+      /* v1031: include the GRANTED stat's own growth. It is 75% of the oblated god's base scaled
+         to the patron's level, so it rises on level up too -- computing the delta from the
+         patron's template alone (0 on the granted side) hid that entirely. */
+      atk:(_trType==='MIX'?(scR(u.atk||0,lv,_uG)-scR(u.atk||0,L0,_uG)):(isPrim?0:cp-(scR(p0,L0,_uG)+sbPrim)))+(_trX&&_trX.stat==='atk'?(_xAtk-((oblationCrossStat(u,L0)||{value:0}).value)):0),
+      mag:(_trType==='MIX'?(scR(u.mag||0,lv,_uG)-scR(u.mag||0,L0,_uG)):(isPrim?cp-(scR(p0,L0,_uG)+sbPrim):0))+(_trX&&_trX.stat==='mag'?(_xMag-((oblationCrossStat(u,L0)||{value:0}).value)):0),
       def:cd2-(scR(u.def,L0,_uG)+sbT.def),res:cr-(scR(u.res||5,L0,_uG)+sbT.res),
       lv:lv-L0,cost:npCostNow-modelNpCost(_bcTR,L0,sbT.cost,u.element,u.isPatron)};})():null; // v956
     // v313: ▲ priority — (1) force-gain flash right after a pick, (2) hidden while a surge choice is
@@ -17905,11 +18279,16 @@ function renderTraining(){
        neither. Mirrors the native specBlock exactly, with the cost on the shared
        oblationCostAtLv curve so it moves on level up alongside the god's own special. */
     const _oblCostTC=oblationCostAtLv(lv,u); /* v997: gate is inside now -- see showUnitTooltip */
+    /* v1021: the native special has shown a struck-through pre-offering price since v957; the
+       oblated one showed only the final figure, so a discount or a Mushroom penalty on it was
+       invisible. noOfferings=true is exactly what modelNpCost's last argument is for. */
+    const _oblPlainTC=modelNpCost(G._oblationNpCost||20,lv,0,u&&u.element,u?!!u.isPatron:true,true);
     const oblBlock=(u.isPatron&&G._oblationAk&&G._oblationAbility)?('<div class="tc-spec" style="margin-top:4px;border-top:0.5px dashed #4a2a6a;padding-top:5px"><span class="tc-spec-name" style="color:#a060e0">\u271f '+G._oblationAbility+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(G._oblationAd||'')+'</span></span>'
-      +'<span class="tc-cost" '+statAttrs('cost')+'>\u2728 Cost: '+_oblCostTC+'</span></div>'
+      +'<span class="tc-cost" '+statAttrs('cost')+'>\u2728 Cost: '+npCostDisplayHtml(_oblCostTC,_oblPlainTC)+'</span></div>' /* v1021 */
       +'<div class="tc-desc">'+(G._oblationAd||'')+'</div>'):'';
-    const statMid=u.type==='MIX'
-      ?('<span data-stat="atk" '+statAttrs('atk')+'>🗡️ <b>ATK</b> '+sg(scR(u.atk||0,lv,_uG)+sbT.atk,scR(u.atk||0,lv+1,_uG)+sbT.atk,'atk')+'</span><span data-stat="mag" '+statAttrs('mag')+'>🪄 <b>MAG</b> '+sg(scR(u.mag||0,lv,_uG)+sbT.mag,scR(u.mag||0,lv+1,_uG)+sbT.mag,'mag')+'</span>')
+    /* v1030: branch on _trType, and fold the granted stat into both rows. */
+    const statMid=_trType==='MIX'
+      ?('<span data-stat="atk" '+statAttrs('atk')+'>🗡️ <b>ATK</b> '+sg(scR(u.atk||0,lv,_uG)+sbT.atk+_xAtk,scR(u.atk||0,lv+1,_uG)+sbT.atk+_xAtk,'atk')+'</span><span data-stat="mag" '+statAttrs('mag')+'>🪄 <b>MAG</b> '+sg(scR(u.mag||0,lv,_uG)+sbT.mag+_xMag,scR(u.mag||0,lv+1,_uG)+sbT.mag+_xMag,'mag')+'</span>')
       :('<span data-stat="'+(isPrim?'mag':'atk')+'" '+statAttrs(isPrim?'mag':'atk')+'>'+primEmoji+' <b>'+(isPrim?'MAG':'ATK')+'</b> '+sg(cp,np_,isPrim?'mag':'atk')+'</span>');
     const d=document.createElement('div');d.className='train-card'+(isPatronRow?' tc-patron':'');d.dataset.uk=uk; // v313: hover targeting · v612: patron flair
     d.innerHTML='<div class="tc-head">'
@@ -18263,6 +18642,16 @@ function doSacredOblation(godId){
         <div style="font-size:11px;color:#60b0ff;font-weight:600;margin-bottom:3px">◆ Special: ${g.ability}</div>
         <div style="font-size:11px;color:var(--td)">${g.ad||'—'}</div></div>
       <div style="font-size:12px;color:#e07070">Both will transfer to <strong>${G.god.name}</strong> for this run. ${g.name} will be sacrificed.</div>
+      ${(()=>{ /* v1031: one line. The v1030 version explained the whole mechanic and pushed the
+                  Confirm/Cancel buttons off screen, which mattered more than the explanation. */
+        const _pg=G.god;const _plv=getLevel('god_'+_pg.id);
+        const _sv=G._oblationAk;G._oblationAk=g.ak;
+        const _x=oblationCrossStat(_pg,_plv);
+        G._oblationAk=_sv;
+        if(!_x)return '';
+        const _lbl=_x.stat==='atk'?'\u{1F5E1}\uFE0F ATK':'\u{1FA84} MAG';
+        return `<div style="margin-top:.4rem;font-size:11px;color:#60a0d0">\u25C6 ${_pg.name} gains <strong>${_lbl} ${_x.value}</strong></div>`;
+      })()}
     </div>`,
     [{label:'Confirm Oblation',fn:()=>{
       G.party=G.party.filter(id=>id!==godId);
@@ -18284,7 +18673,10 @@ function doSacredOblation(godId){
       notify('✟ Sacred Oblation: '+g.name+' sacrificed — '+G.god.name+' gains their power!','#d4af37');
       addLog('<span style="color:#d4af37">♦ Sacred Oblation: '+g.name+' consumed — '+G.god.name+' inherits '+g.ability+'!</span>');
       renderPartyChips();renderAltar();
-      oblationFx(g.name); /* v996: after the re-render -- body-level fixed, so nothing clips it */
+      /* v1032: show the transfer itself. The blood splash still fires underneath it, so the
+         sacrifice still reads as a sacrifice rather than a clean handover. */
+      oblationFx(g.name);
+      oblationTransferFx(g,G.god);
     }},{label:'Cancel',fn:()=>{}}]);
 }
 function renderAltar(){
