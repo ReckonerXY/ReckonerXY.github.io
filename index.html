@@ -2364,7 +2364,13 @@ function renderChampions(){
     entries=Object.values(ch.byPatron||{}).sort((a,b)=>(b.penance-a.penance)||(b.date-a.date));
   }
   if(!entries.length){
-    list.innerHTML=`<div style="text-align:center;color:var(--td);padding:2.5rem 1rem;border:0.5px dashed var(--br);border-radius:12px">
+    /* v1040: if a pre-import backup exists, offer it here. The empty state is exactly where a
+       player who just lost their history will be looking. */
+    const _hasBk=(()=>{try{const r=localStorage.getItem('teotlan_dt_prev');if(!r)return 0;const b=JSON.parse(r);return Object.values(b.champions||{}).reduce((s,c)=>s+((c.recent||[]).length),0);}catch(e){return 0;}})();
+    list.innerHTML=(_hasBk?`<div style="text-align:center;margin-bottom:10px;padding:10px;border:0.5px solid #6a5200;border-radius:10px;background:#150d00">
+      <div style="font-size:12px;color:#d4af37;margin-bottom:6px">\u26A0 ${_hasBk} champion record${_hasBk===1?'':'s'} found in a pre-import backup.</div>
+      <button class="btn" onclick="restorePreImportChampions()" style="font-size:11px;padding:5px 14px;border-color:#d4af37;color:#d4af37">Restore them</button>
+    </div>`:'')+`<div style="text-align:center;color:var(--td);padding:2.5rem 1rem;border:0.5px dashed var(--br);border-radius:12px">
       <div style="font-size:32px;margin-bottom:.5rem;opacity:.5">\u{1F480}</div>
       <div style="font-size:13px">No champion has crossed the nine layers yet.</div>
       <div style="font-size:11px;margin-top:4px">Defeat Cipactli in Chiconahualoy\u00e1n to be recorded here.</div>
@@ -2697,7 +2703,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1039'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1042'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -3680,6 +3686,10 @@ const GOD_ENDINGS_L8={
     "She eats it, and does not flinch, and is not diminished.",
     "The <strong class='teotl'>TEOTL</strong> of the filth-eater settles into you \u2014 not a weight, but the absence of one.",
     "Eight layers crossed. The black water carries you up, and Mictlan lets you go."],
+  /* v1042: Mixcoatl had endings for L1-L4, L5 (Xiuhtecuhtli) and L9 but fell through to the
+     generic text from L5 (Malinalxochitl) down. His throughline: the descent is the greatest
+     hunt there is, and what he actually wants back is the open sky he was named for. */
+  mixcoatl:["The eighth hell is a thunder-layer, and it knows him. The storm over the black water breaks apart rather than be walked through.","Tlazoltéotl holds out her hands anyway. “Give it here. The hunt. All those deaths you carried down.”","“There is nothing here for you,” Mixcoatl says. “I ate every one of them. Nothing I took was ever wasted.”","She looks at him a while, then laughs and hands it back — the one thing in Mictlan she has ever declined.","The <strong class='teotl'>TEOTL</strong> of the crossing goes with him. Eight layers, and one hell above open sky."],
   mictlantecuhtli:["Tlazoltéotl kneels in the black water and eats the filth of the crossing, as she always does.","“You are almost there, lord. Ask me the question.”","“Is she below me?” — “Everything is below you. That is what being God King means. It is also the problem.”","The <strong class='teotl'>TEOTL</strong> of the eater of filth settles in him, heavy as silt.","Eight layers. One left — and the thing on his throne is in it. So, he is nearly certain, is she."],
 };
 const GOD_ENDINGS_L7={
@@ -3739,6 +3749,10 @@ const GOD_ENDINGS_L7={
     "The <strong class='teotl'>TEOTL</strong> of the maguey goes into her anyway, warm and unhurried, and for one long moment nothing in her aches.",
     "Seven layers crossed. She shoulders them all again and walks on toward the black water."],
   tlaloc:["Rain reaches even the sunless forest. The maguey drinks, and yields.","The <strong class='teotl'>TEOTL</strong> of the pulque goddess mingles with the storm like sap in water.","Seven layers drowned. The heart-eaters slink away from the thunder.","Tlaloc walks on, toward the black crossing."],
+  /* v1042: Mixcoatl had endings for L1-L4, L5 (Xiuhtecuhtli) and L9 but fell through to the
+     generic text from L5 (Malinalxochitl) down. His throughline: the descent is the greatest
+     hunt there is, and what he actually wants back is the open sky he was named for. */
+  mixcoatl:["Mayahuel lowers her cup. “Four hundred rabbits in this forest, hunter, and I stopped counting them an age ago.”","“Four hundred sons,” Mixcoatl says. “I never stopped. That is the worse of the two.”","She pours. He drinks. Neither of them says anything else about it, which is its own kind of courtesy.","The <strong class='teotl'>TEOTL</strong> of the heart-eating forest goes down warm and stays there.","Seven layers. For the first time since the first layer, the storm at his back is quiet."],
   mictlantecuhtli:["Mayahuel sets down her cup and looks at him for a long, level moment.","“She was here,” the maguey goddess says. “Your lady. A long time ago, going down. She did not say she was coming back.”","It is the first word of Mictlancíhuatl he has had in nine hundred years. He says nothing at all.","The <strong class='teotl'>TEOTL</strong> of the drunkards' heaven passes to him unremarked.","Seven layers. He goes to the eighth faster than he came."],
 };
 const STORY_LINES_L6=[
@@ -3788,6 +3802,10 @@ tonatiuh:["Opochtli’s net falls slack, and the black water goes still around y
   opochtli:["The arrows know their master and fall to still water.","Opochtli walks his own tideline, <strong class='teotl'>TEOTL</strong> pooling bright around his feet.","Six layers. The fisher-god was only ever going deeper."],
   tlaloc:["The rain of arrows meets the rain of storms, and loses.","The <strong class='teotl'>TEOTL</strong> of the fisher-god pours into the lord of rain.","Six layers drowned. Tlaloc wades on into the black water."],
   quetzalcoatl:["The volley breaks on feathered wind and scatters.","The <strong class='teotl'>TEOTL</strong> of the fisher-god settles over the plumed serpent.","Six layers. The wind carries you on into the dark."],
+  /* v1042: Mixcoatl had endings for L1-L4, L5 (Xiuhtecuhtli) and L9 but fell through to the
+     generic text from L5 (Malinalxochitl) down. His throughline: the descent is the greatest
+     hunt there is, and what he actually wants back is the open sky he was named for. */
+  mixcoatl:["Opochtli fills the whole grey sky with darts. Mixcoatl watches the volley the entire way down and steps into the one gap in it.","“You throw like a fisherman,” the hunter says. “Wide, and hoping.”","The <strong class='teotl'>TEOTL</strong> of the pierced shore comes to the god who gave the world the atlatl in the first place.","Six layers. He gathers the spent shafts out of the shallows as he wades on — a hunter wastes nothing."],
   mictlantecuhtli:["The arrows stop falling. Opochtli lowers his net and bows, which few things in Mictlan bother to do.","“I have fished these waters a long time, lord. Lately something else is fishing them.”","“Describe it.” — “It looks like you. That is the trouble.”","The <strong class='teotl'>TEOTL</strong> of the left-handed one comes to him.","Six layers. Now he knows the shape of the thing, and he does not slow down."],
 };
 const GOD_ENDINGS_L5_MAL={
@@ -3831,6 +3849,10 @@ const GOD_ENDINGS_L5_MAL={
   tepeyollotl:["The mountain heart does not poison.","The <strong class='teotl'>TEOTL</strong> of earthquakes shatters the scorpion's lair.","Five layers. Even the desert dust answers the tremor.","Tepeyollotl walks on. The sorcerer's thorns turn to obsidian."],
   itzpapalotl:["Malinalxochitl's swarms moved exactly as predicted — straight into the trap.","The <strong class='teotl'>TEOTL</strong> of the warrior goddess outlasts venom, because foresight outlasts fury.","Five layers. The strategist of obsidian leaves the desert nothing but her terms.","Itzpapalotl walks out of Pancuetlacaloyán. The campaign is hers, exactly as drawn."],
   malinalxochitl:["You faced your own reflection — fire for fire, venom for venom — and did not blink.","The <strong class='teotl'>TEOTL</strong> of the desert sorceress is wholly your own now, smoke and poison and all.","Five layers. At the bottom of Mictlan there is no brother waiting — only the truth that you never needed him to become this.","Malinalxochitl descends past her own shadow. Let Huitzilopochtli keep the sun; she has the dark, and it burns."],
+  /* v1042: Mixcoatl had endings for L1-L4, L5 (Xiuhtecuhtli) and L9 but fell through to the
+     generic text from L5 (Malinalxochitl) down. His throughline: the descent is the greatest
+     hunt there is, and what he actually wants back is the open sky he was named for. */
+  mixcoatl:["Malinalxochitl sets the crawling things of the desert on him — scorpions, serpents, the whole venomous roster.","A hunter has never once been troubled by animals.","The <strong class='teotl'>TEOTL</strong> of the sorceress sparks off his atlatl like flint on flint.","Five layers. She commanded beasts; he has been reading their tracks since before there was a desert to leave them in.","Mixcoatl crosses Pancuetlacaloyán. Behind him the scorpions turn and follow the thunder instead."],
   mictlantecuhtli:["Malinalxochitl falls in her desert of flags, delighted rather than afraid.","“The God King, walking! Someone has finally frightened you.”","“Someone has finally interested me,” he says.","The <strong class='teotl'>TEOTL</strong> of the sorceress winds around his wrist.","Five layers inspected. Whatever is wearing his crown is wearing it further down."],
 };
 const GOD_ENDINGS_L5_XIU={
@@ -9769,6 +9791,25 @@ const BELIC_SPEC_MAP={
   'Descent from the Trees':{mult:1.5,type:'mag',status:t=>{applyParalyze(t,1);applyPoison(t,1);}},
 };
 const BELIC_HEAL_ABILS=new Set(['Ancestral Storm','Storm Mend','Gust Mend','Holy Harvest','Dark Waters','Bioluminescent Chorus']);
+/* v1041: which cascaded heals also cleanse. Mirrors the real handlers -- Storm Mend and Gust Mend
+   are the two party heals that strip status; the rest (Dark Waters, Death Bloom, Holy Harvest,
+   Bioluminescent Chorus) do not. */
+const BELIC_CLEANSE_ABILS=new Set(['Storm Mend','Gust Mend']);
+/* v1041: SPLIT-LIST FIX. fireBelicAutoAction built its own target list and fired every aoe:true
+   special on the WHOLE opposing row, ignoring the per-ability caps that both normal paths honour
+   (AOE_CAP_AB via aoeCapFor for allies, enemyAoeTargets for enemies). That single omission is the
+   root cause behind the reported Tlapetlanmichin (Voltaic Discharge, cap 2) and Void Xolo
+   (Septic Howl, cap 3) reports, and it also over-applied Colony Sting and Jestress Nightmare.
+   Ally cascades take the N lowest-HP foes, matching the cascade's existing single-target rule
+   (it already snipes the weakest); enemy cascades reuse enemyAoeTargets so layer bosses stay
+   exempt exactly as they are on a normal enemy turn. */
+function belicAoeTargets(u,arr){
+  if(!arr||!arr.length)return arr||[];
+  if(!u||!u.isAlly)return enemyAoeTargets(u,arr);
+  const cap=aoeCapFor(u);
+  if(!cap||arr.length<=cap)return arr;
+  return arr.slice().sort((a,b)=>(a.currentHp||0)-(b.currentHp||0)).slice(0,cap);
+}
 
 // Async version — handles multi-hit with sequential animations, calls onDone when finished
 function fireBelicAutoAction(u,liveEnemies,allies,isEnemySide,onDone){
@@ -9782,19 +9823,25 @@ function fireBelicAutoAction(u,liveEnemies,allies,isEnemySide,onDone){
   // ── HEAL PATH ──────────────────────────────────────────────────────────
   if(BELIC_HEAL_ABILS.has(ab)&&anyDamaged&&hasNP){
     u.currentNP-=enemyNpCost(u);
-    if(ab==='Ancestral Storm'||ab==='Storm Mend'){
+    /* v1041: Storm Mend was bucketed with Ancestral Storm and resolved as a ~39% single-target
+       heal with no cleanse. Its real handler (both sides) is +20% to the WHOLE party + cleanse,
+       so a cascaded Spirit Hound healed the wrong number of units and stripped nothing -- the
+       reported bug. Ancestral Storm really is single-target-plus-Chimalli and stays here. */
+    if(ab==='Ancestral Storm'){
       const tgt=allies.reduce((a,b)=>a.currentHp/a.maxHp<b.currentHp/b.maxHp?a:b);
-      const h=Math.round(tgt.maxHp*(ab==='Ancestral Storm'?0.33:0.30)*BELIC_BOOST);
+      const h=Math.round(tgt.maxHp*0.33*BELIC_BOOST);
       tgt.currentHp=healTo(tgt,h);
-      if(ab==='Ancestral Storm')grantChimalli(tgt,0.04,'Ancestral Storm');
+      grantChimalli(tgt,0.04,'Ancestral Storm');
       renderBattle();animateHit(tgt.id,h,true);
       addLog(`<span class="log-heal">&#9889; Belic Rush: ${u.icon} ${ab} &#8594; ${tgt.icon} +${h} HP!</span>`);
     }else{
       const pct=Math.round(0.25*BELIC_BOOST*100);
       allies.forEach(a=>{const h=Math.round(a.maxHp*0.25*BELIC_BOOST);a.currentHp=healTo(a,h);animateHit(a.id,h,true);});
       if(ab==='Bioluminescent Chorus')allies.forEach(a=>applyAtkBuff(a,1)); /* v699: keep the buff half of the ability during a cascade */
+      const _clnz=BELIC_CLEANSE_ABILS.has(ab); /* v1041 */
+      if(_clnz)allies.forEach(a=>{if(a.currentHp>0)cleanseUnit(a);});
       renderBattle();
-      addLog(`<span class="log-heal">&#9889; Belic Rush: ${u.icon} ${ab} &#8594; all +${pct}% HP!</span>`);
+      addLog(`<span class="log-heal">&#9889; Belic Rush: ${u.icon} ${ab} &#8594; all +${pct}% HP${_clnz?' + cleanse':''}!</span>`);
     }
     onDone();return;
   }
@@ -9805,14 +9852,22 @@ function fireBelicAutoAction(u,liveEnemies,allies,isEnemySide,onDone){
     u.currentNP-=enemyNpCost(u);
     addLog(`<span class="log-thunder">&#9889; Belic Rush: ${u.icon} ${ab} &#8212; ${mh.hits} hits!</span>`);
     let hitNum=0;
+    /* v1041: the real Crippling Shock / Static Burst handlers collect the set of targets actually
+       struck and apply their status ONCE per unique target after the last hit. The cascade applied
+       it inside the hit loop, so four hits into a small enemy row stacked Poison/Paralyze x2-x4 on
+       the same unit -- the Xolotl over-poisoning report. */
+    const _mhStruck=new Set();
     const doHit=()=>{
-      if(hitNum>=mh.hits){onDone();return;}
+      if(hitNum>=mh.hits){
+        if(mh.status)_mhStruck.forEach(id=>{const e=liveEnemies.find(x=>x.id===id&&x.currentHp>0);if(e)mh.status(e);});
+        renderBattle();onDone();return;
+      }
       const live=liveEnemies.filter(e=>e.currentHp>0);
       if(!live.length){onDone();return;}
       const tgt=live[Math.floor(Math.random()*live.length)];
       const raw=mh.dmgFn(u,tgt);
       const hit=applyArmorDamage(tgt,Math.round(raw*BELIC_BOOST),isEnemySide);
-      if(hit>0){tgt.currentHp=Math.max(0,tgt.currentHp-hit);if(mh.status)mh.status(tgt);onHitContact(u,tgt);}
+      if(hit>0){tgt.currentHp=Math.max(0,tgt.currentHp-hit);_mhStruck.add(tgt.id);onHitContact(u,tgt);}
       refreshCaptureTargets();
       if(tgt.currentHp<=0)handleDeath(tgt);
       renderBattle();animateHit(tgt.id,hit,false);
@@ -9827,7 +9882,7 @@ function fireBelicAutoAction(u,liveEnemies,allies,isEnemySide,onDone){
   if(spec)u.currentNP-=enemyNpCost(u);
   const mult=spec?spec.mult:1.1;
   const useMag=spec?spec.type==='mag':(u.type==='MAG'||!!u.magStrike);
-  const targets=spec&&spec.aoe?liveEnemies:[liveEnemies.reduce((a,b)=>a.currentHp<b.currentHp?a:b)];
+  const targets=spec&&spec.aoe?belicAoeTargets(u,liveEnemies):[liveEnemies.reduce((a,b)=>a.currentHp<b.currentHp?a:b)]; /* v1041: was liveEnemies -- uncapped */
   const label=spec?ab:'Strike';
   const hits=[];
   targets.forEach(tgt=>{
@@ -18979,7 +19034,12 @@ async function openSaveFiles(){
       tecpatl_level:DT.tecpatl_level,
       tecpatl_seen:[...DT.tecpatl_seen],
       godTecpatl:DT.godTecpatl,
-      champions:DT.champions // v830: exported saves carry the Champions record too
+      champions:DT.champions, // v830: exported saves carry the Champions record too
+      /* v1040: written by saveDT but missing from the export, so a round trip through a save code
+         silently reset them. Keep this list in step with saveDT and applyImportedSave. */
+      tecpatlBeaten:DT.tecpatlBeaten||0,
+      blessedGod:DT.blessedGod||null,
+      blessedUsed:!!DT.blessedUsed
     },
     v:V,
     version:291
@@ -19031,19 +19091,67 @@ async function loadSaveCode(){
      <strong>Save Summary:</strong><br>
      ✦ TEOTL: <strong style="color:#d4af37">${teotlAmt}</strong><br>
      ✦ Divinity Tree upgrades: <strong style="color:#60e090">${dtUpgrades}</strong><br>
-     ✦ Tecpatl Level: <strong style="color:#ff8080">${tpLevel}</strong></div>`,
+     ✦ Tecpatl Level: <strong style="color:#ff8080">${tpLevel}</strong><br>
+     ✦ Champion runs in this code: <strong style="color:#d4af37">${Object.values(dtIn.champions||{}).reduce((s,c)=>s+((c.recent||[]).length),0)}</strong>
+     <div style="font-size:11px;color:var(--td);margin-top:8px">Champion records are <strong>merged</strong>, not replaced — clears already on this device are kept.</div></div>`,
     [{label:'Replace Save',cls:'btn-sac',fn:()=>{applyImportedSave(parsed);el.value='';notify('Save loaded!','#50e090');}},
      {label:'Cancel',fn:()=>{}}]);
 }
 
+/* v1040: merge two champion records. Entries are matched on patron+date, unique per run. */
+function mergeChampions(cur,inc){
+  const out=JSON.parse(JSON.stringify(cur||{}));
+  Object.keys(inc||{}).forEach(ch=>{
+    out[ch]=out[ch]||{recent:[],byPatron:{}};
+    out[ch].recent=out[ch].recent||[];
+    const seen=new Set(out[ch].recent.map(e=>e.patron+'|'+e.date));
+    (inc[ch].recent||[]).forEach(e=>{const k=e.patron+'|'+e.date;if(!seen.has(k)){out[ch].recent.push(e);seen.add(k);}});
+    out[ch].recent.sort((a,b)=>(b.date||0)-(a.date||0));
+    if(typeof CHAMPIONS_RECENT_CAP==='number'&&out[ch].recent.length>CHAMPIONS_RECENT_CAP)out[ch].recent.length=CHAMPIONS_RECENT_CAP;
+    out[ch].byPatron=out[ch].byPatron||{};
+    Object.entries(inc[ch].byPatron||{}).forEach(([pid,e])=>{
+      const prev=out[ch].byPatron[pid];
+      if(!prev||(e.penance||0)>(prev.penance||0)||((e.penance||0)===(prev.penance||0)&&(e.date||0)>=(prev.date||0)))out[ch].byPatron[pid]=e;
+    });
+  });
+  return out;
+}
+/* v1040: one-step undo. The pre-import snapshot lives under its own key so a mistaken
+   "Replace Save" is recoverable rather than final. Exposed on the Champions screen. */
+function restorePreImportChampions(){
+  try{
+    const raw=localStorage.getItem('teotlan_dt_prev');
+    if(!raw){notify('No pre-import backup found','#e07070');return;}
+    const b=JSON.parse(raw);
+    DT.champions=mergeChampions(DT.champions||{},b.champions||{});
+    saveDT();
+    if(typeof renderChampions==='function')renderChampions();
+    const n=Object.values(b.champions||{}).reduce((s,c)=>s+((c.recent||[]).length),0);
+    notify('Restored '+n+' champion record'+(n===1?'':'s'),'#50e090');
+  }catch(e){notify('Restore failed','#e07070');}
+}
 function applyImportedSave(parsed){
   const dtIn=parsed.dt||{};
   const vIn=parsed.v||{};
+  /* v1040 SAFEGUARD. Every field written by saveDT must be restored here, or importing a save code
+     silently destroys whatever this function forgets -- saveDT then persists the gap. That is
+     exactly how the Champions record was lost: v830 added it to the export and never to the import,
+     so teotl and unlocks survived while the champion history was overwritten with an empty object.
+     If you add a field to saveDT, add it here AND to the export payload in openSaveFiles(). */
+  const _dtBackup={champions:DT.champions||{},teotl:DT.teotl,unlocked:[...DT.unlocked]};
+  try{localStorage.setItem('teotlan_dt_prev',JSON.stringify(_dtBackup));}catch(e){}
   DT.teotl=dtIn.teotl||0;
   DT.unlocked=new Set(dtIn.unlocked||[]);
   DT.tecpatl_level=dtIn.tecpatl_level||0;
+  DT.tecpatlBeaten=dtIn.tecpatlBeaten||0;
   DT.tecpatl_seen=new Set(dtIn.tecpatl_seen||[]);
   DT.godTecpatl=dtIn.godTecpatl||{};
+  /* Champions MERGE rather than replace. A clear is a one-off event the player cannot re-earn by
+     grinding, and a save code is usually a backup or a transfer -- silently discarding clears
+     already on this device is never what they meant. */
+  DT.champions=mergeChampions(DT.champions||{},dtIn.champions||{});
+  DT.blessedGod=dtIn.blessedGod||null;
+  DT.blessedUsed=!!dtIn.blessedUsed;
   saveDT();
   // Replace V flags
   Object.keys(vIn).forEach(k=>{V[k]=vIn[k];});
