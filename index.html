@@ -930,7 +930,21 @@ function loadDT(){
     // v303 migration: dmg_preview became Strike Boost's prereq — grant it free to saves that already own strike_boost
     if(DT.unlocked.has('strike_boost')&&!DT.unlocked.has('dmg_preview'))DT.unlocked.add('dmg_preview');
     // No auto-unlocks: player must interact with Divinity Tree
-  }catch(e){DT={teotl:0,unlocked:new Set(),champions:{}}} // v830
+  }catch(e){
+    /* v1039: this used to hard-reset DT, destroying TEOTL, unlocks, penance progress AND the whole
+       Champions record on any parse error -- a single malformed field wiped a player's entire
+       history. Now it salvages whatever parses and only falls back per-field. */
+    console.error('loadDT failed, salvaging what we can',e);
+    let p={};try{p=JSON.parse(localStorage.getItem('teotlan_dt')||'{}')||{};}catch(e2){p={};}
+    DT.teotl=(typeof p.teotl==='number')?p.teotl:(DT.teotl||0);
+    DT.unlocked=new Set(Array.isArray(p.unlocked)?p.unlocked:[]);
+    DT.tecpatl_level=p.tecpatl_level||0;
+    DT.tecpatlBeaten=p.tecpatlBeaten||0;
+    DT.tecpatl_seen=new Set(Array.isArray(p.tecpatl_seen)?p.tecpatl_seen:[]);
+    DT.godTecpatl=(p.godTecpatl&&typeof p.godTecpatl==='object')?p.godTecpatl:{};
+    DT.champions=(p.champions&&typeof p.champions==='object')?p.champions:(DT.champions||{});
+    DT.blessedGod=p.blessedGod||null;DT.blessedUsed=!!p.blessedUsed;
+  } // v830
 }
 function saveDT(){try{localStorage.setItem('teotlan_dt',JSON.stringify({teotl:DT.teotl,unlocked:[...DT.unlocked],tecpatl_level:DT.tecpatl_level,tecpatlBeaten:DT.tecpatlBeaten||0,tecpatl_seen:[...DT.tecpatl_seen],godTecpatl:DT.godTecpatl,champions:DT.champions,blessedGod:DT.blessedGod||null,blessedUsed:!!DT.blessedUsed}));}catch(e){}}
 loadDT();
@@ -2683,7 +2697,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1034'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1039'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -2888,7 +2902,7 @@ const GODS=[
      because the no-casualty streak is not tracked -- so he is debug-only until those land. */
   {id:'xbalanque',name:'Xbalanque',flavor:'Twin Jaguar God Killer',element:'humanity',icon:'\u{1F406}',
     type:'PHYS',hp:155,atk:21,mag:0,def:12,res:8,np:40,npCost:24,
-    passive:'Nullifidian Rage: Xbalanque and his allies gain +7% HP, ATK, MAG, DEF and RES per vassal in the party',pk:'nullifidianRage',
+    passive:'Nullifidian Rage: Xbalanque and his allies gain +5% HP, ATK, MAG, DEF and RES per vassal in the party',pk:'nullifidianRage',
     ability:'Godbane Blowgun',ad:'0.5\u00d7ATK, 5 hits to random enemies \u2014 2\u00d7 damage against GODS',ak:'godbaneBlowgun',
     locked:true,unlockCriteria:'Defeat him in Apanohual\u00f3yan'} /* v907: naming Xbalanque on a ??? card gave the secret boss away before the player ever met him */,
   {id:'mictlantecuhtli',name:'Mictlantecuhtli',flavor:'God King of the Dead',element:'night',icon:'\u{1F480}',
@@ -3494,7 +3508,7 @@ MINIBOSS_CAP_STATS['atlaua']={hp:188,atk:22,mag:0,def:13,res:8,np:44,npCost:32,f
 MINIBOSS_CAP_STATS['acuecueyotl']={hp:178,atk:0,mag:16,def:11,res:13,np:44,npCost:36,fv:6,ability:'Surging Tide',ad:'Heal 23% all allies + Slow ×1 to 4 random foes',ak:'surgingTide'};
 const TLACATEOCOTL_TPL={id:'tlacateocotl',name:'Tlacateocotl',flavor:'The Owlman Sorcerer',icon:'🦉',isMiniBoss:true,isBoss:false,isAlly:false,element:'wind',type:'MAG',
   ability:'Death Screech',ad:'1.6×MAG AoE — destroys all Chimalli + Burn ×1 + Wound ×1',ak:'deathScreech',
-  hp:540,atk:0,mag:24,def:12,res:14,np:55,npCost:34,fv:0};
+  hp:635,atk:0,mag:24,def:12,res:14,np:55,npCost:34,fv:0};
 /* v704: L8 duo minibosses (B4). Deities, not Gods -- capturable as vassals, never playable gods.
    Not wired into any live battle pool: L8 has no scaffolding, so they are debug-only for now. */
 const IXPUXTEQUI_TPL={id:'ixpuxtequi',name:'Ixpuxtequi',flavor:'The Eagle-Footed One Who Waits in the Trees',icon:'\u{1F9B6}',isMiniBoss:true,isBoss:false,isAlly:false,element:'night',type:'MAG',
@@ -3512,6 +3526,18 @@ MINIBOSS_CAP_STATS['ometochtli']={hp:188,atk:0,mag:19,def:12,res:12,np:44,npCost
    processNextCap), two of which were already commented SPLIT-LIST. Block scoping meant the
    fireGodSpecial copy was not visible inside the Mictlan Clasp branch, which is why the Clasp
    could not resolve a mini-boss species at all. One definition now; add new mini-bosses here. */
+/* MINI-BOSS ENCOUNTER BUDGET. Read this before "balancing" any of these HP values.
+   Mini-boss fights are NOT one unit per layer. L3 fields Xiuhnel AND Mimich, L8 fields Ixpuxtequi
+   AND Nexoxcho, and L6 fields a trio; the rest are solo. So a per-unit HP comparison is meaningless
+   -- v1036 made exactly that mistake, saw Mimich at 2.50x its layer average, "levelled" it, and
+   doubled the L3 encounter from 5.34x to 10.78x.
+   The number that matters is the ENCOUNTER TOTAL as a multiple of the layer's average enemy HP:
+       L1 3.90x   L2 3.39x   L3 5.34x   L4 5.33x   L5 5.38x   L6 16.77x (trio)   L7 5.39x   L8 6.14x
+   L1 and L2 sit low on purpose: they are the on-ramp, fought by a party with almost no offerings,
+   surges or Divinity Tree. L6 is a trio, so its total is high but each body is ~5.6x.
+   v1038 restored every value v1036 touched EXCEPT L5 Tlacateocotl (540 -> 635), whose 4.58x was a
+   real gap against its solo peers. These are ENEMY templates; the v1001 MINIBOSS_CAP_STATS band
+   governs the PLAYABLE capture and is untouched -- mkEnemy has never read it. */
 const MINIBOSS_TEMPLATES=[XOCHITONAL_TPL,QUINAMETZIN_TPL,XIUHNEL_TPL,MIMICH_TPL,MICTLAMPEHECATL_TPL,TLACATEOCOTL_TPL,AMIMITL_TPL,ATLAUA_TPL,ACUECUEYOTL_TPL,OMETOCHTLI_TPL,IXPUXTEQUI_TPL,NEXOXCHO_TPL];
 const MALINALXOCHITL_BOSS_TPL={id:'boss_mal',name:'Malinalxochitl',flavor:'Sorcerer Goddess of the Desert',icon:'🌵',isBoss:true,isAlly:false,element:'fire',type:'MAG',
   ability:'Fiery Stinger',ad:'1.3×MAG to 1 enemy + 0.4×MAG splash + Burn ×2 all targets',ak:'fieryStinger',
@@ -4929,11 +4955,22 @@ function godPronounById(id,name,which){
   return godPronoun(g,which);
 }
 // sc() below is the ENEMY curve.
+/* ═══ v1035: PENANCE STAT SCALING ═══════════════════════════════════════════
+   +5% to EVERY enemy stat per active penance modifier, additive. Penance previously only nudged
+   individual dials (levels, one stat surge, crit, reinforcements) and barely moved the difficulty;
+   this is the global pressure. Additive so the marginal modifier is always worth the same, matching
+   the v1023 decision on the TEOTL payout.
+     penance   0     1     2     3     4     5     8
+     mult    1.00  1.05  1.10  1.15  1.20  1.25  1.40
+   Enemy lead over a Lv74 vassal: 49% at 0 penance, 72% at 3, 87% at 5.
+   Applied inside sc(), the single ENEMY scaling funnel -- scR() (allies) is deliberately untouched,
+   so this can never leak onto the player's side. */
+function penanceStatMult(){return 1+0.05*((G&&G.tecpatl_mods&&G.tecpatl_mods.length)||0);}
 function sc(base,lv){
   // v317 BALANCE TEST: +4% per level, +8% milestone every 10 levels (was every 5) —
   // halves the compounding divergence vs the flat ally curve identified in the HP gap analysis.
   const milestones=Math.floor((lv-1)/10);
-  return Math.round(base*Math.pow(1.04,lv-1)*Math.pow(1.08,milestones));
+  return Math.round(base*Math.pow(1.04,lv-1)*Math.pow(1.08,milestones)*penanceStatMult());
 }
 function cdm(id){return Math.pow(0.97,Math.floor(getLevel(id)/5));}
 function shCost(){return Math.round((4+G.battleNum+Math.floor(((G.layer||1)-1)/2)*2)*G.dte.flowerCostMult);} // v691: per-layer cost RESETS each layer (early-game friendly again), but the per-layer BASE climbs +2 every two layers — so L1-2 start cheap, L7-8 start dearer. Replaces v684's run-wide shieldsBought escalation, which made early Chimalli too costly.
@@ -5861,7 +5898,7 @@ function applyAff(units){
   if(hasPassive('nullifidianRage')){
     const vassals=units.filter(u=>u&&u.isAlly&&!u.isGod&&u.currentHp>0).length;
     if(vassals>0){
-      const m=1+0.07*vassals;
+      const m=1+0.05*vassals; /* v1039: 7% -> 5% per vassal */
       units.filter(u=>u&&u.isAlly).forEach(u=>{
         u.maxHp=Math.round((u.maxHp||0)*m);
         u.currentHp=Math.min(u.maxHp,Math.round((u.currentHp||0)*m));
@@ -9810,17 +9847,22 @@ function fireBelicAutoAction(u,liveEnemies,allies,isEnemySide,onDone){
 
 // Chain cascade units sequentially — each unit waits for the previous to finish
 function runBelicChain(units,idx,getEnemies,getAllies,isEnemySide,animFn){
-  if(idx>=units.length){
+  /* v1039: every exit from the cascade must honour a pending phase transition. handleDeath only
+     RAISES _cipactliPending; advanceTurn is what consumes it, and a cascade never returns through
+     advanceTurn. Without this, killing Mictlantecuhtli inside a Belic Rush chain dropped the flag
+     and the run ended at phase 1 -- no Cipactli, and no champion record. */
+  const _belicExit=()=>{
     G._belicCascading=false;
-    // Wake up processCurrentSlot so non-cascade allies (e.g. Earth units) still get their turn
+    if(G._cipactliPending){G._cipactliPending=false;startCipactliPhase();return;}
     setTimeout(processCurrentSlot,100);
-    return;
-  }
+  };
+  if(idx>=units.length){_belicExit();return;}
   const u=units[idx];
   const enemies=getEnemies();
   const allies=getAllies();
   if(!enemies.length&&!getAllies().some(a=>a.currentHp<a.maxHp)){
-    G._belicCascading=false;return;
+    /* v1039: this used to return outright, leaving the turn dangling as well as dropping the flag. */
+    _belicExit();return;
   }
   setTimeout(()=>{
     fireBelicAutoAction(u,enemies.filter(e=>e.currentHp>0),allies.filter(a=>a.currentHp>0),isEnemySide,()=>{
@@ -11262,8 +11304,9 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
         const _rmVv=(hasOffering('vulture_vessel')&&tgt._killerAlly&&tgt._killerElem==='nature')?1.15:1;
         const _rmBa=1+(((tgt.woundStacks||0)>0)?(getOfferingEffects().bloodyArrow||0):0);
         const _rmCb=1+(((tgt.burnStacks||0)>0)?(getOfferingEffects().burnCacaoBonus||0):0);
-        const _rmB=Math.round((tgt.maxHp||0)*0.45*G.dte.bloodBonus*getLayerResMult()*_rmVv*_rmBa);
-        const _rmC=Math.round((tgt.maxHp||0)*0.27*getLayerResMult()*_rmVv*_rmCb);
+        const _pRewHp2=(tgt.maxHp||0)/penanceStatMult(); /* v1035: see handleDeath */
+        const _rmB=Math.round(_pRewHp2*0.45*G.dte.bloodBonus*getLayerResMult()*_rmVv*_rmBa);
+        const _rmC=Math.round(_pRewHp2*0.27*getLayerResMult()*_rmVv*_rmCb);
         const _rmBoosts=[];
         if(_rmVv>1)_rmBoosts.push({icon:'\u{1F3FA}',label:'Vulture Vessel',pct:Math.round((_rmVv-1)*100),col:'#c0a060',res:'both'});
         if(_rmBa>1)_rmBoosts.push({icon:'\u{1FA78}',label:'Bloody Arrow',pct:Math.round((_rmBa-1)*100),col:'#e07070',res:'blood'});
@@ -15565,7 +15608,10 @@ function handleDeath(dead){
     const _vvM=(hasOffering('vulture_vessel')&&dead._killerAlly&&dead._killerElem==='nature')?1.15:1;
     const _baM=1+(((dead.woundStacks||0)>0)?(getOfferingEffects().bloodyArrow||0):0); /* v939: read the same effect value the slay path does rather than hardcoding 1.20 -- if the offering is ever retuned, both sides move together */
     const _cbM=1+(((dead.burnStacks||0)>0)?(getOfferingEffects().burnCacaoBonus||0):0); /* v1012 */
-    let _gbB=Math.round(dead.maxHp*.45*G.dte.bloodBonus*getLayerResMult()*_feM*_vvM*_baM);const _gbC=Math.round(dead.maxHp*.27*getLayerResMult()*_feM*_vvM*_cbM);
+    /* v1035: divide the penance stat buff back out. This reward is HP-driven, so a +5%/penance
+       enemy buff would otherwise hand the player the same +5% in Blood and Cacao. */
+    const _pRewHp=(dead.maxHp||0)/penanceStatMult();
+    let _gbB=Math.round(_pRewHp*.45*G.dte.bloodBonus*getLayerResMult()*_feM*_vvM*_baM);const _gbC=Math.round(_pRewHp*.27*getLayerResMult()*_feM*_vvM*_cbM);
     /* v807: Obsidian Fishhook -- first kill of the battle only, Blood side alone. */
     let _fhBoost=0;
     if(!G._fishhookUsed){
