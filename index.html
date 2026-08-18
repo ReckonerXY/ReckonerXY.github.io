@@ -326,6 +326,13 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .uc.selectable:hover{border-color:#d4af37;background:#241a08}
 .uc.selected-actor{border-color:#d4af37;background:#241a08;box-shadow:0 0 0 2px #d4af3740}
 .uc.acted,.uc.acted-enemy{opacity:.55;filter:grayscale(70%);border-color:#3a3a3a;background:#111} /* v767: enemies now match the player dim exactly */
+/* v1045: a unit the Belic Rush cascade has claimed but not yet fired. Deliberately NOT the acted
+   dim -- it is waiting its turn, not finished. Reads as lit and pending. */
+.uc.belic-queued{border-color:#6a40a0;background:#150a24;box-shadow:0 0 0 1px rgba(176,144,224,.25),0 0 10px rgba(144,80,192,.18);animation:belicQueuePulse 1.6s ease-in-out infinite}
+@keyframes belicQueuePulse{0%,100%{box-shadow:0 0 0 1px rgba(176,144,224,.25),0 0 10px rgba(144,80,192,.18)}50%{box-shadow:0 0 0 1px rgba(176,144,224,.45),0 0 16px rgba(144,80,192,.34)}}
+/* the one whose slot is resolving right now -- warm, not purple, so it cannot be mistaken for the queue */
+.uc.belic-acting{border-color:#c8a050;background:#1c1408;box-shadow:0 0 0 1px rgba(224,192,96,.45),0 0 18px rgba(200,160,80,.30)}
+@media (prefers-reduced-motion: reduce){.uc.belic-queued{animation:none}}
 .uc.slain{opacity:.6;border-color:#5a1010;background:#1a0404}
 .uc.fallen-ally{opacity:.6;border-color:#5a1010;background:#1a0404}
 .uc.captured-enemy{opacity:.6;border-color:#1a5a2a;background:#041a0a}
@@ -538,6 +545,7 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
     <div class="debug-row"><div><div style="font-size:12px;color:#c0a0e0">🎲 Altar God Reroll</div><div style="font-size:10px;color:#a070c0">Adds a Reroll button on the Altar itself — eligible list logged to console</div></div><button id="dbg-altarreroll-btn" class="btn btn-debug" onclick="debugToggleAltarReroll()" style="font-size:11px;padding:4px 10px">Altar Reroll: OFF</button></div>
     <div class="debug-row"><div><div style="font-size:12px;color:#ffd700">⚡ Force Crit (100%)</div><div style="font-size:10px;color:#a070c0">Every strike &amp; special always crits — verify crit paths</div></div><button id="dbg-forcecrit-btn" class="btn btn-debug" onclick="debugToggleForceCrit()" style="font-size:11px;padding:4px 10px">Force Crit: OFF</button></div>
     <div class="debug-row"><div><div style="font-size:12px;color:#e0a040">🍺 DRUNK Misfire Test</div><div style="font-size:10px;color:#a070c0">Test Battle: instant random battle, everyone Drunk ×2 &middot; Apply: drunk a battle already in progress</div></div><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-debug" onclick="debugDrunkBattle()" style="font-size:11px;padding:4px 10px;background:#2a1a0a;border-color:#8a5010;color:#e0a040">⚔️ Test Battle</button><button class="btn btn-debug" onclick="debugDrunkAll()" style="font-size:11px;padding:4px 10px">🍺 Apply</button></div></div>
+    <div class="debug-row"><div><div style="font-size:12px;color:#b090e0">⚡ BELIC RUSH Test</div><div style="font-size:10px;color:#a070c0">Mixcoatl patron + Tlapetlanmichin / Void Xolo / Spirit Hound / Xolo Guardian / Xolotl vs 6 foes, full TP, party pre-damaged &amp; statused &middot; Audit logs each cascaded action's target count against the ability's cap</div></div><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-debug" onclick="debugBelicRushBattle()" style="font-size:11px;padding:4px 10px;background:#1a0a2a;border-color:#6a40a0;color:#c0a0ff">⚡ Test Battle</button><button id="dbg-belicaudit-btn" class="btn btn-debug" onclick="debugToggleBelicAudit()" style="font-size:11px;padding:4px 10px">Audit: OFF</button></div></div>
     <div class="debug-row"><div style="font-size:12px">\u2726 Ometeotl Blessing</div><div style="display:flex;gap:4px;flex-wrap:wrap">
       <button class="btn btn-debug" onclick="debugCycleBlessing()" style="font-size:11px;padding:4px 8px">Next god</button>
       <button class="btn btn-debug" onclick="debugRerollBlessing()" style="font-size:11px;padding:4px 8px">Reroll</button>
@@ -2703,7 +2711,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1042'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1049'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -4684,7 +4692,7 @@ function initG(){
 // saved; resuming lands at the start of the current battle. Meta (DT/V) is separate.
 const RUN_SAVE_VERSION=1;
 const RUN_SKIP=new Set(['units','enemies','log','battlePhase','roundNum','roundQueue','qIdx',
-  'actedIds','nextRoundSlowIds','thisRoundSlowTail','slowedThisRound',
+  'actedIds','_belicQueue','_belicActing', /* v1045 */'nextRoundSlowIds','thisRoundSlowTail','slowedThisRound',
   '_tecpatlSeen','_contFn','currentEvent','_xochipilliEventFight','_slowedUnits','selectedActorId',
   'pendingAction','captureTargets','captureQueue','capActive','_capturePending','_actingEnemy',
   '_actingAllyElem','_actingAllyLethSpec','_cipactliRound', /* v1012 */
@@ -5311,6 +5319,83 @@ function debugDrunkAll(){ // debug: Drunk ×2 to every living unit both sides (b
   [...(G.units||[]),...(G.enemies||[])].forEach(x=>{if(x&&x.currentHp>0)x.drunkStacks=Math.min(4,(x.drunkStacks||0)+2);reverieRecalc(x);});
   if(typeof renderBattle==='function')renderBattle();
   addLog('<span style="color:#e0a040">🍺 DEBUG: Drunk ×2 applied to all living units</span>');
+}
+/* v1043: BELIC RUSH TEST RIG. Builds the exact board the v1041 fixes were written against --
+   Mixcoatl as patron plus every Thunder unit whose special exercises a different branch of
+   fireBelicAutoAction -- against enough foes for the target caps to actually bite. The reported
+   bugs all needed 4+ enemies to be visible at all, which is why they survived so long.
+
+     Tlapetlanmichin  Voltaic Discharge  AoE, cap 2   (was hitting everything)
+     Void Xolo        Septic Howl        AoE, cap 3   (was poisoning everything)
+     Spirit Hound     Storm Mend         party heal + cleanse (was a single-target heal)
+     Xolotl (god)     Crippling Shock    4-hit, status once per unique target (was per hit)
+     Xolo Guardian    Static Bite        single target -- the control: it must stay at 1
+
+   Turns the audit flag on, so each cascaded action logs got-vs-want inline. */
+const DBG_BELIC_VASSALS=['at5','mt3','mt4','mt1'];
+function debugBelicRushBattle(){
+  const plv=G._dbgPartyLv||40, elv=G._dbgBattleLv||40;
+  G.dte=getDTEffects();initG();loadV();
+  /* Session-only seeds, exactly as debugJumpBoss does it -- no saveV(), so a debug test never
+     writes unlocks into the player's real progress. */
+  GODS.forEach(g=>{V[g.id]=true;for(let L=1;L<=9;L++)V['layer'+L+'_'+g.id]=true;});
+  V['mixcoatl_unlocked']=true;V['xol_unlocked']=true;
+  const patron=GODS.find(g=>g.id==='mixcoatl');
+  if(!patron){notify('Mixcoatl not found in GODS','#e05050');return;}
+  G.god=patron;G.party=[patron.id];G.levels['god_'+patron.id]=plv;
+  G.deplSel=[];
+  const xolotl=GODS.find(g=>g.id==='xolotl');
+  if(xolotl){G.party.push(xolotl.id);G.levels['god_'+xolotl.id]=plv;G.deplSel.push('god_'+xolotl.id);}
+  DBG_BELIC_VASSALS.forEach((bid,i)=>{
+    const cu=unitDefById(bid);
+    if(!cu){console.warn('belic rig: no unit def for '+bid);return;}
+    const cid='dbgbelic_'+bid+'_'+i;
+    G.captured.push({...cu,_captureId:cid,baseId:cu.id});
+    G.levels[cid]=plv;G.deplSel.push(cid);
+  });
+  /* The deploy cap is a Divinity Tree value and is normally 2-4; startBattle itself honours
+     deplSel verbatim, but the cap is raised anyway so the deploy screen agrees if it is opened. */
+  G.res={blood:999000,cacao:999000,flower:999000};
+  G.layer=8;G.battleNum=3;G.battlesCompleted=2;
+  G.chosenDifficulty='easy';G.pendingEvent=null;G._pendingEventRolled=true;
+  G.dte=getDTEffects();G.dte.maxAllies=Math.max(G.dte.maxAllies||2,G.deplSel.length);
+  // Six foes: below four, a cap of 2 or 3 is indistinguishable from hitting everyone.
+  const foes=ALL_CAP_DEFS.filter(c=>c&&!c.isBoss&&!c.isMiniBoss).slice(0,6);
+  G.pendingEnemies=foes.map((d,i)=>mkEnemy(d,i,1.0,elv));
+  G._dbgBelicAudit=true;
+  startBattle();
+  /* Full TP on every ally, or a cascading unit silently falls through to a plain strike and the
+     whole test reads as a failure. NOTE the trap: a built unit's `np` is still the TEMPLATE base
+     (29 for Tlapetlanmichin) while enemyNpCost() is level-scaled (91 at Lv60), so `currentNP=u.np`
+     leaves everyone below cost. maxNPFor(key, base) is the real ceiling. */
+  (G.units||[]).forEach(u=>{if(u&&u.currentHp>0)u.currentNP=maxNPFor(u._captureId||u.id,u.np);});
+  /* Pad foe HP so the first cascade cannot kill anything. A death mid-chain opens a capture window,
+     which suspends the cascade until the player resolves it and scatters the audit lines across
+     several screens -- with the stock roster the first two foes died on the second cascaded action
+     and three of the five audits never printed. The floor is derived from the party's own strongest
+     stat rather than a fixed multiplier, so it holds when the level overrides are changed. They
+     still die on later rounds, so the capture path is not removed from the test, only pushed past
+     the pass the audit cares about. */
+  const _pk=Math.max(1,...(G.units||[]).map(u=>Math.max(u.atk||0,u.mag||0)));
+  (G.enemies||[]).forEach(e=>{if(!e)return;const _f=Math.max(Math.round(e.maxHp*4),_pk*40);e.maxHp=_f;e.currentHp=_f;});
+  /* Wound the party and dirty it with status, so Storm Mend's heal AND its cleanse both have
+     something to do. Direct assignment on purpose -- this is setup, not gameplay. */
+  (G.units||[]).forEach((u,i)=>{
+    if(!u||u.currentHp<=0||u.id==='god_'+patron.id)return;
+    u.currentHp=Math.max(1,Math.round(u.maxHp*0.45));
+    if(i%2===0){u.poisonStacks=2;u.burnStacks=1;}else{u.paralyzStacks=1;u.woundStacks=2;}
+  });
+  if(typeof renderBattle==='function')renderBattle();
+  addLog('<span class="log-thunder">\u26a1 BELIC RUSH TEST \u2014 party Lv'+plv+' vs '+G.pendingEnemies.length+' foes Lv'+elv+'. Audit ON.</span>');
+  addLog('<span style="color:#a070c0;font-size:11px">Act with \ud83c\udff9 Mixcoatl FIRST \u2014 the cascade only fires on unacted Thunder allies, so anyone who moves before him is excluded.</span>');
+  addLog('<span style="color:#a070c0;font-size:11px">Expect: \u26a1 Voltaic Discharge 2 foes \u00b7 \ud83d\udc3a Septic Howl 3 foes \u00b7 \ud83e\uddd9 Storm Mend all allies + cleanse \u00b7 \ud83d\udc15 Crippling Shock \u22641 status per target \u00b7 \ud83e\uddae Static Bite 1 foe.</span>');
+  notify('\u26a1 Belic Rush test battle \u2014 act with Mixcoatl first','#b090e0');
+}
+function debugToggleBelicAudit(){
+  G._dbgBelicAudit=!G._dbgBelicAudit;
+  const b=document.getElementById('dbg-belicaudit-btn');
+  if(b)b.textContent='Audit: '+(G._dbgBelicAudit?'ON':'OFF');
+  notify('\u26a1 Belic Rush audit '+(G._dbgBelicAudit?'ENABLED \u2014 cascade logs got-vs-want':'disabled'),'#b090e0');
 }
 function debugDrunkBattle(){ // v538: one-click misfire test — random Lv20 battle, EVERYONE starts Drunk ×2 (10% misfire)
   if(!G.god){dbgSetupTestRun(20);notify('🧪 Test party ready: Lv20, all units unlocked','#a070c0');}
@@ -6100,7 +6185,14 @@ const GOD_SELECT_DESC={
 // Each entry: { src: 'data:image/jpeg;base64,...', smooth: bool }
 // smooth:false → pixelated/crisp  |  smooth:true → browser bilinear
 // mix-blend-mode:screen removes the black background on dark cards
+/* v1049: baseline multiplier for god portraits on unit/battle cards. See unitIconHtml. */
+const GOD_CARD_SCALE=1.45;
 const GOD_PORTRAITS={
+  /* v1046: Xochitonal, L1 miniboss. First non-god pixel portrait for a MINIBOSS -- the key is the
+     bare template id, which covers both instantiation paths (live 'xochitonal_5' strips to it;
+     debug mkEnemy carries it in baseId). The boss_ alias loop below also derives
+     'boss_xochitonal' for free, harmless since he is never built under that prefix. */
+  xochitonal:{scale:1.45,src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAE00lEQVR42u1aPY7qMBC2Q6qsKLbgAhQIUXMCJHrEDd5yhD3HOwJwA0QfCb1mpS2oUUSxF0ixBdpUu8orVpM3DDOOnTgI9mWkCDB24vn8zY/HUaqVVlpp5T8WfU+TjYa9nLZlSap/LABU4c9+VHwP3zI1fpqq/SquBUZ468pjpTnl8f+R+h7jAkRwqwCAEuFbdnGNn6biuPHTVEXDXs6Zy10xgK5kNOzlu+VWKaXUZDETWYHNJVK9vIwNgboTyZJUY8WzJNVZkurwLTvrh83isx+VsiFUdy5ZkmqwfeoTMCv2q5j1D/reFI6GMq2jYS8HAIjyCrfj8cE9rjinOPgI6ihBeWj3mgdwq2FaoaYYAc4RZLKYnYVJ6iD3q7gA8kcAgH9zkQKzgbJJ130wB4CPFNVnuixlklmS6lo+YLfcnj2Qo6Pt5KooJe0N6MVllBAiA192ZwLGVTnbtrJ2nAN4dYK2ynGZ3GQxu2gvMyNprNQX+wLsFLEfAOcYVFH+sx8p0+UKFNcPswiyQIlZtK+ULoNDHD9NCzYELorjRAM7E3wBunDhGG1jSibzAqUwCBw4YPsYBBoBgBGBrfIUOVB+t9wWdPtI0gtbA8CkFXEBHjOM2rjkeyaLWTFuv4ovgAhtlX/98/LdgBjw2Y8KxXbLrXpYzNRHkqqHYY8NQXgFy8Ik9OXqARwLOYbQggmMgzarPECyY2kS0n80BnOOKktSbSqEiDs6ZHrCRoidk3UeABPtjB6L79T2OSeIAaEAASOwaWCqu0iVMWeboe58kONPbh/eGT2e0Wy33IqAuE7cRPeqAjYPpkB9F5hgQJXGv+F7Z/SoTpujPm2OmnpYDA52lBQIygJfK2gLgsiAr8O7ip/XKhr28vh5reLnterOBznHBgAFQtXX4V3BpxRrXRjRlOxX8dl8sAMOOe9Ld1SnzVF354P86/BeKA39oA9XqDQ5oSYFg47nwEUejdNM7PRo2tmdD/L4eX0Rz00VWroKUpTwrTidk6T8BQNw0sINMK22jUj78jJAbM2IU7xsax7ibEmS7nyQnzZHDUmRaXVtAJImatvflm02NQlNi4lcqLDZg+OsEZwO54iu4fBcijEhLi1TEMp2c3Rbew0Ffay69V6gTCGotdO+EguqKGRrLlVLcCG+AccCn7bpEilgX4Db4HmuPqQyA+oI3olR72+q0ppMqgk/EtIJYBZw6PsEwkfl2NXpWTGAiwDY3l1BkQ4lymoQ14gioa0z4dpNoFwr7NUV74cXuBpTha6mcCqBWscMvB+ONnUiVMfTXxWAJpwVjM2SVHNAwGsxNw2AT4b5ZEPQhA9w2Y76GluVBXfHAN8sCG5l9V38hs/n3AwDXM4RabGzDsiNnA6X1eG4e+GXmKS9Aa0eSX0bZQA+vJROhm3tkzsI4Urk3fkghzNI7gSqTu7hBABMxCQYBGliUFoX83O0F4HyPD1Fgn4uL2PU2g7jiSj1r3Is1Q9MysN4uB9Hf5DT5qgp88pqmI0AABOhPoAefNreZ3KY5dSWTe8Cg8B/vg5car8kBZPBl41NQh+4R5lpdUaPavr719lLUNAGR3NXke58kL++vJy9nBANe0Wb673wwazpSA6bT1lb4wBwB6pVJnITCvkCRbXSSiuttNLK3clfKONUOZEzhzMAAAAASUVORK5CYII='},
   /* v906: Xbalanque, 64x64 Piskel ABGR export decoded to PNG. The boss_ alias loop below derives
      'boss_xbalanque' from this key automatically, so the L8 encounter gets the art for free. */
   xbalanque:{src:'data:image/png;base64,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'},
@@ -6173,7 +6265,11 @@ function unitIconHtml(u,size){
     const p=GOD_PORTRAITS[u.id.replace(/^god_/,'')];
     if(p){
       const cr=p.smooth?'auto':'pixelated';
-      return`<img src="${p.src}" alt="${u.name}" style="width:${size}px;height:${size}px;image-rendering:${cr};image-rendering:-moz-crisp-edges;vertical-align:middle">`;
+      /* v1049: baseline * per-sprite correction. Enemy-side portraits (the branch below) keep a
+         1.0 baseline on purpose -- Cipactli's five parts are composited into one boss figure and
+         scaling them independently would pull the body apart. */
+      const sz=Math.round(size*(p.scale||1)*GOD_CARD_SCALE);
+      return`<img src="${p.src}" alt="${u.name}" style="width:${sz}px;height:${sz}px;image-rendering:${cr};image-rendering:-moz-crisp-edges;vertical-align:middle">`;
     }
   }
   // Also check portraits for named enemy bosses (e.g. Xolotl)
@@ -6186,7 +6282,13 @@ function unitIconHtml(u,size){
   const ep=(_bid&&GOD_PORTRAITS[_bid])||GOD_PORTRAITS[enemyId];
   if(ep){
     const cr=ep.smooth?'auto':'pixelated';
-    return`<img src="${ep.src}" alt="${u.name}" style="width:${size}px;height:${size}px;image-rendering:${cr};image-rendering:-moz-crisp-edges;vertical-align:middle">`;
+    /* v1047: same per-portrait scale knob godIconHtml has carried since Huehueteotl. Enemy and
+       vassal sprites need it MORE than gods do -- they sit in the big 92/112px training and
+       capture cards, where a 64x64 sprite with transparent margin looked half the size of the
+       emoji it replaced. The layout box grows with the image, which is the intent: `.tc-art`
+       is a flex row with min-height 86px, so the card grows to fit rather than clipping. */
+    const sz=Math.round(size*(ep.scale||1));
+    return`<img src="${ep.src}" alt="${u.name}" style="width:${sz}px;height:${sz}px;image-rendering:${cr};image-rendering:-moz-crisp-edges;vertical-align:middle">`;
   }
   return`<span style="font-size:${size}px;line-height:1">${u.icon}</span>`;
 }
@@ -7015,7 +7117,7 @@ function mkCap(cu,slot,b1){
   // v514: absolute override (event penalty, pre-offering scale) consumed once; else persisted ratio
   const startHp=Math.max(1,Math.min(baseMaxHp,overrideHp!==undefined?overrideHp:Math.round(baseMaxHp*(ratioHp!==undefined?ratioHp:1)))-hpPenalty);
   if(overrideHp!==undefined)delete G.unitHpOverride[ck]; // consume once
-  return{...cu,id:'cap_'+(cu._captureId||cu.id)+'_'+slot,baseId:cu.id,_captureId:cu._captureId,level:lv,
+  return{...cu,id:'cap_'+(cu._captureId||cu.id)+'_'+slot,baseId:cu.baseId||cu.id,_captureId:cu._captureId,level:lv, /* v1048: was baseId:cu.id -- see note above */
     maxHp:baseMaxHp,currentHp:startHp,
     atk:scR(cu.atk||0,lv,false)+sb.atk,mag:scR(cu.mag||0,lv,false)+sb.mag, /* v993 */
     def:scR(cu.def,lv,false)+sb.def,res:scR(cu.res||4,lv,false)+sb.res,
@@ -9048,7 +9150,7 @@ function startBattle(){
   G._undeadForcesUsed=false; // v810: Undead Forces is once per battle
   G._reedRaftUsed=false; // v827: single battle-scoped charge
   G.battlePhase='idle';G.roundNum=0;G.roundQueue=[];G.qIdx=0;
-  G.actedIds=new Set();G.nextRoundSlowIds=new Set();G.thisRoundSlowTail=[];G.slowedThisRound=new Set();G._serendipityUsed=false;G._serendipityFreeAction=false;G._tlaloqueSpawnedThisBattle=false;G._coyolPending=0;G._curKiller=null;G._huitziAcc=0;G._xoloLast=null;G._kukulkanRound=-1; // v657: was never reset — the statue was silently skipped on the round matching its last firing
+  G.actedIds=new Set();G._belicQueue=new Set();G._belicActing=null; /* v1045 */G.nextRoundSlowIds=new Set();G.thisRoundSlowTail=[];G.slowedThisRound=new Set();G._serendipityUsed=false;G._serendipityFreeAction=false;G._tlaloqueSpawnedThisBattle=false;G._coyolPending=0;G._curKiller=null;G._huitziAcc=0;G._xoloLast=null;G._kukulkanRound=-1; // v657: was never reset — the statue was silently skipped on the round matching its last firing
   // unitHpPenalty is preserved — applied in mkCap and then cleared per unit by overrideHp logic
   // Reset it AFTER mkCap has consumed penalties (at end of startBattle, not the beginning)
   if(G._tlacuiloVassalPending){delete V['tlacuilo_vassal'];saveV();G._tlacuiloVassalPending=false;}
@@ -9524,7 +9626,7 @@ function buildRoundQueue(){
     }
   }
   /* v761: enemies never enter actedIds, so own-side turn order needs its own counter. */
-  G.qIdx=0;G.actedIds=new Set();G._enemyActedCount=0;G._enemyActedIds=new Set();G._bonusActedRestoreId=null;G._kukulkanPending=false;G._belicRushRound=null;G.roundNum++; /* v885 */ /* v853/v856: markers are round-scoped, like actedIds */
+  G.qIdx=0;G.actedIds=new Set();G._belicQueue=new Set();G._belicActing=null; /* v1045 */G._enemyActedCount=0;G._enemyActedIds=new Set();G._bonusActedRestoreId=null;G._kukulkanPending=false;G._belicRushRound=null;G.roundNum++; /* v885 */ /* v853/v856: markers are round-scoped, like actedIds */
   /* v806: Sak Tahn Waax Calendar. The count is a RUN counter, not a battle counter -- it
      deliberately carries across fights, so a player can walk into a boss room with it nearly
      primed and land the pulse on round 1. Ruled intended in the L8 design; watch it in playtest.
@@ -9763,6 +9865,20 @@ function processCurrentSlot(){
 
 // ── BELIC RUSH CASCADE ─────────────────────────────────────────────────────
 const BELIC_BOOST=1.30;
+/* v1044: ONE pacing table for the cascade. It used to run at 500ms before the first unit and
+   300ms between units, with NO pause at all after an action resolved -- roughly 6x faster than an
+   ordinary turn, which is 700 (attacker highlight) + 600 (target) + 600 (read the damage). Five
+   units then landed inside two seconds and read as one wall of log lines [Genaro].
+   These beats deliberately mirror the ordinary-turn structure so the cascade uses a cadence the
+   rest of the game already teaches: gap -> announce the actor -> focus -> act -> settle.
+   Every timeout in the cascade reads from here. Adding a raw ms literal to this system is how it
+   drifts back out of step -- route it through belicMs(). */
+/* v1045: settled at 0.75x of the v1044 trial values after Genaro played it. ~1.28s per cascading
+   unit -- slower than an ordinary turn's read-the-damage beat feels here, because the cascade is a
+   bonus burst rather than five separate turns, but far enough from the original 300ms that each
+   action can be followed. The debug Pace knob that produced this number has been retired. */
+const BELIC_PACE={lead:450,gap:375,focus:400,settle:500,hit:225,aoeStagger:90};
+function belicMs(k){return BELIC_PACE[k]||0;}
 
 // Multi-hit specs — fire N random hits sequentially with animation
 const BELIC_MULTIHIT={
@@ -9811,6 +9927,22 @@ function belicAoeTargets(u,arr){
   return arr.slice().sort((a,b)=>(a.currentHp||0)-(b.currentHp||0)).slice(0,cap);
 }
 
+/* v1043: Belic Rush audit. Gated on G._dbgBelicAudit (Debug Tools → Belic Rush Test). Prints what
+   the cascade ACTUALLY did beside what the ability's own targeting says it should do, so a live
+   run reads pass/fail straight off the battle log instead of the console. Free when the flag is
+   off -- every probe is behind the same early return. */
+function belicAudit(u,ab,msg,ok){
+  if(!G._dbgBelicAudit)return;
+  addLog('<span style="color:'+(ok?'#60d090':'#ff6060')+';font-size:10px">'+(ok?'\u2713':'\u2717')
+    +' BELIC AUDIT \u00b7 '+(u&&u.icon||'')+' '+ab+' \u2014 '+msg+'</span>');
+}
+/* v1043: the cap the ability SHOULD resolve to, computed independently of belicAoeTargets so the
+   audit is a real second opinion rather than an echo of the code under test. */
+function belicExpectedCap(u,arr){
+  if(!u)return 0;
+  if(!u.isAlly)return u.isBoss?0:(AOE_CAP_AB[u.ability]||0);
+  return aoeCapFor(u);
+}
 // Async version — handles multi-hit with sequential animations, calls onDone when finished
 function fireBelicAutoAction(u,liveEnemies,allies,isEnemySide,onDone){
   onDone=onDone||function(){};
@@ -9834,6 +9966,9 @@ function fireBelicAutoAction(u,liveEnemies,allies,isEnemySide,onDone){
       grantChimalli(tgt,0.04,'Ancestral Storm');
       renderBattle();animateHit(tgt.id,h,true);
       addLog(`<span class="log-heal">&#9889; Belic Rush: ${u.icon} ${ab} &#8594; ${tgt.icon} +${h} HP!</span>`);
+      /* v1043: probes the single-target branch too. Without it, a party heal wrongly routed here
+         produces NO audit line at all -- silence reads as "not tested", not as a failure. */
+      belicAudit(u,ab,'single-target heal \u2192 '+(tgt.icon||'')+' +'+h+' HP (this branch is correct ONLY for Ancestral Storm)',ab==='Ancestral Storm');
     }else{
       const pct=Math.round(0.25*BELIC_BOOST*100);
       allies.forEach(a=>{const h=Math.round(a.maxHp*0.25*BELIC_BOOST);a.currentHp=healTo(a,h);animateHit(a.id,h,true);});
@@ -9842,6 +9977,13 @@ function fireBelicAutoAction(u,liveEnemies,allies,isEnemySide,onDone){
       if(_clnz)allies.forEach(a=>{if(a.currentHp>0)cleanseUnit(a);});
       renderBattle();
       addLog(`<span class="log-heal">&#9889; Belic Rush: ${u.icon} ${ab} &#8594; all +${pct}% HP${_clnz?' + cleanse':''}!</span>`);
+      if(G._dbgBelicAudit){ /* v1043 */
+        const _live=allies.filter(a=>a.currentHp>0);
+        const _left=_live.reduce((n,a)=>n+((typeof statusCount==='function')?statusCount(a):0),0);
+        belicAudit(u,ab,'party heal \u2192 '+_live.length+' allies healed \u00b7 '
+          +(_clnz?('cleanse ON, '+_left+' status remaining (want 0)'):'no cleanse (correct for this ability)'),
+          _live.length>0&&(!_clnz||_left===0));
+      }
     }
     onDone();return;
   }
@@ -9857,9 +9999,29 @@ function fireBelicAutoAction(u,liveEnemies,allies,isEnemySide,onDone){
        it inside the hit loop, so four hits into a small enemy row stacked Poison/Paralyze x2-x4 on
        the same unit -- the Xolotl over-poisoning report. */
     const _mhStruck=new Set();
+    /* v1043: pre-cast status snapshot, so the audit can report stacks ADDED by this cast rather
+       than whatever the target was already carrying. */
+    const _mhBefore=new Map(liveEnemies.map(e=>[e.id,{p:e.poisonStacks||0,z:e.paralyzStacks||0,b:e.burnStacks||0}]));
     const doHit=()=>{
       if(hitNum>=mh.hits){
         if(mh.status)_mhStruck.forEach(id=>{const e=liveEnemies.find(x=>x.id===id&&x.currentHp>0);if(e)mh.status(e);});
+        if(G._dbgBelicAudit){ /* v1043 */
+          let _worst=0,_det=[];
+          _mhStruck.forEach(id=>{
+            const e=liveEnemies.find(x=>x.id===id);const b=_mhBefore.get(id)||{p:0,z:0,b:0};
+            if(!e)return;
+            const dp=(e.poisonStacks||0)-b.p,dz=(e.paralyzStacks||0)-b.z,db=(e.burnStacks||0)-b.b;
+            _worst=Math.max(_worst,dp,dz,db);
+            _det.push((e.icon||'?')+' +'+dp+'p/+'+dz+'z');
+          });
+          /* Honest about its own power: this probe can only catch per-hit stacking when two hits
+             actually land on the SAME foe. With 4 hits into 6 foes that often does not happen, and
+             a clean result would otherwise read as proof when it is only luck. */
+          const _coll=mh.hits>_mhStruck.size;
+          belicAudit(u,ab,mh.hits+' hits \u2192 '+_mhStruck.size+' unique targets \u00b7 max status added per target '
+            +_worst+' (want \u22641)'+(_coll?'':' \u00b7 NO foe was hit twice \u2014 INCONCLUSIVE, cast again')
+            +' \u00b7 '+(_det.join(' ')||'none'),_worst<=1);
+        }
         renderBattle();onDone();return;
       }
       const live=liveEnemies.filter(e=>e.currentHp>0);
@@ -9872,7 +10034,7 @@ function fireBelicAutoAction(u,liveEnemies,allies,isEnemySide,onDone){
       if(tgt.currentHp<=0)handleDeath(tgt);
       renderBattle();animateHit(tgt.id,hit,false);
       hitNum++;
-      setTimeout(doHit,220);
+      setTimeout(doHit,belicMs('hit')); /* v1044: was 220 */
     };
     doHit();return;
   }
@@ -9884,6 +10046,13 @@ function fireBelicAutoAction(u,liveEnemies,allies,isEnemySide,onDone){
   const useMag=spec?spec.type==='mag':(u.type==='MAG'||!!u.magStrike);
   const targets=spec&&spec.aoe?belicAoeTargets(u,liveEnemies):[liveEnemies.reduce((a,b)=>a.currentHp<b.currentHp?a:b)]; /* v1041: was liveEnemies -- uncapped */
   const label=spec?ab:'Strike';
+  if(G._dbgBelicAudit){ /* v1043 */
+    const _isAoe=!!(spec&&spec.aoe);
+    const _cap=_isAoe?belicExpectedCap(u,liveEnemies):0;
+    const _want=_isAoe?(_cap?Math.min(_cap,liveEnemies.length):liveEnemies.length):1;
+    belicAudit(u,label,(_isAoe?'AoE':'single')+' \u2014 hit '+targets.length+' of '+liveEnemies.length
+      +' foes (want '+_want+', cap '+(_cap||'none')+')',targets.length===_want);
+  }
   const hits=[];
   targets.forEach(tgt=>{
     const raw=useMag?Math.max(1,Math.round(u.mag*mult-(tgt.res||0)*0.4)):Math.max(1,Math.round(u.atk*mult-(tgt.def||0)*0.4));
@@ -9896,7 +10065,10 @@ function fireBelicAutoAction(u,liveEnemies,allies,isEnemySide,onDone){
   const total=hits.reduce((s,h)=>s+h.dmg,0);
   addLog(`<span class="log-thunder">&#9889; Belic Rush: ${u.icon} ${label}! ${total}</span>`);
   renderBattle();
-  hits.forEach(h=>animateHit(h.uid,h.dmg,h.isHeal));
+  /* v1044: the damage itself stays atomic -- staggering application would change death ordering
+     and capture timing. Only the floating numbers are fanned out, so a 3-target Septic Howl reads
+     as three hits instead of one simultaneous flash. */
+  hits.forEach((h,i)=>{const _f=()=>animateHit(h.uid,h.dmg,h.isHeal);if(i===0)_f();else setTimeout(_f,i*belicMs('aoeStagger'));});
   onDone();
 }
 
@@ -9908,6 +10080,8 @@ function runBelicChain(units,idx,getEnemies,getAllies,isEnemySide,animFn){
      and the run ended at phase 1 -- no Cipactli, and no champion record. */
   const _belicExit=()=>{
     G._belicCascading=false;
+    if(G._belicQueue)G._belicQueue.clear();G._belicActing=null; /* v1045: nothing waiting, nobody acting */
+    renderBattle();
     if(G._cipactliPending){G._cipactliPending=false;startCipactliPhase();return;}
     setTimeout(processCurrentSlot,100);
   };
@@ -9920,19 +10094,52 @@ function runBelicChain(units,idx,getEnemies,getAllies,isEnemySide,animFn){
     _belicExit();return;
   }
   setTimeout(()=>{
-    fireBelicAutoAction(u,enemies.filter(e=>e.currentHp>0),allies.filter(a=>a.currentHp>0),isEnemySide,()=>{
-      // If a capture window opened during this cascade action, wait for it to resolve
-      function waitForCaptureAndContinue(){
-        if(G.capActive||G.captureQueue.length>0){
-          setTimeout(waitForCaptureAndContinue,200);return;
+    /* v1044: skip a unit that died while waiting its turn. The cascade never checked this because
+       the old 300ms window made it near-impossible; at ~1.7s per unit the window is real. */
+    if(G._belicQueue)G._belicQueue.delete(u.id); /* v1045: leaves the queue... */
+    if(!u||u.currentHp<=0){G._belicActing=null;renderBattle();runBelicChain(units,idx+1,getEnemies,getAllies,isEnemySide,animFn);return;}
+    G._belicActing=u.id; /* ...and becomes the ACTING one until its action resolves */
+    /* v1044: name the actor and pulse its card BEFORE it acts. Half the unreadability was pace and
+       half was that the only log line arrived after the fact, so five units produced five result
+       lines with nothing marking where one unit ended and the next began. */
+    addLog(`<span class="log-thunder">&#9889; Belic Rush ${idx+1}/${units.length} &#8212; ${u.icon} ${u.name} acts&#8230;</span>`);
+    if(typeof animateActor==='function')animateActor(u.id);
+    renderBattle();
+    setTimeout(()=>{
+      fireBelicAutoAction(u,enemies.filter(e=>e.currentHp>0),allies.filter(a=>a.currentHp>0),isEnemySide,()=>{
+        // If a capture window opened during this cascade action, wait for it to resolve
+        function waitForCaptureAndContinue(){
+          if(G.capActive||G.captureQueue.length>0){
+            setTimeout(waitForCaptureAndContinue,200);return;
+          }
+          /* v1044: dwell on the result before the next unit steps up -- the beat an ordinary turn
+             spends letting the player read the damage. */
+          G._belicActing=null;renderBattle(); /* v1045: action resolved -- only now may it grey */
+          setTimeout(()=>runBelicChain(units,idx+1,getEnemies,getAllies,isEnemySide,animFn),belicMs('settle'));
         }
-        runBelicChain(units,idx+1,getEnemies,getAllies,isEnemySide,animFn);
-      }
-      waitForCaptureAndContinue();
-    });
-  },idx===0?500:300); // 500ms before first unit, 300ms gap between subsequent units
+        waitForCaptureAndContinue();
+      });
+    },belicMs('focus'));
+  },idx===0?belicMs('lead'):belicMs('gap'));
 }
 
+/* v1045: THE CASCADE'S CLAIM IS NOT THE SAME AS HAVING ACTED. Both schedulers add every cascading
+   unit to G.actedIds up front -- that is load-bearing (buildRoundQueue skips them, and selectActor
+   refuses them, so the player cannot double-move a unit mid-cascade). But the card render reads the
+   same set, so all five Thunder allies greyed out and printed "\u2713 Acted" the instant Mixcoatl
+   finished, then went on attacking for the next six seconds [Genaro].
+   _belicQueue is the visual half of that state: claimed, not yet fired. It is emptied one id at a
+   time as each unit steps up, so a card greys exactly when its own action lands. Logic keeps
+   reading actedIds and is untouched. */
+function belicClaim(units){
+  if(!G._belicQueue)G._belicQueue=new Set();
+  units.forEach(u=>{G.actedIds.add(u.id);G._belicQueue.add(u.id);});
+}
+function belicQueued(u){return !!(u&&G._belicQueue&&G._belicQueue.has(u.id)&&u.currentHp>0);}
+/* v1045: and the unit whose slot is resolving RIGHT NOW. Three states, not two: waiting, acting,
+   done. Greying a unit the moment it stepped up was the same confusion in miniature -- the log
+   said 'Xolotl acts...' while his card already read as spent. */
+function belicActing(u){return !!(u&&G._belicActing&&G._belicActing===u.id&&u.currentHp>0);}
 function scheduleBelicRushCascade(mixcoatlActorId){
   if(!hasPassive('belicRush'))return; // v700: was G.god.pk!=='belicRush' — that ignored Sacred Oblation
   /* v885: once per round, whoever gets here first. The cascade is now invoked from TWO places (see
@@ -9942,7 +10149,7 @@ function scheduleBelicRushCascade(mixcoatlActorId){
   const thunderAllies=G.units.filter(u=>u.element==='thunder'&&u.currentHp>0&&u.id!==mixcoatlActorId&&!G.actedIds.has(u.id));
   if(!thunderAllies.length)return;
   G._belicRushRound=G.roundNum; /* v885: claim the round before any async work starts */
-  thunderAllies.forEach(u=>G.actedIds.add(u.id));
+  belicClaim(thunderAllies); /* v1045: claim + mark visually queued */
   G._belicCascading=true;
   addLog(`<span class="log-thunder">&#9889; Belic Rush &#8212; ${thunderAllies.length} Thunder unit${thunderAllies.length>1?'s':''} cascade!</span>`);
   runBelicChain(thunderAllies,0,
@@ -9954,7 +10161,7 @@ function scheduleBelicRushCascade(mixcoatlActorId){
 function scheduleBelicRushBossEscorts(bossUnit){
   const escorts=G.enemies.filter(e=>e.element==='thunder'&&e.currentHp>0&&e.id!==bossUnit.id&&!G.actedIds.has(e.id));
   if(!escorts.length)return;
-  escorts.forEach(e=>G.actedIds.add(e.id));
+  belicClaim(escorts); /* v1045 */
   G._belicCascading=true;
   addLog(`<span class="log-thunder">&#9889; Belic Rush &#8212; Mixcoatl's forces cascade!</span>`);
   runBelicChain(escorts,0,
@@ -15871,6 +16078,22 @@ function unitDisplayLevel(u){
   if(u.isGod)return u.id&&u.id.indexOf('god_')===0?getLevel(u.id):1;
   return getLevel(u._captureId||u.baseId||u.id);
 }
+/* v1045: ONE source for the card's footer line. Only the full rebuild ever wrote it -- the in-place
+   patcher updated the `acted` class and left the text alone -- so a card whose state changed between
+   patches kept whatever footer it was built with. That is bug class 4 (create-vs-patch divergence)
+   and it is exactly what would have made a Belic-queued card keep insisting it had already acted. */
+function ucFootHtml(u){
+  if(!u)return '';
+  if(u.id===G._targetedAllyId)return '<span style="color:#e07070">\u26a0 Targeted!</span>';
+  const acted=G.actedIds.has(u.id);
+  const slowedSet=G.slowedThisRound||new Set();
+  if(slowedSet.has(u.id)&&!acted&&G.units.some(x=>x.currentHp>0&&!G.actedIds.has(x.id)&&!slowedSet.has(x.id)))
+    return '<span style="color:#5080a0">\u{1F422} Waiting (Slowed)</span>';
+  if(belicActing(u))return '<span style="color:#e0c060">\u26a1 Acting now\u2026</span>';
+  if(belicQueued(u))return '<span style="color:#b090e0">\u26a1 Belic Rush \u2014 queued</span>';
+  if(acted&&u.isAlly)return '<span style="color:#4a3a10">\u2713 Acted</span>';
+  return '';
+}
 function mkUnitCard(u){
   const d=document.createElement('div');
   if(u.currentHp<=0){
@@ -15885,6 +16108,10 @@ function mkUnitCard(u){
   const lv=_gKey?(u.level||getLevel(_gKey)):unitDisplayLevel(u); // v816
   const em=ELEM_META[u.element];
   const acted=G.actedIds.has(u.id);
+  /* v1045: acted drives LOGIC (selectability); actedVis drives the grey-out. A cascading unit is
+     acted-for-logic the moment the cascade claims it, but must not look spent until it has fired. */
+  const _belicQ=belicQueued(u),_belicA=belicActing(u);
+  const actedVis=acted&&!_belicQ&&!_belicA;
   const slowedSet=G.slowedThisRound||new Set();
   const isSlowedThisRound=slowedSet.has(u.id)&&!acted;
   const normalUnacted=u.isAlly&&!acted&&!isSlowedThisRound&&G.units.filter(x=>x.currentHp>0&&!G.actedIds.has(x.id)&&!slowedSet.has(x.id)).length>0;
@@ -15900,7 +16127,9 @@ function mkUnitCard(u){
   else if(isTargetedByEnemy)cls+=' targeted-ally';
   else if(isSelected)cls+=' selected-actor';
   else if(isSelectable)cls+=' selectable';
-  else if(acted&&u.isAlly)cls+=' acted';
+  else if(_belicA&&u.isAlly)cls+=' belic-acting'; /* v1045 */
+  else if(_belicQ&&u.isAlly)cls+=' belic-queued';
+  else if(actedVis&&u.isAlly)cls+=' acted';
   if(u.isPatron&&isSelectable&&ftuePatronGlowActive())cls+=' ftue-glow'; // v604
   d.dataset.uid=u.id;
   if(isSelectable||isSelected){d.onclick=()=>{selectActor(u.id);if(u.isPatron)triggerPatronTurnPassive(u);};}
@@ -15930,7 +16159,7 @@ function mkUnitCard(u){
     <div class="bar-row"><span class="bar-icon">❤️</span><div class="bar-wrap${(u.armor||0)>0?' has-shield':''}"><div class="bar-fill" style="width:${pct}%;background:var(--hp)"></div><div class="bar-armor" style="width:${_armPct}%${(u.armor||0)>0?'':';display:none'}"></div><div class="bar-lbl">${fmtN(u.currentHp)}/${fmtN(u.maxHp)}</div><div class="bar-shield-badge"${(u.armor||0)>0?'':' style="display:none"'}>🛡 ${Math.round(u.armor||0)}</div></div></div>
     <div class="bar-row"><span class="bar-icon">✨</span><div class="bar-wrap" style="background:#110820"><div class="bar-fill" style="width:${npPct}%;background:linear-gradient(90deg,#5a208a,#9050c0)"></div><div class="bar-lbl">${Math.round(curNP)}/${maxNP}${lthTagCard}</div></div></div>
     <div class="status-row">${pPips(u.poisonStacks,true)}${bPips(u.burnStacks)}${paraPips(u.paralyzStacks||0)}${slowBadge(u.id)}${woundBadge(u.woundStacks||0)}${lethargyBadge(u.lethargyStacks||0)}${drunkBadge(u.drunkStacks||0)}${atkBuffBadge(u.atkBuffStacks||0,u.atkBuffRounds||0)}${defBuffBadge(u.defBuffStacks||0,u.defBuffRounds||0)}${critBuffBadge(u.critBuffStacks||0,u.critBuffRounds||0)}${turquoiseBadge(u._turquoise||0)}${remedyBadge(u._remedy||0)}</div>
-    ${isTargetedByEnemy?'<div style="font-size:10px;color:#e07070;margin-top:2px">⚠ Targeted!</div>':isSlowWaiting?'<div style="font-size:10px;color:#5080a0;margin-top:2px">🐢 Waiting (Slowed)</div>':acted?'<div style="font-size:10px;color:#4a3a10;margin-top:2px">✓ Acted</div>':''} <!-- v611: 'Tap to select' removed — footer isn't reconciled by the in-place patcher, so it showed stale/inconsistently --></div>`;
+    <div class="uc-foot" style="font-size:10px;margin-top:2px;min-height:12px">${ucFootHtml(u)}</div></div>`; /* v1045: always emitted and always reconciled -- see ucFootHtml. The v611 note about the patcher not reconciling this footer no longer applies. */
   setCardIconBtn(d,u); // v353: icon = detail button (only while selected)
   return d;
 }
@@ -16113,7 +16342,11 @@ function renderBattle(){
         existing.classList.toggle('selectable',isSelectable&&!isSel);
         existing.classList.toggle('ftue-glow',!!(u.isPatron&&isSelectable&&!isSel&&ftuePatronGlowActive())); // v604 · v611: !! is load-bearing — u.isPatron is undefined on vassals, and toggle(cls,undefined) FLIPS instead of removing, which made every render blink the glow onto vassal cards (root cause of the B2 ghost glow)
         existing.classList.toggle('targeting-valid',isAllyTarget);
-        existing.classList.toggle('acted',isAct&&u.isAlly);
+        const _bq=belicQueued(u),_ba=belicActing(u); /* v1045 */
+        existing.classList.toggle('belic-acting',_ba&&u.isAlly);
+        existing.classList.toggle('belic-queued',_bq&&u.isAlly);
+        existing.classList.toggle('acted',isAct&&!_bq&&!_ba&&u.isAlly);
+        {const _f=existing.querySelector('.uc-foot');if(_f)_f.innerHTML=ucFootHtml(u);}
         const _normUnacted=G.units.filter(x=>x.currentHp>0&&!G.actedIds.has(x.id)&&!(G.slowedThisRound&&G.slowedThisRound.has(x.id)));
         const _uSlowed=G.slowedThisRound&&G.slowedThisRound.has(u.id)&&!G.actedIds.has(u.id)&&_normUnacted.length>0;
         existing.classList.toggle('is-slowed',_uSlowed);
