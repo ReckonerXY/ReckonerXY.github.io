@@ -2649,17 +2649,17 @@ const TECPATL_MODS=[
   {id:'enemy_lv_2',family:'Enemy Levelup',tier:2,name:'Enemy Levelup II',icon:'📈',desc:'All enemies are +4 levels stronger.',effect:'enemyLvBonus:4',req:'enemy_lv_1'},
   {id:'enemy_lv_3',family:'Enemy Levelup',tier:3,name:'Enemy Levelup III',icon:'📈',desc:'All enemies are +6 levels stronger.',effect:'enemyLvBonus:6',req:'enemy_lv_2'},
   // ENEMY ATK SURGE
-  {id:'enemy_atk_1',family:'Enemy ATK Surge',tier:1,name:'ATK Surge I',icon:'⚔️',desc:'Enemy ATK is multiplied by 1.2.',effect:'enemyAtkMult:1.2'},
-  {id:'enemy_atk_2',family:'Enemy ATK Surge',tier:2,name:'ATK Surge II',icon:'⚔️',desc:'Enemy ATK is multiplied by 1.4.',effect:'enemyAtkMult:1.4',req:'enemy_atk_1'},
+  {id:'enemy_atk_1',family:'Enemy ATK Surge',tier:1,name:'ATK Surge I',icon:'⚔️',desc:'Enemy ATK is multiplied by 1.25.',effect:'enemyAtkMult:1.25'},
+  {id:'enemy_atk_2',family:'Enemy ATK Surge',tier:2,name:'ATK Surge II',icon:'⚔️',desc:'Enemy ATK is multiplied by 1.5.',effect:'enemyAtkMult:1.5',req:'enemy_atk_1'},
   // ENEMY MAG SURGE
-  {id:'enemy_mag_1',family:'Enemy MAG Surge',tier:1,name:'MAG Surge I',icon:'🔮',desc:'Enemy MAG is multiplied by 1.2.',effect:'enemyMagMult:1.2'},
-  {id:'enemy_mag_2',family:'Enemy MAG Surge',tier:2,name:'MAG Surge II',icon:'🔮',desc:'Enemy MAG is multiplied by 1.4.',effect:'enemyMagMult:1.4',req:'enemy_mag_1'},
+  {id:'enemy_mag_1',family:'Enemy MAG Surge',tier:1,name:'MAG Surge I',icon:'🔮',desc:'Enemy MAG is multiplied by 1.25.',effect:'enemyMagMult:1.25'},
+  {id:'enemy_mag_2',family:'Enemy MAG Surge',tier:2,name:'MAG Surge II',icon:'🔮',desc:'Enemy MAG is multiplied by 1.5.',effect:'enemyMagMult:1.5',req:'enemy_mag_1'},
   // ENEMY DEF SURGE
-  {id:'enemy_def_1',family:'Enemy DEF Surge',tier:1,name:'DEF Surge I',icon:'🗡️',desc:'Enemy DEF is multiplied by 1.2.',effect:'enemyDefMult:1.2'},
-  {id:'enemy_def_2',family:'Enemy DEF Surge',tier:2,name:'DEF Surge II',icon:'🗡️',desc:'Enemy DEF is multiplied by 1.4.',effect:'enemyDefMult:1.4',req:'enemy_def_1'},
+  {id:'enemy_def_1',family:'Enemy DEF Surge',tier:1,name:'DEF Surge I',icon:'🗡️',desc:'Enemy DEF is multiplied by 1.25.',effect:'enemyDefMult:1.25'},
+  {id:'enemy_def_2',family:'Enemy DEF Surge',tier:2,name:'DEF Surge II',icon:'🗡️',desc:'Enemy DEF is multiplied by 1.5.',effect:'enemyDefMult:1.5',req:'enemy_def_1'},
   // ENEMY RES SURGE
-  {id:'enemy_res_1',family:'Enemy RES Surge',tier:1,name:'RES Surge I',icon:'🌀',desc:'Enemy RES is multiplied by 1.2.',effect:'enemyResMult:1.2'},
-  {id:'enemy_res_2',family:'Enemy RES Surge',tier:2,name:'RES Surge II',icon:'🌀',desc:'Enemy RES is multiplied by 1.4.',effect:'enemyResMult:1.4',req:'enemy_res_1'},
+  {id:'enemy_res_1',family:'Enemy RES Surge',tier:1,name:'RES Surge I',icon:'🌀',desc:'Enemy RES is multiplied by 1.25.',effect:'enemyResMult:1.25'},
+  {id:'enemy_res_2',family:'Enemy RES Surge',tier:2,name:'RES Surge II',icon:'🌀',desc:'Enemy RES is multiplied by 1.5.',effect:'enemyResMult:1.5',req:'enemy_res_1'},
   // ENEMY CRIT
   {id:'enemy_crit_1',family:'Enemy Crit Up',tier:1,name:'Enemy Crit Up I',icon:'💥',desc:'Enemies have +10% CRIT chance.',effect:'enemyCritBonus:0.10'},
   {id:'enemy_crit_2',family:'Enemy Crit Up',tier:2,name:'Enemy Crit Up II',icon:'💥',desc:'Enemies have +20% CRIT chance.',effect:'enemyCritBonus:0.20',req:'enemy_crit_1'},
@@ -2667,9 +2667,21 @@ const TECPATL_MODS=[
   {id:'enemy_chima_1',family:'Enemy Chimalli',tier:1,name:'Enemy Chimalli I',icon:'🛡',desc:'All enemies begin with Chimalli worth 10% of their max HP.',effect:'enemyChimalli:10%'},
   {id:'enemy_chima_2',family:'Enemy Chimalli',tier:2,name:'Enemy Chimalli II',icon:'🛡',desc:'All enemies begin with Chimalli worth 20% of their max HP.',effect:'enemyChimalli:20%',req:'enemy_chima_1'},
   // BOSS SURGE
-  {id:'boss_surge_1',family:'Boss Surge',tier:1,name:'Boss Surge I',icon:'💀',desc:'Bosses and escorts have 1.5× HP and +5% CRIT.',effect:'bossHpMult:1.5|bossCritBonus:0.05'},
-  {id:'boss_surge_2',family:'Boss Surge',tier:2,name:'Boss Surge II',icon:'💀',desc:'Bosses and escorts have 2× HP and +10% CRIT.',effect:'bossHpMult:2.0|bossCritBonus:0.10',req:'boss_surge_1'},
-  {id:'boss_surge_3',family:'Boss Surge',tier:3,name:'Boss Surge III',icon:'💀',desc:'Bosses and escorts have 2.5× HP and +15% CRIT.',effect:'bossHpMult:2.5|bossCritBonus:0.15',req:'boss_surge_2'},
+  // ENEMY VASSAL HP — ordinary (non-boss, non-miniboss) enemies
+  {id:'vassal_surge_1',family:'Enemy Vassal Surge',tier:1,name:'Enemy Vassal Surge I',icon:'\u{1F5FF}',desc:'Enemy vassals have +25% max HP.',effect:'vassalHpMult:1.25'},
+  {id:'vassal_surge_2',family:'Enemy Vassal Surge',tier:2,name:'Enemy Vassal Surge II',icon:'\u{1F5FF}',desc:'Enemy vassals have +50% max HP.',effect:'vassalHpMult:1.5',req:'vassal_surge_1'},
+  {id:'vassal_surge_3',family:'Enemy Vassal Surge',tier:3,name:'Enemy Vassal Surge III',icon:'\u{1F5FF}',desc:'Enemy vassals have +100% max HP.',effect:'vassalHpMult:2.0',req:'vassal_surge_2'},
+  // MINIBOSS HP
+  {id:'mini_surge_1',family:'Miniboss Surge',tier:1,name:'Miniboss Surge I',icon:'\u{1F409}',desc:'Minibosses and their escorts have +25% max HP.',effect:'miniHpMult:1.25'},
+  {id:'mini_surge_2',family:'Miniboss Surge',tier:2,name:'Miniboss Surge II',icon:'\u{1F409}',desc:'Minibosses and their escorts have +50% max HP.',effect:'miniHpMult:1.5',req:'mini_surge_1'},
+  {id:'mini_surge_3',family:'Miniboss Surge',tier:3,name:'Miniboss Surge III',icon:'\u{1F409}',desc:'Minibosses and their escorts have +100% max HP.',effect:'miniHpMult:2.0',req:'mini_surge_2'},
+  // DEADLY TIMER — a hard clock on long battles
+  {id:'deadly_timer_1',family:'Deadly Timer',tier:1,name:'Deadly Timer I',icon:'\u23F3',desc:'From round 12, each of your units loses 40% of its max HP after it acts.',effect:'deadlyTimerRound:12'},
+  {id:'deadly_timer_2',family:'Deadly Timer',tier:2,name:'Deadly Timer II',icon:'\u23F3',desc:'From round 10, each of your units loses 40% of its max HP after it acts.',effect:'deadlyTimerRound:10',req:'deadly_timer_1'},
+  {id:'deadly_timer_3',family:'Deadly Timer',tier:3,name:'Deadly Timer III',icon:'\u23F3',desc:'From round 7, each of your units loses 40% of its max HP after it acts.',effect:'deadlyTimerRound:7',req:'deadly_timer_2'},
+  {id:'boss_surge_1',family:'Boss Surge',tier:1,name:'Boss Surge I',icon:'💀',desc:'Bosses and escorts have 1.25× HP.',effect:'bossHpMult:1.25'},
+  {id:'boss_surge_2',family:'Boss Surge',tier:2,name:'Boss Surge II',icon:'💀',desc:'Bosses and escorts have 1.5× HP.',effect:'bossHpMult:1.5',req:'boss_surge_1'},
+  {id:'boss_surge_3',family:'Boss Surge',tier:3,name:'Boss Surge III',icon:'💀',desc:'Bosses and escorts have 2× HP.',effect:'bossHpMult:2.0',req:'boss_surge_2'},
   // REINFORCEMENTS
   {id:'reinforce_1',family:'Reinforcements',tier:1,name:'Reinforcements I',icon:'🐾',desc:'10% chance each round-end: one additional enemy spawns next round.',effect:'reinforceChance:0.10'},
   {id:'reinforce_2',family:'Reinforcements',tier:2,name:'Reinforcements II',icon:'🐾',desc:'20% chance each round-end: one additional enemy spawns.',effect:'reinforceChance:0.20',req:'reinforce_1'},
@@ -2700,14 +2712,19 @@ function getTecpatlEffects(){
   const has=id=>mods.includes(id);
   return{
     enemyLvBonus:   has('enemy_lv_3')?6:has('enemy_lv_2')?4:has('enemy_lv_1')?2:0,
-    enemyAtkMult:   has('enemy_atk_2')?1.4:has('enemy_atk_1')?1.2:1.0,
-    enemyMagMult:   has('enemy_mag_2')?1.4:has('enemy_mag_1')?1.2:1.0,
-    enemyDefMult:   has('enemy_def_2')?1.4:has('enemy_def_1')?1.2:1.0,
-    enemyResMult:   has('enemy_res_2')?1.4:has('enemy_res_1')?1.2:1.0,
+    enemyAtkMult:   has('enemy_atk_2')?1.5:has('enemy_atk_1')?1.25:1.0, /* v1096: was 1.2/1.4 -- the DESCRIPTIONS were updated in the same build, so leaving these behind would have advertised numbers the game did not apply */
+    enemyMagMult:   has('enemy_mag_2')?1.5:has('enemy_mag_1')?1.25:1.0, /* v1096: was 1.2/1.4 -- the DESCRIPTIONS were updated in the same build, so leaving these behind would have advertised numbers the game did not apply */
+    enemyDefMult:   has('enemy_def_2')?1.5:has('enemy_def_1')?1.25:1.0, /* v1096: was 1.2/1.4 -- the DESCRIPTIONS were updated in the same build, so leaving these behind would have advertised numbers the game did not apply */
+    enemyResMult:   has('enemy_res_2')?1.5:has('enemy_res_1')?1.25:1.0, /* v1096: was 1.2/1.4 -- the DESCRIPTIONS were updated in the same build, so leaving these behind would have advertised numbers the game did not apply */
     enemyCritBonus: has('enemy_crit_2')?0.20:has('enemy_crit_1')?0.10:0,
     enemyChimalli:  has('enemy_chima_2')?0.20:has('enemy_chima_1')?0.10:0, /* v964: fractions of enemy max HP */
-    bossHpMult:     has('boss_surge_3')?2.5:has('boss_surge_2')?2.0:has('boss_surge_1')?1.5:1.0,
-    bossCritBonus:  has('boss_surge_3')?0.15:has('boss_surge_2')?0.10:has('boss_surge_1')?0.05:0,
+    bossHpMult:     has('boss_surge_3')?2.0:has('boss_surge_2')?1.5:has('boss_surge_1')?1.25:1.0, /* v1096: 25/50/100% */
+    vassalHpMult:   has('vassal_surge_3')?2.0:has('vassal_surge_2')?1.5:has('vassal_surge_1')?1.25:1.0, /* v1098 */
+    miniHpMult:     has('mini_surge_3')?2.0:has('mini_surge_2')?1.5:has('mini_surge_1')?1.25:1.0, /* v1098 */
+    /* v1098: LOWEST round wins -- a lower threshold is the harsher one, the opposite of every
+       other modifier where a larger number is worse. 0 means the timer is not active. */
+    deadlyTimerRound: has('deadly_timer_3')?7:has('deadly_timer_2')?10:has('deadly_timer_1')?12:0,
+    bossCritBonus:  0, /* v1096: Boss Surge is HP only now -- the crit rider is gone */
     reinforceChance:has('reinforce_3')?0.30:has('reinforce_2')?0.20:has('reinforce_1')?0.10:0,
     nauaSurge:      has('naua_surge_2')?0.10:has('naua_surge_1')?0.05:0, /* v696: 5% per tier (was 10/20) */
     inflationMult:  has('inflation_3')?1.3:has('inflation_2')?1.2:has('inflation_1')?1.1:1.0,
@@ -2811,7 +2828,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1095'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1098'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -7288,10 +7305,16 @@ function mkEnemy(cu,idx,scale,lv){
   ensureBountyWeights(); // v663: templates MUST be stamped before the {...cu} spread below, or _bw is lost
                          // and the unit silently pays the flat layer baseline for the whole battle.
   const maxNP=Math.round(sc(cu.np||20,lv));
+  /* v1098: Enemy Vassal Surge / Miniboss Surge. mkEnemy is the one chokepoint every ordinary
+     enemy and every miniboss passes through, so applying here cannot be missed by a spawn path.
+     Layer bosses are spread from their own templates and never reach mkEnemy, which is why
+     bossHpMult stays theirs alone and these two can never double up with it. */
+  const _tpc=getTecpatlEffects();
+  const _clsHp=cu.isMiniBoss?(_tpc.miniHpMult||1):(_tpc.vassalHpMult||1);
   return{...cu,
     id:'en_'+cu.id+'_'+idx+'_'+Math.random().toString(36).slice(2,5),
-    maxHp:Math.round(sc(cu.hp,lv)*scale),
-    currentHp:Math.round(sc(cu.hp,lv)*scale),
+    maxHp:Math.round(sc(cu.hp,lv)*scale*_clsHp),
+    currentHp:Math.round(sc(cu.hp,lv)*scale*_clsHp),
     atk:Math.round(sc(cu.atk||0,lv)*scale),
     mag:Math.round(sc(cu.mag||0,lv)*scale),
     def:Math.round(sc(cu.def,lv)*0.6),
@@ -11009,6 +11032,24 @@ function resolveStatusAfterAction(unit){
   }
   // Legacy defBuff cleanup
   if(unit._defBuffRounds>0){unit._defBuffRounds--;if(unit._defBuffRounds<=0){unit.defBuff=0;}}
+  /* v1098: DEADLY TIMER. Past the threshold round, every ALLY pays 40% of its max HP after acting.
+     Placed here because this hook already runs once per acting unit -- it is where Poison ticks --
+     so the toll cannot be missed by an action path or charged twice for one action.
+     Routed through applyArmorDamage so a Chimalli absorbs it exactly like any other damage, and
+     floored at 1 HP: the timer is meant to strangle a long fight, not to one-shot the party the
+     instant the clock starts. */
+  if(unit.isAlly&&unit.currentHp>0){
+    const _dt=getTecpatlEffects().deadlyTimerRound||0;
+    if(_dt>0&&(G.roundNum||1)>=_dt){
+      const _toll=Math.max(1,Math.round((unit.maxHp||0)*0.40));
+      const _h=applyArmorDamage(unit,_toll,true);
+      if(_h>0){
+        unit.currentHp=Math.max(1,unit.currentHp-_h);
+        animateStatusPop(unit.id,'\u23F3 \u2212'+_h,'#e05050');
+        addLog(`<span class="log-bl">\u23F3 Deadly Timer: ${unit.name} \u2212${_h} HP</span>`);
+      }
+    }
+  }
 }
 
 // ─── PLAYER ACTIONS ───────────────────────────────────────────
@@ -18371,7 +18412,7 @@ function showPenanceLevel(onDoneOverride){
   function render(){
     const chosen=G._penanceLvlChosen||0;
     const mult=penanceTeotlMult(chosen).toFixed(3); /* v1013 */
-    const infoText=chosen===0?'<span style="color:#5a4a40">No modifiers — normal difficulty.</span>':`<span style="color:#7a5050">All ${chosen} modifier${chosen!==1?'s':''} will be chosen at the start.</span>`;
+    const infoText=chosen===0?'<span style="color:#5a4a40">No modifiers — normal difficulty.</span>':`<span style="color:#7a5050">All ${chosen} modifier${chosen!==1?'s':''} will be chosen at the start.</span><br><span style="color:#c07050;font-size:11px">All enemies will be <strong>${chosen*5}% stronger</strong>.</span>`;
     const btnLabel=chosen>0?'🗡️ Offer the Blade →':'Begin without Penance →';
     const btnStyle=`padding:12px;background:${chosen>0?'#2a0808':'#0e1a0e'};border-color:${chosen>0?'#8b2020':'#2a5a2a'};color:${chosen>0?'#e05050':'#50c080'};font-size:14px`;
     el.innerHTML=`
@@ -18421,7 +18462,7 @@ function updatePenanceDisplay(){
   const btn=document.getElementById('penance-confirm-btn');
   if(d)d.textContent=chosen;
   if(m)m.textContent='TEOTL ×'+mult;
-  if(info)info.innerHTML=chosen===0?'<span style="color:#5a4a40">No modifiers — normal difficulty.</span>':`<span style="color:#7a5050">All ${chosen} modifier${chosen!==1?'s':''} will be chosen at the start.</span>`;
+  if(info)info.innerHTML=chosen===0?'<span style="color:#5a4a40">No modifiers — normal difficulty.</span>':`<span style="color:#7a5050">All ${chosen} modifier${chosen!==1?'s':''} will be chosen at the start.</span><br><span style="color:#c07050;font-size:11px">All enemies will be <strong>${chosen*5}% stronger</strong>.</span>`;
   if(btn){
     btn.textContent=chosen>0?'🗡️ Offer the Blade →':'Begin without Penance →';
     btn.style.background=chosen>0?'#2a0808':'#0e1a0e';
@@ -18434,8 +18475,12 @@ function buildPenancePool(){
   // Build eligible modifier pool: not already active family, tier prereq met IN THIS RUN
   const activeFamilies=new Set(G.tecpatl_mods.map(id=>TECPATL_MODS.find(m=>m.id===id)?.family).filter(Boolean));
   const eligible=TECPATL_MODS.filter(m=>{
-    if(activeFamilies.has(m.family))return false; // family already chosen this run
-    if(m.req&&!G.tecpatl_mods.includes(m.req))return false; // tier prereq must be active THIS run
+    /* v1096: these two lines used to contradict each other -- an upgrade needed its family to be
+       simultaneously active (to satisfy `req`) and inactive (to pass the family check), so all 20
+       tier-2/3 modifiers were unreachable and every run only ever saw the 14 tier-1s. */
+    if(G.tecpatl_mods.includes(m.id))return false;              // already carrying this exact one
+    if(m.req)return G.tecpatl_mods.includes(m.req);             // an upgrade: offer once its prerequisite is held
+    if(activeFamilies.has(m.family))return false;               // a tier 1: only if the family is untouched
     return true;
   });
   // Shuffle
@@ -18456,6 +18501,7 @@ function showPenancePick(onDone){
       <div style="font-size:24px">🗡️</div>
       <div style="font-size:16px;color:#c03030;font-weight:600;margin-top:.3rem">Tecpatl Tribute</div>
       <div style="font-size:12px;color:var(--td);margin-top:.2rem">Choose one penance to carry forward. The blade does not forgive.</div>
+      <div style="font-size:11px;color:#c07050;margin-top:.4rem">⚠ Every penance also makes <strong>all enemies ${Math.round(((G.tecpatl_mods||[]).length+1)*5)}% stronger</strong> — +5% to every stat, per penance carried.</div>
     </div>
     <div style="display:flex;flex-direction:column;gap:.75rem">
     ${pool.map(m=>`
