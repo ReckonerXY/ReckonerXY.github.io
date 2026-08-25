@@ -564,6 +564,11 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
       <button class="btn btn-debug" onclick="debugCustomBattle()" style="font-size:11px;padding:4px 10px">⚔️ Launch Custom Battle…</button>
     </div>
     <div style="border-top:1px solid #4a2a6a;margin-top:6px;padding-top:8px">
+      <div style="font-size:11px;color:#ffd060;font-weight:500;margin-bottom:4px">🎬 Trailer Studio</div>
+      <div style="font-size:10px;color:#a070c0;margin-bottom:4px">Staged capture rig — pixel-art units only, no emoji fallbacks</div>
+      <button class="btn btn-debug" onclick="trailerStudio()" style="font-size:11px;padding:4px 10px;background:#2a2000;border-color:#8a7020;color:#ffd060">🎬 Open Trailer Studio…</button>
+    </div>
+    <div style="border-top:1px solid #4a2a6a;margin-top:6px;padding-top:8px">
       <div style="font-size:11px;color:#a070c0;font-weight:500;margin-bottom:4px">🔒 God Unlocks</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-debug" onclick="dbgRelockGod('tlazolteotl')" style="font-size:11px;padding:4px 10px">🌺 Re-lock Tlazoltéotl</button>
@@ -898,7 +903,7 @@ const TREE_NODES=[
   {id:'pantheon_boost_2',label:'Pantheon Boost II',desc:'Each additional deployed god grants all gods a further +2.5% ATK/MAG/DEF/RES (stacks with I)',cost:2500,cat:'gods',req:['pantheon_boost'],tier:4,x:357,y:32},
   // ═══ SOUTH — ALLIES ═══
   {id:'ally_slot_3',label:'3 Ally Slots',desc:'Unlock 3rd ally deployment slot',cost:2,cat:'allies',req:['hub'],tier:1,x:450,y:442},
-  {id:'ally_slot_4',label:'4 Ally Slots',desc:'Unlock a 4th ally slot',cost:180,cat:'allies',req:['ally_slot_3'],tier:2,x:450,y:520},
+  {id:'ally_slot_4',label:'4 Ally Slots',desc:'Unlock a 4th ally slot',cost:245,cat:'allies',req:['ally_slot_3'],tier:2,x:450,y:520},
   {id:'vassal_affinity',label:'Vassal Affinity',desc:'50% chance each non-boss battle guarantees at least one enemy of the same element as your patron god (replaces one enemy slot)',cost:550,cat:'allies',req:['ally_slot_4'],tier:2,x:312,y:520},
   {id:'ally_slot_5',label:'5 Ally Slots',desc:'Unlock a 5th ally slot',cost:3500,cat:'allies',req:['ally_slot_4'],tier:3,x:374,y:594},
   {id:'ally_special_up',label:'Vassal Health Boost I',desc:'Increase all Vassal HP by 10%',cost:350,cat:'allies',req:['ally_slot_4'],tier:3,x:545,y:594},
@@ -1556,7 +1561,10 @@ function azMult(map,element,isP){if(!map)return 1;let m=map[element]||1;if(isP&&
    round1PctByElement key, so the five existing wiring points (accumulator, battle build, modal
    preview, boosting-list check, relicWindow) keep working untouched. */
 function azR1(map,element,isP){const r={atk:0,mag:0,atkPct:0,magPct:0};if(!map)return r;const es=[element];if(isP&&hasPassive('azureZephyr')&&(element==='wind'||element==='fire'))es.push(element==='wind'?'fire':'wind');es.forEach(e=>{if(map[e]){r.atk+=map[e].atk||0;r.mag+=map[e].mag||0;r.atkPct+=map[e].atkPct||0;r.magPct+=map[e].magPct||0;}});return r;}
-function offeringStatLayer(base,element,isGod,type,turquoise,isTlaloqueU,isPatronU,surgeKey){ // v822: surgeKey lets the modal model Teyolia-scaled offerings the way the battle build does
+function offeringStatLayer(base,element,isGod,type,turquoise,isTlaloqueU,isPatronU,surgeKey,capk){ // v822: surgeKey lets the modal model Teyolia-scaled offerings the way the battle build does
+  /* v1107: capk identifies WHICH unit is being modelled. Only the two lowest-level-vassal
+     offerings need it -- see the weakest test in the `affecting` loop below. Optional, so any
+     caller that omits it simply gets those two listed on nobody, which is the safe direction. */
   const oe=getOfferingEffects();const t={...base};
   const usesAtk=type?(type!=='MAG'):((base.atk||0)>0), usesMag=type?(type==='MAG'||type==='MIX'):((base.mag||0)>0); // v351: only list ATK/MAG offerings on units that use that stat (MIX uses both)
   let hpM=oe.hpMult; if(!isGod)hpM*=oe.vassalHpMult;
@@ -1641,6 +1649,12 @@ function offeringStatLayer(base,element,isGod,type,turquoise,isTlaloqueU,isPatro
   const affecting=[];
   const _M=(el)=>element===el||(isPatronU&&hasPassive('azureZephyr')&&(el==='fire'||el==='wind')&&(element==='fire'||element==='wind')); // v639
   const _B=(map)=>!!(map&&(azFlat(map,element,isPatronU)||azMult(map,element,isPatronU)!==1));
+  /* v1107: resolved once per call rather than per offering. Gods can never match -- the resolver
+     filters !isGod -- so no separate god exclusion is needed here. */
+  const _isWeakest=(function(){
+    if(!capk)return false;
+    try{const w=weakestDeployedVassal();return !!(w&&capKey(w)===capk);}catch(e){return false;}
+  })();
   (G.offerings||[]).forEach(id=>{const o=OFFERINGS[id];if(!o||!o.eff)return;const f=o.eff;let hit=false;
     if(f.atkMult&&usesAtk)hit=true;
     if(f.roundCleanse&&(!G.roundNum||G.roundNum<=relicWindow(f.roundCleanse)))hit=true; // v362/v504 · v893: windowed
@@ -1653,7 +1667,14 @@ function offeringStatLayer(base,element,isGod,type,turquoise,isTlaloqueU,isPatro
     if((f.flatAtkParty&&usesAtk)||(f.flatMagParty&&usesMag)||f.flatDefParty||f.flatResParty||f.flatHpParty)hit=true; /* v1008 */
     if(f.vialElements&&f.vialElements.indexOf(element)>=0&&(!G.roundNum||G.roundNum<=relicWindow(f.vialRounds||0)))hit=true; /* v893 */
     if(f.firstHitReduction||f.axolotlHeal)hit=true;
-    if(f.weakestHpMult||f.weakestDefBuff)hit=true;
+    /* v1107: was unconditional, so Llorona Tear and Snake Scale listed themselves on EVERY unit --
+       including patron gods, which weakestDeployedVassal() explicitly excludes. The stat math was
+       always right (battle start resolves one target and boosts only that one); it was the panel
+       that lied about who was getting it.
+       weakestDeployedVassal() reads G.units, which exists only in battle. Outside battle it
+       returns null and these two are listed on nobody -- the ruling, and honest: with no party
+       deployed there is no lowest-level vassal to name yet. */
+    if((f.weakestHpMult||f.weakestDefBuff)&&_isWeakest)hit=true;
     if(f.vassalHpMult&&!isGod)hit=true;
     if(_B(f.flatAtkByElement)&&usesAtk)hit=true;
     if(_B(f.flatMagByElement)&&usesMag)hit=true;
@@ -2828,7 +2849,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1098'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1111'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -2929,7 +2950,7 @@ const GODS=[
   {id:'quetzalcoatl',name:'Quetzalcoatl',flavor:'Merciful God of Wind',element:'wind',icon:'🐍',
     type:'MIX',hp:140,atk:18,mag:15,def:8,res:6,np:30,npCost:18,
     passive:'Divinity Mercy: capturing grants 20% of enemy max HP as bonus resources',pk:'divinityMercy',pv:.20,
-    ability:'Feather Embrace',ad:'1.5×MAG to 1 target — if fatal, auto-captures with 2.2× resources',ak:'featherEmbrace'},
+    ability:'Feather Embrace',ad:'1.5×MAG to 1 target — if fatal, auto-captures for 2× the capture reward',ak:'featherEmbrace'},
   {id:'tlaloc',name:'Tlaloc',flavor:'Supreme God of Rain',element:'water',icon:'🌧',
     type:'MAG',hp:160,atk:0,mag:15,def:11,res:10,np:35,npCost:22,
     passive:'Endless Torrent: At battle start, all <span class="elem-badge elem-water">💧 Water</span> units in party gain +15% ATK/MAG for this battle.',pk:'endlessTorrent',pv:.15, // v622: Genaro's wording; element chip inline — the pattern for descriptions going forward
@@ -3140,23 +3161,23 @@ tonatiuh:["Tepeyollotl's heart goes quiet, and the mountains stop grinding for t
 const MICTLAN_CAPS=[
   // TUTORIAL (B1 only) — weak enemies that teach PHYS/DEF and MAG/RES mitigation.
   // tutorial:true excludes them from all general pools; spoilMult matches old B1 (Bone Walker 110HP, River Wind 70HP) rewards.
-  {id:'met1',name:'Hollow Warrior',icon:'🪆',element:'earth',type:'PHYS',hp:55,atk:8,mag:0,def:4,res:2,np:20,npCost:12,ability:'Hollow Blow',ad:'1.2×ATK physical damage to 1 target',acd:10,fv:2,tutorial:true,spoilMult:2.0},
-  {id:'mwt1',name:'Hollow Breath',icon:'💨',element:'wind',type:'MAG',hp:40,atk:0,mag:7,def:2,res:4,np:20,npCost:12,ability:'Stale Gust',ad:'1.2×MAG magic damage to 1 target',acd:10,fv:2,tutorial:true,spoilMult:1.75},
+  {id:'met1',name:'Yaotl Husk',icon:'🪆',element:'earth',type:'PHYS',hp:55,atk:8,mag:0,def:4,res:2,np:20,npCost:12,ability:'Hollow Blow',ad:'1.2×ATK physical damage to 1 target',acd:10,fv:2,tutorial:true,spoilMult:2.0},
+  {id:'mwt1',name:'Last Breath',icon:'💨',element:'wind',type:'MAG',hp:40,atk:0,mag:7,def:2,res:4,np:20,npCost:12,ability:'Stale Gust',ad:'1.2×MAG magic damage to 1 target',acd:10,fv:2,tutorial:true,spoilMult:1.75},
   // WIND — MAG units: high RES, low DEF → physical strikes are better against them
-  {id:'mw1',name:'Wandering Soul',icon:'🌬',element:'wind',type:'PHYS',hp:65,atk:14,mag:0,def:5,res:3,np:20,npCost:8,ability:'Wail',ad:'1.5×ATK + 10% CRIT',acd:9,fv:3},
-  {id:'mw2',name:'Ash Specter',icon:'🌀',element:'wind',type:'MAG',hp:72,atk:0,mag:15,def:5,res:3,np:22,npCost:8,ability:'Soul Drain',ad:'1.3×MAG + heals self for damage dealt',acd:8,fv:3},
+  {id:'mw1',name:'Nemini',icon:'🌬',element:'wind',type:'PHYS',hp:65,atk:14,mag:0,def:5,res:3,np:20,npCost:8,ability:'Wail',ad:'1.5×ATK + 10% CRIT',acd:9,fv:3},
+  {id:'mw2',name:'Ash Mourner',icon:'🌀',element:'wind',type:'MAG',hp:72,atk:0,mag:15,def:5,res:3,np:22,npCost:8,ability:'Soul Drain',ad:'1.3×MAG + heals self for damage dealt',acd:8,fv:3},
   {id:'mw3',name:'River Wind',icon:'🪶',element:'wind',type:'MAG',hp:70,atk:0,mag:13,def:3,res:14,np:25,npCost:12,ability:'Gust Mend',ad:'Heal all allies 18% HP + cleanse',acd:11,fv:3},
-  {id:'mw4',name:'Dust Shade',icon:'⛈',element:'wind',type:'MAG',hp:78,atk:0,mag:16,def:3,res:16,np:28,npCost:12,ability:'Howling Gust',ad:'1.4×MAG, 3 targets',acd:11,fv:4},
+  {id:'mw4',name:'Grit Wraith',icon:'⛈',element:'wind',type:'MAG',hp:78,atk:0,mag:16,def:3,res:16,np:28,npCost:12,ability:'Howling Gust',ad:'1.4×MAG, 3 targets',acd:11,fv:4},
   // EARTH — PHYS units: high DEF, low RES → magic strikes are better against them
   {id:'me1',name:'Bone Walker',icon:'🦴',element:'earth',type:'PHYS',hp:110,atk:11,mag:0,def:18,res:4,np:25,npCost:9,ability:'Bone Crush',ad:'3-hit Multi: (ATK×0.5) physical per hit, +20% crit chance',acd:12,fv:4},
   {id:'me2',name:'Stone Serpent',icon:'🗿',element:'earth',type:'PHYS',hp:100,atk:12,mag:0,def:16,res:4,np:22,npCost:12,ability:'Coil Crush',ad:'1.4×ATK, 3 targets',acd:10,fv:3},
-  {id:'me3',name:'Grave Bloomer',icon:'🌺',element:'earth',type:'MAG',hp:95,atk:0,mag:10,def:6,res:9,np:28,npCost:15,ability:'Death Bloom',ad:'Heal all 16% + DEF/RES UP×1 all',acd:11,fv:3},
+  {id:'me3',name:'Cempoal Wraith',icon:'🌺',element:'earth',type:'MAG',hp:95,atk:0,mag:10,def:6,res:9,np:28,npCost:15,ability:'Death Bloom',ad:'Heal all 16% + DEF/RES UP×1 all',acd:11,fv:3},
   {id:'me4',name:'Obsidian Skull',icon:'💀',element:'earth',type:'PHYS',hp:115,atk:13,mag:0,def:18,res:4,np:22,npCost:9,ability:'Bone Shard',ad:'1.7×ATK + Slow ×1',acd:9,fv:4},
   // WATER — MAG units: high RES, low DEF → physical is more effective
   {id:'mq1',name:'Black River Eel',icon:'🐍',element:'water',type:'MAG',hp:80,atk:0,mag:13,def:4,res:15,np:22,npCost:9,ability:'River Poison',ad:'1.2×MAG + Poison ×2',acd:9,fv:3},
-  {id:'mq2',name:'Drowned One',icon:'🌊',element:'water',type:'MAG',hp:88,atk:0,mag:11,def:4,res:14,np:28,npCost:12,ability:'Dark Waters',ad:'Heal all 16% + ATK/MAG UP×1 all',acd:11,fv:3},
+  {id:'mq2',name:'River Toll-Taker',icon:'🌊',element:'water',type:'MAG',hp:88,atk:0,mag:11,def:4,res:14,np:28,npCost:12,ability:'Dark Waters',ad:'Heal all 16% + ATK/MAG UP×1 all',acd:11,fv:3},
   {id:'mq3',name:'Swamp Lurker',icon:'🐊',element:'water',type:'MAG',hp:98,atk:0,mag:12,def:5,res:14,np:26,npCost:14,ability:'Murk',ad:'1.2×MAG, 3 targets + Slow ×1',acd:11,fv:3},
-  {id:'mq4',name:'Soul Leech',icon:'🫧',element:'water',type:'MAG',hp:75,atk:0,mag:14,def:4,res:13,np:22,npCost:12,ability:'Life Siphon',ad:'1.35×MAG + heals self for damage dealt',acd:9,fv:3},
+  {id:'mq4',name:'Apanuiayo Leech',icon:'🫧',element:'water',type:'MAG',hp:75,atk:0,mag:14,def:4,res:13,np:22,npCost:12,ability:'Life Siphon',ad:'1.35×MAG + heals self for damage dealt',acd:9,fv:3},
   // FIRE — glass cannons: low DEF and RES, high damage
   {id:'mf1',name:'Ember Skull',icon:'🔥',element:'fire',type:'PHYS',hp:75,atk:16,mag:0,def:4,res:3,np:20,npCost:8,ability:'Skull Flame',ad:'3-hit Multi: 0.6×ATK to random enemies + Burn ×1',acd:8,fv:3},
   {id:'mf2',name:'Cinder Shade',icon:'🔦',element:'fire',type:'MAG',hp:80,atk:0,mag:14,def:3,res:4,np:25,npCost:14,ability:'Cinder Mend',ad:'ATK/MAG UP ×1 + DEF/RES UP ×1 to ALL allies',acd:10,fv:3},
@@ -3208,7 +3229,7 @@ function updateMidwifeCondition(){
 }
 
 const XOCHIPILLI_BOSS_TPL={id:'boss_xochi',name:'Xochipilli',flavor:'Prince God of Art and Games',icon:'🎭',isBoss:true,isAlly:false,element:'humanity',type:'MAG',
-  ability:'Patolli Gamble',ad:'d6 roll: 1=1dmg all · 2=1.65×MAG · 3=1.95×MAG ×2 hits · 4=2.4×MAG ×3 hits · 5=2.7×MAG AoE · 6=4.0×MAG AoE',ak:'patolliGambleBoss',
+  ability:'Patolli Gamble',ad:'d6 roll: 1=1dmg all · 2=1.65×MAG · 3=1.95×MAG ×2 hits · 4=2.4×MAG ×3 hits · 5=2.7×MAG AoE · 6=3.2×MAG AoE',ak:'patolliGambleBoss',
   hp:540,atk:0,mag:28,def:10,res:12,np:50,npCost:18,fv:0};
 
 function buildXochipilliFight(){
@@ -3415,13 +3436,13 @@ const HUITZILOPOCHTLI_BOSS_TPL={id:'boss_huitzilopochtli',name:'Huitzilopochtli'
   ability:'Xiuhcoatl Might',ad:'0.5\u00d7ATK \u00d73 to random foes; each kill restores 10% TP and grants ATK/MAG UP \u00d71 to his host',ak:'xiuhcoatlMight',
   hp:800,atk:32,mag:0,def:19,res:14,np:54,npCost:23,fv:0};
 const MAYAHUEL_BOSS_TPL={id:'boss_mayahuel',name:'Mayahuel',flavor:'Maguey Goddess of Pulque',icon:'🌵',isBoss:true,isAlly:false,element:'nature',type:'MAG',pk:'inebriatedReverie',ability:'Octli Drench',ad:'1.5×MAG + 10% splash + DRUNK ×1 to ALL — her own host drinks too',ak:'octliDrench',hp:800,atk:0,mag:32,def:15,res:14,np:54,npCost:24,fv:0};
-const MICTLAMPEHECATL_TPL={id:'mictlampehecatl',name:'Mictlampehecatl',flavor:'Spirit of the Northern Wind',icon:'🌪️',isMiniBoss:true,isBoss:false,isAlly:false,element:'water',type:'MAG',ability:'Iceburn Storm',ad:'1.1×MAG, 5 targets + Burn ×2 each',ak:'iceburnStorm',hp:480,atk:0,mag:22,def:10,res:12,np:50,npCost:29,fv:0};
+const MICTLAMPEHECATL_TPL={id:'mictlampehecatl',name:'Mictlampehecatl',flavor:'Spirit of the Northern Wind',icon:'🌪️',isMiniBoss:true,isBoss:false,isAlly:false,element:'wind',type:'MAG',ability:'Cinder Screech',ad:'1.1×MAG, 5 targets + Burn ×2 each',ak:'iceburnStorm',hp:480,atk:0,mag:22,def:10,res:12,np:50,npCost:29,fv:0};
 function ixquimilliUnlocked(){return layer4Unlocked();}
 const IXQUIMILLI_BOSS_TPL={id:'boss_ixqui',name:'Ixquimilli',flavor:'Punisher God of Ice',icon:'🧊',isBoss:true,isAlly:false,element:'water',type:'PHYS',
   ability:'Frost Macuahuitl',ad:'1.5×ATK + Wound ×1 + Lethargy ×2',ak:'frostMacuahuitl',
   hp:660,atk:28,mag:0,def:12,res:8,np:50,npCost:20,fv:0};
 // Add Mictlampehecatl capturable stats
-MINIBOSS_CAP_STATS['mictlampehecatl']={hp:170,atk:0,mag:18,def:9,res:10,np:40,npCost:34,fv:6,ability:'Iceburn Storm',ad:'1.1×MAG, 5 targets + Burn ×2 each',ak:'iceburnStorm',type:'MAG',element:'water'};
+MINIBOSS_CAP_STATS['mictlampehecatl']={hp:170,atk:0,mag:18,def:9,res:10,np:40,npCost:34,fv:6,ability:'Cinder Screech',ad:'1.1×MAG, 5 targets + Burn ×2 each',ak:'iceburnStorm',type:'MAG',element:'wind'} /* v1105: display name only -- ak stays 'iceburnStorm' so the enemy-side dispatcher at ak==='iceburnStorm' is untouched */; /* v1104: element follows the template -- the enemy and the captured vassal read from different objects, so both move together or the same creature has two elements */
 function layer3Unlocked(){return Object.keys(V).some(k=>k.startsWith('layer3_')&&V[k]);}
 function layer4Unlocked(){return Object.keys(V).some(k=>k.startsWith('layer4_')&&V[k]);}
 
@@ -3668,7 +3689,7 @@ const ACUECUEYOTL_TPL={id:'acuecueyotl',name:'Acuecueyotl',flavor:'Demigoddess o
 MINIBOSS_CAP_STATS['amimitl']={hp:182,atk:0,mag:20,def:11,res:12,np:42,npCost:34,fv:6,ability:'Mystical Shots',ad:'1.2×MAG, 4 targets — destroys Chimalli + Paralyze ×1',ak:'mysticalShots'};
 MINIBOSS_CAP_STATS['atlaua']={hp:188,atk:22,mag:0,def:13,res:8,np:44,npCost:32,fv:6,ability:'Atlatl Rush',ad:'1.4×ATK, 2 targets + Wound ×1 (+20% CRIT)',ak:'atlatlRush',_critInnate:0.20};
 MINIBOSS_CAP_STATS['acuecueyotl']={hp:178,atk:0,mag:16,def:11,res:13,np:44,npCost:36,fv:6,ability:'Surging Tide',ad:'Heal 23% all allies + Slow ×1 to 4 random foes',ak:'surgingTide'};
-const TLACATEOCOTL_TPL={id:'tlacateocotl',name:'Tlacateocotl',flavor:'The Owlman Sorcerer',icon:'🦉',isMiniBoss:true,isBoss:false,isAlly:false,element:'wind',type:'MAG',
+const TLACATEOCOTL_TPL={id:'tlacateocotl',name:'Tlacateocotl',flavor:'The Owlman Sorcerer',icon:'🦉',isMiniBoss:true,isBoss:false,isAlly:false,element:'fire',type:'MAG',
   ability:'Death Screech',ad:'1.6×MAG AoE — destroys all Chimalli + Burn ×1 + Wound ×1',ak:'deathScreech',
   hp:635,atk:0,mag:24,def:12,res:14,np:55,npCost:34,fv:0};
 /* v704: L8 duo minibosses (B4). Deities, not Gods -- capturable as vassals, never playable gods.
@@ -3681,7 +3702,7 @@ const NEXOXCHO_TPL={id:'nexoxcho',name:'Nexoxcho',flavor:'The Jestress Who Sows 
   hp:360,atk:0,mag:29,def:10,res:15,np:52,npCost:34,fv:0}; // v707: npCost 26→34
 MINIBOSS_CAP_STATS['ixpuxtequi']={hp:195,atk:0,mag:21,def:14,res:11,np:44,npCost:34,fv:8,ability:'Descent from the Trees',ad:'1.5\u00d7MAG to 1 target + 10% splash to all others + random status \u00d72 each',ak:'descentFromTrees',type:'MAG',element:'night'};
 MINIBOSS_CAP_STATS['nexoxcho']={hp:190,atk:0,mag:22,def:10,res:14,np:44,npCost:33,fv:8,ability:'Jestress Nightmare',ad:'1.1\u00d7MAG drain, 5 targets (+50% vs statused) \u2014 heals 40% of damage to self + Ixpuxtequi',ak:'jestressNightmare',type:'MAG',element:'thunder'};
-MINIBOSS_CAP_STATS['tlacateocotl']={hp:175,atk:0,mag:20,def:10,res:12,np:44,npCost:36,fv:7,ability:'Death Screech',ad:'1.4×MAG, 3 targets + destroys Chimalli + Burn ×1 + Wound ×1',ak:'deathScreech',type:'MAG',element:'wind'};
+MINIBOSS_CAP_STATS['tlacateocotl']={hp:175,atk:0,mag:20,def:10,res:12,np:44,npCost:36,fv:7,ability:'Death Screech',ad:'1.4×MAG, 3 targets + destroys Chimalli + Burn ×1 + Wound ×1',ak:'deathScreech',type:'MAG',element:'fire'}; /* v1104: see Mictlampehecatl above -- template and cap stats move together */
 MINIBOSS_CAP_STATS['ometochtli']={hp:188,atk:0,mag:19,def:12,res:12,np:44,npCost:34,fv:7,ability:'Drunken Revel',ad:'0.3×MAG to 6 targets + DRUNK ×2 each + summon 1 Centzon Totochtin',ak:'drunkenRevel',type:'MAG',element:'nature'};
 
 /* v1024: this list existed as THREE identical local copies (resolveCap, fireGodSpecial,
@@ -4098,6 +4119,24 @@ function xbalanqueShouldAppear(){
   if(!G._xbalRoll||G._xbalRoll.key!==key)G._xbalRoll={key:key,val:Math.random()<0.5};
   return G._xbalRoll.val;
 }
+/* ═══ v1104: ONE "was this god already unlocked?" test ══════════════════════════
+   The layer-ending screen announced new patrons through five DIFFERENT guard idioms, and three of
+   them were wrong:
+     - Tepeyollotl tested !hasV('layer2_tepeyollotl'), i.e. "have you cleared L2 AS Tepeyollotl" --
+       not "is Tepeyollotl unlocked". So the banner fired on EVERY L2 clear with any other patron.
+       Itzpapalotl had the identical bug on L3. This is the reported one.
+     - Ixquimilli tested !ixquimilliUnlocked() against the LIVE V, which endBattle has already
+       written by the time this screen renders -- so it was always false and his banner never
+       appeared at all. The opposite failure, silently.
+   The unlock flag is written on the clear, so the only question that can be asked afterwards is
+   whether it was set BEFORE the run. G._preRunV is exactly that snapshot, and godUnlocked already
+   accepts an alternate V source, so every announcement now routes through this.
+   No snapshot (a run predating v805) means we cannot tell -- treat as already-known and stay quiet,
+   since a missed announcement is cheaper than a duplicate one. */
+function unlockedBeforeRun(id){
+  if(!G||!G._preRunV)return true;
+  return godUnlocked(id,G._preRunV);
+}
 function godUnlocked(id,vSrc){
   const _v=vSrc||V;
   const _scan=pfx=>Object.keys(_v).some(k=>k.indexOf(pfx)===0&&_v[k]);
@@ -4321,6 +4360,242 @@ function dbgRelockCodex1(){
   saveV();
   notify(n?('\u{1F512} Re-locked '+n+' Codex 1 god'+(n===1?'':'s')):'Codex 1 gods already locked','#a070c0');
   try{if(typeof renderGods==='function'&&document.getElementById('god-grid'))renderGods();}catch(e){}
+}
+
+/* ═══════════════ v1112: TRAILER STUDIO ═══════════════════════════════════════
+   A capture rig for promotional footage. Three staged encounters plus the knobs that make a
+   take survive being filmed (durability multipliers, full TP on the opening beat).
+
+   THE ONE RULE THIS ENFORCES: every combatant is drawn only from units that have pixel art.
+   The rosters are DERIVED from GOD_PORTRAITS rather than hand-listed, so a sprite landing in a
+   future build joins the pickers with no edit here -- the split-list trap this file is written
+   to avoid. If a unit is missing from a dropdown, it has no sprite yet; that is the tell.
+
+   Nothing here calls saveV(): the unlock seeding is session-only, exactly as debugJumpBoss
+   does it, so filming never writes into real progress. Encounters are built through the same
+   buildEnemySet / startCipactliPhase / mictlanRaiseGod the live game uses -- what you film is
+   what ships, with no parallel copy to drift.
+   TRAILER lives outside G on purpose: every preset calls initG(), which would wipe it. */
+var TRAILER={lv:95,gods:4,host:4,escorts:3,phpx:3,ehpx:1,tp:true,layer:1,
+             patron:'quetzalcoatl',vassal:'mw4',boss:'boss_xolotl'};
+function trlHasArt(id){return !!(id&&typeof GOD_PORTRAITS!=='undefined'&&GOD_PORTRAITS[id]);}
+function trlArtVassals(){
+  var seen={},out=[];
+  (typeof ALL_CAP_DEFS!=='undefined'?ALL_CAP_DEFS:[]).forEach(function(c){
+    if(!c||c.isBoss||c.isMiniBoss||seen[c.id]||!trlHasArt(c.id))return;
+    seen[c.id]=1;out.push(c);
+  });
+  return out;
+}
+/* Minibosses and set-piece bosses from the existing debug roster, PLUS every layer boss that
+   stands in for a god -- dbgBossTpls() only ever listed the six that had no playable twin, so
+   without godBossTpls() the picker was missing Xolotl, Tepeyollotl and nine others. */
+function trlArtBosses(){
+  var seen={},out=[];
+  dbgAllTestableTpls().concat(godBossTpls().map(function(x){return x.tpl;})).forEach(function(c){
+    if(!c||seen[c.id]||!trlHasArt(c.id))return;
+    seen[c.id]=1;out.push(c);
+  });
+  return out;
+}
+/* Session-only unlocks. Mictlantecuhtli's summon roster is gated by godUnlocked(), so an
+   unseeded flag silently shrinks the host -- xbalanque_unlocked in particular is set by
+   nothing else in debug, and its absence quietly dropped the Jaguar from every staged army. */
+function trlSeedUnlocks(){
+  GODS.forEach(function(g){
+    V[g.id]=true;
+    for(var L=1;L<=9;L++)V['layer'+L+'_'+g.id]=true;
+    V['layer5_xiu_'+g.id]=true;V['layer5_mal_'+g.id]=true;
+  });
+  ['chicomecoatl','mixcoatl','xochipilli','patecatl','tonatiuh','cihuacoatl','toci',
+   'huitzilopochtli','xochiquetzal','xbalanque'].forEach(function(k){V[k+'_unlocked']=true;});
+}
+/* Patron + N ally gods, one level across the whole party, all deployed. Element-diverse first
+   so the party reads as a spread of colours on camera rather than four of the same badge. */
+function trlBuildParty(lv,nGods,patronId){
+  G.dte=getDTEffects();initG();loadV();
+  trlSeedUnlocks();
+  var patron=GODS.find(function(g){return g.id===patronId;})||GODS[0];
+  G.god=patron;G.party=[patron.id];G.levels['god_'+patron.id]=lv;G.deplSel=[];
+  var taken={},picks=[];taken[patron.element]=1;
+  var rest=GODS.filter(function(g){return g.id!==patron.id;});
+  rest.forEach(function(g){if(picks.length<nGods&&!taken[g.element]){picks.push(g);taken[g.element]=1;}});
+  rest.forEach(function(g){if(picks.length<nGods&&picks.indexOf(g)<0)picks.push(g);});
+  picks.forEach(function(g){G.party.push(g.id);G.levels['god_'+g.id]=lv;G.deplSel.push('god_'+g.id);});
+  G.res={blood:999000,cacao:999000,flower:999000};
+  G.chosenDifficulty='easy';G.pendingEvent=null;G._pendingEventRolled=true;
+  G.cachedEasy=null;G.cachedHard=null;G.l5BossChoice=null;
+  G.dte=getDTEffects();G.dte.maxAllies=Math.max(G.dte.maxAllies||2,G.deplSel.length);
+  return patron;
+}
+/* Runs AFTER startBattle. HP is scaled as a ratio so a unit already damaged stays damaged, and
+   any Chimalli granted by startBattle scales with it -- otherwise a x3 party would wear a
+   shield worth a third of what the layer table intended.
+   G._cipactliReveal is included because the limbs are held OFF the board and pushed in one at a
+   time by revealCipactli(); scaling them here means they surface already correct. */
+function trlPolish(){
+  var T=TRAILER;
+  var eList=(G.enemies||[]).concat(G._cipactliReveal||[]);
+  function mult(u,m){
+    if(!u||!(m>1)||!(u.maxHp>0))return;
+    var r=u.currentHp/u.maxHp;
+    u.maxHp=Math.round(u.maxHp*m);
+    u.currentHp=Math.round(u.maxHp*r);
+    if(u.armor)u.armor=Math.round(u.armor*m);
+  }
+  (G.units||[]).forEach(function(u){mult(u,T.phpx);});
+  eList.forEach(function(e){mult(e,T.ehpx);});
+  if(T.tp){
+    /* maxNPFor(key,base) is the real ceiling -- a built unit's `np` is still the TEMPLATE base
+       while the level-scaled cost is far higher, so currentNP=u.np leaves everyone unable to
+       fire. Same trap the Belic Rush rig documents. */
+    (G.units||[]).forEach(function(u){if(u&&u.currentHp>0)u.currentNP=maxNPFor(u._captureId||u.id,u.np);});
+    eList.forEach(function(e){if(e&&e.currentHp>0)e.currentNP=e.maxNP||0;});
+  }
+  if(typeof renderBattle==='function')renderBattle();
+}
+/* ── Take 1: patron duel ─────────────────────────────────────────────────────
+   Patron + one vassal against a single boss, every level identical on both sides. */
+function trlDuel(){
+  var T=TRAILER,lv=Math.max(1,T.lv|0);
+  trlBuildParty(lv,0,T.patron);
+  var vd=(typeof ALL_CAP_DEFS!=='undefined'?ALL_CAP_DEFS:[]).find(function(c){return c.id===T.vassal;});
+  if(vd){
+    var cid='trl_'+vd.id;
+    G.captured.push(Object.assign({},vd,{_captureId:cid,baseId:vd.id}));
+    G.levels[cid]=lv;G.deplSel.push(cid);
+  }else{notify('No vassal def for '+T.vassal,'#e05050');}
+  G.dte.maxAllies=Math.max(G.dte.maxAllies||2,G.deplSel.length);
+  var bt=trlArtBosses().find(function(c){return c.id===T.boss;});
+  if(!bt){notify('No boss template for '+T.boss,'#e05050');return;}
+  /* battleNum 8 so layerChimalliRow() pays the boss row; the layer picks which row. */
+  G.layer=Math.max(1,Math.min(9,T.layer|0));G.battleNum=8;G.battlesCompleted=7;
+  /* v1114: escort line, so the capture/slay window actually fires on camera. A LAYER BOSS is
+     never capturable (processNextCap routes isBoss straight to handleDeath), which is why the
+     solo duel could only ever end in a kill. Escorts are drawn from trlArtVassals() -- the eight
+     sprite-backed L1 vassals -- and every one of them lives in MICTLAN_CAPS, so processNextCap
+     resolves a base template BY NAME and offers Capture / Slay for Resources.
+     The deployed vassal's species is excluded so the same sprite is not mirrored across the line,
+     and picks are distinct so each capture window shows a different unit. Escorts take HALF the
+     boss Chimalli row (position beats isMiniBoss), so drop 'Duel layer' to 1 for the thinnest
+     shields if the armour is eating the shot. */
+  var nEsc=Math.max(0,Math.min(7,TRAILER.escorts|0));
+  var escPool=trlArtVassals().filter(function(c){return c.id!==T.vassal;});
+  var esc=[];
+  for(var i=0;i<nEsc&&escPool.length;i++)esc.push(mkEnemy(escPool[i%escPool.length],i+1,1.0,lv));
+  G.pendingEnemies=[mkEnemy(bt,0,1.0,lv)].concat(esc).filter(Boolean);
+  if(!G.pendingEnemies.length){notify('Enemy build failed','#e05050');return;}
+  startBattle();trlPolish();
+  addLog('<span style="color:#ffd060">\u{1F3AC} TAKE 1 \u2014 '+G.god.name+' + '+(vd?vd.name:'?')+' vs '+bt.name+(esc.length?' and '+esc.length+' escort'+(esc.length>1?'s':''):'')+', all Lv'+lv+'.</span>');
+  if(esc.length)addLog('<span style="color:#8a7a50">Escorts are capturable \u2014 slaying one opens the Capture / Slay window.</span>');
+  notify('\u{1F3AC} Take 1 rolling','#ffd060');
+}
+/* ── Take 2: the God King and his host ───────────────────────────────────────
+   buildEnemySet(8,'boss') on Layer 9 returns Mictlantecuhtli ALONE by design -- Undead Forces
+   builds his army over the fight. For footage that means filming a dozen rounds of nothing, so
+   the host is raised up front through the same mictlanRaiseGod the passive uses and folded into
+   pendingEnemies BEFORE startBattle, which is what earns the arrivals round-1 queue slots.
+   Each staged god is stamped _layerChima so applyLayerChimalli skips it: a live summon arrives
+   after startBattle and gets no layer shield, and the staged host must match. */
+function trlGodKing(){
+  var T=TRAILER;
+  trlBuildParty(Math.max(1,T.lv|0),Math.max(0,Math.min(6,T.gods|0)),T.patron);
+  G.layer=9;G.battleNum=8;G.battlesCompleted=7;G.chosenDifficulty='boss';
+  var host=buildEnemySet(8,'boss');
+  if(!host||!host.length){notify('L9 boss build failed','#e05050');return;}
+  var king=host.find(function(e){return e&&e.pk==='undeadForces';});
+  var n=Math.max(0,Math.min(8,T.host|0)),raised=0;
+  if(king&&n){
+    var pool=mictlanSummonPool();
+    for(var i=0;i<n;i++){
+      var done=king._mictlanSummoned||[];
+      var avail=pool.filter(function(t){return done.indexOf(t.id)<0;});
+      if(!avail.length)break;
+      var pick=avail[Math.floor(Math.random()*avail.length)];
+      var s=mictlanRaiseGod(king,pick,king.enemyLevel,host);
+      if(!s)break;
+      s._layerChima=1;raised++;
+    }
+  }
+  G.pendingEnemies=host;
+  startBattle();trlPolish();
+  addLog('<span style="color:#ffd060">\u{1F3AC} TAKE 2 \u2014 '+(1+(G.deplSel||[]).length)+' gods vs the God King and '+raised+' raised dead (Mictlan Clasp at '+(0.30+0.10*raised).toFixed(2)+'\u00d7MAG).</span>');
+  notify('\u{1F3AC} Take 2 rolling \u2014 host of '+raised,'#ffd060');
+}
+/* ── Take 3: Cipactli ────────────────────────────────────────────────────────
+   Phase 2 is a second wave inside battle slot 8, so it is reached by building the phase-1 board
+   and swapping straight into it. Safe to do synchronously: buildEnemyOrder interleaves
+   player-first, so startBattle leaves the queue parked on a PLAYER slot with no enemy action in
+   flight, and startCipactliPhase resets the round counter and rebuilds the queue itself. */
+function trlCipactli(){
+  var T=TRAILER;
+  trlBuildParty(Math.max(1,T.lv|0),Math.max(0,Math.min(6,T.gods|0)),T.patron);
+  G.layer=9;G.battleNum=8;G.battlesCompleted=7;G.chosenDifficulty='boss';
+  G.pendingEnemies=buildEnemySet(8,'boss');
+  if(!G.pendingEnemies||!G.pendingEnemies.length){notify('L9 boss build failed','#e05050');return;}
+  startBattle();
+  startCipactliPhase();
+  trlPolish();
+  addLog('<span style="color:#ffd060">\u{1F3AC} TAKE 3 \u2014 '+(1+(G.deplSel||[]).length)+' gods vs Cipactli, five parts and the God King.</span>');
+  notify('\u{1F3AC} Take 3 rolling \u2014 dismiss the cutscene to trigger the reveal','#ffd060');
+}
+function trlStep(k,d,lo,hi){TRAILER[k]=Math.max(lo,Math.min(hi,(TRAILER[k]||0)+d));trailerStudio();}
+function trlSet(k,v){TRAILER[k]=v;trailerStudio();}
+function trailerStudio(){
+  var T=TRAILER;
+  function stepper(label,key,d,lo,hi,val){
+    return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">'
+      +'<span style="width:104px;color:#a070c0">'+label+'</span>'
+      +'<button class="btn btn-debug" style="padding:1px 7px" onclick="trlStep(&#39;'+key+'&#39;,'+(-d)+','+lo+','+hi+')">\u2212</button>'
+      +'<strong style="min-width:34px;text-align:center;display:inline-block;color:#ffd060">'+val+'</strong>'
+      +'<button class="btn btn-debug" style="padding:1px 7px" onclick="trlStep(&#39;'+key+'&#39;,'+d+','+lo+','+hi+')">+</button></div>';
+  }
+  function chips(label,key,opts){
+    var h='<div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;flex-wrap:wrap">'
+      +'<span style="width:104px;color:#a070c0">'+label+'</span>';
+    opts.forEach(function(o){
+      var on=T[key]===o;
+      h+='<button class="btn btn-debug" style="padding:1px 8px'+(on?';background:#3a2a00;border-color:#8a7020;color:#ffd060':'')+'" onclick="trlSet(&#39;'+key+'&#39;,'+o+')">\u00d7'+o+'</button>';
+    });
+    return h+'</div>';
+  }
+  function sel(label,key,list,idOf,textOf){
+    var h='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">'
+      +'<span style="width:104px;color:#a070c0">'+label+'</span>'
+      +'<select style="font-size:11px;padding:3px 6px;background:#1a0a2a;border:0.5px solid #4a2a6a;color:#c0a0e0;border-radius:6px;flex:1;max-width:210px" onchange="TRAILER.'+key+'=this.value">';
+    list.forEach(function(o){
+      var id=idOf(o);
+      h+='<option value="'+id+'"'+(T[key]===id?' selected':'')+'>'+textOf(o)+'</option>';
+    });
+    return h+'</select></div>';
+  }
+  var vas=trlArtVassals(),bos=trlArtBosses();
+  var h='<div style="font-size:12px;text-align:left;line-height:1.5">';
+  h+='<div style="font-size:10px;color:#8a7a50;margin-bottom:8px">Rosters below list only units with pixel art ('+GODS.length+' gods \u00b7 '+vas.length+' vassals \u00b7 '+bos.length+' bosses). Anything absent has no sprite yet.</div>';
+  h+=stepper('Level','lv',5,1,120,T.lv);
+  h+=stepper('Ally gods','gods',1,0,6,T.gods);
+  h+=stepper('Raised dead','host',1,0,8,T.host);
+  h+=stepper('Duel escorts','escorts',1,0,7,T.escorts);
+  h+=stepper('Duel layer','layer',1,1,9,T.layer);
+  h+=chips('Party HP','phpx',[1,3,10]);
+  h+=chips('Enemy HP','ehpx',[1,2,5]);
+  h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><span style="width:104px;color:#a070c0">Full TP</span>'
+    +'<button class="btn btn-debug" style="padding:1px 10px'+(T.tp?';background:#3a2a00;border-color:#8a7020;color:#ffd060':'')+'" onclick="trlSet(&#39;tp&#39;,'+(T.tp?'false':'true')+')">'+(T.tp?'ON':'OFF')+'</button>'
+    +'<span style="font-size:10px;color:#8a7a50">both sides open at max Tonalli</span></div>';
+  h+=sel('Patron','patron',GODS,function(g){return g.id;},function(g){return g.name+' \u00b7 '+g.element;});
+  h+=sel('Vassal','vassal',vas,function(c){return c.id;},function(c){return c.name+' \u00b7 '+c.element;});
+  h+=sel('Duel boss','boss',bos,function(c){return c.id;},function(c){return c.name;});
+  h+='<div style="margin-top:8px;font-size:10px;color:#8a7a50;border-top:1px solid #3a2a1a;padding-top:6px">'
+    +'Takes 2 and 3 use the real L9 boss levels (phase 1 Lv'+(typeof L9_PHASE1_LV!=='undefined'?L9_PHASE1_LV:'?')
+    +' \u00b7 Cipactli Lv'+(typeof L9_PHASE2_LV!=='undefined'?L9_PHASE2_LV:'?')+'), so set Level to match if you want an even fight. '
+    +'Take 1 puts both sides on Level exactly.</div>';
+  h+='</div>';
+  showMo('\u{1F3AC}','Trailer Studio',h,[
+    {label:'\u{1F40D} Take 1 \u2014 Duel',fn:trlDuel,cls:'btn-teotl'},
+    {label:'\u{1F480} Take 2 \u2014 God King',fn:trlGodKing,cls:'btn-teotl'},
+    {label:'\u{1F40A} Take 3 \u2014 Cipactli',fn:trlCipactli,cls:'btn-teotl'},
+    {label:'\u2716 Close',fn:function(){}}
+  ]);
 }
 function debugCustomBattle(){
   if(!G.god){var _tl=G._dbgPartyLv||20;dbgSetupTestRun(_tl);G._dbgBattleList=[];G._dbgBattleLv=20;notify('🧪 Test party ready: Lv'+_tl+', all units unlocked','#a070c0');}
@@ -4873,6 +5148,14 @@ function initG(){
     _belicCascading:false,
     _patronParalyzeOnStrike:false, // L3-2 Obsidian Forge Option B
     _xochipilliEventFight:false,   // true during Xochipilli boss battle
+    /* v1101: chosenDifficulty and currentEvent both live in RUN_SKIP -- they are round-scoped by
+       design and are never written to a save. That meant an ACCEPTED event battle could not
+       survive a reload even though pendingEnemies was already being persisted: renderDeploy came
+       back with chosenDifficulty undefined, fell into the roll branch and offered the event again.
+       _evFight is the persisted twin. It records only which battle slot the accepted fight belongs
+       to; renderDeploy reads it back and restores the boss framing. */
+    _evFight:null,
+    _evPendingAdvance:false, /* v1108: an event slot was spent but its battleNum++ not yet applied */
     _slowedUnits:new Map(), // uid -> lastRoundSlowed (badge shows while roundNum <= value)
     selectedActorId:null,pendingAction:null,
     captureTargets:new Set(),   // kept for compat; now always empty
@@ -4934,6 +5217,82 @@ function hasRunSave(){
     const o=JSON.parse(raw); return !!(o&&o.v===RUN_SAVE_VERSION&&o.g);}catch(e){return false;}
 }
 function clearRun(){try{localStorage.removeItem('teotlan_run');}catch(e){}}
+/* ═══ v1101: EVENT OUTCOMES ARE COMMITTED WHEN TAKEN ════════════════════════════
+   Before this, the last save before an event was the one renderDeploy takes on the battle-select
+   screen, and the next was the one it takes on the FAR side of the event's Continue button. Every
+   outcome rolled in between -- a Patolli direction, a ball-game point, an accepted boss fight --
+   lived only in memory. Quitting mid-event rolled all of it back to the choice screen with the
+   event still pending, so it could simply be taken again for a different result.
+   Both helpers below spend the event slot and write the run immediately. */
+function evSpendSlot(){
+  G.pendingEvent=null;G._pendingEventRolled=true;
+  G.cachedEasy=null;G.cachedHard=null;
+  /* v1108 RULING: an event CONSUMES its battle slot. v1101 spent the slot at commit time but left
+     the battleNum++ to afterEvent, on the far side of the Continue button -- so quitting mid-Patolli
+     kept the reward and then dropped you back onto the same battle, which is not what an event
+     does. This flag is the outstanding half of afterEvent: set when the slot is spent, cleared the
+     moment the advance is applied, by afterEvent normally or by resumeRun after a quit. */
+  G._evPendingAdvance=true;
+  try{saveRun();}catch(e){}
+}
+/* Accepting an event battle. Called from the option handler, NOT from the Continue callback that
+   follows it -- the decision is made at the click, and that is the moment that must be durable.
+   The existing Continue callbacks are left untouched; they re-clear the same fields harmlessly. */
+function commitEventFight(){
+  G._evFight={layer:G.layer,bn:G.battleNum};
+  evSpendSlot();
+  /* v1108: an event BATTLE occupies the slot itself and finishes through the ordinary spoils and
+     shop, which advance battleNum on their own. Advancing here as well would skip a battle. */
+  G._evPendingAdvance=false;
+}
+/* v1102: a capture is a SNAPSHOT -- name, ad, ak and the rest are frozen at capture time. So the
+   L1 renames would have left a mid-run roster reading 'Wandering Soul' while the same unit newly
+   encountered read 'Nemini'. Display name is refreshed from the live template on resume; nothing
+   dispatches on a captured unit's name (every lookup is id- or baseId-keyed, and the only
+   hardcoded name comparisons in the file are Xiuhnel and Mimich, both minibosses), so this is
+   purely cosmetic and idempotent. Deliberately does NOT touch stats or ability text: those have
+   their own resolution paths and changing them here would be a balance edit in disguise. */
+/* v1106: extracted so the two resume-path repairs below share ONE pool list rather than keeping
+   two copies that can drift -- the split-list failure that keeps costing us. */
+function allCapTemplates(){
+  const pools=[MICTLAN_CAPS,TEPEME_CAPS,OBSIDIAN_CAPS,NATURE_CAPS,HUMANITY_CAPS,
+    CEHUYLOAN_WATER_CAPS,CEHUYLOAN_WIND_CAPS,TONATIUH_DAY_CAPS,PANCUET_FIRE_CAPS,PANCUET_WIND_CAPS,
+    TEMIMINA_WATER_CAPS,TEMIMINA_HUMAN_CAPS,TEYOLLO_NATURE_CAPS,TEYOLLO_DAY_CAPS,
+    APANO_NIGHT_CAPS,APANO_THUNDER_CAPS];
+  return [].concat.apply([],pools.filter(Array.isArray));
+}
+/* v1106: existing saves already hold merc entries written without a baseId, and those units would
+   stay emoji forever. Recovered from the entry's own id (a merc spreads the TEMPLATE object, so
+   its `id` IS the species) and failing that from the '<species>_merc_<ts>' capture id.
+   Writes baseId only; never touches stats, level or the capture key. */
+function repairCaptureBaseIds(){
+  if(!G||!Array.isArray(G.captured))return 0;
+  const all=allCapTemplates();
+  const known=id=>!!(id&&(all.some(c=>c.id===id)||(typeof MINIBOSS_CAP_STATS!=='undefined'&&MINIBOSS_CAP_STATS[id])));
+  let n=0;
+  G.captured.forEach(function(cu){
+    if(!cu||cu.baseId)return;
+    let guess=known(cu.id)?cu.id:null;
+    if(!guess&&typeof cu._captureId==='string'){
+      const head=cu._captureId.split('_merc_')[0];
+      if(head!==cu._captureId&&known(head))guess=head;
+    }
+    if(guess){cu.baseId=guess;n++;}
+  });
+  return n;
+}
+function refreshCaptureNames(){
+  if(!G||!Array.isArray(G.captured))return 0;
+  const all=allCapTemplates();
+  let n=0;
+  G.captured.forEach(function(cu){
+    if(!cu)return;
+    const key=cu.baseId||cu.id;
+    const t=all.find(function(c){return c.id===key;});
+    if(t&&t.name&&cu.name!==t.name){cu.name=t.name;n++;}
+  });
+  return n;
+}
 /* v844: one-time repair for minibosses captured through the pre-v843 Feather Embrace path.
    Those entries carry baseId = the BATTLE INSTANCE id ('tlacateocotl_5_ab3'), which missed the
    MINIBOSS_CAP_STATS lookup at capture time -- so they were frozen with the {hp:150, mag:<enemy
@@ -4975,10 +5334,23 @@ function resumeRun(){
   initG();                                  // clean transient defaults
   Object.assign(G,prog);                    // overlay saved progression
   if(G.god&&G.god.id){const gg=GODS.find(x=>x.id===G.god.id); if(gg)G.god=gg;} // relink patron to canonical object
+  try{repairCaptureBaseIds();}catch(e){} /* v1106: species first -- refreshCaptureNames keys on it */
+  try{refreshCaptureNames();}catch(e){} /* v1102 */
   if(repairMinibossCaptures()>0){try{saveRun();}catch(e){}} // v844: repair pre-v843 Feather Embrace miniboss captures, then persist so it only runs once
   G.dte=getDTEffects();
   loadV();
   if(!hasV('ftue_shop_done'))markV('ftue_shop_done'); // v641: band-aid — resuming a run ends the tutorial; a mid-tutorial quit could soft-lock the gate (per playtest)
+  /* v1108: the player quit between taking an event outcome and pressing Continue. The reward is
+     already banked (v1101 saved at commit); what is still owed is the slot advance. Applied here,
+     once, mirroring afterEvent's own guard at B8. Skipped when pendingEnemies is set: that is an
+     accepted event BATTLE, which resumes to its own deploy and advances through spoils instead. */
+  if(G._evPendingAdvance){
+    G._evPendingAdvance=false;
+    if(!(G.pendingEnemies||[]).length&&G.battleNum<8){
+      G.battleNum++;
+      G.chosenDifficulty=null;G.cachedEasy=null;G.cachedHard=null;
+    }
+  }
   const _st=G._stage;
   if(_st==='spoils'){ afterSpoils(); }            // bank done; lands on Tianguis for the next battle
   else if(_st==='shop'){ G._resumingShop=true; showShop(); G._resumingShop=false; }            // resume on the Tianguis (don't skip it)
@@ -6408,7 +6780,7 @@ const GOD_SELECT_DESC={
   xochiquetzal:{passive:'Floral Sepulture: Sacrificing vassals at the altar yields +20% Flowers.',ability:'Ixiptlatli Bloom',ad:'1.1×MAG to 5 enemies + Chimalli worth 3% of max HP to every <span class="elem-badge elem-nature">🌿 Nature</span> unit in party'},
   huitzilopochtli:{passive:'Golden War Cry: <span class="elem-badge elem-day">☀️ Day</span> allies +10% ATK and PHYS/MIX allies +10% ATK at battle start (can be stacked)',ability:'Xiuhcoatl Might',ad:'0.5×ATK ×3 to random enemies; if defeat, hit restores 10% TP and grants ATK/MAG UP ×1 to ALL allies'},
   toci:{passive:'Tlalli Iyollo: Healing can carry allies past MAX HP (up to 120%), and the excess persists between battles. +1 Status and Buff Stack.',ability:'Tlalli Steam',ad:'Heal all allies 25% + cleanse + <span class="elem-badge elem-fire">🔥 BURN</span> ×1 to ALL enemies'},
-  quetzalcoatl:{passive:'Divinity Mercy: All captures grant +20% bonus resources',ability:'Feather Embrace',ad:'1.5×MAG to 1 target — if fatal, auto-captures with 2.2× resources'},
+  quetzalcoatl:{passive:'Divinity Mercy: All captures grant +20% bonus resources',ability:'Feather Embrace',ad:'1.5×MAG to 1 target — if fatal, auto-captures for 2× the capture reward'},
   opochtli:{passive:'Ueyiatl Tactics: Opochtli & all allies +15% CRIT at battle start',ability:'Sinistral Minacachalli',ad:'1.2×ATK (3 targets), +15% CRIT; on any crit grant ATK/MAG UP ×1 to all allies'},
   mayahuel:{passive:'Inebriated Reverie: ally DRUNK never misfires — each stack grants +5% ATK/MAG/DEF/RES',ability:'Octli Drench',ad:'1.5×MAG to 1 + 10% splash + DRUNK ×1 to ALL enemies — as Patron, also ALL allies'},
   tlaloc:{passive:"Endless Torrent: All <span class='elem-badge elem-water'>💧 Water</span> units in party +15% ATK/MAG at battle start",ability:'Tlalocan Deluge',ad:'1.35×MAG, hits up to 4 targets — first kill rises a Tlaloque ally'},
@@ -6456,7 +6828,7 @@ const GOD_PORTRAITS={
   quetzalcoatl:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAADl0lEQVR42u2bPY7UQBCFfQBCYjKEOAJH2IiciIsQQMYtOMNG5CTEpIgLEK+0BEjDNlKNah+vqqvb3e2aEZZK492xZ/w+d9efe7Ztwfbk9c3Js+0SNrzgmihtP15sj6z87/fp19nSgygX9+bLq7OVv59+fBs2BgIhpABh3UER/u351g2BgWAQBMQh4vWF6X0Rv93cnyEgAG8KMBDpIMhFPezKl7sANITy+v3+k2kMVkoAvYZi2XsaAgLw/MESEOjkWgxF1t5nAL7evaOR4dnnD39tOoheAPou689A56mPsQAIBDEUL+elmQJMHAPUAkCDEPHMgU6FIJvss1d2x9n/WkcAQmDiBcxUADXx2tnhsLdGiAfAGgXoOGVaTIPQAsBzfJ54BqCEVwRR9t+f7v7xCdMgRMTjFLBCXy0EMgBi8n4RL8YATHGMEfHolb0EqJYEMQARCOwzl0aAaApsHRsBIEIRglWD7ILQU9jsLYTQCTIIch5CmBIdZkOwxP+8fUkhoN+wIAyNDnvqgdamiAagIXhTh00H5hxTNlfY3BfxGoI1vC2fwFLm6RnjiNGF4nEksOHd4hhTAsAkyQKggVlFUc0xpoOAKbJOnxkAPI+J8yCk9AVW2lxrfni5B4MwvWiaASAaplnYsyJD2mjQKl6f6znFJRXjjIcsreeiY/TC4nZtG3aLGIAlLbSjRw+LBumToVEArHA4vEz+DyAxAJYLXC0AVl1aYfBqADCxrOxlhdFFh0DmyTUIJtzKA1IN2Z5+Y60pkhKA17312ljesRHhh4v3WlQRCBqEVe1Zwg+rAbwL2GNR0VaJfEhCEh2uPRbxE0sXU0Q7t6OEW1Nl+Z1nQ521p9hd640ItTxg6ZC3LoSJb3F8kYcqh4hu6cbgkO3x/ta8TpHdeZ2Y2iPs3hCYrq3tNSK9KRJ5inxxFZn1oDKbwGHf77Whspafeu3hkEUUXh8u41BeBiBrH345AObNs4iXlWfTpkDU+69yeih+GoCWJCgSDveES7wx0wBYELwawGuG1JKkljIbrwNXnw5vde2p7KLiLYjltfyAoxi7Nlx2K4uvhleEe2p7y2qQULzex+/C1WdTiqI9XZ49oMQsAEPF10pjr7ob3TBBoQJATwe2/HZqEzTa2h4xWiIA9Ly31iBNa5Ex4a2jpXcKIBxrJdr0JmkkrEWPt461ooDnS1I+ERplKLx3UdbFPlfUAGq/eLtaCC0p9R8e/26MIea8vAAAAABJRU5ErkJggg==',smooth:false,blend:false},
   tlaloc:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEQklEQVR42u2bPY4UMRCFJ4CAmBAJkZCQIY6AhDgCCSmIfG9AuCcAiQCRcgJuQEpERE6OCEgGeaRaPZ6qXK/cPdM/oqXS7njctt/nKv91z+Hw/zrfdfvW0+MctmkAd65eTLJNA5gKYfPiDcCz+1+HbLcAKmm7GQhR1PW7D1LabgCgOAUAfl6VmN8/r4+eVSC0v2bWy5y2K/EMQbFdin/56o288LG8uxCPACq2GgBTl6cY0xVbRSi0Btj17eHhZHZ5jYvS1NhXxoKLQjEA3DsegPb58ffPbjqP+krvewCiOi7i/k/ufrmxKAywgZ47t+8Ui8KmIn7yrtIGOxZvAHoVR2La5wdX70/GojE9gqaIYNG4sSqBOAeAJtDGEoTA6aMAeNltq8qhHWYEQKGILosh0cTZxQAwPbpf6X3L3/7inqLsBSjeRv9KQ6xCFFEJAbxP6TkeJyIQH38ccw3c+whA8R52uWgAVL7Dsiq9zwOyQUgB4GpvFIAnyotnHuGjvGr8RwAYdoPQFY8u1QMQLYu5ci8EIovuUwH0ptYugEhINA9ne4Lmsi0/hsJpsPvzq2s2CNp9VsaI15UAVFxK2RB596FQ/Ox9V+n9DIIXZosBMC9g18fvRgFE6xD7TgaguJMCAGcBFNczDAN1CqwAaO6fQlDjSW0Q93LPMM/IpmcVAGwKxd4fser6PZpSywAyCNleIBKezQA4E1RB9AbAIQDYixUP6PX4KIAsJNR2WrpBkJbCVU9gADy9KRbB6J1BKO0z4V0AvBTuVcCPr7jxLFz1gF5+rq+1YTYAfPIbrdVxv/387ad/8tm+3iwSw88BIwhRec1a3VhGFqZdAN7ixvYCCAGFo1Xcut3PwhhCVh7XjxCiMSocA6JFDW6GcFsZVZ4tRSPxDCHbJked0HuoKg+AEQA8EInIZ+sGdn0vHDIAHIaeF3paZgWAEBTx2DNevCMIPsDIIKji5fmf51bvPIAPHxUAJsiEeuKt97OQYi/IFkmlXSCL7x2IKOsEPqHNZgHvnql7Elk4u756HBad4vYANLt53EajP98zeko8/CTIE6+eynoLFQ9AK/veo9cnQwjePb06ZhWP5//Vo3DlIYUJQvEIIcp/9meBONg1U54ATXk9rn3HALL8FwFQfQLUe38gMw/Aoq/RjhTuPbxQ3wD1AIyUMyuE5v5VYNggc1luKKdnANRyZodQBeA1jhvppXMYIMxKObO+U2ziVQjsAdWGM4Ap5SzyLpH3IkLVdaP4V8pZ/DcFKHquH0ZUDWEsDgB3W+1/PH1RvsvS+P7VAcjEKf+raasBwHt93rTMAQPL8kJg0dfq2Qs4HHphMOINWMeive9NhdggFBvFPqZlPY8AuK5VvE7LVo1tNe9mflKn9KYHIJspDlu5PPfPAPTybEq8B0GZ1np5Dlu8qiP9bgHMMRDuKgRG1gCbBhDtAyoLonO28y8rWpsoA2CAbwAAAABJRU5ErkJggg==',smooth:false,blend:false},
   coatlicue:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEnElEQVR42s1bMY4UMRDcF/ADQgKEhERGgMQDEH8g5wM84R5BipAIeQoRCR8gJiI5mINe9fRWV1d7xjs7kjV3Nz12Vbntbo99p9PA9fLxo/tuucU2TqPk73//uv/4+llalufRRgHqbar6UJvTRTBwFaDvn+4eCnpW9WK3Pi/QdE/wADMRFqB/TR8KA+3FYDZVfRHHNAEQUCYCI//z61NYuh6VtT9FhKynEAj7W0Y0uqxqr84LVxWA9agHb4T9zx4wsmGiMI+ZJkAkw4BEUr63kZj+WfSMTHxrH2G7mgCsFxD47D0jotSB3ruKAGj2Zm6Z9bQqAKoDtRejSVuAToJiDaFJiI3XavyOvutxqJnh6jnq2Sw5UfKAqrCeZkNKzTq7fM4CWMIBXOkcgysPUMgzktXzSgCPT+WzEiDrmSiAkr5Ge5Wcn9k79Ud7lc9qTIykrAyoJ9/tcS9Cp00lxb6YI1AMVmP357s358LGWiTqf0fP2FiObSo5BeJzJv/q3Yu2B0QgsaCG1SiA3q3a6nqAcV4J4FNRf48CeUAqQKtDKWarCIxE6HAaEsCrzEBGAWLxhNEztW6ErS3AUhb3+/bkX+hY7svvHigb+0d4QDYMfD0ZJyqAlWgcBVC9oOMto/WiIaBwkgRQI8BW4ur7aiSQBaiMs5BUgdxCXhEhYkBewDitMkELU9EYxtH/FyO4B3mlrogHhV7E6SIVtlhsRnb3vR4vNpHtRZ7lFRUuxikVwAzieps1oiZHewmBwjHCxzilAqB01TdS5f5b3bkrQJyXkAdkKfhqEqxWacqip5O8jM4ZKg6Vj7QWyCofnQNGBFB2k1QB0kywys6QTdedZ7yj4MxsTlkuzsroWEeLKLSoGZ0bRnhsFoB5AiNs211WOoJkq8FhAdiqLFvBKdleRTornWEWsXQ4XHwSU8vb9x/kya5DPBNCacNjah+o8BVEAFmvRPUzl7f37ettRTraZUMCrQOQtyFOxrUtgNmgZTEC5UnZHj8TIbNjYkc8kcd0AfzCwv9NIaYK4EVAbW0WwM8DigDV93007tEQyMRCIlXJja3yFAHSbbOOB1Q7w9XkFgVQ3mHkOx5AN0k7Q6ArQhUVWI5QkT9EgEwE/yElA6J4iBclayeKPlWAbKGBdnmy0FTF5sym2k2KbU4RgJ0VQh8bfnx5vrrH8Y/mBLvHd5X9RI9xqgCdpbMRGPGATIRqw3OqAJ3d5D09oLPbO12A7NgMI7+HB7CPMRmPaQKYvQeXAV/u3guqCODtkQixHcZjugARMBNBXaVV78b2dhWgcx4/6+WKwBKrUVFEQO1s5bHp7CACxMjbBwlEPn6sqOrNBLjalblkRT4ToCMCGwJXFQD1SAQcP0exIYA+XWXkb8ID2ASYfYpWBMgmRiTE4UOg2qAYFUDdkDkdebEtKnRioysAO/V1OHl1baCIkJGXDzvewjBQAKthUF1sHU5c2bxUIkEWAarN10OEGD311S3d+g/t+Q5YVvfo4amriaD0FNvcZOsKdvSOnRQ7ZE7IAKvnB5XeV+s/bDKsvIFNlKwuhfDNJEJMEPWfsqp/4ppJ+A/Q6GLZ1bjEOQAAAABJRU5ErkJggg==',smooth:false,blend:false},
-  huehueteotl:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAC70lEQVR42u2bO27DMAyGFaBDO+cUHXqSoDfo2gvmMEGWXqBjt05ubYABzfAlW5Ep2wEIxI4s6/9EUbTkpLTQ5+PpqcOWtvIBwdeURrYJCJzw1UKgLs6J//58HYxC4Kw54em5GxkFMIg/3wO4eQJzfXgQXMNV8ec8CFBXWPHd8dh5IFgAtDpu94gKABr4CMP1hwbQ9yj3fc45/H0HEBUANBKmN05E7jFXX2gPGBp6SYNxAkbiSDkOBFduBxB9KvS4snUsnQ+dDI28QAlwniAoHe8AWgHwCAsPgOYDpa0J8TWsqd4fzl1Sl+MZ2jXNAgBBroceVH5VAKhRwdzvqwWAn/m1MqsAwLm35AHSGkAzACT7OZ0Gs8a/p1wTC6OQvGBh/y2/CZQMysB1uJ5mVobpExzu2V6gZtgDaD3NA8DzO+15+lvTAAACNJqObQpBOkfraXpniBvvnt+a3DylorBbWwC0sk2Kl4RRd9fENwUBdoA2CQC7NGxz3aa/t9T9fr3cBT0aAPsyFCDdOW7G/TEE+E4hcOIxAHrcFAAQQMUAhPfDYTAQ33uJJj40AG1Ko4IwBCr+aqTLIYeBRzwFATEhR3xICFOSHBDbC7fES/WEAGBlchogDEETb0EOMedbgcqC4BFHp9cQb5Zxcz43PqXcQBvzXB2hhoKUx3MNkjzFCnRz7rlI8JMakjNDTKmrOgCpJ3JniikAuPsvAiC3wVMWRb2dUHUYTAlG1lOe9NSY0xFVAcwdsyWGgeRZmwVQzQsk9y8JAOcUuQAWgYBTViu4cU+G0n8HrJ0hqLf6y9TW4qaUHnuDoFVuBKP22+Q0onPv9Gt5fo6XuB+Lyf2LQ9A2L7kemBr0PKDYQMkAKAZBE6Td3LspknOdGBME+EUgeBqi9Xwpdzeny5oAcnqypFBPBlkNQM4C5hxh3H3wdDknkSqy3j8noFmAPPeRYDx0Jijl4lp9uSvEi+0mz4kBXGa3mrdGtRwi7AZHbW9J+2f5zx8eoghRuU//AgAAAABJRU5ErkJggg==',smooth:false,blend:false,scale:1.20},
+  huehueteotl:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAC70lEQVR42u2bO27DMAyGFaBDO+cUHXqSoDfo2gvmMEGWXqBjt05ubYABzfAlW5Ep2wEIxI4s6/9EUbTkpLTQ5+PpqcOWtvIBwdeURrYJCJzw1UKgLs6J//58HYxC4Kw54em5GxkFMIg/3wO4eQJzfXgQXMNV8ec8CFBXWPHd8dh5IFgAtDpu94gKABr4CMP1hwbQ9yj3fc45/H0HEBUANBKmN05E7jFXX2gPGBp6SYNxAkbiSDkOBFduBxB9KvS4snUsnQ+dDI28QAlwniAoHe8AWgHwCAsPgOYDpa0J8TWsqd4fzl1Sl+MZ2jXNAgBBroceVH5VAKhRwdzvqwWAn/m1MqsAwLm35AHSGkAzACT7OZ0Gs8a/p1wTC6OQvGBh/y2/CZQMysB1uJ5mVobpExzu2V6gZtgDaD3NA8DzO+15+lvTAAACNJqObQpBOkfraXpniBvvnt+a3DylorBbWwC0sk2Kl4RRd9fENwUBdoA2CQC7NGxz3aa/t9T9fr3cBT0aAPsyFCDdOW7G/TEE+E4hcOIxAHrcFAAQQMUAhPfDYTAQ33uJJj40AG1Ko4IwBCr+aqTLIYeBRzwFATEhR3xICFOSHBDbC7fES/WEAGBlchogDEETb0EOMedbgcqC4BFHp9cQb5Zxcz43PqXcQBvzXB2hhoKUx3MNkjzFCnRz7rlI8JMakjNDTKmrOgCpJ3JniikAuPsvAiC3wVMWRb2dUHUYTAlG1lOe9NSY0xFVAcwdsyWGgeRZmwVQzQsk9y8JAOcUuQAWgYBTViu4cU+G0n8HrJ0hqLf6y9TW4qaUHnuDoFVuBKP22+Q0onPv9Gt5fo6XuB+Lyf2LQ9A2L7kemBr0PKDYQMkAKAZBE6Td3LspknOdGBME+EUgeBqi9Xwpdzeny5oAcnqypFBPBlkNQM4C5hxh3H3wdDknkSqy3j8noFmAPPeRYDx0Jijl4lp9uSvEi+0mz4kBXGa3mrdGtRwi7AZHbW9J+2f5zx8eoghRuU//AgAAAABJRU5ErkJggg==',smooth:false,blend:false} /* v1099: scale:1.20 removed -- it predated the v1049 GOD_CARD_SCALE baseline and compounded to 1.74 */,
   xolotl:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEpklEQVR42t1bS7LUMAycI7BhDQeZW1DFhmtwBvbchEuw5Q7suEUYh6dX/fq1ZMlxPg9XqZJMMhN3W5Il2XO77dx+fH639OR2dvvz88vaid/fPiztvB3x8y3gubXfxvMmlyEBCaiC59HEEf4vCWj3mxjI+/2+il2///R1+fj913o0Ei5rAqMaYAQ04I/LVYwEA9+OTBJLREKFpPY+PsfPdtMAJKCJ0gDUDnwWSVPg2/ftN3rg2/uQeDzuToAJkoCAUStMPBLwu6hFu4GfbQJ8juCxtWtlDnydHf1h8BEB3ssjE1Am8UzA43qVJwKUOaBGZAhYnezjO9MJELbrdoBNgM3hFQFPHWYCEDySnCEApTy7MAE2P3t2rcTTBGX/CF6ZAU6xhxCgSEBQrWEH7SU2SpE5IAE8C7CtM3iLH0bC7c3xgDfHZ8Hz6CN4Bs6/ZcCzBOD3M2aTIiFLQM8UFHgGrkLn7Eja75jpTiGAR3URBPBczYFP1sFxZ7MjvxsB7N09DbBOooPzQl9FADqvLTY83QR6BDSxrM4jwJsWlZdnD1714ocQYLOAgUcCIhNQR+X0FBmcXl/GBDiPV04QNcCbGr2RU6YRacXhBKCNqqpPL/1Vsb4qqGTNImMC5fT4lQmQE7QOYYWHPXemHhg5vYxTjLTIS5imzQLsC1iUc4ukEvqisOorbdmVgBfTWmuP+1562jtaphhpBEeaigDLNnF2KhOgZgIVCCn1s05VxQuMVBgdzSitGehh8EoLvFwAHQ97bnXt3Vv+vScErvINJo4zzyHwWQJ4Vng2FYgTuDIMau5WjT3g1YrRvGAICMARVM9Cje9FYRPP8Xk+j4AfWlL3NEB5WiYARRVDEKgqonjAD10viIKh6FkmwqsG9Ug4DXgvH+g9qzQhIqCjCec27GQPfJQE9bTgsiSgt66MfJaAt0TCbQsBTIKTD1zbHEYJ6GkBrQG+LRK2EGAksGZcjgQvffXWBj0CmIQoJ/BIOCwA4oQHs6rMur8nDFY1Rcpho68SHSPA0t3IkUXiAVfXDgm3wwjgdBcJQC3AnF6tAbK6Z0dc3T9l2mMTQLBGAH+uJCKASTgVPPsBNgNVBu+NPju8SjvVDDxfwHuAeqPPWlAlgYk4fOrj+hof+ZmebCXhlLRYbUaqzgI8GzAwD/AlNlcqIGpdv9d6RdPLxAMjviIz+gpcVE3m4OlSdQIuZvI9tWSGmR/H90wC1w4vVyhRIKOlLbVHqAfokgSonVzZZa0qAdE642VsP7MxYRR8tAR+yh8yoiApKpvdnN2kowT0hFegdgefJaAKPno3EyIXSmFdc3iJrLLmH63qqn3ERxFgC6ZTSFho6opWi1SVZ9ST9zRQmQASMLRPYJSAjOOa6XzDTRqzNIB3cnJAVB2tjElxh9Uu02ysslkDZhAww255Y3Wvv5t2iWTAqyjQ20hRJUCNWrQXCI/8/6VNW2XU/kAFvkfADMdV3QzF9YwpIx/l5r3/CkZTaJoAuF/ZDFXeKVYZeUXA1iQrGlWv9LZ5ro/AZ6oymUJpNELZf4FVf3s48quAz4xQ5ntTgpa9ymLZ56PCaM9Gh/b3Fttf1HQe5VDE7EIAAAAASUVORK5CYII=',smooth:false,blend:false},
   tepeyollotl:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAD+ElEQVR42u1ay3FbMQx0Cy7B40OOuaaHpJzUkI6cW4qJq/BNiTSmZrVagCAf+JnEbwbjZ+k9ilgASwDkw8PHlXt9fno67TqvIumD4v+n16+n1SCoef16eblKyvxY2fIjRwdHS0XH4nd+f/92ETW3VABwsIzBz+/+/PHlRqzxUOGzIYoxivIFAJQ0Dxip/Kfn54soAG6Ufny8CAOgFGZZBgBPEKUojACc3t5uninfeQB4HpBGgkrhGgiWha3PivLlOxQLAAbB8p40po2CYFnY+4wtzuIBMGUVYIVVOLDrKoJj4kOly1/1XosHDFkFFLr4g0UZz8IXJf66+vmv8gaPGKMADFkFLHJDy7PVlHIKgNp7hRsiITBsFYiyfJlwEcuSHhcgKeKq0OMB6alwDYhi3au8KxGxdLlnxXuXwWU5+dVl0XoOCIoMo6vA3TPkGUurw7ui6R0Ez+29SbekwjsUaDI8LIKLAGCBYQGQAsLReLrygsEFvQDU6v7DXoBkVOIuCwQUXj57f0eV6ilegGSWuVyqgigTgDQQMHYzSEWtCLgMqpoi8rtK2UMAcAhkA8DrPwJwt/QFPXBIGOCEs8JAAaDS6VYAPBCWh0BRjsfz6gh85igZLg0BrPBqSnvtsV4AuFEyNQTQ8p6ltwOgeACzdqs7Yo2vFEXxUuPW1UC1xu4UjCiBIYAuHJkIru2K9RUoqofQQoZNFudMTymHWRxO1AOCU1tV9m4BgFWpWcmIyucZOCa8aKxbwLSGQNOzGAaRWFdAMGEp6ysuUUp7AAy7OAwK40e2qKyUFoHAcIkCwCGwpKNjWUB2apy2F1ufXX8LAKxQYIta1ZsVGqolFgHgKAekhYLF0Ny1veveGp95zO8BMLS/HwkDr5lRE6sEbgmBKf19KxQ8RXvA7OGAaQBYyVGmN/VwwJD9vVE7Q7I56ewJ8IaqGmvYJmeG4laxw+xtibWXh1KA2QIAK9tTK0VNQVURWrJNKPA2OFufk6iIUi2yDQCq2sOsTyVKkTNCauxtuICtzxsbXtHjKeodl+FQ2gIAPs3lAaC2v2ttMQRWZYJTs0JlfW5MWGFQU7p2UoxXk6VeoCztfddyHiCyUboUAM/6URBq7m9Z3gNganFkWb8HAM/1vW4U1wRTAIgo760QVheoFYBlXoBuWevK9nJB9JDEdACi1reSJAShJlgMeeOrMBgGQisAHgg1iR6SmgZAhPlbuCAKWuRZBcCQ88Ct1vc8ILqHGBl/mBewS0asb7lyq/Itu8+1HuRhpWtKeO+oo65Z7p/f/4OzvN59zzs9ITMfAOrbW/dH38l0/3QAWu5739nS+movIHLf+85R9v9nr/9a+Y9r0fUHJ5SUvCsBVJIAAAAASUVORK5CYII=',smooth:false,blend:false},
   itzpapalotl:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAE8klEQVR42uVbyY3cMBDU01Gs/XUSCyfjTPbnSAw4FkfhhwPwn14OpoyamiK7KVEHYGEbmkMjsaqbfZG7LO9Hef/79ed3qa+/vL4WlqV/lLuER/J+xx8VPAioUgf57e3tJp9eXnqDToMHAfWeW0jAGKPPVpHAN6mDrOADEopI994zCeCxus82H0pAi4T7ZyVDBggIrCrUlQE7jwC2BAYPMmTgCrZ05IEAkOBkhc8ZmorDvoAJIO1FDy2R4Dkfvn68CZ4ZkNB67jwSOBowcHaMWbNvEaLA+f2pBLiw5aygQ8ITISBVf+8sIGEFJZgGc0lwfsA4xpQo+JYFgISVfmB+nqGglZRkiBzyAadPg8gXMAFRWMPvIx9Qr/tZlpskp8FyWDSICOjlCT3SWCpwPBskXMICWr6gRQJnfq3rOaRC6wAPGSRgPx/AmowIYM32rldHOkBAFAWW3X1ARABAuajRmw6OAHGKx4TAyAdkCWhdk/EHLJTnj5AyxwK0NG7lAz0rUAHBei1XdU7cNbvOe537WUfYI4HBMwkA17MEXMOhdPcGS0TAKAmOANZsL7O8HAFrpoJzcqYGeHKI6peEsH0JiEBmSXBenudyScpA7+C42O++QwXY0r56dzb1qI7YDbyL/1mnx5ZQ79HTYAs83mMc5UgCWvF/xOuDBCXAeXKN5fw9E8CFU7JcnmcB6gMyJKgFaPxWreM61XIFywTw62wZv7kTzZobsQSQoObO2oZGWwSABAaf1f4U8C4rVBKyEcDNc1SBDNDNfSYx0SuYS4DzCy40Zq0CUkEzAYshAGeX/0egNOxOXzVqOUgQ03vPJAC8iwYtQjILIFDSj++fbzLNaTonmS179b36Bhf/S4eIiACAn0aATodW6zxT9mbA47N6nzWOuwKHFexmAZl63kUS7v1lGiDILXDurT+y5gGeCRglNJ0qZ4VzAjjDVtYYLbroeOBXeP5XKXcSp4Mf9f5uTSEiIePNNVvEEttuhdOaxMhFAgwuQwLnACrQdHJ98VgCWjkDx/T6GecGTur3AKomzu+nbpTYSkDUDgcBqkEnDqwScegepKjzmwHPBCBtVS8OYO7zlqc/jADN9nq1QaR9AMGch/fWEKnx/bSdZyORQMHDURnzfeol6J6Bw1piMwhwFqEESLb2sHRumifXOSICMguobAHaMzisD7i2SbIFfJGmiMTvJgGXMfu14Os9NLZnCTjVClwPwC2Y9ipAXjTlctfU7dchoQVcQfe0zuC5uquCcNdyhqdOBTX3kV0iSlwLVKd2P9cKsi0vB9rdA03Q5V7ULFTcwBJkZ0jKCnYjIpvrtwaRAc+FkHRwe1r/9/tgI9VDqTw1xkfsG9NvrjXAIfYI0LqBwUfrBJsqQ+f8Mow7AjAQPjMQgJe298NrDpX4HZyoa35MKYsjbWavRzeHz1rvc2Kkmnb5AjJJOE92olP+f2AUPP8mclAM0IHMfM8hlEMpT4vVRGwBP2ItWQL4Gt1P5DpCm6KDzv0sGEl4Us/hBdSRMzdIddvM5k7wEdrn9Ts9t3wGn6P1AOQWEm2uA54twMmo1WparRaQHtcaM14DnqODdoVGSWDttnKUoWmQSTF1v8Ao+FYxRFto0nF82mpPNnty+wVGwfO81XJY/ylyhNAp4DMmuCXJ4IFml74OO44ejBZDl+j3/bfgzyD7CgT8BYOcfWgNqdhRAAAAAElFTkSuQmCC',smooth:false,blend:false},
@@ -6471,6 +6843,23 @@ const GOD_PORTRAITS={
   mayahuel:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAHx0lEQVR42s1bLWwbWRCetSyZBVtqdQX2lRQEGPWIwSlRQUGBlRyJamCVuMrpyiIdD6t0UUyigkQml8ogoODOVkFQkUGrhqTeSpEaaXGZ0R64zGZ2dua9eZtN7p4UJd19+3a+b37fvC3AHY2o1UyrvFbVqN0F8KjVTI+2V3JA6DX645tXtXz129b20faKc67vPp/3fA/SNE6iymS9LQKuBf6eXeeCaxp1zTvaXsnWrIKI6C58npIhgQu575r7n8UAyT/TOInwBzXG/TvUknAtDv4m8aFWFfD2sKcKopHgiviaZSCp9P3tYa80EbWyoKNWM53PpjCfTbN789k0I0LSJCdBCoD8Hpq9tGZ72Cu8fz6b5mSsjADKNgfOhyQEAqFB0Tf4M5x81/upMlxE1KzgOduWgULw52gwQ4DSNctaVhk0EuqWKD6fTWHz5KAwp7O27nw5PkOf1czed01aS5NHImk+m0JnbT3lqbZmYY+OxWgCnbV16Kyte13h+NmL3O8Q86fWIq3lMn2UbzGa5O5LFmSuBBejCXRGE6AR2PcMaqQzmmSClRn02Q4DpQ2UM9O6QlzdCoAD55bBiWoPewVtIRCeEVx/o8ao5jZPDq7JFIC1hz1YjCapRAQnMArJArj48bMXsHlyAMfPXohaRWFxjkQqEri4Ikv6W/Jnuqb2bpyzeXKQraNVjTULcASv+TsuzmMGCiGRQ7Ul/e0Dz31aA4j3tXRYC0klUjDkL+agJRLKDA5esq40TiJr8DO7ABYd3OQlxmmBIgm8MAYwyac18JISqMty2QubrdBOjm8H5iKhs7YOW6eH8OHtO3i88dT0e3GVQULAh8h/a/0AFwmhKbAs+P9FPwBNUPJLX90huYHLBel7reREtwmca1xKdy4CeEr0AYtazfRidxUe7HzMzY1azTSNk4j/rrwnKO3S6L87a+te4BIRriBHB4KnJFxvxaHwO42TKLpN8K7ixxr9tflbp4cAAPDh7TsAAHh//0t2j5OwjJPcs41WEyqzANqR8QG3+r+PiGWcwMAxn1rCDxt/R41WM0USKPgbxwBaI0gBTIoDNxm4l0Awg29/qVaAlsD3MNyd6lWYPK32tABHyXhz76H5PYPL80Lbq0FI4IClnB+1mim6zLjbz50r1DVwvjTTHvZyeRm1TsFj+tNiw+Dy3AneSpRvwxOUBl15lBc4vl0btQbM4QhqcHkOF7urTuEe7HwUyeMuZc0S0jN1CaDms1ebjXQ+m2aAEKC0TaXxwWr6v//0G4y7/QI5VCZL+WuoM/JpkGrXV2byYocGQcnkOXhN+9SHaRoLNe+IRH1tYDaIJO2by0jmEtzkNfAI0DJoJA8N0iTw5WqHcbdva4pa+m5omjz6Sz2AweU5HG2vwNH2SiFiu3J66GkPnS+5kxoEy1iByyUWo0ku6PFW9/O976pwPvN3kULdRyqPvWmwjCVg45EGSCno/fLrvy7w5x/X937+9qOw6kdnB3oZJ1khhAMLIoAvOWIlElQC0KRDt5U0S1jzPAf/eONpLphKvUhaCb65/6RAgqU8frBz/ZGFaFrYkq78YwR26Ll1egjjbl/sN2pNWEpAo9UsbI4sGyR1L6B92mI50QnJHFxgjNJ00+PbWdJdXqPVVAnQyuMCAZg7G61mATxdnI5xtw/aLsuXmrT1kJxxt+8kYRkn8Oj1y4wwjAm4hlUxda1wQK27BAaATIjlq31oePYQyzgBcPgtfdcyTqBxdf7oAk8LGyD53TrqUnX0fA9SyUQlQSkRPhKyTc79JybhkIQyHSPrqEldEk0Y/Bl3+1k1Rbs1j16/hGWciF9zzGdT+Pz1k1mwz18/ZfPpZzGS9iVrsxZPdWsAoy9dvtpH0lJrkzPbIBlJ4BsydCEqB9c+giZxKTXFgNBB/R6tB0ngrsADX6dr6w7Rut0KHoFn8wy9x7pVGJ6qhAAoxgMeS6Scr9UB1P00s6da97mGMwZw35EC39bpISxGk4KA6PuWbu/Zq304u7KcxWgCF7ur2XP0Hk2zHBjOR61rcyyuHbn20ahVKepL2jy7sgS8fkYsg5p0e9jLgDZaTaCmuxhNMovTtIp5n8emMpmhbgp2bD9N3cIV/NAVcA36PIJFEug6Ps27zD00LUaWVhLVlqRNlxXw6zSe0B0bLVk18D6th+5enU1RCxEY5cuSwAmQTN+ndXrfMni9U9fYwY+MtKjvqgOyLGCoD6S9Ba/xJa1z4OYMEPqRlMUiJD8OcQVu+i6t+4BL5xOu+GD6uoJ2UujCVBgXWBcJXPOa1q3AXV0ksbXmA+46enpz7yEMLs+ztFaGBEpgmQB4k1OhjADOlhadtYMNV+tLIscXsaXT4JsCpxhzWQC/qqBtI03bHKzvpEcjxnIkpqXEssD52YT6fQBtHXNy6HXpsKOw71fOAV1nAhe7q7m5jR3bpsYCHuUs1AFSB5iDp8EFfV8KMBI5vB3tshy6Ln0/f4bOc50boKyaBZg+ONLAS//DSxM0xF1C3M1ifUGVoE/7ksYtL7VoHd1LeoavaTlp1hTlTIM89/tOiSWNc1eShOWWIT0nAbUSYQEvboYkzVvTixRHNPDcgtC1LG5F17D+79NKW2KWF2nBkj+DIDBQDQByATmNkwivSWtU+f+IgzuqodZxl++2jn8AgngVuRQ2WNgAAAAASUVORK5CYII=',smooth:false,blend:false}, // v553: Mayahuel pixel art (18_Mayahuel.c)
   opochtli:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAGOklEQVR4nO1bP2gbVxj/qZS0Y7E9dBKCYLK44KHU0CwygWQpGCS6tW4LVotWhXLuUuFOOUJuFY0EKWm3IIGhUGQoEQUPLh0M9RJEwGjK4HguWa7D6Tt/9+79u7t3kof8wER39+7d+/3e933ve39SQYloBH4ouz/qeJUi9XYfvgoPvv+wwq8BQLzHr1V4t0hDbDDseInrZuAXqo/I2pY1ieBEAN7TvHdHHa/SDPxwuBuJ0Hzqx8/5O8OOh2bgF7aMPMj0QZVJT6oRwfrMvndllmESoPvwVfjfdwd48KYXi9mYC7x/o43poJa69/7PXeiswGgBnDQRJRBhGXGRIKEZ+Bh2PHSPLwEAZyd9bGy1gJO+qSlaPHjTQxPZ3UsrQCPwQ05aJCqaMyedIjj/PalG5r7BrnFiDozk+9NBDdi1Izcd1PAR9LFAKwCZE7/mz+nZpOqhPvNj0gROkES4bjC6gKxnROL12dx/A4QbW61Er8tAogD2cYN6sBH44f6NNoa7HppIxyTu//w9FTKNAkric5AInCCVFwnrXMsGJAL9BpC6toGVAJw4gBRxHVSE85AG5m457/n9vSRRIj4d1OKypvqsRgFxmDNVXJ/5WsKnvcNE+c32jqkZCcTBF364vneeeEZDoW1dVjGALCBLxSrCazcf4ctvvwIA/Pq4YVudum1MhKzkAUsXyFrp+t45+kc9fPDDp6lnFy/v4w88Stw77R2iEfjhMjLBdxb9QSAS4eLl/cQ9EmHRbXEqgJg42fr2ZnsHm+2dpcwFSrcAImdCHvKNIBkE1/fOM1uRs+kw9X7rbhv9ox5ad9t4799kMiRG/+uA0tcDDm6toPviMnV/7SYPhH+V3QwlnPicrPeng1oiHT476UstII/v25q5k0SoCM7YFPe0dyiNBXkDnzg1F2GbaRa2AFnv9496qM98pc+7iPjiiMORJVVfSh7gAqOOV5H1chbygMMYoHqm8ntCEUuQWcFSBOANAq6mpUC0ECqb/PCFUiCbEC6DoDMBGmz1d3WSfMbjwWZ7JxHAXtejf22FEJMfHWwmR06CIBD1+upEXY5EEAXgzwk2Iti0rXQLaAR+qOpZGcR1An6fu4nNKMG/zZF1hMk9CogNOO0dasdeFXkZss4Mab6x2d7J/K7TYVAlQhbyNpBZHtW/MAtwBRJMzBJlPdkI/FBl+rr3dMglgKwRREC0ApveV/UYJ0Pf1JGfVL3rYQEkgq3pE0nZXIFEMCVUeVGaC9jM/cWhb9TxKioRRLhaQcpVgalHVOO9LEDK9hpMfk7kVROiLOmw0+kwj8yyRvEUmdB86sdR3GZl2PXaYS4XIFNV+SAFK759Ptz1gDWk/oa7XmL3iESQ1V/GwqmzVFg394/Jq3BxZQlA2h2omGx3uqgLOJ0MAUiltAnyFwDWorMDB7dX4mt6phJB9T3dCGMrgpNRgG+eapfB1xCRBpLkJSB3cNE+HQpPhgD5+hz5NbcA8QAFgMgSgJQF8HpUPakTqPRRwGSCdIaAg8y+++ISB7dW9HGB1WMaHYqcNcjsApSP51qV5WbP3cEAnTtMqh5e1xH/ZZ10GQ9JyT6oAidNqzbNgY/hBRsCwcxeCIBUh+wbOktYnUTkVyc6NnJoo6xqiUsGIj8bb+POsycAgD8//wZ3nj3BdFBTD4Vz8vQene7QLXkDyXMLMhdwMgyaRBB7nAgT+HUsggBOnsrp0lzx26aTbCYYj8k1EYnATUz8uM0i5Wy8LT3IuL53jtlY/m2dCPGqMoodrDAGwVHHq3D/pGHJRF60BiAiS3+z8TZk7/ItbtXmB19JLpoaWx+RMSktI2wC+Xv13vP4N32P/+aW4JI8kCEPkOXhtuvzQJpk9d5z65VgfgAacEceKGF3WNWrwBWRIgclXJIHHKXCIkw9q1pTtNkLcD0dLmQBNsRcooxDVM7WBG3Jly1SVpS6L2C7grOsI3LANdgYWTbeCrDsBizT/IESBVg2MVss1AJkI8DGVgs/Hl8u/JA0wXkm+MUvv8e/N45b4U+3V6RWQOV++/ozAOUkOTZwKoBICkhni1wgXo6XXaQQpbsA39IedbzKmeI/SJq2vsuC042R2XhbW+af8ScVAPj43t9Kn6cyb7Eg/A/PKGw9Vqad2QAAAABJRU5ErkJggg==',smooth:false,blend:false},
   cihuacoatl:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEE0lEQVR42u2aTXKcMBCFdYCcIEsukAv4ClllkwO5KgtfM4scIKtsSCDTk8fjdSOBJJiJKXdhMzBWf+o/tUhpxzHOP//xcQUAn98+jijdAfSAwEqijL++LqQrhBnAn3/aWmFWkhU+xQJMeZOaym8pWQroYQC8vHwav//8MapziRUoaRL8eCAtAeDvOQqzZVSFYABsMCUATBl1bS+AHMuobgE8EFbKU/7blw+z2P18LRKEUeoC1SDw7JcCsEGbwtPZrt2+Q4oCURoUq0A4AoDdxoDY8+AeIYitwNil8tsLwJ7FfK++ywPCrkD39St9jwDgiG/imTTfc48Dt0rUpAuEWhYwKW9is6xmNQKCij8UAE59ke97QFDp0wHs+cdqdnODICt9ugvsBXBX4JYRtkDgtVOCYG3zZxNe5HL4LBGoRDP/cAHQi+KecM5Xs98VwpEiCGfSUwStgSEoC3gYAAjh7fV1ToF2XlR4GQASKd7VFVRK2vsdUWW3lSpPswLPjEv6iOzjCIGVFNbmZoLmAFB5FZj2WgBWhArA9LkCcEor2oNAsxg+zzHgYQCowgUBTCYNymSXwegGBCHhukEURudZQAQgcovcgGfPioJnEQMuYQGYxw0ApC2p+HwPB0UKrjj7ylVOcwNnEZOiym3VvfGqP4orLAzpEgC4YcoAZPsqA8DiXjyTFV4KAFdu45D+So7yDMGeFQAQwmUAWByQPm/KFMhijcDWcJYVlKwFuNAplbvfBwCwwdoNwFbqQlAKgors0bVVbAggNAehBqtWY6rLg3+jotG1HDdQ2+unAZANTOGzqvPL7e9FJtmIAwpCExC5/usp5kHxrkkLIAjdYkBUoXGgU+kqguJdwzY4A/CANzf9ragdAcixGA9A9P+axoBIOVaU7/P8Wj27tT3mWZ4HoRoIXK5Oa3hvFu0zz0pWFR5ViZ5l5Lodj7vKewK8JR21tPEenJWV8mwBBGHOLEOSNYLXSW62MIoAyI3KCMCQ/BeehiStAEtiD37T1WEEYDL5SWoDcNcDQuGjHepdAGxACIA3PqoAcGKDCpJdAViwwwHitaMxgIOlqhf43NUNIpHKDykrC3ifqzdE1Nsjc0+ixXtCu+sAUw4UiZ7d6gtgKls0YnqUw8WVIM8wKZNdIwz/Uhy+7qZmustSOKcocc08+ttxB6/AUePrYgVjsC93T4W5CgezPok3jkjR5guie+//dl5siCCA0ll3zP4IhKogVpsfAQDZDS6IB7lj2lKy+oJIKa1+lxGd8jzGClzv3/YAUymELgGwBMAqGKo87wAohdAlC5S2tGUF6BQ93PE5AuFyxyImOEHRqwmeDoRyBdwpjlpqT2UN7ity4m2Tp1E+F8xTmv+elzCezvz3WkR6P96P5sdv2xlLRibNZdoAAAAASUVORK5CYII='},
+  /* v1102: first L1 VASSAL sprites. 32x32 Piskel ABGR exports (gods and minibosses are 64x64);
+     image-rendering:pixelated does the upscaling, so the smaller canvas costs nothing but bytes.
+     Keys are the bare template ids. Both instantiation paths land on them: a live enemy
+     'en_met1_0_a3f' is stripped to 'met1' by unitIconHtml, and a captured one carries baseId
+     'met1' verbatim. The boss_ alias loop below adds harmless 'boss_met1' entries. */
+  /* v1110: second L1 vassal batch -- the wind set completed (Ash Mourner, River Wind, Grit
+     Wraith) plus the first two earth vassals (Bone Walker, Stone Serpent). Same 32x32 Piskel
+     ABGR export as the v1102 batch; keys are bare template ids, which both the live-enemy
+     id-strip and a capture's baseId resolve to. */
+  mw2:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3ElEQVR42uVWIU/DQBh91zRhQUwSkCwVTRBdEIgmmHnUTP9CcTMDVYEqmDn2F2ZQ+BmSClQrmlQ01BJkRTNXDN+lZet6V66Z4FN37bXvfe++790BBw4muvD44rykcRFnTBUBXRR8bFl8HgKlKhK6DLg5sZWT0GXAXx+fAQA3d7fKSGgii8yJjbnv8fnc92pq9EKAsq9mXo3VYomxZdWKszcFAOCandbGzsztV4EizlgYRUjWAd9zAHgrP5X6gCazmMBVkmAi5kO1UI1kHSCMIjgzF6vFsrM5sX3gzszlQFUjAlB7Zk7sziRYG3gVsBq/CREJWatmIuAUuW1gGKRbitBz2iYZNaSKcBikyG0DI3eKMIqQ2wYHp7r4sxUXccZWi2VJfV79aW4b+Fi+8DmNR+6Uk1BahAC2DOd988XBR+4UAHA1OKk5pEwdMJEOkAlqWdE60EV+uCt2taYSJ9zXBaKRrAM4M1fooNJw4NBUZy+rQicFyHBUXEq0LuBz30MRZ6ztZiSigtaH/L0qsG9Luqigi2ZPIHPfg5luGACY6YYlvlcCwNP9Q6fzQBfNjm7FBM7f/8ybiLS5ImuqgTbgRsmNQY1I2/HMdvlAF+AmIpdHZ3I3pcQYlPTxv4hv4TAh7UE86K4AAAAASUVORK5CYII='},
+  mw3:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAC+klEQVR42sVWPUgcQRT+TrZQU0XcysqABrRdgoLFupLD8hrtzyKNYBFODhNIEdAgd6QIWBghW6uNpRo8txC8hAOLoBAFraw2JJWaQpgU7nv3Zm7vzvsxTjM782bm+9733psd4JFbInbWsRV/l8LEQxKwqhnevwgBAO8QkXkgItUPdWz1de4ZDovf7oh8t3VFpEotEKy9KSIBoIKImy5oSwPfa4pI/cWCxMtP58jM76L0y4LTewsAyOeSAMDzge81ROJ+ckZ28trpvWWwv1+eAgA6Z/7UJxGDY8GxVcXB8JR2QClMwLEV2am56QI6ZzwRktuaSrrpAuQZATxlETCAsrTpQiUJYZchQHQoUJ4P6oDT3gBABx1MsaQFbrpQcR8EvqcpIAlRy+eSuvwxnudzSf5OEEg4NAj75DQ2zmb5yUSUvRZ7kTea7L7HWEwgHBpE99gkrg+22eCytIZnRkLGlmFEUipFdhPLAsAT3WOTCKNNtu9xLN10AZn5XeRzSZXd2MTF3iE2Vj2NAM/jo9KqIWrh0CBMLBABYhNGCwAwESKDyOOLvUP0T4xiGq/RPzHKY+qxWvaYQCHOlVj8L6DY277HBtoAAFdjk3jy+c4bCbY8PcWe07hvxEXge7h6NacpdH2wDROLc0AmSpxs9skpehZm0bV/jMtiucj6RtyK8c34MK+T++XdIbEsmfF0B2jSR61r/xg348PoAxgkbkw9ioGW0FyVRtlaWpYamU9kAt/DZTHQwGqNf39YgXl1mxVBNi4rKh+TLZVgdmMTy9NTbEstLmHr7ZvYMa2lUpQe810R4db8YUgP8rkkUotLeD4wgJ9nZzV7ApeXT3PvBsdWcGzlrvxQ9J3aWVPZ80Cldtaqjs09rb0HhCpm1vcszHK848b38baxZ5RjKyrHuMznMm34QdIkictiwLXPnj/wK1rLjcz6UTnOdWLdPgWq/JIbfQu2RYXM+lE525tsHa1wqPp6+i8ExBOtVRJtS8hWw9GWnHg8AkKNRrb8A2xkYCCZFyI9AAAAAElFTkSuQmCC'},
+  mw4:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACAklEQVR42u1WLW/CQBh+2uKYre0fmOjdltQs2cxSTaYRiAU3scxNTuAQC44QguAHYJmfQUD5BSO1hCULVJabGNcc5a5cC8Nsb3LJXXvt877P+wn8dTF+68emTRjfr+eBEqd0TCBRYifA58sVbl/PMZ1AqYxR1CJ+jp0AAGCFBJ3+ILl/X60ke5d6yX46GW0pUdIF50AAYGH7zBWxqpUtJTgLdm0EFQNmEdpjJ4AVElghUd7p9AewQgK7FmHeK8OlHlzqKV2mxQK7BGOXYKZN2HIVseUqYuJz/q47nLHucJa8M22SrJ3/yoBkK0352U1ZyQ73P2chdoKEhbQSRpavReF0i0EnnmV3ZbI3C1Q++vp4BwBc3z1ivGgrAayQYN4rw65FmfmvzALZR1wpXfA8UtJNwYs94IULmW7+jxftJPVkKahjPfXrTLsXcHARSHSPbj6nXUr9Opu8tfUqoRWS3cq1Aebl9eHpWfptq9nYlN6fPrCeB0YaPHc3NG3CXOopQVXSajZ2ekAuBbjmhctoRoYZuuBFWciyPjcDeQNQZyApPBHtY0K0XBZ8RxnJ9jEhWp6lRC4Ri4lpE0b9etJ++aJ+fav1ygpQIQZkVqhY0GlEBzOgYiLNwEnG8jSgLgPmMdlxqYdOf3DY7HdoUKZnv6wAPLoSfCDlCpwEPG9t+Je0fAMvI1sIwQNRqQAAAABJRU5ErkJggg=='},
+  me1:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACUUlEQVR42uVXMWjbQBR9Uo8Lnjw2k5amoNZTwF06ec9ashR5KERrt1LIELyYQqauDmTQ0SHQ1Xvm0rUlSxdNHrMZTKzr0H5xOt/p7mRlygch2f+k//679/+XgKduUcjilHOp/n5xeFhfL8syelSkKefy5dtj+ePmpj5SzuVJkkgAoHOoxT6BU87l7WAAAHj/9UvtK4TAn9Wqc3AngJRzWQiBQghM1msAwLePn41rl2UZdQHCXAvenJ7icj5HIYTzYV100HrDajisM3p+f49XBwcNINMsAwDcbTZ19qEgnIullPJyPsfk6KgRFAC24xEA4NnPXw0gISAiHw2oGVNQk6lAemNArX1bcApMlaFuTe+NaDseNQJSUGLIppHOVWDK1qciNEYkAPyuqn+1//AQBTNAW1EIgSTPjWvKxaIhUh3oNMtwt9lEFWOSQEQhgadZhtvBAOViYVyb5Dkm63VNuXqvCkJlgvkE1rOkYCYGoDBAQGgL6L8YQMWYtGqAyk+lk+ibZpm0sWDbGgJSMSbxn35VByBnxZhMOd+ZeGopkn81HBoPuqdtWyn7mgEShdp42kooyfNWHTgnoKkKCNXrOHbWrivDkG7YYEC/brMPFxdW3/Vs1m0Y+QSnbkh2dvKuvr5afm80LB8WYtve+ARvs+145LVVnVpxwxQGdnx9vBOaRrN+1luvenaxEDwN9baqivF6Nttpuy4dxOjRQl5EOmtAt0/n51FIf9jrw0RtzXrLdfn31gA9jEap3jFd/r2zp2GlDi1ffy8aoIxsgnP5bfYXOtuVjicC800AAAAASUVORK5CYII='},
+  me2:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACM0lEQVR42u1Wu2obQRQ9I1RMl8b5gICqgCGwhYuYtTv7F7ZNFSzYwqVBKiScwkUKge38wbYppU4ScpFiq0CqhXyDu+nWje766mpeuxGpfEGMtJqdc+7r3AHebGuZ1jVf/5f1CLTKy501hvAhyPb4jyovo6NV5SViyQYJFMaowSwBAAxmCQpjlMtjAqT9B42AD/Qh1Rgu5juRGswSpJPRzr62qemHwgwAX45+4mo8RfXpPZCXDTBZOhlhPZ4CQEMSF5e1LZJBAlVeIpslNQFzEIyT1+9bI+DCGAJm+6dBEsrmMc/xQ6pxtTbNKsHJ43sOzGw9nsJHQtm0gOzmx0c8f/iOd3+vmxUAvn39Yz1MgosIqSABaZvVsibvuKeuwzKtayIha8L33sEVNdO63pKvAXi7o99FrslsHhXGKCbr+6kRhaliwXi7DRdznJ6dI9M6Kh2+eui7Xua5kz1PNlzMo/q9lUb4cvh4d1s/3t02/4dUz3eWNwLpZIT7i0tk+lV+ea/bhKt1PWxrQcXmTeaODuZzoW09FMaoXkz1F8YoeTg9I8XsOpqVZMk99imYq2Nco9zmlLNg6POvlw0uQFSI8lzF2+707Jy/3Fk6CcA2NaX3Sva9rdpDRGSkXBpim47KdkgMc99+Hs1Ma/ABJZ3ph8apVDDb89+/nvY0ZLNaevUjeB+QXhXG7Hjjey4j1+k+YJl82KyWe3k9Pvns9LLTndCVb5JS6eW6JWCrG1GX+8CbtbUXionNQib0MjIAAAAASUVORK5CYII='},
+  met1:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXUlEQVR42u1WMY6DQAz0rkKR5qQ8IOQFNGnheMg98B5CoKXZFxAegHQNRQquMjKGjdYmJCddLCHtAtaMPPbsArzjxWG0iV+fHwPdf19+zFMIILBr+sn75LRXEbFS8MPxDK7pITntJ49rejgcz7PKPIwAghdlBbwCuC7KSkzCSsC7tp6VnK+7thaRsCHgXFcKuNQDSGKTJkziaEAwLD3du+vNbD6GSRwtllcKDgCw04DnWTo2HQAA7qGshk0rgOC0GWnglEhIGA24r8Hwm4SEXQNelNUoA1aga2vIs9TbJ2IC98DRBdeQsGvAqQdoSexCR40CUCDUnv8zIRhH3ukwknl315tBI6LWjGs0oqU8lQQ0ka75ucAl8uX9SSu2oAzX9JBnKeRZOrucbHoWoL6j/bImfUoFOLjv3cMJ0IPIRyzUAdVngc8X+LdQKYxE93uzHfKPWgLNRUOT847/Gb8+qPvHrEiGEAAAAABJRU5ErkJggg=='},
+  mwt1:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB50lEQVR42uVXMW4CMRCcO7mIIkSZFyBqyihSlE9AFSkNXfKepKNBogodokkqhIQoeQclQoiKS8OSvT17vTbpcg3Yu74Zz9pjH/DfnyKWcHv/UGnxw3pVXEPAxYBb/WHsHdU1RJwW1MB3myUAoP2bU+WQKEKzJ/CnuxsstscLIAC0e4+NNgDsp6PkspQ+8FOnewFYbI/m2RDp2LoJKkADT51ubWY5z346MinhtLqTpLKfysLzeMkAYJ5bAh+4ry37eZzIWUpR5sirrQuKGbZvPoGYSrvNErvNEq3+MKpCaXW8GPifOKFPtpCUmsQpu6dGgK9uHwCtcG0tXBzSSMJpIBKAt61A54kEbdpZZ6SBSV+gcRYVXK6EPB6za02Fgh8+ltlqDpljz2XqKvbtfd5HHpB1GrZ7jzVw+TJt71t8wWdMjp3flTxQZlcaj2U9Bbfh7Ou7NrjVH6okiHwIjMiUPgIki287xQBl/WMzljvC8QCB76cj4HwpqSnz+tYgaLXkECkXqrEcEFKGX0Zi1j3/eG/cGRtXssN6VfhOxtBNKcUPfD5QAMBgPKk+X54LSUQ7qoko5Wmk+W1ZYjWewXhSpXwZyXw5Vo4P5lsSeY6M87YvL+nCQ8n0awGjPk0RLZZELDU39B8AfgDfQU9co3tpSgAAAABJRU5ErkJggg=='},
+  mw1:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACHklEQVR42sVXMW7CQBDcO/kB7iwkHgAd6VxRkIIP8IooP7CoLP8AhR9Q0VFR0LuLO/wAS5Y78wKniNY5lt07nxOUlSzs893O7NzungH4Z1NjFs2ybceNl0mqnk5glm27MI7Yd23eeJPQY8Ff3pJ+HO/DOBLV+RMCFNA1NsSCMYs+PzLrszcBTrYhe4lRDyEgYehZtu3qqoAwjvqrrgrnXnI5YAOXMDQAwHyzhuvx7IyiTFLV5k0f9WG1hMNq2SswtAquxzPMN+ufJMQBXxJjSpBi3Slg/vr2AVcJShhamsA5NMFxrhmNbY0UoKITqFSm3BQcgaljusbmO6AOJ9MFhHH0kBOT6cKrvuuq+P49wh2xuirusAIaQZs30OZNT8JMMprB0h7jM01SDkvbMt28KJCttBDQvKQKCaRSogtocpmAHKEySVV82XX567syx6gfLckaX3adq4lwW2AaglNfD32AM5P5b4yqIB7H3D5R5q4mZVMB/dFOqrHETHAEtjFHMBcpjkyZpArLWtOE4ySzfYZxRjsil0+IqfFmSNRjTfJZJqnSrkm+33jSWgyQqqGlzKWSco2GuzcPM04FGqjmQOkkmtkIeNuf1G1/UpSE1Jw4FdQQCfEAQRCpreJ8VAwznStvDFJ8wYHbHEnfABIJNgeoMxs4Nx+lxWYz36z7Y3nUH5PJdPEALp0R3MHT5o33dwQMqQpXadnWPN18gb8AF5IGcoAx2EYAAAAASUVORK5CYII='},
   mq_tlaloque:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAByklEQVR42u2aQW4CMQxFZ0FPxqW6Rr1yF4gFRVUj0S8sfycZJ0y+JS9gJhn7wTi2k23rLB+n8/1ZP2/fTYrzbbPL4QGgQWhY+Xza7r9q3c8qzsPaIQB7OV4MQi3Xvy7Xf2rdzyrOx9ohAFkA8C+IhlrXLfXGWa+IAGQD8Ax8WPBSLRDRcWywFIBhAIoUJ/7EBUCOE4BRAKwHmo6A0ACccd4PIgCjUuJoatsrdZ6mKFoGAJsgsSlsdBzr+LAi6fAAMGh5hnopdHQcPpe1TwCylsdo2Rwd7zmUFiyXBxBdHmvL4WjQS2+YCAAGHyhji5R2Nwp+b80jAO8GAB1g1RrfK0UXgN5FDutIVGsdqX2F1gXANhzYZQyDWTVAspEiAKMBRFtjrFjzeiAEYFQQLMCsV4B1GO/3WmbWdQGIAmhNgHBbnHXAAojb5OyBDKu4EoCsMhhBeMundbCCdcQLjgKQ3R7vnVKz5ezwKlAAGg9FsU3R2saMAGS/AtEND+97AZgVwF4NldYglr59vjwANjFpvX96WRZAqyNvD0IABEAAumxvT3ccTgAai6LW7W0BmB1Ar4MJww84CMBOjZBeAKYDsTyAaBmcNY8AkPIDHU1PRZ77Qy8AAAAASUVORK5CYII='}, // v520: Tlaloque vassal sprite — matched via u.baseId (v521)
   tlazolteotl:{src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAHlBMVEUAAAA0CEn79P/no1b/AAATAgLdujIpaaUAAAAAAADBNWYhAAAAAXRSTlMAQObYZgAABA5JREFUeNqVls9z00YUxz+7UiBAwSs7A7RMU0VMf0zTwAZDLx3AzOTGgfTgnnrI39UTvTaHui1cIS3TTg8Yq3WG4QCKmrRM6eBo0wxgkLXbg+1gHF/6dHg7q6/2+13t9z0J/kcIBUHQz3shR8ZBgFhaUgTBZIBQQs3AFaFGlxBvEOyFM8OR/5qgn0r9NAHgxu7s16DeuPZpCMaezMYoRGBKwtSgDT1hSmIoc0+DU07fafOUK7h1xASR0C4Wble5PdNbXJskskrhtapQ7eiY6t60N8jlbqafPM9PCjj+66G88yIwYysI96PTuolqep55y6j9FKZkKAIlghi34/Zr8MSzeuxlxmW6qF9Teh+ggAZUoQo5xBO2mavh5r9zavJZaGh1wBsxwYgGdhZjxMV1RVEpMVED/Kb8mjgKIxrkqJ0OfBkXxL+sjBpsAAiqCq+F6FB0VuhoRDUYbh+AQxufbRzL/K0jf/197MH7a0+mz9/te0vJoXmaiGAFPv8CDgSK5tBPPostA3hOOVgmZxkwylyOAVHpSbxFBRSaZzvXYQp4VbqG17+vkS5mDmAdzh7ur/v1LlwEKFMYSQcgK3XOzno71wFelfTmbmsnA2ghoBI+MmIOV8YaAwgRsqHYNuKcbSEBO4fLsn/BM0EQBE7De1lmKKeD05Qok5UBde4ecFoAagMRYsEHiwVR6ZEKFwHOWflHLTOkYQoSEaVyDhY0s44ULGYTrw3l0EYKH5hFBn77aSQTIpAJEb0FtxayGYJAnEsiKxOckOHgiG1qFFEaJtEj41O2BokMbUvYvfZRCS0hLp1rSdhwKYQAVa96YGWptjTwgTXbAz9sW0g3qAxddGU4A3h0u5ArW0qZfvvxicfpP4/fuWfIjTqWQrfbr83pzGRdjjx/9bJXP3iypR/QPZiZLnT7dSHqsIrQhVd8yp3arq+MqsM3Zljdxz9avR+9eCnTE/fT02d+8k9svPz45/vzH8R7ps3ry8wxKze5epMF3abMVL0x4uqbfI9UkpCpZTy0CDnF1VHb5yGEqbU0cuK4kCAb+5v5CMXkbv+aYmRypPxlkyZfARDtB6QhRCR1YDUCsGMUZ4B+VQzizzHAVgJY8gb5UgokF8cAszqFrfkpcrgE1m+PAMR83pBYrIZlbuCnpOi88YMaACpeoNK0mmzd81a5UePupWSpKESgFwGJCJaB2ZBAy6TagKb2A7w2MBUoJJX6gCqCiPnaoFdqgPoiks7DWwm7ltRiSaEgJi6IL5M8vNXCg93n3a7eLKnNo6eSOXdYNs+vXWh3L6xvd7sfPkCAcDMaYk3hQTEDrNXo+dD7VhkkODqWdJyiIL6NGbwo93vyrp7dRCYha15Ts9D27zQ/Ma8/i8HEv4EM4D/kwKgnmDZjtAAAAABJRU5ErkJggg=='}, // v710: L8 layer boss portrait (64×64, Piskel ABGR export)
 };
@@ -6479,6 +6868,15 @@ const GOD_PORTRAITS={
    produces ('boss_mayahuel_8' strips to 'mayahuel'). Alias every portrait under 'boss_<key>'
    so a boss shows its art in BOTH paths instead of falling back to its emoji. */
 Object.keys(GOD_PORTRAITS).forEach(function(k){if(!GOD_PORTRAITS['boss_'+k])GOD_PORTRAITS['boss_'+k]=GOD_PORTRAITS[k];});
+/* v1112: six boss templates carry ABBREVIATED ids that the loop above cannot derive --
+   'boss_tepy' is not 'boss_tepeyollotl', so unitIconHtml resolved none of them and fell back to
+   the emoji. renderBattle's ENEMY row hid this: it matches GODS by e.name first and so drew the
+   art anyway, but every other consumer of unitIconHtml -- the deploy-screen boss preview, capture
+   and spoils cards, run history -- got the emoji. Mictlantecuhtli's summon roster draws from
+   these same templates, so six of his fifteen possible gods arrived as emoji too.
+   Keyed to the BARE god portrait, so this stays correct if a sprite is ever replaced. */
+const BOSS_PORTRAIT_ALIASES={boss_tepy:'tepeyollotl',boss_itzpap:'itzpapalotl',boss_ixqui:'ixquimilli',boss_mal:'malinalxochitl',boss_xiu:'xiuhtecuhtli',boss_xochi:'xochipilli'};
+Object.keys(BOSS_PORTRAIT_ALIASES).forEach(function(k){var t=GOD_PORTRAITS[BOSS_PORTRAIT_ALIASES[k]];if(t&&!GOD_PORTRAITS[k])GOD_PORTRAITS[k]=t;});
 /* v741: also register 'mq_'-prefixed species under their bare name. unitIconHtml() falls back
    to a stripped id when baseId is absent, and 'tlaloque_<ts>_<rnd>' strips to 'tlaloque' --
    which had no portrait, since the only key was 'mq_tlaloque'. Any Tlaloque reaching a
@@ -6541,7 +6939,9 @@ function unitIconHtml(u,size){
        bosses reach here two ways -- spread straight from their template (id 'boss_x_8', which the
        strip above reduces to 'x') or through mkEnemy (baseId 'boss_x', used verbatim). */
     const _gkey=(_bid&&GOD_PORTRAITS[_bid])?_bid:enemyId;
-    const _isGodPortrait=(typeof GODS!=='undefined')&&GODS.some(g=>g.id===_gkey||('boss_'+g.id)===_gkey);
+    /* v1112: the alias keys ('boss_tepy'...) are god portraits too and must take the same
+       1.45 baseline, or the six of them would render a third smaller than every other god boss. */
+    const _isGodPortrait=(typeof GODS!=='undefined')&&GODS.some(g=>g.id===_gkey||('boss_'+g.id)===_gkey||(typeof BOSS_PORTRAIT_ALIASES!=='undefined'&&BOSS_PORTRAIT_ALIASES[_gkey]===g.id));
     const sz=Math.round(size*(ep.scale||1)*(_isGodPortrait?GOD_CARD_SCALE:1));
     return`<img src="${ep.src}" alt="${u.name}" style="width:${sz}px;height:${sz}px;image-rendering:${cr};image-rendering:-moz-crisp-edges;vertical-align:middle">`;
   }
@@ -7428,6 +7828,16 @@ function renderDeploy(){
   /* v1072: was an unconditional smartAutoSel(), which refilled every slot the player had just
      emptied in Edit Party. Once they have curated the party for this battle we prune only. */
   smartAutoSel(partyIsManual());
+  /* v1101: an event battle accepted before a reload comes back here with its encounter intact but
+     no chosenDifficulty (RUN_SKIP). Restore the boss framing so we fall through to the
+     `else if(G.chosenDifficulty)` branch below and land straight on the deploy step, rather than
+     re-offering the event. Self-expiring: the moment pendingEnemies is cleared (proceedShop) or
+     the slot advances, the marker is dropped. */
+  if(G._evFight){
+    if((G.pendingEnemies||[]).length&&G._evFight.layer===G.layer&&G._evFight.bn===G.battleNum){
+      if(!G.chosenDifficulty)G.chosenDifficulty='boss';
+    }else G._evFight=null;
+  }
   G._stage='deploy';saveRun();
   renderRes('rb-deploy');renderDmap('dmap-deploy');
   /* v825: the chip row was only built by showDeployStep, so the copy on the battle-SELECT step
@@ -8219,6 +8629,7 @@ function evL1Cornfield(el){
     G.currentEvent='l1_cornfield_boss';
     G.pendingEnemies=buildChicomecoatlFight();
     G.chosenDifficulty='boss';
+    commitEventFight(); /* v1101 */
     G._chicomecoatlEventFight=true;
     showScr('screen-deploy');
     showDeployStep();
@@ -8329,6 +8740,7 @@ function evL7HeartJaguar(el){
       G.currentEvent='l7_heart_jaguar_fight';
       G.pendingEnemies=buildHeartJaguarFight();
       G.chosenDifficulty='boss';
+      commitEventFight(); /* v1101 */
       G._heartJaguarFight=true;
       showScr('screen-deploy');showDeployStep();
     });
@@ -8401,6 +8813,7 @@ function evMixcoatlTribute(el2,lv){
       G.currentEvent='l2_mixcoatl_boss';
       G.pendingEnemies=buildMixcoatlFight();
       G.chosenDifficulty='boss';
+      commitEventFight(); /* v1101 */
       G._mixcoatlEventFight=true;
       showScr('screen-deploy');
       showDeployStep();
@@ -8697,6 +9110,7 @@ function evUXochipilli(el){
       G.xochipilliGames=[...(G.xochipilliGames||[]),'boss']; // lock out future appearances
       G.pendingEnemies=buildXochipilliFight();
       G.chosenDifficulty='boss';G._xochipilliEventFight=true;
+      commitEventFight(); /* v1101 */
       const el2=document.getElementById('event-content');
       evResult(el2,godIconHtml(GODS.find(g=>g.id==='xochipilli'),72),'"Let us see if your gods can match my Patolli Beans!"',()=>{
         G.currentEvent=null;G.pendingEvent=null;G._pendingEventRolled=false;
@@ -8715,6 +9129,10 @@ function evUXochipilli(el){
   // Pick next game
   const nextGame=unplayed[Math.floor(Math.random()*unplayed.length)];
   G.xochipilliGames=[...games,nextGame];
+  /* v1101: none of the three games has a way out once dealt, and the game played is already
+     recorded above -- so the slot is spent here. Quitting mid-game now keeps whatever was banked
+     and returns to the ordinary battle choice, instead of restoring a pristine shrine. */
+  evSpendSlot();
 
   const hdr=document.createElement('div');
   hdr.innerHTML=`<div style="font-size:13px;color:var(--td);margin-bottom:.75rem;text-align:center;font-style:italic">"You enter a small shrine full of toys, paintings, and undead dancers. Xochipilli grins and challenges you." <span style="font-size:10px;color:#e0a0d0">(Game ${games.length+1}/3)</span></div>`;
@@ -8735,7 +9153,7 @@ function evUTonatiuh(el){
     ihdr.innerHTML='<div style="font-size:13px;color:#ffd060;margin-bottom:.75rem;text-align:center;font-style:italic">"The eternal blizzard splits, and the Fifth Sun blazes through the frost. Ixquimilli\'s blindfolded gaze turns upward — the one heat cold enough to despise. After all the ages, the nemesis has come to the ice."</div>';
     el.appendChild(ihdr);
     el.appendChild(evOpt('☀️','Face your nemesis','Fight Tonatiuh directly · Win to unlock him as a patron','"Ice and Sun. Only one endures the other."',false,'',()=>{
-      G.pendingEnemies=buildTonatiuhFight();G.chosenDifficulty='boss';
+      G.pendingEnemies=buildTonatiuhFight();G.chosenDifficulty='boss';commitEventFight(); /* v1101 */
       const el2=document.getElementById('event-content');
       evResult(el2,'☀️','The snow turns to steam. Tonatiuh descends to meet the Punisher of Ice.',()=>{
         G.currentEvent=null;G.pendingEvent=null;G._pendingEventRolled=false;G.cachedEasy=null;G.cachedHard=null;
@@ -8800,6 +9218,7 @@ function evUTonatiuh(el){
         // Start Tonatiuh battle
         G.pendingEnemies=buildTonatiuhFight();
         G.chosenDifficulty='boss';
+        commitEventFight(); /* v1101 */
         evResult(pickerEl,'☀️','"Tonatiuh is impressed. Are you worthy of challenging his ancient enemy?"',()=>{
           G.currentEvent=null;G.pendingEvent=null;G._pendingEventRolled=false;
           G.cachedEasy=null;G.cachedHard=null;
@@ -8845,7 +9264,7 @@ function evUPatecatl(el){ // v336: Patecatl's Apothecary — A/B/C run-buffs, D 
     }));
   }else if(teyoliaLv>=3){
     el.appendChild(evOpt('⚔️','Challenge him','Fight Patecatl in his Apothecary · Win to unlock him as a patron — your patron\'s Teyolia: '+teyoliaLv,'"Show me your resolve."',false,'',()=>{
-      G.pendingEnemies=buildPatecatlFight();G.chosenDifficulty='boss';
+      G.pendingEnemies=buildPatecatlFight();G.chosenDifficulty='boss';commitEventFight(); /* v1101 */
       const el2=document.getElementById('event-content');
       evResult(el2,'🍶','"Then let us see if you are worthy of the cure."',()=>{
         G.currentEvent=null;G.pendingEvent=null;G._pendingEventRolled=false;G.cachedEasy=null;G.cachedHard=null;
@@ -8895,7 +9314,7 @@ function evUMidwifeShrine(el){ // v510: Cihuacoatl unlock — blessing / challen
   }));
   el.appendChild(evOpt('⚔️','Challenge her','Fight Cihuacoatl and her Cihuateteo · '+(cihuacoatlUnlocked()?'Win for +50 FP':'Win to unlock her as a patron'),'“Birth is a battle. Show me yours.”',false,'',()=>{
     G.midwifeDone=true;G.midwifeArmed=false;
-    G.pendingEnemies=buildCihuacoatlFight();G.chosenDifficulty='boss';
+    G.pendingEnemies=buildCihuacoatlFight();G.chosenDifficulty='boss';commitEventFight(); /* v1101 */
     evResult(document.getElementById('event-content'),'🤱','“Then raise your shield, little one. The Cihuateteo are watching.”',()=>{
       G.currentEvent=null;G.pendingEvent=null;G._pendingEventRolled=false;G.cachedEasy=null;G.cachedHard=null;
       smartAutoSel();showScr('screen-deploy');renderDeploy();
@@ -9146,7 +9565,7 @@ function evUXochiquetzal(el){
     el.appendChild(evOpt('\u{1F3F5}\ufe0f','Empty your arms at her feet','(1000 \u273f)','<div>An offering no one has made before \u2014 she will want to measure you for it</div><div style="margin-top:3px;font-style:italic;opacity:.75">\u201cNo one has ever given me everything. Stand up. I want to see what those arms can do.\u201d</div>',!afford4,'Not enough Flowers \u2014 need 1000 \u273f',()=>{
       if((G.res.flower||0)<1000){notify('Not enough Flowers!','#e05050');return;}
       G.res.flower-=1000;
-      G.pendingEnemies=buildXochiquetzalFight();G.chosenDifficulty='boss';
+      G.pendingEnemies=buildXochiquetzalFight();G.chosenDifficulty='boss';commitEventFight(); /* v1101 */
       const el2=document.getElementById('event-content');
       evResult(el2,'\u{1F338}','She rises out of the flowers, and they close over the place where she was sitting. \u201cIf you can hold what you have given, you can hold me.\u201d',()=>{
         G.currentEvent=null;G.pendingEvent=null;G._pendingEventRolled=false;G.cachedEasy=null;G.cachedHard=null;
@@ -9185,7 +9604,7 @@ function evUToci(el){
     }));
   }else if(V['toci_bath_taken']){
     el.appendChild(evOpt('\u2694\ufe0f','Ask her to tend you herself','(free)','<div>Fight Toci and her attendants \u2014 win to unlock her as a patron</div><div style="margin-top:3px;font-style:italic;opacity:.75">\u201cYou have sat in my steam before. Then you know what I am.\u201d</div>',false,'',()=>{
-      G.pendingEnemies=buildTociFight();G.chosenDifficulty='boss';
+      G.pendingEnemies=buildTociFight();G.chosenDifficulty='boss';commitEventFight(); /* v1101 */
       const el2=document.getElementById('event-content');
       evResult(el2,'\u2668\ufe0f','"Sit down, then. This will not be gentle."',()=>{
         G.currentEvent=null;G.pendingEvent=null;G._pendingEventRolled=false;G.cachedEasy=null;G.cachedHard=null;
@@ -9211,7 +9630,7 @@ function evUHuitzilopochtli(el){
   }else{
     const _why=_bloodless?'Not one of yours has fallen in nine layers.':`${_sacs} hearts given at the altar.`;
     el.appendChild(evOpt('\u2694\ufe0f','Answer the drum','(free)','<div>Fight Huitzilopochtli, Cihuacoatl and Tonatiuh \u2014 win to unlock him as a patron</div><div style="margin-top:2px;color:#c0a040">'+_why+'</div><div style="margin-top:3px;font-style:italic;opacity:.75">\u201cThen show me it was not luck.\u201d</div>',false,'',()=>{
-      G.pendingEnemies=buildHuitzilopochtliFight();G.chosenDifficulty='boss';
+      G.pendingEnemies=buildHuitzilopochtliFight();G.chosenDifficulty='boss';commitEventFight(); /* v1101 */
       const el2=document.getElementById('event-content');
       evResult(el2,'\u{1F426}','"Three of us, then. You have earned that much."',()=>{
         G.currentEvent=null;G.pendingEvent=null;G._pendingEventRolled=false;G.cachedEasy=null;G.cachedHard=null;
@@ -9332,6 +9751,8 @@ function memFinish(matched,pairs,container,vassalLv){
     bd.textContent='🌼 Xochipilli\'s favor: +800 🩸 +400 🫘 +20 ✿';
     container.appendChild(bd);
   }
+  try{saveRun();}catch(e){} /* v1101: matched vassals, the recruited god and the favor bonus are all
+     applied above -- persist before the Continue button, not after it. */
   const btn=document.createElement('button');btn.className='btn';btn.style.cssText='margin-top:.75rem;width:100%';btn.textContent='Continue';
   btn.onclick=afterEvent;container.appendChild(btn);
 }
@@ -9346,7 +9767,7 @@ function evXochiBallGame(el){
   const W=320,H=220;
 
   const REWARDS=['blood','cacao','flower'];
-  const addPReward=()=>{const r=REWARDS[Math.floor(Math.random()*3)];pRewards.push(r);if(r==='blood')G.res.blood+=100;else if(r==='cacao')G.res.cacao+=50;else G.res.flower+=10;renderRes('rb-battle');};
+  const addPReward=()=>{const r=REWARDS[Math.floor(Math.random()*3)];pRewards.push(r);if(r==='blood')G.res.blood+=100;else if(r==='cacao')G.res.cacao+=50;else G.res.flower+=10;renderRes('rb-battle');try{saveRun();}catch(e){}}; /* v1101: banked per point */
 
   const canvas=document.createElement('canvas');
   canvas.width=W;canvas.height=H;canvas.style.cssText='display:block;margin:0 auto;border:1px solid #5a4020;border-radius:6px;background:#1a0a00;cursor:none';
@@ -9387,6 +9808,7 @@ function evXochiBallGame(el){
         const k=capKey(vic);const maxHp=allyMaxHpFor(k,vic.hp||50,1);const d=Math.round(maxHp*.20);
         G.unitHpPenalty=G.unitHpPenalty||{};G.unitHpPenalty[k]=(G.unitHpPenalty[k]||0)+d;
         rewardLog.textContent=`CPU scored! ${vic.icon} ${vic.name} -${d} HP next battle`;
+        try{saveRun();}catch(e){} /* v1101: the penalty sticks too -- the cost cannot be quit away */
       }else{rewardLog.textContent='CPU scored!';}
     }
     scoreDiv.textContent=`You: ${pScore} — Xochipilli: ${cScore} (First to ${POINTS_TO_WIN})`;
@@ -9416,6 +9838,7 @@ function evXochiBallGame(el){
     if(won){
       // v322: free recruit replaced with Xochipilli's favor (same bundle as the memory bonus)
       G.res.blood+=800;G.res.cacao+=400;G.res.flower+=20;
+      try{saveRun();}catch(e){} /* v1101 */
       resultDiv.innerHTML+=`<div style="font-size:12px;color:#d4af37;margin-top:.25rem">🌼 Xochipilli's favor: +800 🩸 +400 🫘 +20 ✿</div>`;
     }
     const btn=document.createElement('button');btn.className='btn';btn.style.cssText='margin-top:.75rem;width:100%';btn.textContent='Continue';btn.onclick=afterEvent;
@@ -9493,6 +9916,7 @@ function evXochiPatolli(el){
         rewardText=`All allies +${rewardAmt} levels!`;
       }
     }
+    try{saveRun();}catch(e){} /* v1101: the roll is spent -- a reload cannot buy a second direction */
     const resDiv=document.createElement('div');resDiv.style.cssText='text-align:center;padding:.5rem 0';
     resDiv.innerHTML=`<div style="font-size:20px;margin-bottom:.5rem">${dir.icon}</div>
     <div style="font-size:13px;color:#d4af37;margin-bottom:.25rem">${beans} bean${beans!==1?'s':''} (Roll: ${roll})</div>
@@ -9513,6 +9937,7 @@ function afterEvent(){
   // Advance run after an event — no spoils screen, no shop
   G.currentEvent=null;G.pendingEvent=null;G._pendingEventRolled=true;
   G.cachedEasy=null;G.cachedHard=null;G.chosenDifficulty=null;G.pendingEnemies=null;
+  G._evPendingAdvance=false; /* v1108: about to advance for real -- resumeRun must not repeat it */
   if(G.battleNum>=8){
     // Event fired at B8 (shouldn't happen, but handle gracefully — go to boss deploy)
     smartAutoSel();showScr('screen-deploy');renderDeploy();return;
@@ -9909,6 +10334,8 @@ function startBattle(){
   }
   G.enemies=G.pendingEnemies;
   if(G.enemies&&G.enemies.some(e=>e&&e.ak==='sinistralMinacachalli'&&e.isBoss)){G.enemies.forEach(e=>{if(e)e._critBonus=(e._critBonus||0)+0.15;});}
+  /* v1100: layer Chimalli resolves FIRST so the penance below remains strictly additive on top. */
+  applyLayerChimalli(G.enemies,layerChimalliRow());
   // Apply Enemy Chimalli penance if active
   const _ec=getTecpatlEffects().enemyChimalli;
   if(_ec>0)G.enemies.forEach(e=>grantChimalli(e,_ec,'Enemy Chimalli penance')); /* v964 */
@@ -11482,7 +11909,7 @@ function fireSerendipityBonus(unitId){
 }
 
 const AOE_CAP={deluge:4,obsidianStorm:5,sinistralMinacachalli:3,mictlanClaspPlayer:6,ixiptlatliBloom:5}; /* v1058 */ // v811: at 6 or fewer living foes it fires on everything automatically; above that the player picks 6
-const AOE_CAP_AB={'Prism Daze':5, /* v986 */ 'Searing Stings':4,'Writhing Bloom':4,'Filthwater Plume':5,'Drowning Grasp':2,'Colony Sting':5,'Voltaic Discharge':2,'Jestress Nightmare':5,'Atlatl Rush':2,'Toxic Bloom':3,'Arrow Rain':5,'Net Cast':5,'Mystical Shots':4,'Coil Crush':3,'Tremor':3,'Withering Touch':4,'Shard Breath':4,'Tectonic Slam':5,'Howling Gust':3,'Murk':3,'Magma Burst':3,'Septic Howl':3,'Collapse':5,'Haunt':5,'Solar Crush':2,'Pollen Burst':2,'Craft Shard':4,'Permafrost':2,'Biting Draft':4,'Howling Chill':3,'Ash Surge':5,'Sandblast':5,'Howling Drift':5,'Virulent Gale':5,'Ancient Crush':4,'Thorn Mangle':3,'Iceburn Storm':5,'Death Screech':3,'Solar Pounce':2,'Sun Dive':5,'Carrion Breath':4,'Five-Rabbit Haze':5};
+const AOE_CAP_AB={'Prism Daze':5, /* v986 */ 'Searing Stings':4,'Writhing Bloom':4,'Filthwater Plume':5,'Drowning Grasp':2,'Colony Sting':5,'Voltaic Discharge':2,'Jestress Nightmare':5,'Atlatl Rush':2,'Toxic Bloom':3,'Arrow Rain':5,'Net Cast':5,'Mystical Shots':4,'Coil Crush':3,'Tremor':3,'Withering Touch':4,'Shard Breath':4,'Tectonic Slam':5,'Howling Gust':3,'Murk':3,'Magma Burst':3,'Septic Howl':3,'Collapse':5,'Haunt':5,'Solar Crush':2,'Pollen Burst':2,'Craft Shard':4,'Permafrost':2,'Biting Draft':4,'Howling Chill':3,'Ash Surge':5,'Sandblast':5,'Howling Drift':5,'Virulent Gale':5,'Ancient Crush':4,'Thorn Mangle':3,'Cinder Screech':5,'Death Screech':3,'Solar Pounce':2,'Sun Dive':5,'Carrion Breath':4,'Five-Rabbit Haze':5};
 // v664: enemy AoE specials now honour the same per-ability target caps as their player versions
 // (AOE_CAP_AB, from the v419 AoE rework). Enemies had never been capped and still hit the whole party.
 // LAYER BOSSES ARE EXEMPT — they keep hitting everyone.
@@ -11572,7 +11999,7 @@ function isAoeOrAutoSpecial(actor){
   if(actor.isGod)return[/* v919: Godbane Blowgun re-rolls a random living target for each of its 5 darts, so it needs no target prompt -- without this it fell through to the single-target path and asked the player to pick one. */'godbaneBlowgun','deluge','ophidianMother','cripplingShock','obsidianStorm','holyHarvest','patolliGamble','miseryBlizzard','torridTornado','torridTornadoBoss','peyoteConcoction','sheWhoEatsFilth','sinistralMinacachalli','cihuateteoFury','mictlanClaspPlayer','tlalliSteam', /* v1057: party heal -- was falling through to the targeted path, same as v713's sheWhoEatsFilth fix */'xiuhcoatlMight', /* v1057: re-rolls 3 random targets itself, same as v919's godbaneBlowgun fix */'ixiptlatliBloom' /* v1058 */].includes(ak); // v811: Mictlan Clasp is a 6-target AoE -- absent from this list it fell through to the single-target path and asked for a target // v713: sheWhoEatsFilth is a party heal — it was falling through to the targeted path
   const aoeOrAuto=new Set(['Searing Stings','Writhing Bloom','Filthwater Plume','Drowning Grasp','Chitin Shell','Colony Sting','Voltaic Discharge','Bioluminescent Chorus','Jestress Nightmare','Atlatl Rush','Howling Gust','Magma Burst','Septic Howl','Murk','Thunder Crash','Collapse','Tremor','Death Bloom','Dark Waters','Earth Bloom','Gust Mend','Storm Mend',
     'Pollen Burst','Withering Touch','Uapantotli','Coil Crush','Toxic Bloom','Feeding Frenzy','Arrow Rain','Net Cast','Trident Lunge','Healing Rite','Mystical Shots','Surging Tide',
-    'Craft Shard','Biting Draft','Permafrost','Iceburn Storm','Howling Chill','Burrow Mend','Ball Strike','Sun Dive','Sacred Arrow','Cleansing Steam','Prism Daze','Solar Pounce',
+    'Craft Shard','Biting Draft','Permafrost','Cinder Screech','Howling Chill','Burrow Mend','Ball Strike','Sun Dive','Sacred Arrow','Cleansing Steam','Prism Daze','Solar Pounce',
     'Obsidian Storm','Shard Breath','Tectonic Slam','Haunt','Godbane Blowgun', /* v919 */
     // L4/L5 AoE abilities
     'Ash Surge','Solar Crush','Sandblast','Howling Drift','Virulent Gale','Death Screech','Fuming Wall','Wind Rush',
@@ -11866,6 +12293,50 @@ function triggerCaptureWindow(dead,base,_already){
   renderBattle();
 }
 
+/* ═══ v1103: ONE capture-reward calculator ════════════════════════════════════
+   The ordinary capture path and Feather Embrace's auto-capture computed rewards with entirely
+   separate arithmetic, and had drifted: FE used a different base fraction (0.667 vs 0.5), skipped
+   Divinity Mercy outright, and skipped every capture-side offering -- Iztaccihuatl Snowflake,
+   Camaxtli Memento and Feather Snake Helmet all did nothing on an FE capture, invisibly, because
+   the FE branch also pushed no `boosts` array to explain itself.
+   RULING (v1103): Feather Embrace IS a capture. It earns everything a capture earns, and then the
+   whole reward is multiplied. Both paths now call this, so they cannot drift again. */
+const FEATHER_EMBRACE_MULT=2.0; /* tunable. Was 2.2 -- but measured against a BASE capture, and
+   Quetzalcoatl can never have a base capture, since Divinity Mercy is his own patron passive. The
+   multiple a player could actually observe was (0.667*2.2)/(0.5+0.20) = 2.10x, never 2.2x. The
+   spoils row has been rendering a hardcoded "2x" tag this whole time. Paying exactly 2x the
+   capture the player would otherwise have received makes the number honest from every direction. */
+function captureReward(dead,mult){
+  const m=mult||1;
+  const _bty=unitBounty(dead);
+  const mercy=hasPassive('divinityMercy');
+  /* v702: effectivePv(), not G.god.pv -- the wrong rate when Mercy is OBLATED rather than native. */
+  const mb=mercy?Math.round(_bty*effectivePv()):0;
+  /* v1011 Iztaccihuatl Snowflake / v1012 Camaxtli Memento. Read off the DEAD enemy: the roster
+     entry is built from the template and never carries battle statuses. */
+  const _lb=((dead.lethargyStacks||0)>0)?(getOfferingEffects().lethargyCaptureBonus||0):0;
+  const _cbM=1+(((dead.burnStacks||0)>0)?(getOfferingEffects().burnCacaoBonus||0):0);
+  /* Mercy is added AFTER the dte bonus and is not scaled by the 0.6 cacao factor -- preserved
+     exactly as the ordinary path has always computed it. The multiplier then doubles the lot. */
+  const blood=Math.round((Math.round(_bty*0.5*G.dte.bloodBonus*(1+_lb))+mb)*m);
+  const cacao=Math.round((Math.round(_bty*0.5*0.6*G.dte.cacaoBonus*(1+_lb)*_cbM)+mb)*m);
+  const boosts=[];
+  if(_cbM>1)boosts.push({icon:'\u{1F3F9}',label:'Camaxtli Memento',pct:Math.round((_cbM-1)*100),col:'#e0a060',res:'cacao'});
+  if(_lb>0)boosts.push({icon:'\u2744\ufe0f',label:'Iztacc\u00edhuatl Snowflake',pct:Math.round(_lb*100),col:'#a0d0e0',res:'both'});
+  return {blood:blood,cacao:cacao,mercy:mercy,mb:mb,boosts:boosts};
+}
+/* v1009 Feather Snake Helmet, extracted so BOTH capture paths fire it. Capture-triggered only --
+   a slain enemy pays nothing, which is why this never sat on the kill path. */
+function captureTpRefund(){
+  const _ctp=getOfferingEffects().captureTpPct||0;
+  if(!(_ctp>0))return 0;
+  let _any=0;
+  (G.units||[]).filter(x=>x&&x.isAlly&&x.currentHp>0&&x.maxNP).forEach(x=>{
+    const _g=Math.round(x.maxNP*_ctp);
+    if(_g>0){const _b=x.currentNP||0;x.currentNP=Math.min(x.maxNP,_b+_g);_any+=x.currentNP-_b;}});
+  if(_any>0)addLog(`<span class="log-tp">\ud83e\udeb6 Feather Snake Helmet \u2014 the capture returns <strong>${_any}</strong> TP to the party.</span>`);
+  return _any;
+}
 function resolveCap(enemyId,doCapture){
   try{relicTipHide();}catch(e){} // v825: same as handleDeath -- the card is about to be replaced
   const dead=G.enemies.find(u=>u.id===enemyId);
@@ -11897,33 +12368,20 @@ function resolveCap(enemyId,doCapture){
     }
     // v657: Divinity Mercy now scales. It used to pay 20% of the unscaled TEMPLATE hp (~24 blood),
     // not the enemy's real max HP as its description promised — a ~30x shortfall by L7.
-    const _bty=unitBounty(dead);
-    const mb=mercy?Math.round(_bty*effectivePv()):0; // v702: was G.god.pv — wrong rate when Mercy is oblated
-    /* v1011: Iztaccihuatl Snowflake. Read off the DEAD enemy's lethargy stacks at capture time --
-       the roster entry is built from the template and never carries battle statuses. */
-    const _lb=((dead.lethargyStacks||0)>0)?(getOfferingEffects().lethargyCaptureBonus||0):0;
-    /* v1012: Camaxtli Memento -- the Bloody Arrow shape, on Cacao and on BOTH defeat paths. */
-    const _cbM=1+(((dead.burnStacks||0)>0)?(getOfferingEffects().burnCacaoBonus||0):0);
-    const bR=Math.round(_bty*0.5*G.dte.bloodBonus*(1+_lb))+mb;
-    const cR=Math.round(_bty*0.5*0.6*G.dte.cacaoBonus*(1+_lb)*_cbM)+mb;
+    const _rw=captureReward(dead); /* v1103: shared calculator -- see captureReward */
+    const mb=_rw.mb;
+    /* v1103: the Snowflake/Camaxtli reads and the boosts list moved into captureReward(), which is
+       what lets Feather Embrace inherit them. v1015's point still stands -- the chips must be
+       pushed or an applied bonus looks like a broken one -- it is just made in one place now. */
+    const bR=_rw.blood,cR=_rw.cacao;
     if(!G._spoilIdx)G._spoilIdx=0;
-    /* v1015: the capture entry carried no boosts list, so Camaxtli's cacao bonus applied but was
-       invisible -- it looked like it only worked on slain enemies. */
-    const _capBoosts=[];
-    if(_cbM>1)_capBoosts.push({icon:'\u{1F3F9}',label:'Camaxtli Memento',pct:Math.round((_cbM-1)*100),col:'#e0a060',res:'cacao'});
-    if(_lb>0)_capBoosts.push({icon:'\u2744\ufe0f',label:'Iztacc\u00edhuatl Snowflake',pct:Math.round(_lb*100),col:'#a0d0e0',res:'both'});
-    G.spoils.captured.push({unit:dead,blood:bR,cacao:cR,mercyBonus:mercy&&mb>0,boosts:_capBoosts,_idx:++G._spoilIdx});
+    G.spoils.captured.push({unit:dead,blood:bR,cacao:cR,mercyBonus:mercy&&mb>0,boosts:_rw.boosts,_idx:++G._spoilIdx});
     if(G.runStats)G.runStats.captured++; // v829
     const label=dead.isMiniBoss?'Mini-boss spoils!':'Captured!';
     addLog(`<span class="log-cp">${dead.icon} ${dead.name} — ${label}${mercy?' (+Mercy)':''}</span> <span class="log-gain">+${bR} 🩸 +${cR} 🫘</span>`);
     flashResGain(bR,cR);renderRes('rb-battle');
     if(!hasV('first_capture_seen')){markV('first_capture_seen');notify('Captured units join your roster after battle','#50c080');}
-    /* v1009: Feather Snake Helmet -- restore a share of max TP to the living party on capture.
-       Sits on the capture branch only, so a slain enemy pays nothing. */
-    {const _ctp=getOfferingEffects().captureTpPct||0;
-     if(_ctp>0){let _any=0;(G.units||[]).filter(x=>x&&x.isAlly&&x.currentHp>0&&x.maxNP).forEach(x=>{
-       const _g=Math.round(x.maxNP*_ctp);if(_g>0){const _b=x.currentNP||0;x.currentNP=Math.min(x.maxNP,_b+_g);_any+=x.currentNP-_b;}});
-       if(_any>0)addLog(`<span class="log-tp">\ud83e\udeb6 Feather Snake Helmet \u2014 the capture returns <strong>${_any}</strong> TP to the party.</span>`);}}
+    captureTpRefund(); /* v1103: v1009 Feather Snake Helmet, extracted so FE fires it too */
     tryKukulkanBonus(); // v580 · v856: extracted, so the Feather Embrace path can fire it too
     notify(`⚔ ${dead.name} ${label}`,'#50c080');
   }else if(dead){
@@ -12064,31 +12522,46 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
           G.captured.push({...base,id:captureId3,_captureId:captureId3,baseId:base.id,level:pickT.enemyLevel||1});
           G.levels[captureId3]=pickT.enemyLevel||1;
         }
+        ensureSurge(captureId3); /* v1103: parity with the ordinary path (v313) -- baseline the
+           surge store at capture level so a later event level-up cannot be swallowed. */
         // Don't auto-deploy feather embrace captures — let player manage at shop
         // v657: bounty-based. Previously omitted getLayerResMult() entirely (paid ~1.54x too much at L7)
         // and used raw maxHp instead of spoilHp(), ignoring spoilMult.
-        const _bty=unitBounty(pickT);
-        const bR=Math.round(_bty*0.667*G.dte.bloodBonus*2.2);
-        const cR=Math.round(_bty*0.667*0.6*G.dte.cacaoBonus*2.2);
+        /* v1103: was its own arithmetic at 0.667 base with no Mercy and no offerings. Now the
+           ordinary capture reward, multiplied. Mercy+, the 2x tag and any offering chips all
+           render together on the row -- renderSpoils already supports all three side by side. */
+        const _rw=captureReward(pickT,FEATHER_EMBRACE_MULT);
+        const bR=_rw.blood,cR=_rw.cacao;
         if(!G._spoilIdx)G._spoilIdx=0;
-        G.spoils.captured.push({unit:pickT,blood:bR,cacao:cR,mercyBonus:false,featherBonus:true,_idx:++G._spoilIdx});
+        G.spoils.captured.push({unit:pickT,blood:bR,cacao:cR,mercyBonus:_rw.mercy&&_rw.mb>0,featherBonus:true,boosts:_rw.boosts,_idx:++G._spoilIdx});
+        captureTpRefund(); /* v1103: Feather Snake Helmet fires on this capture too */
+        if(G.runStats)G.runStats.captured++; /* v1103: FE captures were never counted */
         G._kukulkanPending=true; /* v856: deferred to advanceTurn -- see the note there */
-        addLog(`<span class="log-cp">🐍 Feather Embrace — <span style="color:#60e0c0">AUTO-CAPTURE! ${pickT.isMiniBoss?'Mini-boss! ':''}2.2× reward!</span></span>`);
-        notify(`🐍 Auto-captured ${pickT.name}! 2.2× reward!`,'#60e0c0');
+        addLog(`<span class="log-cp">🐍 Feather Embrace — <span style="color:#60e0c0">AUTO-CAPTURE! ${pickT.isMiniBoss?'Mini-boss! ':''}2× reward!</span></span>`);
+        notify(`🐍 Auto-captured ${pickT.name}! 2× reward!`,'#60e0c0');
       }else if(pickT.isBoss){
         // v319: boss can't be captured — FE still grants 2.5× resources, but the death MUST go
         // through handleDeath so layer unlocks, bossesDefeated, and victory popups fire on every
         // layer (the old hand-rolled spoils path silently skipped all of them — Xolotl bug).
         G.captureProcessed.delete(pickT.id); // was pre-added by the fatal path; handleDeath must process
-        pickT._featherBonus=2.2;
-        addLog(`<span class="log-cp">🐍 Feather Embrace — <span style="color:#60e0c0">boss felled! 2.2× reward!</span></span>`);
+        pickT._featherBonus=FEATHER_EMBRACE_MULT; /* v1103 */
+        addLog(`<span class="log-cp">🐍 Feather Embrace — <span style="color:#60e0c0">boss felled! 2× reward!</span></span>`);
         handleDeath(pickT);
-        notify(`🐍 Feather Embrace — 2.2× resources!`,'#60e0c0');
+        notify(`🐍 Feather Embrace — 2× resources!`,'#60e0c0');
       }else{
         G._unitStates[pickT.id]='slain';
         if(!G._spoilIdx)G._spoilIdx=0;
-        G.spoils.killed.push({unit:pickT,blood:Math.round(unitBounty(pickT)*1.333*G.dte.bloodBonus),cacao:Math.round(unitBounty(pickT)*1.333*0.6*G.dte.cacaoBonus),_idx:++G._spoilIdx}); // v657: bounty
-        addLog(`<span class="log-ab">🐍 Feather Embrace! ${dmg} — fatal, slain.</span>`);
+        /* v1109 RULING: the third branch -- a fatal hit on something that can be neither captured
+           nor is a boss -- keeps the Feather Embrace multiplier but earns NOTHING capture-side.
+           No Divinity Mercy, no Snowflake, no Camaxtli, no Feather Snake Helmet: the target is
+           SLAIN, not captured, so captureReward() is deliberately not called here.
+           1.333 was left over from before the multiplier was ever named; against a plain slay
+           (bounty x1.0 blood, x0.6 cacao) it paid 1.33x while the ability advertised 2x. Now it is
+           exactly twice an ordinary slay, which is what "the 2x boost, no capture effects" means. */
+        const _feB=unitBounty(pickT)*FEATHER_EMBRACE_MULT;
+        G.spoils.killed.push({unit:pickT,blood:Math.round(_feB*G.dte.bloodBonus),cacao:Math.round(_feB*0.6*G.dte.cacaoBonus),featherBonus:true,_idx:++G._spoilIdx}); // v657: bounty
+        if(G.runStats)G.runStats.slain++; /* v1109: this branch never counted, mirroring the FE capture miss fixed in v1103 */
+        addLog(`<span class="log-ab">🐍 Feather Embrace! ${dmg} — fatal, slain. <span style="color:#60e0c0">2× spoils</span></span>`);
       }
       animateActor(u.id);animateHit(pickT.id,dmg,false,rollCrit._lc);
     }else{
@@ -13188,7 +13661,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     // L4
     'Diving Gust':  {mult:1.6, phys:true, wound:2},
     'Permafrost':   {mult:1.6, mag:true,  aoe:true, burn:1, slowAll:1},
-    'Iceburn Storm': {mult:1.1, mag:true, aoe:true, burn:2}, // v719: 1.2→1.1
+    'Cinder Screech': {mult:1.1, mag:true, aoe:true, burn:2}, // v719: 1.2→1.1 · v1105: renamed from 'Iceburn Storm'
     'Venom Coil':   {mult:1.5, phys:true, poison:2, wound:1},
     'Tainted Draught':{mult:1.2, mag:true,  poison:2},
     // Fallback
@@ -13727,9 +14200,14 @@ function isHealAbl(ab){return['Gust Mend','Death Bloom','Dark Waters','Storm Men
    builders rather than existing as named templates, so they cannot be summoned yet --
    that costs the DAY element, capping Teocipactli Punishment at 8 elements (2.80x)
    instead of 9 (3.15x). Extracting those three is a follow-up build. */
-function mictlanSummonPool(){
+/* v1112: ONE source for "the boss template that represents god X". This pairing used to live
+   only inside mictlanSummonPool, welded to its godUnlocked gate, so any second consumer had to
+   hand-copy fifteen lines -- the split-list shape this file keeps getting bitten by. The gate is
+   now applied by the caller instead: mictlanSummonPool filters, the Trailer Studio takes the
+   list whole (it seeds every unlock anyway). */
+function godBossTpls(){
   const P=[];
-  const add=(gid,tpl)=>{ if(tpl&&godUnlocked(gid))P.push(tpl); };
+  const add=(gid,tpl)=>{ if(tpl)P.push({gid,tpl}); };
   add('tepeyollotl',    typeof TEPEYOLLOTL_TPL!=='undefined'?TEPEYOLLOTL_TPL:null);
   add('itzpapalotl',    typeof ITZPAPALOTL_TPL!=='undefined'?ITZPAPALOTL_TPL:null);
   add('ixquimilli',     typeof IXQUIMILLI_BOSS_TPL!=='undefined'?IXQUIMILLI_BOSS_TPL:null);
@@ -13747,6 +14225,7 @@ function mictlanSummonPool(){
   add('cihuacoatl',     typeof CIHUACOATL_BOSS_TPL!=='undefined'?CIHUACOATL_BOSS_TPL:null);
   return P;
 }
+function mictlanSummonPool(){return godBossTpls().filter(x=>godUnlocked(x.gid)).map(x=>x.tpl);}
 /* v757: summoned gods share one HP baseline instead of inheriting their own layer's value.
    Raw template HP ranged 280 (Chicomecoatl) to 1020 (Xbalanque) -- a 3.6x spread, so an
    identical-looking summon could be a speed bump or a wall depending purely on which layer
@@ -13774,6 +14253,36 @@ function mictlanSummonPending(){
   return ((G.enemies||[]).filter(e=>e&&e.pk==='undeadForces'&&e.currentHp>0&&!G.captureProcessed.has(e.id))
     .find(e=>G.roundNum>=mictlanNextSummonRound(e)&&mictlanCanSummon(e)))||null;
 }
+/* v1112: the BUILD half of Undead Forces, lifted out so a second caller cannot drift from it.
+   mictlanUndeadForces keeps the GATING (2-round cadence, 15-slot cap, roster exhaustion) and the
+   log line; this owns what a raised god actually IS. The Trailer Studio pre-seeds a host through
+   here, so a staged fight is made of the same units the live one builds.
+   `list` defaults to G.enemies. Passing the pendingEnemies array instead lets a host be assembled
+   BEFORE startBattle, which is the only way the arrivals get round-1 queue slots -- summoned
+   mid-battle they deliberately have none, and enemyIsDimmed() would grey every card. */
+function mictlanRaiseGod(u,pick,lv,list){
+  if(!u||!pick)return null;
+  const arr=list||G.enemies;
+  const eSum=mkEnemy(pick,arr.length,1.0,lv);
+  if(!eSum)return null;
+  /* v753: summoned gods fight as ALLY GODS -- they do not carry their patron passive.
+     This mirrors the standing rule that recruited ally gods drop their passives, and it is
+     why sacred_oblation exists at all. Without this, Mayahuel arrived with inebriatedReverie
+     and Tlazolteotl with uncleanPurification, so bossHasPassive() saw them and their
+     self-side DRUNK/Poison became a benefit for Mictlantecuhtli's whole host.
+     NOTE: the self-side component still fires -- it lives in the ability, not the passive --
+     so it is now a genuine downside for the summoner rather than a buff. Flagged for ruling. */
+  delete eSum.pk;
+  eSum._summonedGod=true;
+  /* v757: uniform durability across the pool -- see MICTLAN_SUMMON_HP_BASE. */
+  const _uniHp=Math.round(sc(MICTLAN_SUMMON_HP_BASE,lv));
+  eSum.maxHp=_uniHp;eSum.currentHp=_uniHp;
+  arr.push(eSum);
+  u._mictlanSummoned=u._mictlanSummoned||[];
+  u._mictlanSummoned.push(pick.id);
+  u._mictlanSummons=(u._mictlanSummons||0)+1;
+  return eSum;
+}
 function mictlanUndeadForces(u){
   if(!u||u.currentHp<=0)return;
   /* v758: 2-round cadence. Advance the marker even on a blocked attempt so the cycle does not
@@ -13789,25 +14298,12 @@ function mictlanUndeadForces(u){
   if(!pool.length){addLog(`<span class="log-ab">\u{1F480} Undead Forces \u2014 no god remains unbound. The roster is spent.</span>`);return;}
   const pick=pool[Math.floor(Math.random()*pool.length)];
   const lv=u.enemyLevel||Math.max(1,...G.enemies.map(e=>e.enemyLevel||0))||1;
-  const eSum=mkEnemy(pick,G.enemies.length,1.0,lv);
-  /* v753: summoned gods fight as ALLY GODS -- they do not carry their patron passive.
-     This mirrors the standing rule that recruited ally gods drop their passives, and it is
-     why sacred_oblation exists at all. Without this, Mayahuel arrived with inebriatedReverie
-     and Tlazolteotl with uncleanPurification, so bossHasPassive() saw them and their
-     self-side DRUNK/Poison became a benefit for Mictlantecuhtli's whole host.
-     NOTE: the self-side component still fires -- it lives in the ability, not the passive --
-     so it is now a genuine downside for the summoner rather than a buff. Flagged for ruling. */
-  delete eSum.pk;
-  eSum._summonedGod=true;
-  /* v757: uniform durability across the pool -- see MICTLAN_SUMMON_HP_BASE. */
-  const _uniHp=Math.round(sc(MICTLAN_SUMMON_HP_BASE,lv));
-  eSum.maxHp=_uniHp;eSum.currentHp=_uniHp;
-  G.enemies.push(eSum);fxSummon(eSum.id);
+  const eSum=mictlanRaiseGod(u,pick,lv);
+  if(!eSum)return;
+  fxSummon(eSum.id);
   /* v754: no queue splice -- this now runs while buildRoundQueue is assembling the next
      round from an aE snapshot taken before the summon, so the arrival is picked up on the
      following round's queue naturally. Splicing here would edit a queue about to be replaced. */
-  u._mictlanSummoned.push(pick.id);
-  u._mictlanSummons=(u._mictlanSummons||0)+1;
   const coefNow=(0.30+0.10*u._mictlanSummons).toFixed(2);
   addLog(`<span class="log-ab">\u{1F480} Undead Forces \u2014 ${eSum.icon} ${eSum.name} is dragged back from the dead! Mictlan Clasp now ${coefNow}\u00d7MAG.</span>`);
   renderBattle();
@@ -14738,7 +15234,16 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   }
   if(ab==='Patolli Gamble'&&aa.length){
     const roll=Math.floor(Math.random()*6)+1;
-    const mults=[0,0,1.65,1.95,2.4,2.7,4.0];const hits=[0,0,1,2,3,0,0];
+    /* v1111: roll 6 nerfed 4.0 -> 3.2. Rolls 2-5 are untouched. Chimalli (v1100) does not change
+       any single Patolli number, it lengthens the fight by its own percentage and so buys
+       proportionally more rolls -- which fattens the tail rather than the mean. Roll 6 carried
+       16.0 of the 39.55 total MAG-multiples across the six faces against a party of four (40%),
+       and was 2.43x an average cast; at 3.2 it is 12.8 of 36.35 (35%) and 2.11x average. That is
+       -20% on roll 6 itself but only -8.1% on the ability's total output across the six faces --
+       the point is flattening the spike, not cutting the average.
+       Note this branch never crits -- unlike Ball Strike and Craft Shard beside it, it skips
+       critify -- so these multipliers are hard ceilings, not averages. */
+    const mults=[0,0,1.65,1.95,2.4,2.7,3.2];const hits=[0,0,1,2,3,0,0];
     addLog(`<span class="log-ab">🎭 Patolli Gamble — rolled <strong>${roll}</strong>!</span>`);
     if(roll===1){
       aa.forEach(a=>{const h=applyArmorDamage(a,1,true);if(h>0){a.currentHp=Math.max(0,a.currentHp-h);G._animQueue.push({uid:a.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,a);if(a.currentHp<=0)handleDeath(a);}});
@@ -15112,7 +15617,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   if(ak==='iceburnStorm'&&aa.length){
     let total=0;
     aa.forEach(a=>{if(a.currentHp<=0)return;const dmg=critify(Math.max(1,Math.round((u.mag||0)*1.1-(a.res||0)*0.4)),u,true);const h=applyArmorDamage(a,dmg,true);if(h>0){a.currentHp=Math.max(0,a.currentHp-h);total+=h;G._animQueue.push({uid:a.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});applyBurn(a,2);onHitContact(u,a);if(a.currentHp<=0)handleDeath(a);}});
-    addLog(`<span class="log-ab">🌪️ Iceburn Storm: 1.1×MAG ${total} + Burn ×2 each!</span>`);return;
+    addLog(`<span class="log-ab">🌪️ Cinder Screech: 1.1×MAG ${total} + Burn ×2 each!</span>`);return;
   }
   if(ak==='bitingDraft'&&aa.length){
     let total=0;
@@ -15912,7 +16417,7 @@ function spareFx(ck,resAmt,resIcon,delay){
 function offeringAffectsUnit(id,u){
   if(!u)return false;
   try{
-    const r=offeringStatLayer({hp:100,atk:10,mag:10,def:10,res:10,tp:10},u.element,!!u.isGod,u.type,0,false,!!u.isPatron,null);
+    const r=offeringStatLayer({hp:100,atk:10,mag:10,def:10,res:10,tp:10},u.element,!!u.isGod,u.type,0,false,!!u.isPatron,null,capKey(u)); /* v1107 */
     return ((r&&r.affecting)||[]).indexOf(id)>=0;
   }catch(e){return true;}
 }
@@ -16110,6 +16615,59 @@ function grantChimalli(u,pct,src){
    same trap the HP-persistence ruling already covers.
    MIGRATION: pre-v964 saves hold absolutes (20/40/60). Any stored value > 1 is treated as legacy
    and ignored, so the shield re-resolves from the stack count in G.shields. Self-healing. */
+/* ═══ v1100: LAYER CHIMALLI PROGRESSION ═════════════════════════════════════
+   Minibosses and bosses now arrive shielded, scaling by layer. Applied at ONE choke point in
+   startBattle rather than in the ~18 separate builder branches, so the layer B5/B8 fights, every
+   event encounter and the Cipactli wave are all covered and cannot drift apart.
+   RULINGS (v1100):
+     Q2 -- the table is a FLOOR, not an override: max(existing, target). The four fights that
+           already ship bespoke Chimalli (Heart Jaguar 25%, Toci 40%, Huitzilopochtli 40%,
+           Xochiquetzal 60%) are never walked down by it.
+     Q3 -- escorts take HALF the row value.
+     Q4 -- position beats flag. Mictlampehecatl rides into the L4 boss fight as the fifth escort
+           while still carrying isMiniBoss; he is paid as an escort.
+   The Enemy Chimalli penance runs AFTER this and stays strictly additive on top.
+   Mid-battle arrivals never pass through here and are deliberately unshielded -- which is what
+   keeps Mictlantecuhtli's Undead Forces summons bare, per ruling Q1. */
+const LAYER_CHIMALLI={
+  1:{mini:0,    boss:0},
+  2:{mini:.05,  boss:.10},
+  3:{mini:.08,  boss:.12},
+  4:{mini:.10,  boss:.15},
+  5:{mini:.15,  boss:.18},
+  6:{mini:.18,  boss:.20},
+  7:{mini:.20,  boss:.22},
+  8:{mini:.22,  boss:.25},
+  9:{mini:.25,  boss:.30}};
+/* Row from the battle SLOT, not from the flags: B5 is the miniboss row and B8 the boss row.
+   L9 B5 is why -- the taunt Mictlantecuhtli is built isMiniBoss:true but keeps isBoss:true from
+   the spread, so a flag-driven row would have paid him the boss rate in the miniboss slot.
+   Anything outside those two slots that fields an isBoss unit is an event encounter and takes the
+   boss row for whatever layer it was found on. Ordinary battles get nothing. */
+function layerChimalliRow(){
+  if(G.battleNum===5)return 'mini';
+  if(G.battleNum===8)return 'boss';
+  return (G.enemies||[]).some(e=>e&&e.isBoss)?'boss':null;
+}
+/* Within the encounter the LEAD takes the full value and everyone else half. Lead is isBoss when
+   any is present, otherwise isMiniBoss -- so the L3 pair, the L6 trio and the L8 duo are each paid
+   in full, while a miniboss-flagged unit standing in a boss's escort line is not. */
+function applyLayerChimalli(list,row){
+  const tbl=LAYER_CHIMALLI[G.layer||1];
+  if(!tbl||!row||!(tbl[row]>0)||!list||!list.length)return;
+  const full=tbl[row],half=full/2;
+  const anyBoss=list.some(e=>e&&e.isBoss);
+  let n=0;
+  list.forEach(e=>{
+    if(!e||e._layerChima)return;
+    e._layerChima=1; /* stamp: pendingEnemies IS G.enemies, so a re-entry cannot double-grant */
+    const target=(anyBoss?!!e.isBoss:!!e.isMiniBoss)?full:half;
+    const have=(e.maxHp>0)?((e.armor||0)/e.maxHp):0;
+    if(target<=have)return; /* a bespoke value already meets or beats the table -- leave it */
+    if(grantChimalli(e,target-have,'Layer Chimalli')>0)n++;
+  });
+  if(n)addLog(`<span class="log-sh">\u{1F6E1} The layer arms its own \u2014 ${n} foe${n>1?'s':''} arrive${n>1?'':'s'} behind Chimalli.</span>`);
+}
 function armorFracFor(key){
   const v=G.unitArmor?G.unitArmor[key]:undefined;
   if(v!==undefined&&v<=1)return v;
@@ -16548,6 +17106,10 @@ function startCipactliPhase(){
      a time by revealCipactli() once the player dismisses the cutscene, so the beast assembles
      itself on screen instead of appearing fully formed. */
   G.enemies=[mict];
+  /* v1100: phase 2 assembles its board here, not in startBattle, so the layer table needs its own
+     call -- the God King and all five limbs at the L9 boss row (ruling Q1: both phases shielded).
+     Applied before the reveal so each limb is already armoured as it surfaces. */
+  applyLayerChimalli([mict,...parts],'boss');
   G._cipactliReveal=parts;
   /* Phase-1 bookkeeping refers to units that no longer exist. */
   G.captureProcessed=new Set();
@@ -17440,7 +18002,7 @@ function renderActionPanel(){
     const godSpecFlat={'seismicRoar':8,'ophidianMother':0,'deluge':0,'tlalocanDeluge':0,'featherEmbrace':0,'oldFire':20,'cripplingShock':0,'riverJudge':0,'obsidianStorm':14,'holyHarvest':0,'zappingStrike':0,'aurumBreak':0,'frostMacuahuitl':0};
     const godSpecMult={'deluge':1.35,'tlalocanDeluge':1.35,'obsidianStorm':1.25,'aurumBreak':1.5,'frostMacuahuitl':1.5,'cihuateteoFury':0.6,'cripplingShock':0.6,'featherEmbrace':1.5,'godbaneBlowgun':0.5,'mictlanClaspPlayer':0.5,'octliDrench':1.5,'oldFire':1.6,'seismicRoar':1.5,'sinistralMinacachalli':1.2,'zappingStrike':1.1}; /* v924: 12 patron abilities were missing, previewing at 1.0x */
     // Vassal ability mult overrides (for abilities that use a mult formula instead of base+flat)
-    const vassalSpecMult={'Rain Drop':1.3,'Soul Drain':1.3,'Life Siphon':1.35,'Coil Crush':1.4,'Wail':1.5,'Thorn Lash':1.5,'Vine Grasp':1.3,'Blood Drink':1.8,'Glass Cut':1.6,'Pollen Burst':1.1,'Ball Strike':0.55,'War Rhythm':1.2,'Heavy Cleave':1.3,'Razor Dive':1.3,'Haunt':1.3,'Venom Shade':1.3,'Thorn Mangle':1.5,'Ancient Crush':1.4,'Iceburn Storm':1.1,'Death Screech':1.4,'Shard Breath':1.2,'Tremor':1.3,'Withering Touch':1.25,'Tectonic Slam':1.05,'Howling Gust':1.4,'Murk':1.2,'Magma Burst':1.2,'Septic Howl':1.25,'Collapse':1.2,'Haunt':1.1,'Frost Macuahuitl':1.5,'Solar Crush':1.6,'Craft Shard':1.1,'Permafrost':1.6,'Biting Draft':1.2,'Howling Chill':1.05,'Ash Surge':1.1,'Sandblast':1.1,'Howling Drift':1.1,'Virulent Gale':1.1,'Obsidian Blade':2.0,'Sun Dive':1.25,'Solar Pounce':1.6,'Sacred Arrow':0.7,'Prism Daze':0.5,'Filthwater Plume':0.75,'Drowning Grasp':1.5,'Writhing Bloom':1.2,'Colony Sting':0.9,'Voltaic Discharge':1.5,'Gnaw the Fallen':1.9,'Abyssal Lure':1.3,'Fang Flash':1.3,'Descent from the Trees':1.5,'Jestress Nightmare':1.1,'Arrow Rain':0.9,'Atlatl Rush':1.4,'Atlatl Throw':1.6,'Bone Shard':1.7,'Carrion Breath':1.3,'Copper Axe':1.7,'Diving Gust':1.6,'Dolphin Dash':1.2,'Electro Bite':1.4,'Five-Rabbit Haze':0.9,'Flint Sting':1.6,'Gale Strike':1.9,'Gar Chomp':1.5,'Heart Feast':1.7,'Hollow Blow':1.2,'Lava Fang':1.7,'Lightning Fang':1.4,'Marlin Pierce':1.6,'Mystical Shots':1.2,'Net Cast':0.8,'Open the Chest':1.7,'Pack Surge':1.2,'River Poison':1.2,'Rot Gore':1.8,'Scorching Bite':1.3,'Searing Stings':1.1,'Seismic Bolt':1.6,'Shadow Cut':1.5,'Stale Gust':1.2,'Static Bite':1.3,'Tainted Draught':1.2,'Thunder Yip':1.6,'Toxic Bloom':1.2,'Venom Coil':1.5,'Wind Rush':1.3};
+    const vassalSpecMult={'Rain Drop':1.3,'Soul Drain':1.3,'Life Siphon':1.35,'Coil Crush':1.4,'Wail':1.5,'Thorn Lash':1.5,'Vine Grasp':1.3,'Blood Drink':1.8,'Glass Cut':1.6,'Pollen Burst':1.1,'Ball Strike':0.55,'War Rhythm':1.2,'Heavy Cleave':1.3,'Razor Dive':1.3,'Haunt':1.3,'Venom Shade':1.3,'Thorn Mangle':1.5,'Ancient Crush':1.4,'Cinder Screech':1.1,'Death Screech':1.4,'Shard Breath':1.2,'Tremor':1.3,'Withering Touch':1.25,'Tectonic Slam':1.05,'Howling Gust':1.4,'Murk':1.2,'Magma Burst':1.2,'Septic Howl':1.25,'Collapse':1.2,'Haunt':1.1,'Frost Macuahuitl':1.5,'Solar Crush':1.6,'Craft Shard':1.1,'Permafrost':1.6,'Biting Draft':1.2,'Howling Chill':1.05,'Ash Surge':1.1,'Sandblast':1.1,'Howling Drift':1.1,'Virulent Gale':1.1,'Obsidian Blade':2.0,'Sun Dive':1.25,'Solar Pounce':1.6,'Sacred Arrow':0.7,'Prism Daze':0.5,'Filthwater Plume':0.75,'Drowning Grasp':1.5,'Writhing Bloom':1.2,'Colony Sting':0.9,'Voltaic Discharge':1.5,'Gnaw the Fallen':1.9,'Abyssal Lure':1.3,'Fang Flash':1.3,'Descent from the Trees':1.5,'Jestress Nightmare':1.1,'Arrow Rain':0.9,'Atlatl Rush':1.4,'Atlatl Throw':1.6,'Bone Shard':1.7,'Carrion Breath':1.3,'Copper Axe':1.7,'Diving Gust':1.6,'Dolphin Dash':1.2,'Electro Bite':1.4,'Five-Rabbit Haze':0.9,'Flint Sting':1.6,'Gale Strike':1.9,'Gar Chomp':1.5,'Heart Feast':1.7,'Hollow Blow':1.2,'Lava Fang':1.7,'Lightning Fang':1.4,'Marlin Pierce':1.6,'Mystical Shots':1.2,'Net Cast':0.8,'Open the Chest':1.7,'Pack Surge':1.2,'River Poison':1.2,'Rot Gore':1.8,'Scorching Bite':1.3,'Searing Stings':1.1,'Seismic Bolt':1.6,'Shadow Cut':1.5,'Stale Gust':1.2,'Static Bite':1.3,'Tainted Draught':1.2,'Thunder Yip':1.6,'Toxic Bloom':1.2,'Venom Coil':1.5,'Wind Rush':1.3};
     /* v924: the preview multiplier table had drifted badly out of step with the handlers.
        35 vassal abilities were absent, so the action panel priced each of them at 1.0xATK
        while the battle handler used the real figure -- Copper Axe showed 178-182 next to a
@@ -17482,7 +18044,7 @@ function renderActionPanel(){
           <div>🔮 ${specLabel||'Special'} ${isHealSpec?'❤️':specIsMagic(actor)?'🪄':'🗡️'}</div>
           ${specSub}
         </button>
-        ${(()=>{if(!(actor.isGod&&G._oblationAk&&actor.id===('god_'+G.god?.id)))return '';const oblCost=oblationNpCost(actor);const canOb=actor.currentNP>=oblCost;const oblLabel=G._oblationAbility||'Oblated';/* v1030: estimate the OBLATED special exactly as the native one is estimated a few lines above. Now that the v1030 MIX flip gives the patron a REAL stat for the borrowed ability, the same base*mult-def arithmetic applies with no special-casing. */var _oblSub='';try{var _oak=G._oblationAk;var _oMag=(oblationSpecStat(_oak)==='mag');var _obase=_oMag?(actor.mag||0):(actor.atk||0);var _ot=(typeof ae!=='undefined'&&ae&&ae.length)?ae[0]:null;var _odef=_ot?(_oMag?(_ot.res||0):(_ot.def||0)):0;var _oboost=G.dte.specialBoostMult||1;var _OGM={'deluge':1.35,'tlalocanDeluge':1.35,'obsidianStorm':1.25,'aurumBreak':1.5,'frostMacuahuitl':1.5,'cihuateteoFury':0.6,'cripplingShock':0.6,'featherEmbrace':1.5,'godbaneBlowgun':0.5,'mictlanClaspPlayer':0.5,'octliDrench':1.5,'oldFire':1.6,'seismicRoar':1.5,'sinistralMinacachalli':1.2,'zappingStrike':1.1};var _OGF={'seismicRoar':8,'oldFire':20,'obsidianStorm':14};var _omult=_OGM[_oak]||1;var _oflat=(_OGF[_oak]!==undefined?_OGF[_oak]:0);/* mixBurnPenalty/burnPenalty are block-scoped to the estimate branch above and are NOT visible here -- referencing them threw into the catch and the preview silently degraded to a bare cost. Computed inline instead, matching that branch's rule: MIX takes the reduced penalty. */var _obp=((actor.burnStacks||0)>0)?(1-Math.min(actor.burnStacks,4)*(actor.type==='MIX'?0.15:0.15)):1;if(/heal|cleanse|restore/i.test(String(G._oblationAd||''))){_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">💚 Heal · '+oblCost+' ✨</div>';}else if(_ot){var _olo=Math.max(1,Math.round(((_obase*_omult)+_oflat-_odef*0.4-2)*_oboost*_obp));var _ohi=Math.max(1,Math.round(((_obase*_omult)+_oflat-_odef*0.4+2)*_oboost*_obp));_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">~'+_olo+'–'+_ohi+' '+(_oMag?'🪄 MAG':'🗡️ ATK')+' · '+oblCost+' ✨</div>';}}catch(e){}if(!_oblSub)_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">Cost '+oblCost+' ✨</div>';return '<button class=\"btn btn-special\" onclick=\"doPlayerSpecial(true)\"'+(canOb?'':' disabled')+' style=\"line-height:1.35;opacity:'+(canOb?1:0.45)+'\"><div>✟ '+oblLabel+'</div>'+_oblSub+'</button>';})()}
+        ${(()=>{if(!(actor.isGod&&G._oblationAk&&actor.id===('god_'+G.god?.id)))return '';const oblCost=oblationNpCost(actor);const canOb=actor.currentNP>=oblCost;const oblLabel=G._oblationAbility||'Oblated';/* v1030: estimate the OBLATED special exactly as the native one is estimated a few lines above. Now that the v1030 MIX flip gives the patron a REAL stat for the borrowed ability, the same base*mult-def arithmetic applies with no special-casing. */var _oblSub='';try{var _oak=G._oblationAk;var _oMag=(oblationSpecStat(_oak)==='mag');var _obase=_oMag?(actor.mag||0):(actor.atk||0);var _ot=(typeof ae!=='undefined'&&ae&&ae.length)?ae[0]:null;var _odef=_ot?(_oMag?(_ot.res||0):(_ot.def||0)):0;var _oboost=G.dte.specialBoostMult||1;var _OGM={'deluge':1.35,'tlalocanDeluge':1.35,'obsidianStorm':1.25,'aurumBreak':1.5,'frostMacuahuitl':1.5,'cihuateteoFury':0.6,'cripplingShock':0.6,'featherEmbrace':1.5,'godbaneBlowgun':0.5,'mictlanClaspPlayer':0.5,'octliDrench':1.5,'oldFire':1.6,'seismicRoar':1.5,'sinistralMinacachalli':1.2,'zappingStrike':1.1,'torridTornado':0.55,'torridTornadoBoss':0.6};var _OGH={'torridTornado':4,'torridTornadoBoss':5,'cripplingShock':4,'godbaneBlowgun':5};var _OGF={'seismicRoar':8,'oldFire':20,'obsidianStorm':14};var _omult=_OGM[_oak]||1;var _oflat=(_OGF[_oak]!==undefined?_OGF[_oak]:0);/* mixBurnPenalty/burnPenalty are block-scoped to the estimate branch above and are NOT visible here -- referencing them threw into the catch and the preview silently degraded to a bare cost. Computed inline instead, matching that branch's rule: MIX takes the reduced penalty. */var _obp=((actor.burnStacks||0)>0)?(1-Math.min(actor.burnStacks,4)*(actor.type==='MIX'?0.15:0.15)):1;if(/heal|cleanse|restore/i.test(String(G._oblationAd||''))){_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">💚 Heal · '+oblCost+' ✨</div>';}else if(_ot){var _olo=Math.max(1,Math.round(((_obase*_omult)+_oflat-_odef*0.4-2)*_oboost*_obp));var _ohi=Math.max(1,Math.round(((_obase*_omult)+_oflat-_odef*0.4+2)*_oboost*_obp));var _ohits=_OGH[_oak]||1;_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">'+(_ohits>1?(_ohits+'× '):'')+'~'+_olo+'–'+_ohi+' '+(_oMag?'🪄 MAG':'🗡️ ATK')+(_ohits>1?' hits':'')+' · '+oblCost+' ✨</div>';}}catch(e){}if(!_oblSub)_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">Cost '+oblCost+' ✨</div>';return '<button class=\"btn btn-special\" onclick=\"doPlayerSpecial(true)\"'+(canOb?'':' disabled')+' style=\"line-height:1.35;opacity:'+(canOb?1:0.45)+'\"><div>✟ '+oblLabel+'</div>'+_oblSub+'</button>';})()}
         <button class="btn" onclick="G.selectedActorId=null;G.battlePhase='player_choose';renderBattle();" style="font-size:11px">↩ Back</button>
       </div>
       ${specDesc?`<div style="font-size:11px;color:#5a7a9a;margin-top:6px;padding-top:5px;border-top:0.5px solid #2a3a4a">🔮 ${isHealSpec?'❤️':specIsMagic(actor)?'🪄':'🗡️'} <em>${specLabel}</em>: ${specDesc}</div>`:''}
@@ -18077,7 +18639,9 @@ function showEnding(){
     if(i>=allLines.length){
       setTimeout(()=>{
         let newUnlockBan='';
-        const wasXolPrev=G._preRunV&&Object.keys(G._preRunV).some(k=>G._preRunV[k]);
+        /* v1104: was "any pre-run flag at all is truthy" -- a proxy that answered a different
+           question and went wrong the moment a player had any unrelated V flag. */
+        const wasXolPrev=unlockedBeforeRun('xolotl');
         /* v805: this is the LAYER 1 completion notice -- Xolotl unlocks from clearing L1, so it
            has no business on any other layer's ending. The condition only excluded L2/L3/L4/L6,
            so it also fired on L5, L7, L8 and L9 whenever xolUnlocked() was true and the pre-run
@@ -18085,15 +18649,15 @@ function showEnding(){
            leaves behind, since it seeds those flags mid-run. Pinned to the L1 ending. */
         if(_eLayer===1&&!wasXolPrev&&xolUnlocked()&&gd.id!=='xolotl')
           newUnlockBan=`<div style="font-size:12px;color:#b090e0;margin-bottom:1rem;padding:.5rem;background:#1a0a2a;border:0.5px solid #5a3a8a;border-radius:8px">⚡ 🐕 Xolotl has been unlocked!</div>`;
-        if(isL2&&layer2Unlocked()&&gd.id!=='tepeyollotl'&&!hasV('layer2_tepeyollotl'))
+        if(isL2&&layer2Unlocked()&&gd.id!=='tepeyollotl'&&!unlockedBeforeRun('tepeyollotl')) /* v1104 */
           newUnlockBan+=`<div style="font-size:12px;color:#a0c060;margin-bottom:1rem;padding:.5rem;background:#0a1a08;border:0.5px solid #3a6a18;border-radius:8px">🐆 Tepeyollotl has been unlocked!</div>`;
-        if(isL3&&layer3Unlocked()&&gd.id!=='itzpapalotl'&&!hasV('layer3_itzpapalotl'))
+        if(isL3&&layer3Unlocked()&&gd.id!=='itzpapalotl'&&!unlockedBeforeRun('itzpapalotl')) /* v1104 */
           newUnlockBan+=`<div style="font-size:12px;color:#b090ff;margin-bottom:1rem;padding:.5rem;background:#0d0d1a;border:0.5px solid #4a3a8a;border-radius:8px">🦋 Itzpapalotl has been unlocked!</div>`;
         /* v810: Mictlantecuhtli. The layer9_<patron> flag is written by endBattle on the clear, so
            by the time this screen renders godUnlocked('mictlantecuhtli') is already true -- the
            check that matters is whether it was true BEFORE this run, which is what _preRunV
            records. Suppressed when he is the current patron, matching the other notices. */
-        const _mictPrev=G._preRunV&&Object.keys(G._preRunV).some(k=>k.indexOf('layer9_')===0&&G._preRunV[k]);
+        const _mictPrev=unlockedBeforeRun('mictlantecuhtli'); /* v1104 */
         /* v835: the other nineteen gods announce themselves with a portrait modal; this one only
            had a banner line. Fired on a delay so it lands after the ending text has settled. */
         if(isL9&&!_mictPrev&&godUnlocked('mictlantecuhtli')&&gd.id!=='mictlantecuhtli'){
@@ -18108,7 +18672,7 @@ function showEnding(){
         }
         if(isL9&&!_mictPrev&&godUnlocked('mictlantecuhtli')&&gd.id!=='mictlantecuhtli')
           newUnlockBan+=`<div style="font-size:12px;color:#d4af37;margin-bottom:1rem;padding:.5rem;background:#1a1200;border:0.5px solid #8a6a00;border-radius:8px">\u{1F480} <strong>Mictlantecuhtli</strong> has been unlocked \u2014 the God King of the Dead will answer as your Patron.</div>`;
-        if(isL4&&layer4Unlocked()&&gd.id!=='ixquimilli'&&!ixquimilliUnlocked())
+        if(isL4&&layer4Unlocked()&&gd.id!=='ixquimilli'&&!unlockedBeforeRun('ixquimilli')) /* v1104: was checking the LIVE flag, already written -- never fired */
           newUnlockBan+=`<div style="font-size:12px;color:#80c8ff;margin-bottom:1rem;padding:.5rem;background:#0a1428;border:0.5px solid #2a5a8a;border-radius:8px">🧊 Ixquimilli has been unlocked!</div>`;
         if(!isL2&&!isL3&&!isL4&&!isL5&&!isL6&&!isL7&&!isL8&&!isL9){ // v804: without !isL9 the ninth layer matched the LAYER 1 case and offered 'Enter Layer 2', so the isL9 run-complete branch below was unreachable
           actEl.innerHTML=`${newUnlockBan}<button class="btn" onclick="enterLayer2()" style="padding:10px 24px;background:#0e2a14;border-color:#2a6a3a;color:#50e090">Enter Layer 2 →</button>`;
@@ -18122,14 +18686,14 @@ function showEnding(){
           actEl.innerHTML=`${newUnlockBan}<button class="btn" onclick="enterLayer6()" style="padding:10px 24px;background:#081828;border-color:#2a5a8a;color:#60a0d0">Enter Layer 6 →</button>`;
         }else if(isL6){
           // v554: L6 no longer ends the run — descend to Teyōllōcuālōyān
-          const wasOpoPrev=G._preRunV&&Object.keys(G._preRunV).some(k=>k.startsWith('layer6_')&&G._preRunV[k]);
+          const wasOpoPrev=unlockedBeforeRun('opochtli'); /* v1104 */
           if(!wasOpoPrev&&gd.id!=='opochtli')newUnlockBan+=`<div style="font-size:12px;color:#60b8d8;margin-bottom:1rem;padding:.5rem;background:#06141e;border:0.5px solid #2a6a8a;border-radius:8px">🎣 <strong>New Patron Unlocked</strong> — Opochtli, Swift God of Fishing joins the pantheon!</div>`;
           G._scaldingMiasmaActive=false;
           actEl.innerHTML=`${newUnlockBan}<button class="btn" onclick="enterLayer7()" style="padding:10px 24px;background:#0a1a08;border-color:#3a6a18;color:#a0d060">Enter Layer 7 →</button>`;
          }else if(isL7){
            // v715: L7 no longer ends the run — descend to Apanohualóyan.
           // v554: L7 = run complete: grant TEOTL (also fixes the old 'Layer 5 Complete' header typo)
-          const wasMayaPrev=G._preRunV&&Object.keys(G._preRunV).some(k=>k.startsWith('layer7_')&&G._preRunV[k]);
+          const wasMayaPrev=unlockedBeforeRun('mayahuel'); /* v1104 */
           if(!wasMayaPrev&&gd.id!=='mayahuel'){
             newUnlockBan+=`<div style="font-size:12px;color:#a0d060;margin-bottom:1rem;padding:.5rem;background:#0a1a08;border:0.5px solid #3a6a18;border-radius:8px">🌵 <strong>New Patron Unlocked</strong> — Mayahuel, Maguey Goddess of Pulque joins the pantheon!</div>`;
             setTimeout(()=>showMo('🌵','New Patron Unlocked!',`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'mayahuel',icon:'🌵',name:'Mayahuel',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#a0d060;margin:.5rem 0 .25rem">Mayahuel</div><div style="font-size:12px;color:#7ba840;margin-bottom:.75rem">Maguey Goddess of Pulque</div><div style="font-size:12px;color:var(--td);line-height:1.6">She can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs.</div></div>`,[{label:'Drink Deep',fn:()=>{}}]),900); // v564
@@ -18145,7 +18709,7 @@ function showEnding(){
            /* v789: FINISH LINE MOVED. L8 no longer ends the run -- it advances to Chiconahualoyan.
               The Tlazolteotl unlock stays here, since it is still an L8 reward; only the
               run-completion body moved down to the isL9 branch below. */
-           const wasTlazPrev=G._preRunV&&Object.keys(G._preRunV).some(k=>k.startsWith('layer8_')&&G._preRunV[k]);
+           const wasTlazPrev=unlockedBeforeRun('tlazolteotl'); /* v1104 */
            if(!wasTlazPrev&&gd.id!=='tlazolteotl'){
              newUnlockBan+=`<div style="font-size:12px;color:#e070b0;margin-bottom:1rem;padding:.5rem;background:#1a0a14;border:0.5px solid #6a2a4a;border-radius:8px">🌺 <strong>Tlazoltéotl</strong> has been unlocked as a patron!</div>`;
              setTimeout(()=>showMo('🌺','New Patron Unlocked!',`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'tlazolteotl',icon:'🌺',name:'Tlazoltéotl',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#e070b0;margin:.5rem 0 .25rem">Tlazoltéotl</div><div style="font-size:12px;color:#b05a88;margin-bottom:.75rem">Forgiving Goddess of Filth and Lust</div><div style="font-size:12px;color:var(--td);line-height:1.6">She can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs.</div></div>`,[{label:'Give It Here',fn:()=>{}}]),900); // v731: match the Xolotl/Mayahuel unlock layout
@@ -18155,7 +18719,7 @@ function showEnding(){
               shown HER card instead -- the reward for the hardest gate in the game went unnamed.
               Gated on G._xbalanqueDone (he actually appeared AND the layer was cleared) and on
               not having had him before, mirroring the wasTlazPrev test. */
-           const wasXbalPrev=G._preRunV&&G._preRunV['xbalanque_unlocked'];
+           const wasXbalPrev=unlockedBeforeRun('xbalanque'); /* v1104 */
            if(G._xbalanqueDone&&!wasXbalPrev&&gd.id!=='xbalanque'){
              newUnlockBan+=`<div style="font-size:12px;color:#d0a060;margin-bottom:1rem;padding:.5rem;background:#1a1206;border:0.5px solid #6a5220;border-radius:8px">\u{1F406} <strong>Xbalanque</strong> has been unlocked as a patron!</div>`;
              setTimeout(()=>showMo('\u{1F406}','New Patron Unlocked!',`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'xbalanque',icon:'\u{1F406}',name:'Xbalanque',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#e0b070;margin-top:.5rem">Xbalanque</div><div style="font-size:12px;color:#a08050;margin-top:.25rem">Twin Jaguar God Killer</div><div style="font-size:12px;color:var(--td);margin-top:.75rem">He can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs.</div></div>`,[{label:'The Court Is Mine'}]),900);
@@ -18501,7 +19065,7 @@ function showPenancePick(onDone){
       <div style="font-size:24px">🗡️</div>
       <div style="font-size:16px;color:#c03030;font-weight:600;margin-top:.3rem">Tecpatl Tribute</div>
       <div style="font-size:12px;color:var(--td);margin-top:.2rem">Choose one penance to carry forward. The blade does not forgive.</div>
-      <div style="font-size:11px;color:#c07050;margin-top:.4rem">⚠ Every penance also makes <strong>all enemies ${Math.round(((G.tecpatl_mods||[]).length+1)*5)}% stronger</strong> — +5% to every stat, per penance carried.</div>
+      <div style="font-size:11px;color:#c07050;margin-top:.4rem">⚠ All enemies are <strong>${Math.round((G.tecpatl_mods||[]).length*5)}% stronger</strong>.</div>
     </div>
     <div style="display:flex;flex-direction:column;gap:.75rem">
     ${pool.map(m=>`
@@ -19106,7 +19670,7 @@ function showUnitTooltip(u){
   /* v826: _sk passes the surge key (v822). Written as a block comment -- the v822 edit used a
      trailing // here, which swallowed `const T=_ol.total;` and threw ReferenceError: T is not
      defined on every stat-modal open. */
-  const _isTl=u._isTlaloque||isTlaloqueUnit(u);const _ol=offeringStatLayer({hp,atk,mag,def,res,tp:np},u.element,u.isGod,bo.type,u._turquoise||0,_isTl,!!u.isPatron,_sk);const T=_ol.total; /* v639: azure-aware */
+  const _isTl=u._isTlaloque||isTlaloqueUnit(u);const _ol=offeringStatLayer({hp,atk,mag,def,res,tp:np},u.element,u.isGod,bo.type,u._turquoise||0,_isTl,!!u.isPatron,_sk,_tk);const T=_ol.total; /* v639: azure-aware · v1107: _tk is the capture key, matching capKey() on the battle unit */
   // v642: Elemental Synergy joins the modal math — same +max(1,round(stat×pct)) bump the battle build applies, in the same order (after offerings, before buffs)
   // v672: gods carry two HP multipliers the generic stat layer never saw — the DT node (applied inside
   // mkGod, before Soul Surge) and God Affinity (applied by applyAff, 1.1^n per other deployed god).
@@ -19569,7 +20133,13 @@ function doHireMerc(baseId){
   G.res.cacao-=u._tier.cost;
   // Give merc a unique capture ID so level doesn't conflict with wild captures
   const captureId=`${baseId}_merc_${Date.now()}_${Math.random().toString(36).slice(2,4)}`;
-  const mercEntry={...u,_captureId:captureId,_isHiredMerc:true};
+  /* v1106 ROOT CAUSE of "the sprite is missing on hired units". Every other capture path records
+     baseId; this one never did. The id-strip in unitIconHtml cannot recover the species from a
+     merc capture id -- 'mw1_merc_1755..._a3' reduces to 'mw1_merc', which matches no portrait --
+     so with baseId absent the lookup failed and the card fell back to the emoji. It was invisible
+     until v1102 gave L1 vassals sprites at all: before that every vassal was an emoji anyway.
+     Nothing about the unit is merc-specific here, so this affected EVERY hire of every species. */
+  const mercEntry={...u,_captureId:captureId,baseId:u.baseId||u.id,_isHiredMerc:true};
   G.captured.push(mercEntry);
   G.levels[captureId]=u._tier.lv; // always use hired level
   if(G.deplSel.length<getMaxAllies()&&!G.deplSel.includes(captureId))G.deplSel.push(captureId);
