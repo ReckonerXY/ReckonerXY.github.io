@@ -1546,7 +1546,35 @@ function applyOfferings(){
   // v370: Turquoise Serpent Pectoral — flat +DEF/+RES to the single weakest (lowest DEF+RES) ally; dies with the unit, re-picks next battle
   if(oe.weakestFlatDefRes>0||oe.weakestPctDefRes>0){ /* v1088 */
     const _tsA=(G.units||[]).filter(u=>u.isAlly&&u.currentHp>0&&!u._sacVictim); /* v988 */
-    if(_tsA.length){const _wt=weakestAlly(_tsA);const _tD=flatOrPct(oe.weakestFlatDefRes,oe.weakestPctDefRes,_wt.def||0),_tR=flatOrPct(oe.weakestFlatDefRes,oe.weakestPctDefRes,_wt.res||0); /* v1088 */_wt.def=(_wt.def||0)+_tD;_wt.res=(_wt.res||0)+_tR;_wt._turquoise=_tD;if(_wt._mask2rBase){_wt._mask2rBase.def+=oe.weakestFlatDefRes;_wt._mask2rBase.res+=oe.weakestFlatDefRes;}addLog(`<span class="log-sh">🐍 Turquoise Serpent: ${_wt.icon} ${_wt.name} +${oe.weakestFlatDefRes} DEF & RES!</span>`);}
+    if(_tsA.length){
+      const _wt=weakestAlly(_tsA);
+      /* base stats read BEFORE the grant. */
+      const _tBD=_wt.def||0,_tBR=_wt.res||0;
+      const _tD=flatOrPct(oe.weakestFlatDefRes,oe.weakestPctDefRes,_tBD),_tR=flatOrPct(oe.weakestFlatDefRes,oe.weakestPctDefRes,_tBR); /* v1088 */
+      _wt.def=_tBD+_tD;_wt.res=_tBR+_tR;
+      _wt._turquoise=_tD; /* stays FLAT -- offeringStatLayer and the tooltip breakdown read it as a raw stat */
+      /* v1121 [Genaro]: the pip states WHICH BRANCH WON, in that branch's own units -- "+20
+         DEF/RES" when the flat applied, "+20% DEF/RES" when the percentage did.
+         v1120 tried showing the effective uplift instead and it read as two different boost
+         rates ("+33% DEF / +56% RES") when in fact both stats had received the same flat +20;
+         the numbers differed only because the unit's DEF and RES differed. Nominal-by-branch has
+         no such ambiguity: the figure shown is the one the offering advertises.
+         Labels are built from the LIVE oe values, not the literal 20, because these offerings
+         stack -- two pectorals make it flat 40 / 40%.
+         Per stat rather than once, because the branch flips at stat = flat/pct (100 by default),
+         so a unit can be below it on DEF and above it on RES. In that narrow band the pip splits
+         into "+20 DEF / +20% RES", which is honest: one stat took the flat, the other the
+         percentage. Everywhere else the two agree and it collapses to a single label. */
+      const _tFlatN=oe.weakestFlatDefRes||0,_tPctF=oe.weakestPctDefRes||0,_tPctN=Math.round(_tPctF*100);
+      const _tLbl=(base)=>(_tPctF>0&&Math.round(base*_tPctF)>_tFlatN)?`+${_tPctN}%`:`+${_tFlatN}`;
+      _wt._turquoiseLbl=_tLbl(_tBD);
+      _wt._turquoiseLblR=_tLbl(_tBR);
+      if(_wt._mask2rBase){_wt._mask2rBase.def+=oe.weakestFlatDefRes;_wt._mask2rBase.res+=oe.weakestFlatDefRes;}
+      /* v1120: was hardcoded to oe.weakestFlatDefRes, so it printed "+20" even when the PERCENTAGE
+         branch had granted more -- wrong since v1088 added that branch. Prints the stat points that
+         actually landed, which is what the log is for; the pip carries the headline figure. */
+      addLog(`<span class="log-sh">🐍 Turquoise Serpent: ${_wt.icon} ${_wt.name} +${_tD} DEF / +${_tR} RES</span>`);
+    }
   }
   if((G.offerings||[]).length)addLog(`<span class="log-god">🪶 Offerings active: ${G.offerings.length}</span>`);
 }
@@ -1561,7 +1589,7 @@ function azMult(map,element,isP){if(!map)return 1;let m=map[element]||1;if(isP&&
    round1PctByElement key, so the five existing wiring points (accumulator, battle build, modal
    preview, boosting-list check, relicWindow) keep working untouched. */
 function azR1(map,element,isP){const r={atk:0,mag:0,atkPct:0,magPct:0};if(!map)return r;const es=[element];if(isP&&hasPassive('azureZephyr')&&(element==='wind'||element==='fire'))es.push(element==='wind'?'fire':'wind');es.forEach(e=>{if(map[e]){r.atk+=map[e].atk||0;r.mag+=map[e].mag||0;r.atkPct+=map[e].atkPct||0;r.magPct+=map[e].magPct||0;}});return r;}
-function offeringStatLayer(base,element,isGod,type,turquoise,isTlaloqueU,isPatronU,surgeKey,capk){ // v822: surgeKey lets the modal model Teyolia-scaled offerings the way the battle build does
+function offeringStatLayer(base,element,isGod,type,turquoise,isTlaloqueU,isPatronU,surgeKey,capk,remedy){ // v822: surgeKey lets the modal model Teyolia-scaled offerings the way the battle build does · v1123: remedy appended last so every existing positional argument keeps its slot
   /* v1107: capk identifies WHICH unit is being modelled. Only the two lowest-level-vassal
      offerings need it -- see the weakest test in the `affecting` loop below. Optional, so any
      caller that omits it simply gets those two listed on nobody, which is the safe direction. */
@@ -1628,6 +1656,14 @@ function offeringStatLayer(base,element,isGod,type,turquoise,isTlaloqueU,isPatro
   const _hme=azMult(oe.hpMultByElement,element,isPatronU);
   if(_hme&&_hme!==1)t.hp=Math.round(t.hp*_hme);
   const _fr=flatOrPct(azFlat(oe.flatResByElement,element,isPatronU),azFlat(oe.pctResByElement,element,isPatronU),t.res); if(_fr)t.res+=_fr; /* v1088: max(flat,pct) */
+  /* v1123 [Genaro]: Fifth Sun Stone's LIVE hook. v579 reshaped the offering from dayStatMult
+     (+25% all stats) to dayAtkMult (+20% ATK/MAG) plus a TP discount, and applyOfferings was
+     updated but this function was not -- so the modal kept modelling the retired hook, which no
+     offering sets any more, and ignored the one that fires. The offering still appeared in the
+     boosting list, because tpCostMultByElement matched there, which made it look modelled.
+     Ordered before dayStatMult to match applyOfferings. dayStatMult is left in place: it is
+     harmless, and a future DAY offering may want it. */
+  if(element==='day'&&(oe.dayAtkMult||1)!==1){t.atk=Math.round(t.atk*oe.dayAtkMult);t.mag=Math.round(t.mag*oe.dayAtkMult);}
   // v374: Fifth Sun Stone — DAY units +25% all stats (except TP)
   if(element==='day'&&oe.dayStatMult!==1){t.hp=Math.round(t.hp*oe.dayStatMult);t.atk=Math.round(t.atk*oe.dayStatMult);t.mag=Math.round(t.mag*oe.dayStatMult);t.def=Math.round(t.def*oe.dayStatMult);t.res=Math.round(t.res*oe.dayStatMult);}
   // v375: Tlaloque Tamales — boost Tlaloque (HP + all stats); shown like other boosting gems
@@ -1645,7 +1681,44 @@ function offeringStatLayer(base,element,isGod,type,turquoise,isTlaloqueU,isPatro
     }
   }
   if(!G.roundNum||G.roundNum<=relicWindow(1)){const _r1=azR1(oe.round1FlatByElement,element,isPatronU);t.atk+=(_r1.atk||0)+(_r1.atkPct?Math.round(t.atk*_r1.atkPct):0);t.mag+=(_r1.mag||0)+(_r1.magPct?Math.round(t.mag*_r1.magPct):0);} // v639 // v481: Hummingbird Plume · v893: windowed · v1006: pct
+  /* v1123 [Genaro] ROOT CAUSE of "Coatepec Ball is listed but does nothing to my numbers".
+     Vials are applied in applyOfferings(), which mutates u.atk/u.mag directly and banks the grant
+     in G._vialApplied so buildRoundQueue can strip it when the window closes. This function -- the
+     one the stat modal and the unit card read -- never touched oe.vials at all. It checked
+     vialElements only to decide whether to LIST the offering, so Coatepec Ball and Bioluminescent
+     Vial both showed up under "OFFERINGS BOOSTING THIS UNIT" while contributing zero to the
+     figures beside them. Understated by the flat 10 since the hook existed, and by the larger
+     max(flat, pct) since v1089.
+     Same window gate as the listing check, so the modal drops the bonus when the vial expires,
+     exactly as the 2-round masks and Hummingbird Plume already do. Placed after the round-1 block
+     to match applyOfferings, where vials resolve last among the ATK/MAG adders. */
+  (oe.vials||[]).forEach(v=>{
+    if(!v||(!(v.amount>0)&&!(v.pct>0)))return;
+    if(!v.elements||v.elements.indexOf(element)<0)return;
+    if(G.roundNum&&G.roundNum>relicWindow(v.rounds||0))return;
+    t.atk+=flatOrPct(v.amount,v.pct,t.atk||0);
+    t.mag+=flatOrPct(v.amount,v.pct,t.mag||0);
+  });
+  /* v1123: Cipactonal Amate. The ramp is banked on the LIVE unit (_elemRampA/_elemRampM) by
+     buildRoundQueue and cannot be recomputed from the template, so it is read off the unit the
+     same way New Fire Knife reads live TP -- via the capture key. Pre-battle there is no unit and
+     nothing is added, which is correct: the ramp has not started. */
+  if(capk&&(oe.elemRamp||[]).length){
+    const _ru=(G.units||[]).find(x=>x&&(x._captureId||x.id)===capk);
+    if(_ru&&(oe.elemRamp||[]).some(r=>r&&r.element===element)){
+      if(_ru._elemRampA!==undefined)t.atk+=_ru._elemRampA;
+      else if(_ru._elemRamp)t.atk+=_ru._elemRamp;
+      if(_ru._elemRampM!==undefined)t.mag+=_ru._elemRampM;
+      else if(_ru._elemRamp)t.mag+=_ru._elemRamp;
+    }
+  }
   if(turquoise){t.def+=turquoise;t.res+=turquoise;} // v370: Turquoise flat grant (blessed unit only)
+  /* v1123: Tlamatlquiticitl Remedy. Parallel to the Turquoise line above and missing for the same
+     reason -- applyOfferings resolves ONE recipient at battle start and records it as _remedy, so
+     the modal cannot recompute it and must be handed the granted figure. Without this the Remedy
+     was invisible here twice over: absent from the DEF/RES numbers AND absent from the boosting
+     list, since weakestElemDefRes has no listing check either (fixed below). */
+  if(remedy){t.def+=remedy;t.res+=remedy;}
   const affecting=[];
   const _M=(el)=>element===el||(isPatronU&&hasPassive('azureZephyr')&&(el==='fire'||el==='wind')&&(element==='fire'||element==='wind')); // v639
   const _B=(map)=>!!(map&&(azFlat(map,element,isPatronU)||azMult(map,element,isPatronU)!==1));
@@ -1675,6 +1748,7 @@ function offeringStatLayer(base,element,isGod,type,turquoise,isTlaloqueU,isPatro
        returns null and these two are listed on nobody -- the ruling, and honest: with no party
        deployed there is no lowest-level vassal to name yet. */
     if((f.weakestHpMult||f.weakestDefBuff)&&_isWeakest)hit=true;
+    if(f.weakestElemDefRes&&remedy)hit=true; /* v1123: listed on whoever actually received it */
     if(f.vassalHpMult&&!isGod)hit=true;
     if(_B(f.flatAtkByElement)&&usesAtk)hit=true;
     if(_B(f.flatMagByElement)&&usesMag)hit=true;
@@ -1819,7 +1893,7 @@ function renderRelicBar(){
     return `<div class="relic${_spent?' relic-spent':''}" title="${o.name} — ${o.desc}${_note?' ('+_note.label+')':''}" onmouseenter="relicTip(event,'${id}')" onmousemove="relicTip(event,'${id}')" onmouseleave="relicTipHide()" onclick="showOfferingInfo('${id}')">${o.icon}${_cnt}</div>`;}).join('')):'';
   ['relic-bar','relic-bar-shop'].forEach(bid=>{const el=document.getElementById(bid);if(el)el.innerHTML=html;});
 }
-function relicTip(e,id){const o=OFFERINGS[id];if(!o)return;const tt=document.getElementById('relic-tooltip');if(!tt)return;
+function relicTip(e,id){_tipOwn(e);const o=OFFERINGS[id];if(!o)return;const tt=document.getElementById('relic-tooltip');if(!tt)return;
   const _n=offeringStatusNote(id);
   const _ns=_n?`<br><span style="color:${_n.exhausted?'#d07040':'#c0a040'};font-size:11px;font-weight:600">${_n.exhausted?'⛔':'⏳'} ${_n.label}</span>`:'';
   tt.innerHTML=`<strong>${o.icon} ${o.name}</strong><br><span style="color:#c0e060">${o.desc}</span>${_ns}<br><span style="color:var(--td);font-style:italic;font-size:11px">${o.flavor}</span>`;
@@ -1847,6 +1921,7 @@ const STATUS_INFO={
   critup:{icon:'⬆',name:'CRIT UP',color:'#ffd24d',base:'<strong>+5% critical chance per stack</strong>.',fn:(n,_a,r)=>`<strong>+${5*n}% critical hit chance</strong> (${n} stack${n>1?'s':''}${r>0?`, ${r} round${r>1?'s':''} left`:''}).`},
 };
 function statusTip(e,kind,stacks,ally,rounds){ /* v900: rounds reaches the copy */
+  _tipOwn(e);
   const s=STATUS_INFO[kind];if(!s)return;
   const tt=document.getElementById('relic-tooltip');if(!tt)return;
   const n=Math.max(1,Math.min(5,parseInt(stacks,10)||1)); /* v1053: was 4 — under-reported the 5th buff stack added in v1051 */
@@ -1968,7 +2043,26 @@ function pipAttrs(kind,stacks,ally,rounds){ // shared handlers for every status 
   /* v1025: data-st lets statusFx locate this exact badge after the repaint. */
   return `data-st="${kind}" style="cursor:help" onmouseenter="statusTip(event,'${kind}',${n},${a},${rd})" onmousemove="statusTip(event,'${kind}',${n},${a},${rd})" onmouseleave="relicTipHide()" ontouchstart="statusTipTap(event,'${kind}',${n},${a},${rd})" onclick="pipTap(event,'${kind}',${n},${a},${rd})"`;
 }
-function relicTipHide(){const tt=document.getElementById('relic-tooltip');if(tt)tt.style.display='none';}
+/* v1125 [Genaro] ROOT CAUSE of "the Slowed tooltip never goes away after a capture".
+   Every tooltip in the game shares one floating #relic-tooltip and is dismissed by an
+   onmouseleave="relicTipHide()" sitting on the element the pointer is over. That works right up
+   until the element is DESTROYED while hovered -- which is exactly what a capture does: the enemy
+   card is replaced by the green "Captured" card, so the pip carrying the handler is gone from the
+   DOM and its mouseleave can never fire. The tooltip is position:fixed with pointer-events:none,
+   so nothing else can dismiss it either, and it hangs over the board for the rest of the battle.
+   Not specific to Slowed -- any pip or badge on a card that gets replaced mid-hover does this;
+   Slowed is simply the one whose card most often vanishes underneath the cursor.
+   Fix: remember which element opened the tooltip, and on every repaint drop the tooltip if that
+   element is no longer connected to the document. A surviving element keeps its tooltip, so an
+   ordinary repaint while hovering does not flicker. */
+let _tipAnchor=null;
+function _tipOwn(e){try{_tipAnchor=(e&&(e.currentTarget||e.target))||null;}catch(_){_tipAnchor=null;}}
+function relicTipHide(){const tt=document.getElementById('relic-tooltip');if(tt)tt.style.display='none';_tipAnchor=null;}
+function relicTipReap(){
+  const tt=document.getElementById('relic-tooltip');
+  if(!tt||tt.style.display==='none')return;
+  if(!_tipAnchor||_tipAnchor.isConnected===false)relicTipHide();
+}
 // v615: stat tooltips on training cards — same hover/tap behavior as status pips, same #relic-tooltip
 const STAT_INFO={
   hp:{icon:'❤️',name:'HP',color:'#e06060',desc:'Hit Points — the unit is slain when HP reaches 0. Not restored automatically between battles.'},
@@ -1980,7 +2074,7 @@ const STAT_INFO={
   cost:{icon:'✨',name:'TP Cost',color:'#c0a0e0',desc:'Tonalli Points spent each time this unit casts its 🔮 special. The unit needs at least this much ✨ TP to cast.'},
   crit:{icon:'🎯',name:'CRIT',color:'#60d080',desc:'Chance to land a critical hit dealing ×2 damage. Some offerings raise the multiplier further.'}
 };
-function statTip(e,key){
+function statTip(e,key){_tipOwn(e);
   const s=STAT_INFO[key];if(!s)return;
   const tt=document.getElementById('relic-tooltip');if(!tt)return;
   tt.innerHTML='<strong style="color:'+s.color+'">'+s.icon+' '+s.name+'</strong><br><span style="color:var(--td)">'+s.desc+'</span>';
@@ -1993,7 +2087,7 @@ function statTip(e,key){
 function statTipTap(e,key){if(e&&e.stopPropagation)e.stopPropagation();statTip(e,key);setTimeout(()=>{document.addEventListener('click',relicTipHide,{once:true});},50);}
 // v620: special move typing derived from its description — 🗡️ physical, 🪄 magical, both for hybrid, ❤️ heal/support (no damage multiplier)
 function specTypeEmoji(ad){const s=String(ad||'');const a=/(×\s*ATK|ATK\s*[×+])/i.test(s),m=/(×\s*MAG|MAG\s*[×+])/i.test(s);if(a&&m)return '🗡️🪄';if(a)return '🗡️';if(m)return '🪄';return '❤️';} // v620: matches both '1.5×MAG' and 'MAG×0.55' / '(MAG+2)' notations; buff text like 'ATK/MAG UP ×1' stays support
-function synTip(e){ // v643: hover the 🔗 label for the live synergy explanation
+function synTip(e){_tipOwn(e); // v643: hover the 🔗 label for the live synergy explanation
   const tt=document.getElementById('relic-tooltip');if(!tt)return;
   const az=hasPassive('azureZephyr');
   const _chip=el=>{const m=ELEM_META[el];return m?('<span class="elem-badge '+m.cls+'" style="font-size:10px">'+m.icon+' '+m.label+'</span>'):el;};
@@ -2012,7 +2106,7 @@ const SYN_ATTRS='style="cursor:help" onmouseenter="synTip(event)" onmouseleave="
    shield pip, using the same relic-tooltip surface (and the same hover + tap pair) as the
    synergy and stat tips. Purely presentational -- it rewrites display strings only, never data. */
 const CHIMA_ATTRS='style="cursor:help" onmouseenter="chimaTip(event)" onmouseleave="relicTipHide()" ontouchstart="chimaTipTap(event)" onclick="event.stopPropagation();chimaTipTap(event)"';
-function chimaTip(e){
+function chimaTip(e){_tipOwn(e);
   const tt=document.getElementById('relic-tooltip');if(!tt)return;
   tt.innerHTML='<div style="font-weight:700;color:#60c0e0;margin-bottom:3px">\u{1F6E1} Chimalli</div>'
     +'<div style="font-size:12px">HP armor that protects your <span style="color:#e05050">\u2764</span> HP and blocks status.</div>';
@@ -2026,7 +2120,7 @@ function chimaTipTap(e){if(e&&e.stopPropagation)e.stopPropagation();chimaTip(e);
    repeated renders cannot nest them. */
 /* v982: Sacrifice Slot pip. Same surface and same hover+tap pair as the Chimalli pip. */
 const SAC_ATTRS='style="cursor:help" onmouseenter="sacTip(event)" onmouseleave="relicTipHide()" ontouchstart="sacTipTap(event)" onclick="event.stopPropagation();sacTipTap(event)"';
-function sacTip(e){
+function sacTip(e){_tipOwn(e);
   const tt=document.getElementById('relic-tooltip');if(!tt)return;
   tt.innerHTML='<div style="font-weight:700;color:#d4af37;margin-bottom:3px">\u{1F5E1} Sacrifice Slot</div>'
     +'<div style="font-size:12px">An extra slot beside your party. The unit placed here is sacrificed at the start of the next battle, granting a special benefit. It does not void a Perfect Battle.</div>';
@@ -2046,7 +2140,7 @@ function chimaWord(txt){
   return String(txt).replace(/\bChimalli\b/g,
     '<span class="chima-pip" '+CHIMA_ATTRS+'><span style="color:#60c0e0">\u{1F6E1}</span> Chimalli</span>');
 }
-function specTip(e,name,ad){ // v635: hover a special's name for its full detail (altar cards)
+function specTip(e,name,ad){_tipOwn(e); // v635: hover a special's name for its full detail (altar cards)
   const tt=document.getElementById('relic-tooltip');if(!tt)return;
   tt.innerHTML='<strong style="color:#6090e0">🔮 '+name+'</strong><br><span style="color:var(--td)">'+ad+'</span>';
   tt.style.display='block';
@@ -2072,7 +2166,7 @@ function _specEsc(v){
     .replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 function specAttrs(name,ad){const n=_specEsc(name),a=_specEsc(ad);return 'style="cursor:help" onmouseenter="specTip(event,\''+n+'\',\''+a+'\')" onmouseleave="relicTipHide()" ontouchstart="specTipTap(event,\''+n+'\',\''+a+'\')" onclick="event.stopPropagation();specTipTap(event,\''+n+'\',\''+a+'\')"';}
-function unitTypeTip(e,tcode,heal){ // v621: top-right type badge tooltip — strike typing + whether the 🔮 special heals
+function unitTypeTip(e,tcode,heal){_tipOwn(e); // v621: top-right type badge tooltip — strike typing + whether the 🔮 special heals
   const tt=document.getElementById('relic-tooltip');if(!tt)return;
   const core=tcode==='MAG'?'This unit’s strikes are purely magical — 🪄 MAG, reduced by the target’s 🔯 RES.'
     :tcode==='MIX'?'This unit uses both physical (🗡️ ATK) and magical (🪄 MAG) strikes.'
@@ -2849,7 +2943,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1111'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1125'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -3229,7 +3323,7 @@ function updateMidwifeCondition(){
 }
 
 const XOCHIPILLI_BOSS_TPL={id:'boss_xochi',name:'Xochipilli',flavor:'Prince God of Art and Games',icon:'🎭',isBoss:true,isAlly:false,element:'humanity',type:'MAG',
-  ability:'Patolli Gamble',ad:'d6 roll: 1=1dmg all · 2=1.65×MAG · 3=1.95×MAG ×2 hits · 4=2.4×MAG ×3 hits · 5=2.7×MAG AoE · 6=3.2×MAG AoE',ak:'patolliGambleBoss',
+  ability:'Patolli Gamble',ad:'d6 roll: 1=1dmg all · 2=1.2×MAG · 3=1.4×MAG ×2 hits · 4=1.75×MAG ×3 hits · 5=2.0×MAG AoE · 6=3.1×MAG AoE',ak:'patolliGambleBoss',
   hp:540,atk:0,mag:28,def:10,res:12,np:50,npCost:18,fv:0};
 
 function buildXochipilliFight(){
@@ -3246,8 +3340,16 @@ function buildXochipilliFight(){
     maxNP,currentNP:maxNP,npCost:18,
     poisonStacks:0,burnStacks:0,defBuff:0,armor:0,slowStacks:0,woundStacks:0,lethargyStacks:0,atkBuffStacks:0,atkBuffRounds:0,defBuffStacks:0,defBuffRounds:0,
     _raged:false,enemyLevel:lv,fv:0};
-  // Escorts — Humanity element (xe1–xe4)
-  const escorts=HUMANITY_CAPS.filter(c=>c.id!=='xe6'&&c.id!=='xe7'&&c.id!=='xe8').map((cu,i)=>mkEnemy(cu,i,1.0,Math.max(1,lv-2))); // v341: Patecatl escorts aren't part of Xochipilli's fight
+  /* Escorts -- Humanity element. xe1 Tlachtli Champion, xe2 Obsidian Sculptor, xe3 War Drummer,
+     xe5 War Priest. Four, not five.
+     v1117 [Genaro]: xe4 Macuahuitl Bearer dropped from this fight to take pressure off it alongside
+     the Patolli renumber. It is NOT removed from the game and NOT made unobtainable -- it stays in
+     HUMANITY_CAPS, so it is still rolled by getHumanityCaps() into the L1 battle pool and the
+     Vassal Affinity pool once Xochipilli is unlocked, and it is still a named escort in
+     buildPatecatlFight (xe6,xe7,xe8,xe4,xe5). Capturing or defeating it is unaffected; only this
+     one encounter stops fielding it.
+     v341: xe6-8 are Patecatl's escorts and were never part of Xochipilli's fight. */
+  const escorts=HUMANITY_CAPS.filter(c=>c.id!=='xe4'&&c.id!=='xe6'&&c.id!=='xe7'&&c.id!=='xe8').map((cu,i)=>mkEnemy(cu,i,1.0,Math.max(1,lv-2)));
   return[boss,...escorts];
 }
 const MIXCOATL_BOSS_TPL={id:'boss_mixcoatl',name:'Mixcoatl',flavor:'Hunter God of Thunderstorms',icon:'🏹',isBoss:true,isAlly:false,element:'thunder',type:'PHYS',
@@ -6350,17 +6452,35 @@ function diffHpMult(diff){return diff==='hard'?hardHpMult():1.10;}      // boss/
 function hardHpRatio(){return hardHpMult()/1.10;}                        // hard relative to easy
 function hardLvBonus(){return (G.chosenDifficulty==='hard')?1:0;}       // v658: +1 enemy level on hard
 function initBountyWeights(){
+  /* v1119 [Genaro]: the miniboss array is GONE from this list, deliberately. Do not put it back.
+     _bw weights a unit's HP against its OWN cohort, which is right for capture pools -- every
+     member sits in one layer, so the weight separates a tough vassal from a weak one. The
+     miniboss cohort was CROSS-LAYER (L1 to L7, average 461.5 HP), so the weight was measuring a
+     miniboss against minibosses from other layers and then unitBounty multiplied that by the
+     isMiniBoss tier of 1.5. The two compounded into nonsense: Xochitonal 0.69 x 1.5 = 1.04 and
+     Mimich 0.63 x 1.5 = 0.94 -- an L3 miniboss paying LESS than an ordinary L3 vassal -- while
+     Tlacateocotl reached 2.06 and Ometochtli 2.01.
+     With the array removed every miniboss falls through to _bw=1 and the tier means exactly what
+     it says: 1.5x the layer baseline, everywhere. This is not a new rule, it is the rule the
+     three minibosses that were never in the array (Ocetekuani, Ixpuxtequi, Nexoxcho) have always
+     followed; the other nine now match them, and a new miniboss is correct by default.
+     Ruled with the cuts understood and accepted: Tlacateocotl -27%, Atlaua -15%, Amimitl -11%,
+     Acuecueyotl -8%, Mictlampehecatl -4%; against Mimich +59%, Xiuhnel +40%, Quinametzin +21%.
+     Battle-level, since minibosses arrive in groups: L3 Xiuhnel+Mimich +49%, L6 Lake Lords -11%.
+     Layer BOSSES were audited at the same time and needed nothing -- no boss template is in any
+     cohort, so all eleven already resolve to a clean 2.0x. */
   const cohorts=[MICTLAN_CAPS,TEPEME_CAPS,OBSIDIAN_CAPS,NATURE_CAPS,HUMANITY_CAPS,
     CEHUYLOAN_WATER_CAPS,CEHUYLOAN_WIND_CAPS,TONATIUH_DAY_CAPS,PANCUET_FIRE_CAPS,
-    PANCUET_WIND_CAPS,TEMIMINA_WATER_CAPS,TEMIMINA_HUMAN_CAPS,TEYOLLO_NATURE_CAPS,TEYOLLO_DAY_CAPS,APANO_NIGHT_CAPS,APANO_THUNDER_CAPS,
-    [XOCHITONAL_TPL,QUINAMETZIN_TPL,XIUHNEL_TPL,MIMICH_TPL,MICTLAMPEHECATL_TPL,
-     TLACATEOCOTL_TPL,AMIMITL_TPL,ATLAUA_TPL,ACUECUEYOTL_TPL,OMETOCHTLI_TPL]];
+    PANCUET_WIND_CAPS,TEMIMINA_WATER_CAPS,TEMIMINA_HUMAN_CAPS,TEYOLLO_NATURE_CAPS,TEYOLLO_DAY_CAPS,APANO_NIGHT_CAPS,APANO_THUNDER_CAPS];
   cohorts.forEach(arr=>{
     if(!arr||!arr.length)return;
     const avg=arr.reduce((t,u)=>t+(u.hp||0),0)/arr.length;
     if(avg<=0)return;
     arr.forEach(u=>{u._bw=(u.hp||0)/avg;});
   });
+  /* v1119: v1118's explicit XOCHITONAL_TPL._bw=1 override lived here. Removed -- it is now
+     redundant, and leaving a hand-pinned weight beside the general rule would be a trap the next
+     time someone edits either one. */
 }
 // Bounty for one enemy. Falls back to _bw=1 for anything not in a cohort (bosses, summons),
 // so an unstamped unit pays the layer baseline rather than zero.
@@ -9340,12 +9460,25 @@ function buildCihuacoatlFight(){ // v510: Cihuacoatl + 5 warrior-day escorts inc
 
 function buildTonatiuhFight(){
   const lv=eLv(G.battleNum)+layerLvBonus();
-  // Tonatiuh boss + 4 Day escorts
+  /* v1115: Solar Sacrifice, ENEMY SIDE [Genaro]. The mirror of the patron passive, including its
+     "+1 Sacrifice Slot": a FIFTH Day escort is drawn purely to fill Tonatiuh's slot, is killed on
+     screen before round 1, and the survivors -- Tonatiuh and the remaining four -- take
+     ATK/MAG UP x2 and DEF/RES UP x2. Because the victim is the extra unit, the fight still
+     presents four escorts once the rite resolves.
+     Deliberately scoped to THIS boss object and NOT to TONATIUH_BOSS_TPL: that template feeds the
+     Huitzilopochtli War Host and mictlanSummonPool, and neither may gain this (the L9 ruling
+     4.1 keeps summons passive-free, and the summon builder's `delete eSum.pk` would strip it
+     anyway -- which is exactly why the rite gates on `pk`, never on `ak`).
+     The victim never reaches handleDeath, so it yields no spoils, no TEOTL, no capture window,
+     and cannot trigger Obsidian Fishhook or the Mictlan Clasp. */
+  // Tonatiuh boss + 4 Day escorts + 1 sacrifice-slot escort
   const dayPool=getDayPool();
-  const escorts=dayPool.sort(()=>Math.random()-.5).slice(0,4).map((c,i)=>mkEnemy(c,i+1,0.8,lv));
+  const escorts=dayPool.sort(()=>Math.random()-.5).slice(0,5).map((c,i)=>mkEnemy(c,i+1,0.8,lv));
+  if(escorts.length>4&&escorts[4])escorts[4]._sacVictim=true; /* pool is 8+ deep; if it were ever short, no victim and no rite */
   const maxNP=Math.round(sc(35,lv));
   const boss={id:'boss_tonatiuh_ev',name:'Tonatiuh',icon:'☀️',flavor:'Shining God of the Fifth Sun',
     isBoss:true,isAlly:false,element:'day',type:'MIX',magStrike:true,
+    passive:'Solar Sacrifice: the escort in his sacrifice slot is given to the Fifth Sun at battle start — his whole host gains ATK/MAG UP ×2 and DEF/RES UP ×2.',pk:'solarSacrifice',pv:1,
     ability:'Aurum Break',ak:'aurumBreak',ad:'1.5×ATK to 1 enemy; heals lowest HP ally for all damage dealt',
     hp:Math.round(sc(480,lv)*1.1),atk:Math.round(sc(18,lv)),mag:Math.round(sc(18,lv)),
     def:Math.round(sc(9,lv)*0.7),res:Math.round(sc(9,lv)*0.7),
@@ -10333,6 +10466,7 @@ function startBattle(){
       :buildEnemySet(G.battleNum,G.chosenDifficulty||'hard');
   }
   G.enemies=G.pendingEnemies;
+  repairSolarSacrificeHost(); /* v1116: see the function -- heals an encounter locked in by an older build */
   if(G.enemies&&G.enemies.some(e=>e&&e.ak==='sinistralMinacachalli'&&e.isBoss)){G.enemies.forEach(e=>{if(e)e._critBonus=(e._critBonus||0)+0.15;});}
   /* v1100: layer Chimalli resolves FIRST so the penance below remains strictly additive on top. */
   applyLayerChimalli(G.enemies,layerChimalliRow());
@@ -10382,8 +10516,7 @@ function startBattle(){
   if(G.layer===9&&G.battleNum===5&&(G.enemies||[]).some(e=>e&&e._l9Taunt)){
     renderBattle();
     const _taunt=()=>{if(!G._l9TauntDone){G._l9TauntDone=true;l9TauntSummon(()=>{
-      if((G.units||[]).some(u=>u&&u._sacVictim))runSacrificeRite(()=>buildRoundQueue());
-      else buildRoundQueue();
+      runSacrificeRites(()=>buildRoundQueue()); /* v1115: no-ops straight through to done() when neither side has a victim */
     });}};
     showMo('\u{1F480}','The God King Is Waiting',
       '<div style="font-size:13px;line-height:1.7;color:var(--td);padding:.25rem 0">'
@@ -10397,13 +10530,98 @@ function startBattle(){
   /* v984: the sacrifice resolves BEFORE the round begins, mirroring the L9 taunt gate above --
      buildRoundQueue() fires start-of-round passives, so running it first would start the fight
      underneath the rite. */
-  if((G.units||[]).some(u=>u&&u._sacVictim)){
+  if((G.units||[]).some(u=>u&&u._sacVictim)||(G.enemies||[]).some(u=>u&&u._sacVictim)){ /* v1115: either side */
     renderBattle();
-    runSacrificeRite(()=>buildRoundQueue());
+    runSacrificeRites(()=>buildRoundQueue());
     return;
   }
   buildRoundQueue();
 }
+/* v1116 ROOT CAUSE of "Solar Sacrifice did not fire on my continued run" [Genaro].
+   G.pendingEnemies is NOT in RUN_SKIP, so an accepted encounter is serialized whole and restored
+   verbatim. dropStaleEncounter() exists for exactly this and rerolls on a GAME_VERSION change --
+   but it is only reachable from the branch that OFFERS the choice cards. Once chosenDifficulty is
+   set the code takes `else if(G.chosenDifficulty){showDeployStep();}` and never reaches it, and
+   v1101's _evFight restore re-sets chosenDifficulty='boss' on resume. A committed event fight is
+   therefore permanently immune to the staleness check: the array Genaro was fighting had been
+   built by v1114, so its boss object carried no pk and it held four escorts, not five.
+   This is older than v1115 and would silently freeze ANY future change to an event encounter that
+   a player had already accepted.
+   The repair upgrades such a set in place rather than rerolling it -- rerolling would clear
+   pendingEnemies, drop _evFight and re-offer an event whose slot evSpendSlot() has already spent.
+   Matching on the exact hand-built id is safe here: unlike mkEnemy output, this boss object is
+   literal ('boss_tonatiuh_ev'), so no en_<id>_<idx>_<rand> wrapping is in play. */
+function repairSolarSacrificeHost(){
+  const es=G.enemies;
+  if(!Array.isArray(es)||!es.length)return 0;
+  let n=0;
+  /* EXACT id, never a prefix. mkGodBoss builds the War Host's Tonatiuh as tpl.id+'_ev'+idx --
+     'boss_tonatiuh_ev_2' -- which an indexOf()===0 test would happily match, handing Solar
+     Sacrifice and a sixth unit to the Huitzilopochtli fight and breaking the ruling that this
+     stays on the Sun's Demand alone. (The L9 summon is safe either way: mkEnemy wraps it as
+     en_boss_tonatiuh_<idx>_<rand>.) The event boss is the only object built with this literal. */
+  const boss=es.find(e=>e&&e.id==='boss_tonatiuh_ev');
+  if(boss&&!boss.pk){
+    boss.pk='solarSacrifice';boss.pv=1;
+    boss.passive='Solar Sacrifice: the escort in his sacrifice slot is given to the Fifth Sun at battle start \u2014 his whole host gains ATK/MAG UP \u00d72 and DEF/RES UP \u00d72.';
+    n++;
+  }
+  const carrier=es.find(e=>e&&e.currentHp>0&&e.pk==='solarSacrifice');
+  if(carrier&&!es.some(e=>e&&e._sacVictim)){
+    try{
+      const lv=carrier.enemyLevel||eLv(G.battleNum)+layerLvBonus();
+      const pool=getDayPool();
+      const tpl=pool[Math.floor(Math.random()*pool.length)];
+      const v=tpl?mkEnemy(tpl,es.length,0.8,lv):null;
+      if(v){v._sacVictim=true;es.push(v);n++;}
+    }catch(e){}
+  }
+  return n;
+}
+/* v1115: the enemy twin of the rite below. Same shape and the same guarantee -- the victim is an
+   ordinary enemy card until it bleeds, and it is spliced straight out of G.enemies rather than
+   passed to handleDeath, so there are no spoils, no TEOTL, no capture window, no Obsidian Fishhook
+   and no Mictlan Clasp reanimation [Genaro].
+   Gated on a LIVING carrier of the pk, mirroring the Golden War Cry enemy gate at startBattle: if
+   the carrier is absent or already dead the flag is dropped and the fifth escort simply fights as
+   an ordinary escort rather than dying for nothing. */
+function runEnemySacrificeRite(done){
+  const v=(G.enemies||[]).find(u=>u&&u._sacVictim);
+  if(!v){if(done)done();return;}
+  const carrier=(G.enemies||[]).find(e=>e&&e.currentHp>0&&e.pk==='solarSacrifice'&&!e._sacVictim);
+  if(!carrier){delete v._sacVictim;if(done)done();return;}
+  const name=(typeof liveName==='function'?liveName(v):v.name);
+  const cname=(typeof liveName==='function'?liveName(carrier):carrier.name);
+  const vid=v.id;
+  notify('\u{1F5E1} '+cname+' gives '+name+' to the Fifth Sun...','#ffd060');
+  addLog(`<span class="log-ab">\u{1F5E1} ${carrier.icon||''} ${cname} drags ${v.icon||''} ${name} forward and offers it to the Fifth Sun.</span>`);
+  setTimeout(()=>{
+    try{
+      animateHit(vid,Math.round(v.maxHp||1),false,true);
+      if(typeof animateArmorShatter==='function')animateArmorShatter(vid);
+      if(typeof fxCard==='function'){const c=fxCard(vid);if(c&&typeof fxClass==='function')fxClass(c,'fx-shake',420);}
+      if(typeof enemySlainFx==='function')enemySlainFx(vid);
+    }catch(e){}
+  },380);
+  setTimeout(()=>{
+    try{
+      /* removed by identity, never by handleDeath */
+      G.enemies=(G.enemies||[]).filter(u=>u&&u.id!==vid);
+      const alive=(G.enemies||[]).filter(u=>u&&u.currentHp>0);
+      alive.forEach(u=>{applyAtkBuff(u,2);applyDefBuff(u,2);});
+      addLog(`<span class="log-gain">\u2600\ufe0f The sun drinks deep \u2014 his host gains ATK/MAG UP \u00d72 and DEF/RES UP \u00d72!</span>`);
+      renderBattle();
+      notify('\u2600\ufe0f His host is empowered!','#ffd060');
+      alive.forEach((u,i)=>setTimeout(()=>{try{animateBuff(u.id);}catch(e){}},i*140));
+    }catch(e){}
+    setTimeout(()=>{try{if(done)done();}catch(e){}},260);
+  },1150);
+}
+/* v1115: both rites, in order, behind one entry point. Only one of them can fire in a single
+   battle today -- the Sun's Demand is suppressed when Tonatiuh is the patron or in the party
+   (eventSuppressed, u_tonatiuh) -- but chaining costs nothing and settles the ordering question
+   permanently. Every caller now comes through here rather than calling runSacrificeRite directly. */
+function runSacrificeRites(done){ runSacrificeRite(()=>runEnemySacrificeRite(done)); }
 /* v984: the Sacrifice Slot rite. The victim is on the field as a normal card; it bleeds, dies and
    is removed, then the surviving party lights up. Nothing routes through handleDeath, so no
    casualty is recorded and a Perfect Battle survives. */
@@ -15234,16 +15452,26 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   }
   if(ab==='Patolli Gamble'&&aa.length){
     const roll=Math.floor(Math.random()*6)+1;
-    /* v1111: roll 6 nerfed 4.0 -> 3.2. Rolls 2-5 are untouched. Chimalli (v1100) does not change
-       any single Patolli number, it lengthens the fight by its own percentage and so buys
-       proportionally more rolls -- which fattens the tail rather than the mean. Roll 6 carried
-       16.0 of the 39.55 total MAG-multiples across the six faces against a party of four (40%),
-       and was 2.43x an average cast; at 3.2 it is 12.8 of 36.35 (35%) and 2.11x average. That is
-       -20% on roll 6 itself but only -8.1% on the ability's total output across the six faces --
-       the point is flattening the spike, not cutting the average.
+    /* v1117 [Genaro]: near-mirror of the PLAYER table. v1111 had cut roll 6 alone (4.0 -> 3.2)
+       and left 2-5 at a flat 1.50x the player's 1.1/1.3/1.6/1.8 -- so face 6 was already almost
+       mirrored (1.07x) while the faces that actually killed parties were half again as strong.
+       Face 5 was the real problem: 2.7xMAG as an AoE was 32% of total output against a party of
+       five, and it lands on 1 roll in 6 (Jumping Beans biases 5-6 upward for the PLAYER only, so
+       the boss keeps a flat d6 -- see rollPatolli).
+                    player   old      new     new/player
+         face 2      1.10     1.65     1.20      1.09
+         face 3      1.30     1.95     1.40      1.08
+         face 4      1.60     2.40     1.75      1.09
+         face 5      1.80     2.70     2.00      1.11
+         face 6      3.00     3.20     3.10      1.03
+       Total MAG-multiples across the six faces vs a party of five: 42.25 -> 34.75, i.e. -17.8%
+       on the ability's whole output, landing the boss at 1.07x the player rather than 1.30x.
+       Against a party of four it is -18.4% and the same 1.07x, so the ratio is party-size stable.
+       Xochipilli also lost one escort this build (see buildXochipilliFight), which cuts incoming
+       damage further on top of this -- judge the two together, not separately.
        Note this branch never crits -- unlike Ball Strike and Craft Shard beside it, it skips
        critify -- so these multipliers are hard ceilings, not averages. */
-    const mults=[0,0,1.65,1.95,2.4,2.7,3.2];const hits=[0,0,1,2,3,0,0];
+    const mults=[0,0,1.2,1.4,1.75,2.0,3.1];const hits=[0,0,1,2,3,0,0];
     addLog(`<span class="log-ab">🎭 Patolli Gamble — rolled <strong>${roll}</strong>!</span>`);
     if(roll===1){
       aa.forEach(a=>{const h=applyArmorDamage(a,1,true);if(h>0){a.currentHp=Math.max(0,a.currentHp-h);G._animQueue.push({uid:a.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,a);if(a.currentHp<=0)handleDeath(a);}});
@@ -17137,6 +17365,23 @@ function startCipactliPhase(){
      behind the text -- the same fault hit the B5 taunt. hideMo() has run onDismiss on every
      close path since v785, so a stall is no longer reachable and the net is pure downside. */
 }
+/* v1124 [Genaro]: event-boss victories now scale with depth -- +10 Flowers per layer, ADDED to
+   the flat reward each boss already paid, so beating Xochipilli at L8 is worth more than beating
+   him at L2 rather than the same 30 either way.
+   Additive rather than replacing: a straight 10-per-layer would have made every fight above L5
+   better and every fight below it WORSE (L1 would drop 50 -> 10), which is the opposite of the ask.
+   Applied only where a Flower reward already exists -- the repeat win. The FIRST win still pays
+   nothing but the unlock modal, deliberately left as it was: the unlock is the reward, and turning
+   it into a currency payout is a design change rather than a scaling one. One line per branch if
+   that is wanted later.
+   Clamped to 1-9 so an out-of-range G.layer can never mint Flowers. */
+const EVENT_BOSS_FP_PER_LAYER=10;
+function eventBossFlowers(base){
+  const L=Math.max(1,Math.min(9,G.layer||1));
+  const total=(base||0)+EVENT_BOSS_FP_PER_LAYER*L;
+  G.res.flower+=total;
+  return total;
+}
 function handleDeath(dead){
   if(dead.currentHp>0)return;
   /* v825: the pip tooltip hides on mouseleave, which never fires when the card is torn out of the
@@ -17318,37 +17563,37 @@ function handleDeath(dead){
       if(!tonatiuhUnlocked()){
         V['tonatiuh_unlocked']=true;saveV();
         setTimeout(()=>showMo('☀️','New Patron Unlocked!',`<div style="text-align:center;padding:.5rem 0"><div style="${godIconHtml(GODS.find(g=>g.id==='tonatiuh')||{id:'tonatiuh',icon:'☀️',name:'tonatiuh'},56)}<div style="font-size:16px;font-weight:600;color:#ffd060;margin-bottom:.25rem">Tonatiuh</div><div style="font-size:12px;color:#c09030;margin-bottom:.75rem">Shining God of the Fifth Sun</div><div style="font-size:12px;color:var(--td);line-height:1.6">He can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs, and recruited via <strong style="color:#d4af37">Flowers summon</strong> mid-run.</div></div>`,[{label:'Embrace the Sun',fn:()=>{}}]),400);
-      }else{G.res.flower+=50;notify('☀️ Tonatiuh is pleased — +50 FP!','#ffd060');}
+      }else{const _fp=eventBossFlowers(50);notify('☀️ Tonatiuh is pleased — +'+_fp+' FP!','#ffd060');}
     }
     if(dead.id.startsWith('boss_patecatl')){ // v336: Apothecary challenge win
       if(!patecatlUnlocked()){
         V['patecatl_unlocked']=true;saveV();
         setTimeout(()=>showMo('🍶','New Patron Unlocked!',`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'patecatl',icon:'🍶',name:'Patecatl',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#c0e060;margin:.5rem 0 .25rem">Patecatl</div><div style="font-size:12px;color:#90b040;margin-bottom:.75rem">Apothecary God of Medicine</div><div style="font-size:12px;color:var(--td);line-height:1.6">He can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs, and recruited via <strong style="color:#d4af37">Flowers summon</strong> mid-run.</div></div>`,[{label:'Take the Remedy',fn:()=>{}}]),400);
-      }else{G.res.flower+=50;notify('🍶 Patecatl is pleased — +50 FP!','#c0e060');}
+      }else{const _fp=eventBossFlowers(50);notify('🍶 Patecatl is pleased — +'+_fp+' FP!','#c0e060');}
     }
     if(dead.id.startsWith('boss_xochiquetzal')){ /* v1079: The Flower Offering */
       if(!xochiquetzalUnlocked()){
         V['xochiquetzal_unlocked']=true;saveV();
         setTimeout(()=>showMo('\u{1F338}','New Patron Unlocked!',`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'xochiquetzal',icon:'\u{1F338}',name:'Xochiquetzal',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#f090c0;margin:.5rem 0 .25rem">Xochiquetzal</div><div style="font-size:12px;color:#c07098;margin-bottom:.75rem">Princess Goddess of Flowers and Beauty</div><div style="font-size:12px;color:var(--td);line-height:1.6">She can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs, and recruited via <strong style="color:#d4af37">Flowers summon</strong> mid-run.</div></div>`,[{label:'Take the Flower',fn:()=>{}}]),400);
-      }else{G.res.flower+=50;notify('\u{1F338} Xochiquetzal is pleased \u2014 +50 FP!','#f090c0');}
+      }else{const _fp=eventBossFlowers(50);notify('\u{1F338} Xochiquetzal is pleased \u2014 +'+_fp+' FP!','#f090c0');}
     }
     if(dead.id.startsWith('boss_toci')){ /* v1074: The Grandmother's Temazcal */
       if(!tociUnlocked()){
         V['toci_unlocked']=true;saveV();
         setTimeout(()=>showMo('\u2668\ufe0f','New Patron Unlocked!',`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'toci',icon:'\u2668\ufe0f',name:'Toci',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#ffb060;margin:.5rem 0 .25rem">Toci</div><div style="font-size:12px;color:#d09050;margin-bottom:.75rem">Grandmother Goddess of Steam</div><div style="font-size:12px;color:var(--td);line-height:1.6">She can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs, and recruited via <strong style="color:#d4af37">Flowers summon</strong> mid-run.</div></div>`,[{label:'Sit in the Steam',fn:()=>{}}]),400);
-      }else{G.res.flower+=50;notify('\u2668\ufe0f Toci is pleased \u2014 +50 FP!','#ffb060');}
+      }else{const _fp=eventBossFlowers(50);notify('\u2668\ufe0f Toci is pleased \u2014 +'+_fp+' FP!','#ffb060');}
     }
     if(dead.id.startsWith('boss_huitzilopochtli')){ /* v1062: The War God's Notice */
       if(!huitzilopochtliUnlocked()){
         V['huitzilopochtli_unlocked']=true;saveV();
         setTimeout(()=>showMo('\u{1F426}','New Patron Unlocked!',`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'huitzilopochtli',icon:'\u{1F426}',name:'Huitzilopochtli',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#ffd060;margin:.5rem 0 .25rem">Huitzilopochtli</div><div style="font-size:12px;color:#c0a040;margin-bottom:.75rem">Hummingbird God of War</div><div style="font-size:12px;color:var(--td);line-height:1.6">He can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs, and recruited via <strong style="color:#d4af37">Flowers summon</strong> mid-run.</div></div>`,[{label:'Answer the Drum',fn:()=>{}}]),400);
-      }else{G.res.flower+=50;notify('\u{1F426} Huitzilopochtli is pleased \u2014 +50 FP!','#ffd060');}
+      }else{const _fp=eventBossFlowers(50);notify('\u{1F426} Huitzilopochtli is pleased \u2014 +'+_fp+' FP!','#ffd060');}
     }
     if(dead.id.startsWith('boss_cihuacoatl')){ // v510: Midwife Shrine challenge win
       if(!cihuacoatlUnlocked()){
         V['cihuacoatl_unlocked']=true;saveV();
         setTimeout(()=>showMo('🤱','New Patron Unlocked!',`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'cihuacoatl',icon:'🤱',name:'Cihuacoatl',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#ffd0a0;margin:.5rem 0 .25rem">Cihuacoatl</div><div style="font-size:12px;color:#d0a070;margin-bottom:.75rem">Protector Goddess of Motherhood</div><div style="font-size:12px;color:var(--td);line-height:1.6">She can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs, and recruited via <strong style="color:#d4af37">Flowers summon</strong> mid-run.</div></div>`,[{label:'Embrace Her',fn:()=>{}}]),400);
-      }else{G.res.flower+=50;notify('🤱 Cihuacoatl is pleased — +50 FP!','#ffd0a0');}
+      }else{const _fp=eventBossFlowers(50);notify('🤱 Cihuacoatl is pleased — +'+_fp+' FP!','#ffd0a0');}
     }
     // L5 boss victory flag
     if(dead.id.startsWith('boss_mal')||dead.id.startsWith('boss_xiu')){
@@ -17389,7 +17634,7 @@ function handleDeath(dead){
         V['mixcoatl_unlocked']=true;saveV();
         setTimeout(()=>showMo('🏹','New Patron Unlocked!',`<div style="text-align:center;padding:.5rem 0"><div style="${godIconHtml(GODS.find(g=>g.id==='mixcoatl')||{id:'mixcoatl',icon:'🏹',name:'mixcoatl'},56)}<div style="font-size:16px;font-weight:600;color:#b090e0;margin-bottom:.25rem">Mixcoatl</div><div style="font-size:12px;color:#8070c0;margin-bottom:.75rem">Hunter God of Thunderstorms</div><div style="font-size:12px;color:var(--td);line-height:1.6">He can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs, and recruited via <strong style="color:#d4af37">Flowers summon</strong> mid-run.</div></div>`,[{label:'Claim the Hunt',fn:()=>{}}]),400);
       }else{
-        G.res.flower+=50;notify('🏹 Mixcoatl is pleased — +50 FP!','#b090e0');
+        const _fp=eventBossFlowers(50);notify('🏹 Mixcoatl is pleased — +'+_fp+' FP!','#b090e0');
       }
       G._mixcoatlEventFight=false;
     }
@@ -17407,7 +17652,7 @@ function handleDeath(dead){
       if(!xochipilliUnlocked()){
         V['xochipilli_unlocked']=true;saveV();
         setTimeout(()=>showMo(godIconHtml(GODS.find(g=>g.id==='xochipilli')||{id:'xochipilli',icon:'🎭',name:'Xochipilli'},56),'New Patron Unlocked!',`<div style="text-align:center;padding:.5rem 0"><div style="font-size:16px;font-weight:600;color:#e0a0d0;margin-bottom:.25rem">Xochipilli</div><div style="font-size:12px;color:#c07090;margin-bottom:.75rem">Prince of Flowers · God of Art and Games</div><div style="font-size:12px;color:var(--td);line-height:1.6">He can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs, and recruited via <strong style="color:#d4af37">Flowers summon</strong> mid-run.</div></div>`,[{label:'Accept the Challenge',fn:()=>{}}]),400);
-      }else{G.res.flower+=30;notify('🎭 Xochipilli laughs — +30 FP!','#e0a0d0');}
+      }else{const _fp=eventBossFlowers(30);notify('🎭 Xochipilli laughs — +'+_fp+' FP!','#e0a0d0');}
       G._xochipilliEventFight=false;
     }
     if(dead.id.startsWith('boss_chicomecoatl')){
@@ -17415,7 +17660,7 @@ function handleDeath(dead){
         V['chicomecoatl_unlocked']=true;saveV();
         setTimeout(()=>showMo('🌽','New Patron Unlocked!',`<div style="text-align:center;padding:.5rem 0"><div style="${godIconHtml(GODS.find(g=>g.id==='chicomecoatl')||{id:'chicomecoatl',icon:'🌽',name:'chicomecoatl'},56)}<div style="font-size:16px;font-weight:600;color:#70e070;margin-bottom:.25rem">Chicomecoatl</div><div style="font-size:12px;color:#a0d080;margin-bottom:.75rem">Goddess of Maize and Agriculture</div><div style="font-size:12px;color:var(--td);line-height:1.6">She can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs, and recruited via <strong style="color:#d4af37">Flowers summon</strong> mid-run.</div></div>`,[{label:'Receive Her Blessing',fn:()=>{}}]),400);
       }else{
-        G.res.flower+=50;notify('🌽 Chicomecoatl is pleased — +50 FP!','#d4af37');
+        const _fp=eventBossFlowers(50);notify('🌽 Chicomecoatl is pleased — +'+_fp+' FP!','#d4af37');
       }
       G._chicomecoatlEventFight=false;
     }
@@ -17471,7 +17716,16 @@ function slowBadge(uid){
 
 function armorBadge(armor){if(!armor)return'';return`<div style="margin-top:3px;font-size:10px;color:#60c0e0;font-weight:500">🛡 ${Math.round(armor)}</div>`;}
 function remedyBadge(amt){if(!amt)return'';return`<div style="margin-top:2px"><span class="burn-pip" style="color:#e0d060;border-color:#6a6020;background:#141200">\u2695\uFE0F +${amt} DEF/RES</span></div>`;} /* v961 */
-function turquoiseBadge(amt){if(!amt)return'';return`<div style="margin-top:2px"><span class="burn-pip" style="color:#40d0d0;border-color:#1a6a6a;background:#001414">🐍 +${amt} DEF/RES</span></div>`;}
+/* v1120: takes the UNIT, not a bare amount -- the branch labels live on it.
+   v1121: renders the label the grant recorded. Falls back to the raw flat if the labels are
+   missing, so a unit built by an older path still renders a true figure rather than "+undefined". */
+function turquoiseBadge(u){
+  if(!u)return'';
+  const amt=u._turquoise||0; if(!amt)return'';
+  const ld=u._turquoiseLbl||`+${amt}`,lr=u._turquoiseLblR||ld;
+  const txt=(ld===lr)?`${ld} DEF/RES`:`${ld} DEF / ${lr} RES`;
+  return`<div style="margin-top:2px"><span class="burn-pip" style="color:#40d0d0;border-color:#1a6a6a;background:#001414">🐍 ${txt}</span></div>`;
+}
 
 /* v816: single source for a unit card's displayed level. mkUnitCard honoured u.level while the
    in-place patch branch in renderBattle recomputed it from getLevel() alone -- so a raised undead
@@ -17570,7 +17824,7 @@ function mkUnitCard(u){
     <div class="uc-name" style="color:${u.isGod?'#c8a050':'var(--tx)'}">${liveName(u)} <span class="unit-lv" style="font-size:9px;color:var(--td)">Lv${lv}</span>${typeTag}</div>
     <div class="bar-row"><span class="bar-icon">❤️</span><div class="bar-wrap${(u.armor||0)>0?' has-shield':''}"><div class="bar-fill" style="width:${pct}%;background:${_hpBg}"></div><div class="bar-armor" style="width:${_armPct}%${(u.armor||0)>0?'':';display:none'}"></div><div class="bar-lbl">${fmtN(u.currentHp)}/${fmtN(u.maxHp)}${_over?' \u2191':''}</div><div class="bar-shield-badge"${(u.armor||0)>0?'':' style="display:none"'}>🛡 ${fmtN(Math.round(u.armor||0))}</div></div></div>
     <div class="bar-row"><span class="bar-icon">✨</span><div class="bar-wrap" style="background:#110820"><div class="bar-fill" style="width:${npPct}%;background:linear-gradient(90deg,#5a208a,#9050c0)"></div><div class="bar-lbl">${Math.round(curNP)}/${maxNP}${lthTagCard}</div></div></div>
-    <div class="status-row">${pPips(u.poisonStacks,true)}${bPips(u.burnStacks)}${paraPips(u.paralyzStacks||0)}${slowBadge(u.id)}${woundBadge(u.woundStacks||0)}${lethargyBadge(u.lethargyStacks||0)}${drunkBadge(u.drunkStacks||0)}${atkBuffBadge(u.atkBuffStacks||0,u.atkBuffRounds||0)}${defBuffBadge(u.defBuffStacks||0,u.defBuffRounds||0)}${critBuffBadge(u.critBuffStacks||0,u.critBuffRounds||0)}${turquoiseBadge(u._turquoise||0)}${remedyBadge(u._remedy||0)}</div>
+    <div class="status-row">${pPips(u.poisonStacks,true)}${bPips(u.burnStacks)}${paraPips(u.paralyzStacks||0)}${slowBadge(u.id)}${woundBadge(u.woundStacks||0)}${lethargyBadge(u.lethargyStacks||0)}${drunkBadge(u.drunkStacks||0)}${atkBuffBadge(u.atkBuffStacks||0,u.atkBuffRounds||0)}${defBuffBadge(u.defBuffStacks||0,u.defBuffRounds||0)}${critBuffBadge(u.critBuffStacks||0,u.critBuffRounds||0)}${turquoiseBadge(u)}${remedyBadge(u._remedy||0)}</div>
     <div class="uc-foot" style="font-size:10px;margin-top:2px;min-height:12px">${ucFootHtml(u)}</div></div>`; /* v1045: always emitted and always reconciled -- see ucFootHtml. The v611 note about the patcher not reconciling this footer no longer applies. */
   setCardIconBtn(d,u); // v353: icon = detail button (only while selected)
   return d;
@@ -17758,7 +18012,7 @@ function renderBattle(){
       const _np=u.currentNP||0,_mnp=u.maxNP||1,_npPct=Math.round(_np/_mnp*100);
       const existing=_psOldCards.get(u.id);
       if(existing&&!existing.classList.contains('fallen-ally')&&u.currentHp>0){
-        patchBarsOnEl(existing,_pct,`${Math.round(u.currentHp)}/${u.maxHp}`,_npPct,`${Math.round(_np)}/${_mnp}`,pPips(u.poisonStacks,true)+bPips(u.burnStacks)+paraPips(u.paralyzStacks||0)+slowBadge(u.id)+woundBadge(u.woundStacks||0)+lethargyBadge(u.lethargyStacks||0)+drunkBadge(u.drunkStacks||0)+atkBuffBadge(u.atkBuffStacks||0,u.atkBuffRounds||0)+defBuffBadge(u.defBuffStacks||0,u.defBuffRounds||0)+critBuffBadge(u.critBuffStacks||0,u.critBuffRounds||0)+turquoiseBadge(u._turquoise||0)+remedyBadge(u._remedy||0),u.armor||0,u.maxHp);
+        patchBarsOnEl(existing,_pct,`${Math.round(u.currentHp)}/${u.maxHp}`,_npPct,`${Math.round(_np)}/${_mnp}`,pPips(u.poisonStacks,true)+bPips(u.burnStacks)+paraPips(u.paralyzStacks||0)+slowBadge(u.id)+woundBadge(u.woundStacks||0)+lethargyBadge(u.lethargyStacks||0)+drunkBadge(u.drunkStacks||0)+atkBuffBadge(u.atkBuffStacks||0,u.atkBuffRounds||0)+defBuffBadge(u.defBuffStacks||0,u.defBuffRounds||0)+critBuffBadge(u.critBuffStacks||0,u.critBuffRounds||0)+turquoiseBadge(u)+remedyBadge(u._remedy||0),u.armor||0,u.maxHp);
         const isSel=u.id===G.selectedActorId;
         const isAct=G.actedIds.has(u.id);
         const isAllyTarget=G.battlePhase==='player_ally_targeting'&&u.isAlly&&u.currentHp>0;
@@ -17806,6 +18060,10 @@ function renderBattle(){
   renderActionPanel();
   // Log
   const bl=document.getElementById('blog');bl.innerHTML=G.log.map(l=>`<div>${l}</div>`).join('');bl.scrollTop=bl.scrollHeight;
+  /* v1125: AFTER the repaint, never before. Called at the top of this function the anchor is
+     still connected and the check passes, and then the very repaint we were guarding against
+     detaches it -- the tooltip survives and the fix does nothing. */
+  relicTipReap();
 }
 
 function alignActPanel(){ // v600: dock the panel under the selected actor's card
@@ -19670,12 +19928,22 @@ function showUnitTooltip(u){
   /* v826: _sk passes the surge key (v822). Written as a block comment -- the v822 edit used a
      trailing // here, which swallowed `const T=_ol.total;` and threw ReferenceError: T is not
      defined on every stat-modal open. */
-  const _isTl=u._isTlaloque||isTlaloqueUnit(u);const _ol=offeringStatLayer({hp,atk,mag,def,res,tp:np},u.element,u.isGod,bo.type,u._turquoise||0,_isTl,!!u.isPatron,_sk,_tk);const T=_ol.total; /* v639: azure-aware · v1107: _tk is the capture key, matching capKey() on the battle unit */
+  const _isTl=u._isTlaloque||isTlaloqueUnit(u);const _ol=offeringStatLayer({hp,atk,mag,def,res,tp:np},u.element,u.isGod,bo.type,u._turquoise||0,_isTl,!!u.isPatron,_sk,_tk,u._remedy||0);const T=_ol.total; /* v639: azure-aware · v1107: _tk is the capture key, matching capKey() on the battle unit */
   // v642: Elemental Synergy joins the modal math — same +max(1,round(stat×pct)) bump the battle build applies, in the same order (after offerings, before buffs)
   // v672: gods carry two HP multipliers the generic stat layer never saw — the DT node (applied inside
   // mkGod, before Soul Surge) and God Affinity (applied by applyAff, 1.1^n per other deployed god).
   // Without these the modal showed base HP while Temazcal and battle showed a value up to ~1.8x higher.
   const _affInfo=(()=>{const a=calcAffinity();return (u.isGod&&G.dte&&G.dte.godAffinity&&a.count>0)?a:null;})(); // v828
+  /* v1122 [Genaro]: Divine Strength was INVISIBLE here. It is applied for real -- buildBattleUnits
+     multiplies every god's ATK/MAG/DEF/RES by G.dte.godStatsMult and logs it -- but this modal
+     rebuilds stats from the template and never read the node, so a player who had just spent 200
+     TEOTL saw identical numbers and reasonably concluded it had done nothing.
+     Fourth time a DT god multiplier has been applied in battle and omitted from the modal: v672
+     godHpMult, v733 its attribution, v828 God Affinity, v673 Pantheon Boost. Placed BEFORE the
+     Pantheon Boost line to match buildBattleUnits, where godStatsMult runs first and Pantheon
+     multiplies its result -- the two are chained, not summed, so order changes the rounding. */
+  const _dsInfo=(()=>{const m=(G.dte&&G.dte.godStatsMult)||1;return (u.isGod&&m>1)?{mult:m}:null;})();
+  if(_dsInfo){const m=_dsInfo.mult;T.atk=Math.round(T.atk*m);T.mag=Math.round(T.mag*m);T.def=Math.round(T.def*m);T.res=Math.round(T.res*m);}
   const _pbInfo=(()=>{const t=(G.dte&&G.dte.pantheonBoostTiers)||0;const n=calcAffinity().count;
     return (u.isGod&&t>0&&n>0)?{tiers:t,count:n,mult:1+0.025*t*n}:null;})();
   if(_pbInfo){const m=_pbInfo.mult;T.atk=Math.round(T.atk*m);T.mag=Math.round(T.mag*m);T.def=Math.round(T.def*m);T.res=Math.round(T.res*m);}
@@ -19706,6 +19974,10 @@ function showUnitTooltip(u){
     const _t=[];if(DT&&DT.unlocked&&DT.unlocked.has('ally_special_up'))_t.push('I');if(DT&&DT.unlocked&&DT.unlocked.has('ally_special_up_2'))_t.push('II');
     return '<div style="margin-top:6px;font-size:11px;color:#c0a0e0">\u2726 Vassal Health Boost'+(_t.length?' '+_t.join('+'):'')+': <strong>\u00d7'+_vhm.toFixed(2)+' HP</strong></div>';})(); // v732
   const _pbLine=_pbInfo?('<div style="margin-top:6px;font-size:11px;color:#c0a0e0">\u2726 Pantheon Boost: <strong>\u00d7'+_pbInfo.mult.toFixed(2)+' ATK/MAG/DEF/RES</strong> ('+_pbInfo.count+' other god'+(_pbInfo.count>1?'s':'')+' deployed)</div>'):'';
+  /* v1122: names the tiers owned, matching the God/Vassal Health Boost lines. */
+  const _dsLine=(()=>{if(!_dsInfo)return '';
+    const _d=[];if(DT&&DT.unlocked&&DT.unlocked.has('god_stats_1'))_d.push('I');if(DT&&DT.unlocked&&DT.unlocked.has('god_stats_2'))_d.push('II');
+    return '<div style="margin-top:6px;font-size:11px;color:#c0a0e0">\u2726 Divine Strength'+(_d.length?' '+_d.join('+'):'')+': <strong>\u00d7'+_dsInfo.mult.toFixed(2)+' ATK/MAG/DEF/RES</strong></div>';})();
   const _abS=u.atkBuffStacks||0,_dbS=u.defBuffStacks||0,_cbS=u.critBuffStacks||0;
   const _abM=1+0.10*_abS,_dbM=1+0.10*_dbS;
   if(_abM>1){T.atk=Math.round(T.atk*_abM);T.mag=Math.round(T.mag*_abM);}
@@ -19788,7 +20060,7 @@ function showUnitTooltip(u){
     +patronLine
     +abilLine
     +oblLine
-    +(_synInfo?('<div style="font-size:11px;color:#d4af37;margin-top:4px">🔗 Elemental Synergy: +'+Math.round(_synInfo.pct*100)+'% ATK/MAG/DEF/RES ('+_synInfo.count+' bond'+(_synInfo.count>1?'s':'')+')</div>'):'')+_affLine+_pbLine+_vhLine+_ghLine
+    +(_synInfo?('<div style="font-size:11px;color:#d4af37;margin-top:4px">🔗 Elemental Synergy: +'+Math.round(_synInfo.pct*100)+'% ATK/MAG/DEF/RES ('+_synInfo.count+' bond'+(_synInfo.count>1?'s':'')+')</div>'):'')+_affLine+_dsLine+_pbLine+_vhLine+_ghLine
     +offSec
     +buffSec
     +'</div>';
