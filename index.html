@@ -213,6 +213,10 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 /* v1167: was a hard 3 columns at 760px. auto-fill lets the grid widen to 4-5 across as the
    roster grows, instead of running ever further down the page. */
 .god-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:1100px;margin:.5rem auto}
+/* v1169: blacked-out sprite for a locked god. brightness(0) flattens the art to a
+   silhouette while keeping its exact shape. */
+.god-silhouette{display:inline-flex}
+.god-silhouette img{filter:brightness(0) saturate(0);opacity:.6}
 .god-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;margin-bottom:.5rem}
 .god-head-l{grid-row:1;grid-column:1;display:flex;gap:8px;align-items:center;justify-self:start}
 .god-head-c{grid-row:1;grid-column:2;text-align:center}
@@ -1139,7 +1143,7 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
     </div>
   </div>
   <div id="god-tecpatl-hdr" style="text-align:center;margin-bottom:.5rem;display:none"></div>
-  <div id="god-detail-panel" style="margin-bottom:.75rem;background:#1e1408;border:0.5px solid var(--br);border-radius:12px;padding:.75rem 1rem;display:none;position:sticky;top:0;z-index:30;box-shadow:0 6px 14px rgba(0,0,0,.45)"><!-- v626: sticky — with the full pantheon unlocked, bottom-row picks updated a panel scrolled out of view -->
+  <div id="god-detail-panel" style="margin-bottom:.75rem;background:#1e1408;border:0.5px solid var(--br);border-radius:12px;padding:.75rem 1rem;display:block;min-height:150px;position:sticky;top:0;z-index:30;box-shadow:0 6px 14px rgba(0,0,0,.45)"><!-- v626: sticky — with the full pantheon unlocked, bottom-row picks updated a panel scrolled out of view -->
     <div style="display:flex;align-items:stretch;gap:14px">
       <span id="gdp-icon" style="display:flex;align-items:center;justify-content:center;min-width:96px;flex-shrink:0"></span>
       <div style="flex:1;min-width:0">
@@ -3426,7 +3430,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1168'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1170'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -7758,46 +7762,28 @@ function renderGods(){
   let lockedShown=0;
   GODS.forEach(gd=>{
     const locked=gd.locked&&!godUnlocked(gd.id); // v808: see unlockedCount above
-    const chosen=G.god&&G.god.id===gd.id;
+    const chosen=(G.god&&G.god.id===gd.id)||(gd.locked&&!godUnlocked(gd.id)&&G._lockedSel===gd.id); // v1170
     const d=document.createElement('div');
     d.className='god-card'+(chosen?' chosen':'')+(locked?' locked':'')+((!locked&&isBlessedGod(gd.id))?' blessed-god':''); /* v935 */
     if(locked){
       if(lockedShown>=maxLockedVisible){return;} lockedShown++;
-      /* v1167: glyph only. The criteria text was the tallest element in the grid and stretched
-         every row it appeared in; it now lives in a tooltip instead. */
+      /* v1169: the unlock criteria goes in the detail panel now, with the god's own sprite
+         blacked out -- so a locked pick reads like every other pick instead of a hover-only
+         tooltip that could land off-screen. */
       d.innerHTML=`<div style="font-size:28px">❓</div>`;
-      d.style.cursor='help';
-      const _lockTip=function(){
-        const tt=document.getElementById('relic-tooltip');if(!tt)return;
-        tt.innerHTML='<strong style="color:#d4af37">🔒 Locked</strong><br><span style="color:var(--td)">'+gd.unlockCriteria+'</span>';
-        tt.style.display='block';
-        /* v1168: measure AFTER display:block, then centre on the tile and flip above when
-           there is no room below -- it was fixed to r.bottom, so a locked god on the last
-           row put the tooltip over the next row or off the bottom of the screen. */
-        const r=d.getBoundingClientRect();
-        const vw=window.innerWidth||960, vh=window.innerHeight||700;
-        const tw=tt.offsetWidth||220, th=tt.offsetHeight||70;
-        let left=r.left+r.width/2-tw/2;
-        left=Math.max(8,Math.min(left,vw-tw-8));
-        let top=r.bottom+8;
-        if(top+th>vh-8)top=r.top-th-8;
-        if(top<8)top=8;
-        tt.style.left=left+'px';
-        tt.style.top=top+'px';
-      };
-      d.onmouseenter=_lockTip;
-      d.onmouseleave=function(){relicTipHide();};
-      d.ontouchstart=function(ev){ev.stopPropagation();_lockTip();};
       d.onclick=()=>{
-        const panel=document.getElementById('god-detail-panel');if(panel)panel.style.display='none';
-        _lockTip(); /* tap on desktop shows it too -- the tile has no other action */
+        /* v1170: a locked pick is NOT a selection -- clear it and disarm the button. */
+        G.god=null;
+        G._lockedSel=gd.id;
+        const _cb=document.getElementById('confirm-god');if(_cb)_cb.disabled=true;
+        renderGods();
       };
     }else{
       const personalTp=DT.godTecpatl&&DT.godTecpatl[gd.id]?DT.godTecpatl[gd.id]:0;
       const tpHeader='';
       const _conq=godConquered(gd.id)?' <span title="Mictlan conquered" style="color:#d4af37">\u2605</span>':''; // v824
       d.innerHTML=`${tpHeader}<div style="height:64px;display:flex;align-items:center;justify-content:center;margin-bottom:4px">${godIconHtml(gd,52)}</div><div class="jersey" style="font-size:18px;color:${chosen?'#d4af37':'var(--tx)'}">${gd.name}${_conq}</div>`; // v630: tile pills reverted — the ask was pills in descriptions, not on tiles
-      d.onclick=()=>{G.god=gd;document.getElementById('confirm-god').disabled=false;renderGods();showGodDetail(gd);};
+      d.onclick=()=>{G.god=gd;G._lockedSel=null;/* v1170 */document.getElementById('confirm-god').disabled=false;renderGods();showGodDetail(gd);};
     }
     /* v935: four drifting sparks, positioned inside the card. The card is position:relative via
        .god-card, so these ride with it rather than needing body-level coordinates. */
@@ -7816,8 +7802,40 @@ function renderGods(){
     }
     el.appendChild(d);
   });
+  /* v1169: with no selection the panel shows the placeholder rather than vanishing. */
+  if(!G.god){
+    const _lk=G._lockedSel?GODS.find(x=>x.id===G._lockedSel):null;
+    if(_lk)showGodLocked(_lk); else showGodPlaceholder();
+  }
 }
 
+/* v1169: shared reset so no badge or stat from a previous selection survives into the
+   placeholder or a locked view. */
+function _gdpClear(){
+  ['gdp-conquered','gdp-blessed'].forEach(function(id){const e=document.getElementById(id);if(e)e.remove();});
+  const tp=document.getElementById('gdp-tecpatl');if(tp)tp.style.display='none';
+  ['gdp-elem','gdp-type'].forEach(function(id){const e=document.getElementById(id);if(e)e.innerHTML='';});
+}
+function showGodPlaceholder(){
+  const panel=document.getElementById('god-detail-panel');if(!panel)return;
+  _gdpClear();
+  document.getElementById('gdp-icon').innerHTML='<span style="font-size:64px;opacity:.25">✦</span>';
+  document.getElementById('gdp-name').innerHTML=''; /* v1170: the screen title already says it */
+  const fl=document.getElementById('gdp-flavor');if(fl)fl.textContent='Pick a deity below to see its powers';
+  document.getElementById('gdp-passive').innerHTML='';
+  document.getElementById('gdp-ability').innerHTML='';
+  panel.style.display='block';
+}
+function showGodLocked(gd){
+  const panel=document.getElementById('god-detail-panel');if(!panel)return;
+  _gdpClear();
+  document.getElementById('gdp-icon').innerHTML='<span class="god-silhouette">'+godIconHtml(gd,96)+'</span>';
+  document.getElementById('gdp-name').innerHTML='<span style="color:#8a7a5a">???</span>';
+  const fl=document.getElementById('gdp-flavor');if(fl)fl.textContent='Unknown deity';
+  document.getElementById('gdp-passive').innerHTML='<strong style="color:#d4af37">🔒 Locked</strong>';
+  document.getElementById('gdp-ability').innerHTML='<span style="color:var(--td)">'+gd.unlockCriteria+'</span>';
+  panel.style.display='block';
+}
 function showGodDetail(gd){
   const panel=document.getElementById('god-detail-panel');
   if(!panel)return;
