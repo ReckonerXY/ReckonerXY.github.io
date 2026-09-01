@@ -182,6 +182,12 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 @keyframes lvFloat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-18px)}}
 .lv-float{position:absolute;right:6px;top:-8px;color:#d4af37;font-weight:600;font-size:13px;pointer-events:none;animation:lvFloat .7s ease-out forwards}
 @keyframes tabPulse{0%,100%{box-shadow:0 0 0 0 rgba(212,175,55,0)}50%{box-shadow:0 0 8px 2px rgba(212,175,55,.55)}}
+/* v1163 FTUE: at 160% text the codex CTA and the shop Continue both sat below the fold, which
+   reads as a softlock. Both are pinned instead of shrinking the text. position:sticky keeps them
+   IN FLOW, so they settle naturally once the page is scrolled to the end. */
+.story-cta{position:sticky;bottom:0;margin-top:1.5rem;padding:10px 0 8px;text-align:center;background:var(--bd);z-index:5}
+.shop-sticky{position:sticky;top:0;z-index:40;background:var(--bd);box-shadow:0 4px 8px rgba(0,0,0,.35)}
+.shop-sticky .res-bar{position:static;box-shadow:none;margin-bottom:.3rem}
 .tab-pulse{animation:tabPulse 1.4s ease-in-out infinite}
 .ftue-tip{font-size:13px;color:#d4af37;background:#1a1400;border:0.5px solid #5a4a10;border-radius:8px;padding:8px 11px;margin-bottom:8px}
 /* v306: bigger touch targets in the Tianguis — !important beats per-button inline styles */
@@ -1072,7 +1078,7 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
     <h2 id="story-title" style="text-align:center;color:var(--am);margin-bottom:.5rem;font-size:18px">Itzucuintlan</h2>
     <div id="story-subtitle" style="font-size:11px;color:#6a5a30;text-align:center;margin-bottom:.75rem;font-style:italic">"The Place Where the Dog Lives"</div>
     <div id="story-text" style="font-size:13px;color:var(--td);line-height:1.9"></div>
-    <div style="text-align:center;margin-top:1.5rem"><button class="btn" id="story-btn" style="padding:9px 24px" disabled>Choose Your God</button></div>
+    <div class="story-cta"><button class="btn" id="story-btn" style="padding:9px 24px" disabled>Choose Your God</button></div>
   </div>
 </div>
 
@@ -1208,10 +1214,12 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 </div>
 
 <div id="screen-shop" class="screen">
+  <div class="shop-sticky">
   <div class="res-bar emph-blood" id="rb-shop"></div><!-- v622: training tab is the default → blood emphasized -->
   <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">
     <h2 style="margin-bottom:.15rem;font-size:17px">Sacred Tianguis</h2>
     <button id="continue-btn" class="btn" onclick="if(ftueGateBlocked()){ftueJumpToStep();return;}G._pulseContinue=false;this.classList.remove('btn-pulse');continueFx(this);G._contFn?G._contFn():maybeWarnTemazcal()">Continue to Next Battle</button>
+  </div>
   </div>
   <div id="tecpatl-panel-shop"></div>
   <div class="relic-bar" id="relic-bar-shop"></div>
@@ -20374,6 +20382,33 @@ function ftueJumpToStep(){
     if(glow){try{glow.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){}}
   },80);
 }
+/* v1163: bring the current tutorial cue on screen. Guarded on the pending step so it fires
+   once per step change, never on every re-render -- and skipped entirely when the cue is already
+   visible, so it cannot yank the page while the player is reading. */
+let _ftueCueKey='';
+function ftueScrollToCue(){
+  try{
+    const st=(typeof ftuePendingStep==='function')?ftuePendingStep():null;
+    const key=String(st||'')+'|'+(G&&G._pulseContinue?'cont':'');
+    if(key===_ftueCueKey)return;
+    _ftueCueKey=key;
+    requestAnimationFrame(function(){
+      try{
+        let el=null;
+        if(G&&G._pulseContinue)el=document.getElementById('continue-btn');
+        if(!el){
+          ['panel-training','panel-mercs'].forEach(function(p){
+            if(el)return;
+            const pane=document.getElementById(p);
+            if(pane&&pane.classList.contains('active'))el=pane.querySelector('.tab-pulse')||pane.querySelector('.ftue-tip');
+          });
+        }
+        if(!el)el=document.querySelector('#screen-shop .tab-pulse');
+        if(el&&!_asFullyVisible(el))el.scrollIntoView({behavior:'smooth',block:'center'});
+      }catch(e){}
+    });
+  }catch(e){}
+}
 function ftueGateUpdate(){
   // v641 debloat: Temazcal tab appears only after the patron has been trained (first run);
   // the 'Level up allies' tip hides while the patron-weak tip is on stage, then returns gendered.
@@ -20397,6 +20432,7 @@ function ftueGateUpdate(){
     G._pulseContinue=true; // v595: armed HERE — the gate clearing IS the moment to point at Continue
     if(cont){cont.disabled=false;cont.style.display='';cont.classList.remove('btn-ghost');cont.removeAttribute('title');cont.classList.add('lv-burst');setTimeout(()=>{cont.classList.remove('lv-burst');if(G._pulseContinue&&!cont.disabled)cont.classList.add('btn-pulse');},700);}
     notify('⚔ The gods are satisfied — battle awaits!','#d4af37');
+    ftueScrollToCue(); // v1163: this branch returns early -- point at Continue
     return;
   }
   // v711: visible but greyed while the gate is pending (v603 hid it; a missing button read as a broken
@@ -20416,6 +20452,7 @@ function ftueGateUpdate(){
   if(s1&&(!s2||!s3)){const tb=document.getElementById('tab-mercs');const _onPanel=document.getElementById('panel-mercs')&&document.getElementById('panel-mercs').classList.contains('active');if(tb&&!_onPanel)tb.classList.add('tab-pulse');} /* v652: once here, the glow moves to the Restore / Hire buttons */
   else if(s1&&s2&&s3&&!s4&&epBtn)epBtn.classList.add('tab-pulse');
   // v641 debloat: the 'Complete to unlock' checklist header is gone — the step tips carry the guidance
+  ftueScrollToCue(); // v1163
 }
 function showShop(){
   // v536: Tianguis Decay penance — chance the market is skipped entirely between battles.
@@ -20476,7 +20513,7 @@ function showShop(){
   // First-ever Tianguis intro popup
   if(!V['tianguis_intro_seen']){
     V['tianguis_intro_seen']='1';saveV();
-    showMo('🏪','Welcome to the Sacred Tianguis!',
+    showMo('<svg class="tl tl-cacao" style="width:1.6em;height:1.6em"><use href="#tl-cacao"/></svg>','Welcome to the Sacred Tianguis!',
       `<div style="font-size:13px;line-height:1.6">Here you can spend your earned resources:<br><br>
        <span style="color:#e05050"><svg class="tl tl-blood" style="width:1.9em;height:1.9em;vertical-align:-.52em"><use href="#tl-blood"/></svg> <strong>Blood</strong></span> — Level up your allies to make them more powerful.<br><br>
        <span style="color:#c0844a"><svg class="tl tl-cacao" style="width:1.9em;height:1.9em;vertical-align:-.52em"><use href="#tl-cacao"/></svg> <strong>Cacao</strong></span> — Restore your unit HP and TP (Tonalli Points) and hire new allies!</div>`,
