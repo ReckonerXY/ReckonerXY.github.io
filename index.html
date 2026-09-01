@@ -185,7 +185,10 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 /* v1163 FTUE: at 160% text the codex CTA and the shop Continue both sat below the fold, which
    reads as a softlock. Both are pinned instead of shrinking the text. position:sticky keeps them
    IN FLOW, so they settle naturally once the page is scrolled to the end. */
-.story-cta{position:sticky;bottom:0;margin-top:1.5rem;padding:10px 0 8px;text-align:center;background:var(--bd);z-index:5}
+/* v1165: the CTA is sticky, so while the page is mid-scroll it floats OVER the last line.
+   Reserving space under the text means the final paragraph can never end up behind it. */
+.story-cta{position:sticky;bottom:0;margin-top:.6rem;padding:8px 0 6px;text-align:center;background:var(--bd);z-index:5}
+#story-text{padding-bottom:.5rem}
 .shop-sticky{position:sticky;top:0;z-index:40;background:var(--bd);box-shadow:0 4px 8px rgba(0,0,0,.35)}
 .shop-sticky .res-bar{position:static;box-shadow:none;margin-bottom:.3rem}
 .tab-pulse{animation:tabPulse 1.4s ease-in-out infinite}
@@ -207,8 +210,14 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .cap-pop{background:#0a2a14;border:1.5px solid #2a8a50;border-radius:12px;padding:1rem;margin-bottom:.75rem;text-align:center;animation:pi .3s ease}
 @keyframes pi{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
 .phase-ban{text-align:center;padding:.4rem;border-radius:8px;margin-bottom:.75rem;font-size:13px;font-weight:500;background:#1a1a2a;border:0.5px solid #3a3a6a}
-.god-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:760px;margin:.75rem auto}
-.god-card{background:var(--bm);border:1.5px solid var(--br);border-radius:12px;padding:.55rem .4rem;cursor:pointer;text-align:center;transition:border-color .15s,background .15s;position:relative;min-width:0;display:flex;flex-direction:column;align-items:center}
+/* v1167: was a hard 3 columns at 760px. auto-fill lets the grid widen to 4-5 across as the
+   roster grows, instead of running ever further down the page. */
+.god-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:1100px;margin:.5rem auto}
+.god-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;margin-bottom:.5rem}
+.god-head-l{grid-row:1;grid-column:1;display:flex;gap:8px;align-items:center;justify-self:start}
+.god-head-c{grid-row:1;grid-column:2;text-align:center}
+.god-head-r{grid-row:1;grid-column:3;justify-self:end}
+.god-card{flex:0 1 190px;background:var(--bm);border:1.5px solid var(--br);border-radius:12px;padding:.55rem .4rem;cursor:pointer;text-align:center;transition:border-color .15s,background .15s;position:relative;min-width:0;display:flex;flex-direction:column;align-items:center}
 .god-card:hover{border-color:#d4af37;background:#221a08}.god-card.chosen{border-color:#d4af37;background:#2a1e0a;box-shadow:0 0 0 2px #d4af3740}
 .god-card.locked{cursor:default;opacity:.5;border-style:dashed}.god-card.locked:hover{border-color:var(--br);background:var(--bm)}
 .victory-mark{position:absolute;top:8px;right:8px;font-size:14px;color:#d4af37}
@@ -1072,7 +1081,7 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 </div>
 
 <div id="screen-story" class="screen">
-  <div style="max-width:480px;margin:0 auto;padding-top:.5rem">
+  <div class="story-wrap" style="max-width:820px;margin:0 auto;padding-top:.5rem">
     <div id="story-codex" style="font-size:11px;color:#6a5a30;text-align:center;margin-bottom:.5rem;letter-spacing:1px;font-style:italic">CODEX I: MICTLAN</div>
     <div id="story-icon" style="font-size:32px;text-align:center;margin-bottom:.5rem">🌒</div>
     <h2 id="story-title" style="text-align:center;color:var(--am);margin-bottom:.5rem;font-size:18px">Itzucuintlan</h2>
@@ -1116,12 +1125,19 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
   <div id="champ-list" style="max-width:1100px;margin:0 auto"></div>
 </div>
 <div id="screen-god" class="screen">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem">
-    <button class="btn" onclick="goMainMenu()" style="font-size:11px;padding:5px 12px">← Main Menu</button>
-    <button class="btn" id="champ-entry-btn" onclick="showChampions()" style="display:none;font-size:11px;padding:5px 12px;border-color:#8a6a00;color:#d4af37">★ Teotlan Champions</button>
+  <div class="god-head">
+    <div class="god-head-l">
+      <button class="btn" onclick="goMainMenu()" style="font-size:11px;padding:5px 12px">← Main Menu</button>
+      <button class="btn" id="champ-entry-btn" onclick="showChampions()" style="display:none;font-size:11px;padding:5px 12px;border-color:#8a6a00;color:#d4af37">★ Teotlan Champions</button>
+    </div>
+    <div class="god-head-c">
+      <h2 style="margin-bottom:.1rem;font-size:20px">Choose Your Patron God</h2>
+      <p style="font-size:14px;color:var(--td);margin:0">Select a deity to begin your journey through Mictlan</p><!-- v624: font pass -->
+    </div>
+    <div class="god-head-r">
+      <button class="btn btn-cap" id="confirm-god" disabled style="font-size:14px;padding:10px 30px">✦ Select God</button>
+    </div>
   </div>
-  <h2 style="margin-bottom:.1rem;font-size:20px;text-align:center">Choose Your Patron God</h2>
-  <p style="font-size:14px;color:var(--td);margin-bottom:.5rem;text-align:center">Select a deity to begin your journey through Mictlan</p><!-- v624: font pass -->
   <div id="god-tecpatl-hdr" style="text-align:center;margin-bottom:.5rem;display:none"></div>
   <div id="god-detail-panel" style="margin-bottom:.75rem;background:#1e1408;border:0.5px solid var(--br);border-radius:12px;padding:.75rem 1rem;display:none;position:sticky;top:0;z-index:30;box-shadow:0 6px 14px rgba(0,0,0,.45)"><!-- v626: sticky — with the full pantheon unlocked, bottom-row picks updated a panel scrolled out of view -->
     <div style="display:flex;align-items:stretch;gap:14px">
@@ -1147,7 +1163,6 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
   </div>
   <div id="tlacuilo-banner" style="display:none;text-align:center;margin-bottom:.75rem"></div>
   <div class="god-grid" id="god-grid"></div>
-  <div style="text-align:center;margin-top:.75rem"><button class="btn btn-cap" id="confirm-god" disabled style="font-size:13px;padding:8px 28px">✦ Select God</button></div>
   <div id="god-max-penance" style="font-size:11px;color:#8b2020;text-align:center;margin-top:.4rem;display:none"></div>
 </div>
 
@@ -3411,7 +3426,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1142'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1168'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -7427,10 +7442,39 @@ function runStory(overrideLines){
   const _storyFirstTime=!V[_layerKey];
   if(_storyFirstTime){V[_layerKey]='1';saveV();}
   if(_storyFirstTime){
-    let i=0;function next(){if(i>=lines.length){if(btnEl)btnEl.disabled=false;return;}const p=document.createElement('p');p.style.cssText='margin-bottom:.85rem;opacity:0;transition:opacity .7s';p.innerHTML=lines[i++];el.appendChild(p);setTimeout(()=>p.style.opacity='1',30);setTimeout(next,1100);}next();
+    /* v1164 FIRST RUN ONLY: crawl the intro. Two problems, one cause -- the CTA is pinned to
+       the bottom, so it sat on top of the last visible line and made the text look like it
+       simply ended there, with no cue that more was below. So the CTA is hidden for the whole
+       reveal, and each paragraph scrolls itself into view as it fades in. It appears, enabled,
+       only once every line has landed. Repeat visits are untouched (see the else branch). */
+    const _cta=btnEl?btnEl.parentElement:null;
+    if(_cta)_cta.style.display='none';
+    let _smooth=true;
+    try{_smooth=!window.matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+    const _crawl=function(node,block){
+      try{node.scrollIntoView({behavior:_smooth?'smooth':'auto',block:block,inline:'nearest'});}catch(e){}
+    };
+    let i=0;
+    function next(){
+      if(i>=lines.length){
+        const _last=el.lastElementChild;
+        if(_last)_crawl(_last,'end');   /* settle on the final line, not on the sticky CTA */
+        if(_cta)_cta.style.display='';  /* v1166: no delay -- the button arrives with the ending */
+        if(btnEl)btnEl.disabled=false;
+        return;
+      }
+      const p=document.createElement('p');
+      p.style.cssText='margin-bottom:.85rem;opacity:0;transition:opacity .7s';
+      p.innerHTML=lines[i++];
+      el.appendChild(p);
+      setTimeout(function(){p.style.opacity='1';},30);
+      _crawl(p,'end');
+      setTimeout(next,1100);
+    }
+    next();
   }else{
     lines.forEach(l=>{const p=document.createElement('p');p.style.cssText='margin-bottom:.85rem';p.innerHTML=l;el.appendChild(p);});
-    if(btnEl)btnEl.disabled=false;
+    if(btnEl){btnEl.disabled=false;if(btnEl.parentElement)btnEl.parentElement.style.display='';} // v1164: undo any hide left by a first-run crawl
   }
 }
 
@@ -7719,9 +7763,34 @@ function renderGods(){
     d.className='god-card'+(chosen?' chosen':'')+(locked?' locked':'')+((!locked&&isBlessedGod(gd.id))?' blessed-god':''); /* v935 */
     if(locked){
       if(lockedShown>=maxLockedVisible){return;} lockedShown++;
-      d.innerHTML=`<div style="font-size:28px;margin-bottom:4px">❓</div><div style="font-size:13px;font-weight:600;color:#8a7a5a">???</div><div style="font-size:11px;color:#6a5c42;font-style:italic;margin-top:2px">Unknown deity</div><div style="font-size:11px;color:#a8905a;margin-top:6px;line-height:1.35;padding:0 4px">🔒 ${gd.unlockCriteria}</div>`;
+      /* v1167: glyph only. The criteria text was the tallest element in the grid and stretched
+         every row it appeared in; it now lives in a tooltip instead. */
+      d.innerHTML=`<div style="font-size:28px">❓</div>`;
+      d.style.cursor='help';
+      const _lockTip=function(){
+        const tt=document.getElementById('relic-tooltip');if(!tt)return;
+        tt.innerHTML='<strong style="color:#d4af37">🔒 Locked</strong><br><span style="color:var(--td)">'+gd.unlockCriteria+'</span>';
+        tt.style.display='block';
+        /* v1168: measure AFTER display:block, then centre on the tile and flip above when
+           there is no room below -- it was fixed to r.bottom, so a locked god on the last
+           row put the tooltip over the next row or off the bottom of the screen. */
+        const r=d.getBoundingClientRect();
+        const vw=window.innerWidth||960, vh=window.innerHeight||700;
+        const tw=tt.offsetWidth||220, th=tt.offsetHeight||70;
+        let left=r.left+r.width/2-tw/2;
+        left=Math.max(8,Math.min(left,vw-tw-8));
+        let top=r.bottom+8;
+        if(top+th>vh-8)top=r.top-th-8;
+        if(top<8)top=8;
+        tt.style.left=left+'px';
+        tt.style.top=top+'px';
+      };
+      d.onmouseenter=_lockTip;
+      d.onmouseleave=function(){relicTipHide();};
+      d.ontouchstart=function(ev){ev.stopPropagation();_lockTip();};
       d.onclick=()=>{
         const panel=document.getElementById('god-detail-panel');if(panel)panel.style.display='none';
+        _lockTip(); /* tap on desktop shows it too -- the tile has no other action */
       };
     }else{
       const personalTp=DT.godTecpatl&&DT.godTecpatl[gd.id]?DT.godTecpatl[gd.id]:0;
