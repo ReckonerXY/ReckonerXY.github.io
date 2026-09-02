@@ -3432,7 +3432,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1172'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1175'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -13830,9 +13830,10 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
       const t=(untouched.length?untouched:alive)[Math.floor(Math.random()*(untouched.length||alive.length))];
       let dmgRaw=Math.max(1,Math.round(bpn(u)*((u.mag*0.55-(t.res||0)*0.4)*boost*atkMult)));
       if(rollCrit(-0.05,false,u)){dmgRaw=Math.round(dmgRaw*(u._critMult||2));addLog(`<span style="color:#ffd700;font-size:10px">⚡ Critical!</span>`);}
+      const ttPreArmor=t.armor||0; /* v1175: same fix as seismicRoar */
       const h=applyArmorDamage(t,dmgRaw,false);
       if(h>0){t.currentHp=Math.max(0,t.currentHp-h);renderBattle();animateHit(t.id,h,false,rollCrit._lc);
-        ttBurned.add(t.id);applySlowToUnit(t,t.armor||0);onHitContact(u,t);
+        ttBurned.add(t.id);applySlowToUnit(t,ttPreArmor);onHitContact(u,t);
         if(t.currentHp<=0)handleDeath(t);}
       ttH++;setTimeout(ttHit,160);
     }
@@ -13989,6 +13990,8 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
     let raw1=Math.max(1,Math.round(bpn(u)*((u.atk*1.5-(pickT.def||0)*0.4)*(G.dte.specialBoostMult||1))));
     const _srSplashBase=raw1;
     if(rollCrit(0,false,u)){raw1=Math.round(raw1*(u._critMult||2));addLog(`<span style="color:#ffd700;font-size:10px">⚡ Critical!</span>`);}
+    const pickPreArmor=pickT.armor||0; /* v1175: BEFORE the hit -- reading it after meant a
+       Chimalli that shattered on this very strike no longer counted, and Slow landed anyway */
     const d1=applyArmorDamage(pickT,raw1,false);
     if(d1>0){pickT.currentHp=Math.max(0,pickT.currentHp-d1);animateHit(pickT.id,d1,false,rollCrit._lc);}
     onHitContact(u,pickT);
@@ -13999,7 +14002,6 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
       if(sh>0){e.currentHp=Math.max(0,e.currentHp-sh);animateHit(e.id,sh,false,false);refreshCaptureTargets();if(e.currentHp<=0&&!G.captureProcessed.has(e.id))handleDeath(e);}
       applySlowToUnit(e,preArmor);
     });
-    const pickPreArmor=pickT.armor||0;
     applySlowToUnit(pickT,pickPreArmor);addLog(`<span class="log-ab">🐆 Epicenter Roar! <span class="log-bl">${d1}</span> + <span class="log-splash">${splash}</span> splash + all Slowed!</span>`);
     refreshCaptureTargets();if(pickT.currentHp<=0&&!G.captureTargets.has(pickT.id))handleDeath(pickT);
   }
@@ -14601,8 +14603,8 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     let totalDmg=0,h=0;
     function rjHit(){
       if(h>=hits){
-        hitTargets.forEach(id=>{const e=ae.find(x=>x.id===id&&x.currentHp>0);if(e)e.poisonStacks=(e.poisonStacks||0)+1;});
-        if(hitTargets.size)addLog(`<span class="log-poison">☠ River Judge poisoned ${hitTargets.size} target${hitTargets.size>1?'s':''}!</span>`);
+        let _rjP=0;hitTargets.forEach(id=>{const e=ae.find(x=>x.id===id&&x.currentHp>0);if(e&&applyPoison(e,1))_rjP++;}); /* v1174 */
+        if(_rjP)addLog(`<span class="log-poison">☠ River Judge poisoned ${_rjP} target${_rjP>1?'s':''}!</span>`);
         addLog(`<span class="log-ab">${u.icon} River Judge! ${hits} hits → ${totalDmg} total ✨🤢</span>`);
         G._multiHitPending=false;return;
       }
@@ -14638,7 +14640,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     let h=0;
     function sbHit(){
       if(h>=hits){
-        hitTargets.forEach(id=>{const e=ae.find(x=>x.id===id&&x.currentHp>0);if(e)e.poisonStacks=(e.poisonStacks||0)+1;});
+        hitTargets.forEach(id=>{const e=ae.find(x=>x.id===id&&x.currentHp>0);if(e)applyPoison(e,1);}); /* v1174 */
         addLog(`<span class="log-thunder">${u.icon} Static Burst! ${hits} hits + Paralyze on each target!</span>`);
         G._multiHitPending=false;return;
       }
@@ -15480,8 +15482,8 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     const hitTargets=new Set();let i=0;
     function rjEHit(){
       if(i>=hits){
-        hitTargets.forEach(id=>{const a=aa.find(x=>x.id===id&&x.currentHp>0);if(a)a.poisonStacks=(a.poisonStacks||0)+1;});
-        if(hitTargets.size)addLog(`<span class="log-poison">☠ River Judge poisoned ${hitTargets.size} target${hitTargets.size>1?'s':''}!</span>`);
+        let _rjP=0;hitTargets.forEach(id=>{const a=aa.find(x=>x.id===id&&x.currentHp>0);if(a&&applyPoison(a,1))_rjP++;}); /* v1174 */
+        if(_rjP)addLog(`<span class="log-poison">☠ River Judge poisoned ${_rjP} target${_rjP>1?'s':''}!</span>`);
         addLog(`<span class="log-ab">🦎 River Judge! ${hits} hits ✨🤢</span>`);
         // Flush anim queue now — Phase 3 has already cleared it by the time we finish
         G._animQueue.forEach(a=>animateHit(a.uid,a.dmg,a.isHeal,a.isCrit));
