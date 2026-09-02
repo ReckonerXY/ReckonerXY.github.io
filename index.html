@@ -3432,7 +3432,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1175'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1177'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -17499,7 +17499,9 @@ function fireXoloGuide(){
 function animateXolo(uid,text,color){
   const card=uid?document.querySelector('[data-uid="'+uid+'"]'):null;
   const el=document.createElement('div');
-  el.textContent='🐕 '+(text||'');
+  /* v1177: innerHTML, not textContent -- the Cacao branch passes an <svg> token and it was
+     being printed literally. Every caller is an internal literal, so no untrusted input here. */
+  el.innerHTML='🐕 '+(text||'');
   let x,y;
   if(card){const r=card.getBoundingClientRect();x=r.left+r.width/2-46;y=r.top+2;}            // on the acted-upon unit's card
   else{ // Cacao dig: anchor to the Cacao indicator in the battle resource bar
@@ -21798,7 +21800,7 @@ function renderAltar(){
      something the player could never actually see. Every unit is listed now;
      the maxed ones come through as disabled cards with the bar full. */
   G.party.forEach(gdId=>{const gd=GODS.find(g=>g.id===gdId);if(gd)targets.push({id:'god_'+gd.id,name:gd.name,icon:gd.icon,sh:Math.round(armorFracFor('god_'+gd.id)/aps),mx:rosterMaxHpFor('god_'+gd.id),maxed:!chimaEligible('god_'+gd.id),isGod:true,gd:gd});});
-  G.captured.forEach(cu=>{const ck=capKey(cu);targets.push({id:ck,name:cu.name,icon:cu.icon,sh:Math.round(armorFracFor(ck)/aps),mx:rosterMaxHpFor(ck),maxed:!chimaEligible(ck),isGod:false});});
+  G.captured.forEach(cu=>{const ck=capKey(cu);targets.push({id:ck,baseId:cu.baseId||cu.id,/* v1176: capKey is a generated id -- baseId is what resolves the sprite */name:cu.name,icon:cu.icon,sh:Math.round(armorFracFor(ck)/aps),mx:rosterMaxHpFor(ck),maxed:!chimaEligible(ck),isGod:false});});
   if(!targets.length){shEl.innerHTML='<div style="font-size:12px;color:var(--td)">No units to armour yet.</div>';}
   else{const info=document.createElement('div');info.style.cssText='font-size:12px;color:var(--td);margin-bottom:.6rem';info.innerHTML=`Protects your HP <strong>and blocks new status effects</strong> while it holds. Purchase ${Math.round(aps*100)}% of max HP per stack, up to ${Math.round(maxArmorHp*100)}%. <span style="color:#d4af37;font-weight:500"><svg class="tl tl-quincunx" style="width:1.3em;height:1.3em;vertical-align:-.28em"><use href="#tl-quincunx"/></svg> ${cost}</span> each${G.dte.chimaImmune?' <span style="color:#b090e0;font-size:11px">(Status immune!)</span>':''}`;shEl.appendChild(info);/* v1129: one card per unit -- art, armour carried, and a segmented bar of the
        stacks it holds out of the stacks it can hold. */
@@ -21807,10 +21809,11 @@ function renderAltar(){
     targets.forEach(t=>{
       const b=document.createElement('button');b.className='chima-card';
       const cur=rosterArmorHp(t.id),cap=Math.round((t.mx||0)*maxArmorHp);
-      /* gods carry pixel portraits; everything else falls back to its emoji, which
-         is exactly what godIconHtml already does. */
+      /* v1176: vassals have sprites now too. unitIconHtml resolves one when it exists and
+         emits the emoji itself when it does not, so there is no separate fallback branch. */
       const art=t.isGod&&t.gd?godIconHtml(t.gd,32)
-        :'<span style="font-size:24px;line-height:1">'+t.icon+'</span>';
+        :(hasUnitSprite(t)?unitIconHtml(t,32)
+          :'<span style="font-size:24px;line-height:1">'+t.icon+'</span>');
       let pips='';for(let i=0;i<maxStacks;i++){
         /* v1138: light the segment this purchase just paid for */
         const fresh=(G._chimaJustBought===t.id&&i===t.sh-1)?' just-on':'';
