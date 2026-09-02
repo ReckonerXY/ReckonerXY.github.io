@@ -239,6 +239,8 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .mb{background:var(--bp);border:0.5px solid var(--br);border-radius:16px;padding:1.5rem;max-width:440px;width:100%;text-align:center}
 /* v1160: the party list needs more room than a stock modal; scope it so no other modal moves. */
 .mb:has(#edit-party-content){max-width:560px}
+/* v1171: the unit stat modal renders a .train-card; at 440px a long name had nowhere to go. */
+.mb:has(.train-card){max-width:620px}
 .dc{background:var(--bm);border:1px dashed #4a3a18;border-radius:10px;padding:.75rem;cursor:pointer;text-align:center;min-width:90px;max-width:130px;flex:1;transition:all .15s;opacity:.55}
 .dc:hover{border-color:#7a6a30;opacity:.8}.dc.sel{border:1.5px solid #50c080;background:#0d2218;opacity:1}
 .dc.god-fixed{cursor:default;border-color:#5a4a10;background:#241a08;opacity:1}
@@ -272,7 +274,7 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .train-card.tc-patron{border:1.5px solid #d4af37;background:#1e1608;box-shadow:0 0 8px rgba(212,175,55,.18)}
 /* v1155: allow the header to wrap instead of overflowing the card. */
 .tc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:nowrap}
-.tc-head>.tc-name{min-width:0;overflow-wrap:anywhere;flex:1 1 auto}
+.tc-head>.tc-name{min-width:0;overflow-wrap:break-word;flex:1 1 auto}
 .tc-head>.tc-meta{min-width:0;max-width:100%}
 .tc-name{font-size:15px;font-weight:700;line-height:1.2}
 .tc-meta{text-align:right;flex-shrink:1}
@@ -3430,7 +3432,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1170'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1172'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -20878,7 +20880,7 @@ function showUnitTooltip(u){
      oblated PASSIVE moved up beside the native passive; see the card head below. */
   const oblLine=(u.isPatron&&G._oblationAk&&G._oblationAbility)?('<div class="tc-spec" style="margin-top:4px;border-top:0.5px dashed #4a2a6a;padding-top:5px"><span class="tc-spec-name" style="color:#a060e0">✟ '+G._oblationAbility+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(G._oblationAd||'')+'</span></span><span class="tc-cost" '+statAttrs('cost')+'>✨ Cost: '+npCostDisplayHtml(_oblCostLv,_oblPlainLv)+'</span></div><div class="tc-desc">'+(G._oblationAd||'')+'</div>'):'';
   const offSec=_ol.affecting.length?('<div style="margin-top:6px;border-top:0.5px solid var(--br);padding-top:6px"><div style="font-size:10px;color:var(--td);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">🪶 Offerings boosting this unit</div>'+_ol.affecting.map(id=>{const o=OFFERINGS[id];return '<div style="font-size:11px;color:#c0e060;margin-bottom:2px">'+o.icon+' '+o.name+': <span style="color:var(--td)">'+o.desc+'</span></div>';}).join('')+'</div>'):'';
-  const cardBody='<div class="train-card'+(u.isPatron?' tc-patron':'')+'" style="text-align:left;max-width:360px;margin:0 auto">'
+  const cardBody='<div class="train-card'+(u.isPatron?' tc-patron':'')+'" style="text-align:left;max-width:520px;margin:0 auto">'
     +'<div class="tc-head"><div class="tc-name">'+liveName(u)+(u.isPatron?' ⭐':u.isGod?' ✦':'')
       +((u.isPatron&&(G._oblationGodName||(G._oblationHistory&&G._oblationHistory.length&&G._oblationHistory[G._oblationHistory.length-1].name)))?' <span style="font-style:italic;font-weight:400;font-size:13px;color:#a060e0">'+(G._oblationGodName||G._oblationHistory[G._oblationHistory.length-1].name)+'</span>':'')+'</div>' /* v771/v774: _oblationGodName only exists from v770, so fall back to the history entry for runs oblated before it */ // v629: ⭐ patron / ✦ ally god, matching the party chips
     /* v940: the v934 pip landed on mkUnitCard only. showUnitTooltip builds its own header, which
