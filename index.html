@@ -3432,7 +3432,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1177'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1178'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -6018,7 +6018,10 @@ function clearTransientFx(){
   }catch(e){}
 }
 function showScr(id){clearTransientFx();relicTipHide();document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');} // v655: hide any orphaned tooltip — a screen torn down under the cursor never fires mouseleave
-function notify(msg,col){const n=document.getElementById('notif');n.textContent=msg;n.style.color=col||'#50c080';n.style.display='block';clearTimeout(n._t);n._t=setTimeout(()=>n.style.display='none',2400);}
+function notify(msg,col){const n=document.getElementById('notif');
+  /* v1178: innerHTML, not textContent -- offering icons can be tl- SVG tokens (Moctezuma
+     Shield) and were being printed as raw tags. All callers build from internal strings. */
+  n.innerHTML=msg;n.style.color=col||'#50c080';n.style.display='block';clearTimeout(n._t);n._t=setTimeout(()=>n.style.display='none',2400);}
 function showMo(icon,title,body,actions,onDismiss){ /* v785: onDismiss also fires when the modal is closed via its X or by clicking the backdrop -- both of those call hideMo() directly and never reach an action callback, which soft-locked the Cipactli cutscene */document.getElementById('mo-icon').innerHTML=icon;document.getElementById('mo-title').textContent=title;document.getElementById('mo-body').innerHTML=body.replace(/\n/g,'<br>');const ac=document.getElementById('mo-actions');ac.innerHTML='';actions.forEach(a=>{const b=document.createElement('button');b.className='btn '+(a.cls||'');b.textContent=a.label;b.onclick=()=>{if(typeof G!=='undefined'&&G)G._moDismiss=null;hideMo();if(typeof a.fn==='function')a.fn();}; /* v836: a label-only action is a reasonable thing to write; it should close the modal, not throw */ac.appendChild(b);});document.getElementById('mo').classList.add('open');if(typeof G!=='undefined'&&G)G._moDismiss=onDismiss||null;}
 function hideMo(){
   document.getElementById('mo').classList.remove('open');
