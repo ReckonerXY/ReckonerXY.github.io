@@ -5282,7 +5282,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1302'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1304'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -11207,10 +11207,10 @@ function evUThreefoldFlame(el){
   hdr.innerHTML=`<div style="font-size:12px;color:#e0a050;margin-bottom:.75rem;font-style:italic">&ldquo;A spirit asks not which soul burns brightest, but whether all three burn together.&rdquo; Present a warrior to the flame.</div>`;
   el.appendChild(hdr);
   units.forEach(u=>{
-    const i=surgeForceLv(u.key,'ihiyotl'),t=surgeForceLv(u.key,'teyolia'),n=surgeForceLv(u.key,'tonalli');
-    const cnt=(i>=3?1:0)+(t>=3?1:0)+(n>=3?1:0);
+    const i=surgeForceLv(u.key,'ihiyotl'),ty=surgeForceLv(u.key,'teyolia'),n=surgeForceLv(u.key,'tonalli');
+    const cnt=(i>=3?1:0)+(ty>=3?1:0)+(n>=3?1:0);
     const tierName=cnt>=3?'Rare offering':cnt===2?'Uncommon offering':cnt===1?'Common offering':'small resources';
-    el.appendChild(evOpt(u.icon,u.name,`💪${i} 🫀${t} 🔮${n} — ${cnt}/3 souls ≥3 → ${tierName}`,
+    el.appendChild(evOpt(u.icon,u.name,`💪${i} 🫀${ty} 🔮${n} — ${cnt}/3 souls ≥3 → ${tierName}`,
       t('ui.ev.presentFlame',{name:u.name}),false,'',()=>{
         const el2=document.getElementById('event-content');let line;
         if(cnt>=3){line=offeringRewardLine(grantRandomOffering('rare'));}
@@ -12434,21 +12434,21 @@ function evUXochiquetzal(el){
   hdr.innerHTML='<div style="font-size:13px;color:#f090c0;margin-bottom:.75rem;text-align:center;font-style:italic">"Flowers are growing here, in a place that has never grown anything. A woman sits among them with her hands open, waiting to be given something."</div>';
   el.appendChild(hdr);
   const fin=(icon,msg)=>{const el2=document.getElementById('event-content');evResult(el2,icon,msg,()=>afterEvent());};
-  XOCHI_TIERS.forEach(t=>{
-    const afford=(G.res.flower||0)>=t.cost;
+  XOCHI_TIERS.forEach(tier=>{
+    const afford=(G.res.flower||0)>=tier.cost;
     /* v1080: the price goes in costHtml PARENTHESISED -- evCostOnly keeps nothing else.
        v1081: the REWARD line is deliberately gone. The player needs the price to decide; naming
        the exact offerings and surge count turned the choice into arithmetic and spoiled the
        giving. Each tier keeps its own line so they escalate instead of reading as three identical
        rows at different prices. */
-    const _price='('+t.cost+' \u273f)';
-    const sub='<div>'+t.blurb+'</div><div style="margin-top:3px;font-style:italic;opacity:.75">\u201c'+t.quote+'\u201d</div>';
-    el.appendChild(evOpt(t.icon,t.name,_price,sub,!afford,'Not enough Flowers \u2014 need '+t.cost+' \u273f',()=>{
-      if((G.res.flower||0)<t.cost){notify(t('ui.msg.noFlowers'),'#e05050');return;}
-      G.res.flower-=t.cost;
-      const r=xochiGrantTier(t);
+    const _price='('+tier.cost+' \u273f)';
+    const sub='<div>'+tier.blurb+'</div><div style="margin-top:3px;font-style:italic;opacity:.75">\u201c'+tier.quote+'\u201d</div>';
+    el.appendChild(evOpt(tier.icon,tier.name,_price,sub,!afford,'Not enough Flowers \u2014 need '+tier.cost+' \u273f',()=>{
+      if((G.res.flower||0)<tier.cost){notify(t('ui.msg.noFlowers'),'#e05050');return;}
+      G.res.flower-=tier.cost;
+      const r=xochiGrantTier(tier);
       const names=r.got.length?r.got.map(o=>o.icon+' '+o.name).join(', '):'nothing she had not already given you';
-      fin(t.icon,'She presses '+names+' into your hands, and '+t.surges+' surge'+(t.surges>1?'s':'')+' settle over '+r.units+' of you.');
+      fin(tier.icon,'She presses '+names+' into your hands, and '+tier.surges+' surge'+(tier.surges>1?'s':'')+' settle over '+r.units+' of you.');
     }));
   });
   if(xochiquetzalUnlocked()){
@@ -21165,7 +21165,12 @@ function renderActionPanel(){
     // action-panel description stale even though the ability itself dispatches on name and behaves correctly.
     const _bid=(actor.baseObj&&actor.baseObj.id)||actor.baseId||actor.id;
     const _tpl=gd?gd:unitDefById(_bid);
-    const specDesc=(_tpl&&_tpl.ad)||actor.ad;
+    /* v1304: a CAPTURED miniboss is not in ALL_CAP_DEFS, so _tpl was null and this fell through to
+       actor.ad -- the capture-time snapshot, frozen in whatever language was active then (captured in
+       Spanish, then switched to English -> Spanish description). Read the live MINIBOSS_CAP_STATS copy
+       first, which i18nExpandProse rewrites on every language change; same priority as liveAd(). */
+    const _mcs=(!gd&&typeof MINIBOSS_CAP_STATS!=='undefined'&&!actor.isMiniBoss&&!actor.isBoss)?MINIBOSS_CAP_STATS[_bid]:null;
+    const specDesc=(_mcs&&_mcs.ad)||(_tpl&&_tpl.ad)||actor.ad;
     const isAoe=isAoeOrAutoSpecial(actor);
     const _aoeCapN=aoeCapFor(actor);const _aoeLbl=_aoeCapN?(' '+_aoeCapN+' targets'):(isAoe?' AoE':'');
     const ae=G.enemies.filter(u=>u.currentHp>0&&!G.captureProcessed.has(u.id));
