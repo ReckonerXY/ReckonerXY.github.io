@@ -224,7 +224,7 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
    silhouette while keeping its exact shape. */
 /* v1184: the conquered star is a corner badge, not inline text -- inline it wrapped onto
    its own line on long names and stretched that tile taller than the rest of its row. */
-.god-conq{position:absolute;top:5px;right:7px;color:#d4af37;font-size:11px;line-height:1;pointer-events:none}
+.god-conq{display:inline-block;margin-left:.22em;color:#d4af37;font-size:.55em;line-height:1;vertical-align:.45em;pointer-events:none;letter-spacing:0} /* v1324: inline after the name (was top-right corner, under the BLESSED tag). em-sized, so it follows the name's length tier and the text scale; line-height 1 keeps the tile height unchanged */
 .god-silhouette{display:inline-flex}
 .god-silhouette img{filter:brightness(0) saturate(0);opacity:.6}
 .god-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;margin-bottom:.5rem}
@@ -2301,6 +2301,10 @@ Object.assign(T_EN,{
   'ui.altar.hintSac':'Check units to select for multi-sacrifice',
   'ui.altar.deployedNote':'⚔ Units in the battle party cannot be sacrificed',
   'ui.pochteca.intro':'💎 The Wandering Pochteca lays out his wares. Effects apply at the start of each battle and persist for the run.',
+  'ui.pochteca.introTitle':'The Pochteca Has Arrived',
+  'ui.pochteca.introBody':'A wandering merchant has set up in the Tianguis under the <strong>✨ Special</strong> tab. He sells <strong style="color:#c0e060">Offerings</strong> — relics that boost your party for the rest of the run. They apply automatically at the start of every battle.',
+  'ui.pochteca.introXochi':'Xochitonal waits ahead — choose wisely.',
+  'ui.pochteca.introBtn':'Show me',
   'ui.mercs.preWarn':'⚠ Pre-battle warning',
   'ui.mercs.restoreAll':'Restore all units',
   'ev.l8holes.dive':'{icon} <strong>{name}</strong> dives: spends {pct}% of max TP.',
@@ -2833,6 +2837,10 @@ Object.assign(T_ES,{
   'ui.altar.hintSac':'Marca unidades para sacrificar en grupo',
   'ui.altar.deployedNote':'⚔ Las unidades del grupo de batalla no se pueden sacrificar',
   'ui.pochteca.intro':'💎 El Pochteca Errante extiende su mercancía. Los efectos se aplican al inicio de cada batalla y duran toda la partida.',
+  'ui.pochteca.introTitle':'Llegó el Pochteca',
+  'ui.pochteca.introBody':'Un mercader errante se instaló en el Tianguis, en la pestaña <strong>✨ Especial</strong>. Vende <strong style="color:#c0e060">Ofrendas</strong>: reliquias que fortalecen a tu grupo por el resto de la partida. Se aplican solas al inicio de cada batalla.',
+  'ui.pochteca.introXochi':'Xochitonal te espera más adelante: elige con cuidado.',
+  'ui.pochteca.introBtn':'Ver',
   'ui.mercs.preWarn':'⚠ Aviso antes de la batalla',
   'ui.mercs.restoreAll':'Restaurar todas las unidades',
   'ui.mercs.intro':'Usa <strong style="color:#c0844a"><svg class="tl tl-cacao"><use href="#tl-cacao"/></svg> Cacao</strong> para el Temazcal o para contratar mercenarios.',
@@ -3059,8 +3067,8 @@ const TREE_NODES=[
   {id:'hub',label:'Divinity',labelEs:'Divinidad',desc:'The heart of your divine power. Unlocks all four branches.',descEs:'El corazón de tu poder divino. Desbloquea las cuatro ramas.',cost:0,cat:'gods',req:[],tier:0,x:450,y:360},
   // ═══ NORTH — GODS ═══
   {id:'god_stats_1',label:'Divine Strength I',labelEs:'Fuerza Divina I',desc:'All gods gain +5% ATK, MAG, DEF and RES',descEs:'Todos los dioses ganan +5% ATQ, MAG, DEF y RES',cost:200,cat:'gods',req:['synergy_unlock'],tier:2,x:450,y:196},
-  {id:'god_stats_2',label:'Divine Strength II',labelEs:'Fuerza Divina II',desc:'All gods gain another +5% ATK, MAG, DEF and RES (stacks with I)',descEs:'Todos los dioses ganan otro +5% ATQ, MAG, DEF y RES (se acumula con I)',cost:1000,cat:'gods',req:['god_stats_1'],tier:2,x:312,y:196},
-  {id:'synergy_unlock',label:'Elemental Bond I',labelEs:'Vínculo Elemental I',desc:'Elemental Synergy strengthens: each other patron-element deployed unit grants +10% ATK/MAG/DEF/RES (up from the innate +5%)',descEs:'La Sinergia Elemental se fortalece: cada otra unidad desplegada del elemento del patrón otorga +10% ATQ/MAG/DEF/RES (sube desde el +5% innato)',cost:22,cat:'gods',req:['hub'],tier:1,x:450,y:278}, // v640: synergy is innate now; this node upgrades it
+  {id:'god_stats_2',label:'Divine Strength II',labelEs:'Fuerza Divina II',desc:'All gods gain another +5% ATK/MAG/DEF/RES (total +10%)',descEs:'Todos los dioses ganan otro +5% ATQ/MAG/DEF/RES (total +10%)' /* v1334: streamlined. Ranks multiply (1.05x1.05), so the true total is +10.25% */,cost:1000,cat:'gods',req:['god_stats_1'],tier:2,x:312,y:196},
+  {id:'synergy_unlock',label:'Elemental Bond I',labelEs:'Vínculo Elemental I',desc:'Each other patron-element deployed unit gains +5% ATK/MAG/DEF/RES (total +10%)',descEs:'Cada otra unidad desplegada del elemento del patrón gana +5% ATQ/MAG/DEF/RES (total +10%)' /* v1332: streamlined */,cost:22,cat:'gods',req:['hub'],tier:1,x:450,y:278}, // v640: synergy is innate now; this node upgrades it
   /* v828: God Affinity used to ride on Elemental Bond I, whose description says nothing about
      HP -- a leftover that made gods gain up to +33% HP from a node that only advertises
      ATK/MAG/DEF/RES. It is its own purchase now, gated behind Bond I so the branch still reads
@@ -3078,14 +3086,14 @@ const TREE_NODES=[
      behind a 42-cost one. In practice that gates nothing (nobody reaches 1200 TEOTL without
      spending 42), but it IS a dependency change rather than a pure move. */
   {id:'ometeotl_blessing',label:'Ometeotl Blessing',labelEs:'Bendición de Ometeotl',desc:'Each run, Ometeotl blesses one unlocked god at random: +5% Blood AND Cacao for the whole run if you choose them',descEs:'En cada partida, Ometeotl bendice al azar a un dios desbloqueado: +5% de Sangre Y Cacao durante toda la partida si lo eliges',cost:42,cat:'gods',req:['synergy_unlock'],tier:1,x:312,y:278},
-  {id:'synergy_unlock_2',label:'Elemental Bond II',labelEs:'Vínculo Elemental II',desc:'Elemental Synergy peaks: each other patron-element deployed unit grants +20% ATK/MAG/DEF/RES',descEs:'La Sinergia Elemental alcanza su cima: cada otra unidad desplegada del elemento del patrón otorga +20% ATQ/MAG/DEF/RES',cost:1200,cat:'gods',req:['ometeotl_blessing'],tier:2,x:200,y:278} /* v936: moved left and re-parented; see the note above */,
+  {id:'synergy_unlock_2',label:'Elemental Bond II',labelEs:'Vínculo Elemental II',desc:'Each other patron-element deployed unit gains another +10% ATK/MAG/DEF/RES (total +20%)',descEs:'Cada otra unidad desplegada del elemento del patrón gana otro +10% ATQ/MAG/DEF/RES (total +20%)' /* v1333 */,cost:1200,cat:'gods',req:['ometeotl_blessing'],tier:2,x:200,y:278} /* v936: moved left and re-parented; see the note above */,
   {id:'god_special_up',label:'God Health Boost I',labelEs:'Aumento de Vida Divina I',desc:'Increase all God HP by 10%',descEs:'Aumenta los PV de todos los dioses en 10%',cost:500,cat:'gods',req:['god_stats_1'],tier:2,x:588,y:196},
   {id:'sacred_oblation',label:'Sacred Oblation',labelEs:'Oblación Sagrada',desc:'Sacrifice an Ally God at the Altar to bestow their patron ability upon your Patron God — once per run',descEs:'Sacrifica a un Dios Aliado en el Altar para otorgar su habilidad de patrón a tu Dios Patrón — uno por partida',cost:1250,cat:'gods',req:['god_special_up'],tier:3,x:588,y:114},
   {id:'god_special_up_2',label:'God Health Boost II',labelEs:'Aumento de Vida Divina II',desc:'Increase all God HP by another 10% (total +20%)',descEs:'Aumenta los PV de todos los dioses otro 10% (total +20%)',cost:1600,cat:'gods',req:['god_special_up'],tier:3,x:450,y:114},
   {id:'ally_special_up_2',label:'Vassal Health Boost II',labelEs:'Aumento de Vida de Vasallos II',desc:'Increase all Vassal HP by another 10% (total +20%)',descEs:'Aumenta los PV de todos los vasallos otro 10% (total +20%)',cost:1500,cat:'allies',req:['ally_special_up'],tier:4,x:458,y:594},
-  {id:'godly_compassion',label:'Godly Compassion',labelEs:'Compasión Divina',desc:'Enables Sparing vassals at the Sacrifice Altar — release a unit for a small Blood or Cacao reward instead of sacrificing it for Flowers',descEs:'Permite Perdonar vasallos en el Altar de Sacrificio — libera una unidad a cambio de una pequeña recompensa de Sangre o Cacao en vez de sacrificarla por Flores',cost:400,cat:'allies',req:['ally_slot_3'],tier:2,x:550,y:520},
+  {id:'godly_compassion',label:'Godly Compassion',labelEs:'Compasión Divina',desc:'Spare vassals at the Altar for a small Blood or Cacao reward instead of Flowers',descEs:'Perdona vasallos en el Altar por una pequeña recompensa de Sangre o Cacao en vez de Flores' /* v1334 */,cost:400,cat:'allies',req:['ally_slot_3'],tier:2,x:550,y:520},
   {id:'pantheon_boost',label:'Pantheon Boost',labelEs:'Impulso del Panteón',desc:'Each additional deployed god grants all gods +2.5% ATK/MAG/DEF/RES',descEs:'Cada dios desplegado adicional otorga a todos los dioses +2.5% ATQ/MAG/DEF/RES',cost:700,cat:'gods',req:['synergy_unlock'],tier:3,x:357,y:114},
-  {id:'pantheon_boost_2',label:'Pantheon Boost II',labelEs:'Impulso del Panteón II',desc:'Each additional deployed god grants all gods a further +2.5% ATK/MAG/DEF/RES (stacks with I)',descEs:'Cada dios desplegado adicional otorga a todos los dioses otro +2.5% ATQ/MAG/DEF/RES (se acumula con I)',cost:2500,cat:'gods',req:['pantheon_boost'],tier:4,x:357,y:32},
+  {id:'pantheon_boost_2',label:'Pantheon Boost II',labelEs:'Impulso del Panteón II',desc:'Each additional deployed god grants all gods another +2.5% ATK/MAG/DEF/RES (total +5%)',descEs:'Cada dios desplegado adicional otorga a todos los dioses otro +2.5% ATQ/MAG/DEF/RES (total +5%)' /* v1334 */,cost:2500,cat:'gods',req:['pantheon_boost'],tier:4,x:357,y:32},
   // ═══ SOUTH — ALLIES ═══
   {id:'ally_slot_3',label:'3 Ally Slots',labelEs:'3 Espacios de Aliado',desc:'Unlock 3rd ally deployment slot',descEs:'Desbloquea el 3er espacio de despliegue de aliados',cost:2,cat:'allies',req:['hub'],tier:1,x:450,y:442},
   {id:'ally_slot_4',label:'4 Ally Slots',labelEs:'4 Espacios de Aliado',desc:'Unlock a 4th ally slot',descEs:'Desbloquea un 4º espacio de aliado',cost:245,cat:'allies',req:['ally_slot_3'],tier:2,x:450,y:520},
@@ -3095,17 +3103,17 @@ const TREE_NODES=[
   // ═══ ECONOMY — STARTERS ═══
   {id:'blood_starter_1',label:'Blood Starter I',labelEs:'Sangre Inicial I',desc:'Start each run with +100 Blood',descEs:'Empieza cada partida con +100 de Sangre',cost:200,cat:'qol',req:['cost_reduce_1'],tier:2,x:130,y:510},
   {id:'cacao_starter_1',label:'Cacao Starter I',labelEs:'Cacao Inicial I',desc:'Start each run with +50 Cacao',descEs:'Empieza cada partida con +50 de Cacao',cost:200,cat:'qol',req:['cost_reduce_1'],tier:2,x:130,y:580},
-  {id:'blood_starter_2',label:'Blood Starter II',labelEs:'Sangre Inicial II',desc:'Start each run with +150 additional Blood (stacks with I)',descEs:'Empieza cada partida con +150 de Sangre adicional (se acumula con I)',cost:2000,cat:'qol',req:['blood_starter_1'],tier:3,x:25,y:510},
-  {id:'cacao_starter_2',label:'Cacao Starter II',labelEs:'Cacao Inicial II',desc:'Start each run with +100 additional Cacao (stacks with I)',descEs:'Empieza cada partida con +100 de Cacao adicional (se acumula con I)',cost:2000,cat:'qol',req:['cacao_starter_1'],tier:3,x:25,y:580},
+  {id:'blood_starter_2',label:'Blood Starter II',labelEs:'Sangre Inicial II',desc:'Start each run with another +150 Blood (total +250)',descEs:'Empieza cada partida con otros +150 de Sangre (total +250)' /* v1334 */,cost:2000,cat:'qol',req:['blood_starter_1'],tier:3,x:25,y:510},
+  {id:'cacao_starter_2',label:'Cacao Starter II',labelEs:'Cacao Inicial II',desc:'Start each run with another +100 Cacao (total +150)',descEs:'Empieza cada partida con otros +100 de Cacao (total +150)' /* v1334 */,cost:2000,cat:'qol',req:['cacao_starter_1'],tier:3,x:25,y:580},
   {id:'minion_rebirth',label:'Minion Rebirth',labelEs:'Renacimiento de Súbdito',desc:'Patron starts the run with one free same-element ally (L1 B1, persists to roster)',descEs:'El patrón empieza la partida con un aliado gratis de su mismo elemento (Nv1 B1, se conserva en el roster)',cost:3200,cat:'allies',req:['vassal_affinity'],tier:4,x:294,y:662},
   {id:'ally_slot_6',label:'6 Ally Slots',labelEs:'6 Espacios de Aliado',desc:'Unlock a 6th ally slot',descEs:'Desbloquea un 6º espacio de aliado',cost:12500,cat:'allies',req:['ally_slot_5'],tier:4,x:458,y:662},
   {id:'minion_rebirth_2',label:'Double Rebirth',labelEs:'Doble Renacimiento',desc:'Patron starts the run with TWO free same-element allies (L1 B1, persist to roster)',descEs:'El patrón empieza la partida con DOS aliados gratis de su mismo elemento (Nv1 B1, se conservan en el roster)',cost:6000,cat:'allies',req:['minion_rebirth'],tier:5,x:294,y:725},
   // ═══ EAST — COMBAT ═══
-  {id:'dmg_preview',label:'Combat Insight',labelEs:'Visión de Combate',desc:'See estimated damage before striking — shows damage range on Strike and Special actions',descEs:'Muestra el daño estimado antes de golpear — indica el rango de daño en las acciones de Golpe y Especial',cost:5,cat:'combat',req:['hub'],tier:1,x:565,y:360},
-  {id:'strike_boost',label:'Strike Boost',labelEs:'Impulso de Golpe',desc:'All ally strikes (including gods) deal +10% damage',descEs:'Todos los golpes aliados (dioses incluidos) infligen +10% de daño',cost:10,cat:'combat',req:['dmg_preview'],tier:1,x:680,y:360},
-  {id:'special_boost',label:'Special Boost',labelEs:'Impulso de Especial',desc:'All ally specials (including gods) deal +10% damage',descEs:'Todos los especiales aliados (dioses incluidos) infligen +10% de daño',cost:250,cat:'combat',req:['strike_boost'],tier:2,x:800,y:360},
-  {id:'strike_boost_2',label:'Strike Boost II',labelEs:'Impulso de Golpe II',desc:'All ally strikes (including gods) deal an additional +15% damage',descEs:'Todos los golpes aliados (dioses incluidos) infligen +15% de daño adicional',cost:300,cat:'combat',req:['strike_boost'],tier:2,x:680,y:278},
-  {id:'special_boost_2',label:'Special Boost II',labelEs:'Impulso de Especial II',desc:'All ally specials (including gods) deal an additional +15% damage',descEs:'Todos los especiales aliados (dioses incluidos) infligen +15% de daño adicional',cost:2000,cat:'combat',req:['special_boost'],tier:3,x:800,y:278},
+  {id:'dmg_preview',label:'Combat Insight',labelEs:'Visión de Combate',desc:'Shows damage range on Strike and Special actions',descEs:'Muestra el rango de daño en las acciones de Golpe y Especial' /* v1332 */,cost:5,cat:'combat',req:['hub'],tier:1,x:565,y:360},
+  {id:'strike_boost',label:'Strike Boost',labelEs:'Impulso de Golpe',desc:'All ally strikes deal +10% damage',descEs:'Todos los golpes aliados infligen +10% de daño' /* v1332 */,cost:10,cat:'combat',req:['dmg_preview'],tier:1,x:680,y:360},
+  {id:'special_boost',label:'Special Boost',labelEs:'Impulso de Especial',desc:'All ally specials deal +10% damage',descEs:'Todos los especiales aliados infligen +10% de daño' /* v1333: streamlined */,cost:250,cat:'combat',req:['strike_boost'],tier:2,x:800,y:360},
+  {id:'strike_boost_2',label:'Strike Boost II',labelEs:'Impulso de Golpe II',desc:'All ally strikes deal another +15% damage (total +25%)',descEs:'Todos los golpes aliados infligen otro +15% de daño (total +25%)' /* v1333 */,cost:300,cat:'combat',req:['strike_boost'],tier:2,x:680,y:278},
+  {id:'special_boost_2',label:'Special Boost II',labelEs:'Impulso de Especial II',desc:'All ally specials deal another +15% damage (total +25%)',descEs:'Todos los especiales aliados infligen otro +15% de daño (total +25%)' /* v1333 */,cost:2000,cat:'combat',req:['special_boost'],tier:3,x:800,y:278},
   /* v819: Bloodlust and Theobroma each split into two ranks. The single 6,665 node was a wall --
      one purchase or nothing -- so the first rank now lands at 999 and the second at 5,555.
      The original ids are kept for rank I so existing saves keep what they already bought.
@@ -3117,8 +3125,8 @@ const TREE_NODES=[
   {id:'battle_bonus',label:'Blood Surge',labelEs:'Oleada de Sangre',desc:'[Merged into Blood Surge — the second Bloodlust rank now carries this]',descEs:'[Fusionado en Oleada de Sangre — el segundo rango de Sed de Sangre ahora lo incluye]',cost:0,cat:'combat',req:['bloodlust2'],tier:6,x:635,y:630,hidden:true},
   {id:'cacao_bonus',label:'Cacao Flow',labelEs:'Flujo de Cacao',desc:'[Merged into Cacao Flow — the second Theobroma rank now carries this]',descEs:'[Fusionado en Flujo de Cacao — el segundo rango de Deseo de Theobroma ahora lo incluye]',cost:0,cat:'combat',req:['theobroma2'],tier:6,x:835,y:630,hidden:true},
   // ═══ WEST — ECONOMY ═══
-  {id:'trade_route',label:'Trade Route',labelEs:'Ruta Comercial',desc:'Unlocks the Pochteca — a wandering merchant who brings Offerings to the Tianguis. (25% chance after every battle)',descEs:'Desbloquea al Pochteca — un mercader errante que trae Ofrendas al Tianguis. (25% de probabilidad después de cada batalla)',cost:12,cat:'qol',req:['hub'],tier:1,x:340,y:360},
-  {id:'offering_surplus',label:'Offering Surplus',labelEs:'Excedente de Ofrendas',desc:'Lets you reroll the Pochteca\u2019s wares. First reroll costs 25 Cacao; each further reroll in the same run costs +25 more.',descEs:'Te permite volver a tirar la mercancía del Pochteca. La primera vez cuesta 25 de Cacao; cada tirada siguiente en la misma partida cuesta +25 más.',cost:64,cat:'qol',req:['trade_route'],tier:1,x:235,y:450},
+  {id:'trade_route' /* v1326: was Trade Route (unlocked the Pochteca). The Pochteca is now free from run 1; this node lets Flowers pay for Offerings. Id kept so owned saves and the three req chains stay intact. Name is a placeholder. */,label:'Flower Barter',labelEs:'Trueque de Flores',desc:'The Pochteca accepts <svg class="tl tl-quincunx"><use href="#tl-quincunx"/></svg> Flowers \u2014 pay for Offerings with Flowers as well as Cacao.',descEs:'El Pochteca acepta <svg class="tl tl-quincunx"><use href="#tl-quincunx"/></svg> Flores \u2014 paga las Ofrendas con Flores además de Cacao.',cost:12,cat:'qol',req:['hub'],tier:1,x:340,y:360},
+  {id:'offering_surplus',label:'Offering Surplus',labelEs:'Excedente de Ofrendas',desc:'Reroll the Pochteca\u2019s wares for Cacao (cost rises with each reroll)',descEs:'Vuelve a tirar la mercancía del Pochteca con Cacao (el costo sube con cada tirada)' /* v1334: the old '+25 each' text predated the v922/v923 layer + growth bands */,cost:64,cat:'qol',req:['trade_route'],tier:1,x:235,y:450},
   {id:'codex_services',label:'Codex Services',labelEs:'Servicios de Códice',desc:'Unlocks the Tlacuilo — a wandering scribe who records and clones vassals in the Tianguis. (Appears with the Pochteca)',descEs:'Desbloquea al Tlacuilo — un escriba errante que registra y clona vasallos en el Tianguis. (Aparece con el Pochteca)',cost:30,cat:'qol',req:['trade_route'],tier:1,x:340,y:450},
   {id:'cost_reduce_1',label:'Cheaper Blood I',labelEs:'Sangre más Barata I',desc:'Level-up Blood costs reduced by 10%',descEs:'Los costos de Sangre para subir de nivel se reducen 10%',cost:25,cat:'qol',req:['trade_route'],tier:1,x:235,y:360},
   {id:'cost_reduce_2',label:'Cheaper Blood II',labelEs:'Sangre más Barata II',desc:'Level-up Blood costs reduced by another 15% (total -25%)',descEs:'Los costos de Sangre para subir de nivel se reducen otro 15% (total −25%)',cost:550, /* v871: 600 -> 550 */cat:'qol',req:['cost_reduce_1'],tier:2,x:130,y:294},
@@ -3247,7 +3255,7 @@ const OFFERINGS={
   cacao_effigy:{name:'Cacao Effigy',nameEs:'Efigie de Cacao',tier:'uncommon',icon:'🟤',price:250,priceType:'cacao',desc:'+10% Cacao on spoils \u2014 battles won in 3 rounds or less',descEs:'+10% de Cacao en el botín — batallas ganadas en 3 rondas o menos' /* v903: common -> uncommon. v904: and conditional -- an unconditional economy multiplier compounds across a whole run. */,flavor:"A small clay statue cradling a cacao pod — the merchants' quiet blessing.",flavorEs:'Una estatuilla de barro que acuna una mazorca de cacao — la bendición callada de los comerciantes.',eff:{cacaoMultSwift:1.10}},
   spondylus_pendant:{name:'Spondylus Pendant',nameEs:'Pendiente de Spondylus',tier:'uncommon',icon:'🐚',price:250,priceType:'cacao',desc:'+10% Blood on spoils \u2014 Perfect Battles only',descEs:'+10% de Sangre en el botín — solo en Batallas Perfectas' /* v903: common -> uncommon. v904: and conditional. */,flavor:'Crimson shell traded from distant seas, dearer than jade to the old kings.',flavorEs:'Concha carmesí traída de mares lejanos, más preciada que el jade para los viejos reyes.',eff:{bloodMultPerfect:1.10}},
   copal_brazier:{name:'Copal Brazier',nameEs:'Brasero de Copal',tier:'common',icon:'🔥',price:100,priceType:'cacao',desc:'All units −5% TP cost',descEs:'Todas las unidades −5% de costo de PT',flavor:'Sweet copal smoke curling upward — the gods lean close to listen.',flavorEs:'Humo dulce de copal que sube en espiral — los dioses se acercan para escuchar.',eff:{tpCostMult:0.95}} /* v1090: was tpCostFlat:5. A flat discount decays like every other flat -- 22.7% of a Lv5 cost, 1.9% of a Lv95 one. */,
-  yauhtli_flower:{name:'Yauhtli Flower',nameEs:'Flor de Yauhtli',tier:'common',icon:'🌼',price:100,priceType:'cacao',desc:'Cleanse all allies of ailments at the start of the first round',descEs:'Limpieza de dolencias a todos los aliados al inicio de la primera ronda',flavor:"Sacred marigold of Tlaloc, burned to drive sickness from the body.",flavorEs:'Cempasúchil sagrado de Tlaloc, quemado para expulsar la enfermedad del cuerpo.',eff:{roundCleanse:1}},
+  yauhtli_flower:{name:'Yauhtli Flower',nameEs:'Flor de Yauhtli',tier:'common',icon:'🌼',price:100,priceType:'cacao',desc:'During the first round, all allies are cleansed of ailments after every enemy action',descEs:'Durante la primera ronda, todos los aliados se limpian de dolencias tras cada acción enemiga' /* v1327: was "at the start of the first round" -- it actually cleanses after each enemy action through round 1 (advanceTurn) */,flavor:"Sacred marigold of Tlaloc, burned to drive sickness from the body.",flavorEs:'Cempasúchil sagrado de Tlaloc, quemado para expulsar la enfermedad del cuerpo.',eff:{roundCleanse:1}},
   // Pochteca — Uncommon (750 Cacao) — v370
   stingray_spine:{name:'Stingray Spine',nameEs:'Espina de Mantarraya',tier:'uncommon',icon:'🦴',price:250,priceType:'cacao',desc:'All ally strikes apply Poison \u00d71',descEs:'Todos los golpes aliados aplican Veneno ×1',flavor:"A bloodletter's barb, still slick with the venom of devotion.",flavorEs:'La púa de un sangrador, aún húmeda con el veneno de la devoción.',eff:{strikePoison:1}},
   head_old_god:{name:'Head of the Old God',nameEs:'Cabeza del Dios Viejo',tier:'uncommon',icon:'🪔',price:250,priceType:'cacao',desc:"FIRE units' strikes apply Burn \u00d71",descEs:'Los golpes de las unidades de FUEGO aplican Quemadura ×1',flavor:'A clay brazier-head of Huehueteotl; the oldest fire never truly goes out.',flavorEs:'Un brasero de barro con el rostro de Huehueteotl; el fuego más viejo nunca se apaga del todo.',eff:{strikeBurnFire:1}},
@@ -4544,8 +4552,18 @@ function showOfferingInfo(id){const o=OFFERINGS[id];if(!o)return;
   showMo(o.icon,o.name,`<div style="text-align:center"><div style="font-size:13px;color:#c0e060;margin-bottom:.5rem">${o.desc}</div>${_ns}<div style="font-size:12px;color:var(--td);font-style:italic">${o.flavor}</div></div>`,[{label:'Close',fn:()=>{}}]);
 }
 let POCHTECA_TEST_FREE=false; // v346: real rolled vendor live — debug toggle flips this at runtime
+/* v1330: Run 1, Layer 1 stalls (B4, B5, and the L1-boss stall, which opens at L2/B1) only stock
+   party-wide offerings and ones for the four base-patron elements. offeringElems() derives the
+   element; a multi-element offering must be ALL inside the set (Coatepec Ball: day+earth is out). */
+const R1L1_POCHTECA_ELEMS=['water','fire','wind','earth'];
+function pochtecaR1L1(){
+  const fr=DT.teotl===0&&[...DT.unlocked].length===0&&DT.tecpatl_level===0;
+  return fr&&(G.layer===1||(G.layer===2&&G.battleNum===1));
+}
 function pochtecaPool(){
+  var _r1l1=pochtecaR1L1();
   return Object.keys(OFFERINGS).filter(function(id){var o=OFFERINGS[id];if(!o)return false;
+    if(_r1l1&&offeringElems(id).some(function(e){return R1L1_POCHTECA_ELEMS.indexOf(e)<0;}))return false; /* v1330 */
     if(['common','uncommon','rare'].indexOf(o.tier)<0)return false; // exclude event-exclusives
     if(hasOffering(id))return false; // no dupes: don't offer what you already hold
     if(o.noStockIf&&o.noStockIf())return false; // conditional stock (future, e.g. Stingray vs Xolotl)
@@ -4561,20 +4579,64 @@ function rollPochtecaStock(){
     if(!cands.length)cands=pool.filter(function(id){return !used[id];}); // fallback to any remaining tier
     if(!cands.length)break;
     var id=cands[Math.floor(Math.random()*cands.length)];used[id]=1;
-    var o=OFFERINGS[id];var price=o.price,pt=o.priceType||'cacao';
-    // v684: offerings can be bought with EITHER currency. flowerPrice (rares) is the alt price;
-    // commons get a derived flower price so Flowers always have somewhere to go. buyOffering picks.
-    var altFlower=o.flowerPrice||Math.max(5,Math.round(price/30)); // commons ~100 cacao -> ~5-8 flowers
-    stock.push({id:id,price:price,priceType:pt,flowerPrice:altFlower,sold:false});
+    stock.push(mkPochtecaItem(id));
   }
   return stock;
 }
+/* v1326: one builder for a stall slot, shared by the random roll and the run-1 intro stall.
+   v684: offerings can be bought with EITHER currency. flowerPrice (rares) is the alt price;
+   commons/uncommons get a derived flower price. The derivation reads the DATA price (100 for
+   commons) on purpose: Flower pricing is unchanged by the v1326 Cacao rebase. */
+function mkPochtecaItem(id){
+  var o=OFFERINGS[id];var pt=o.priceType||'cacao';
+  var altFlower=o.flowerPrice||Math.max(5,Math.round(o.price/30));
+  var price=(o.tier==='common')?COMMON_CACAO_BASE:o.price;
+  return {id:id,price:price,priceType:pt,flowerPrice:altFlower,sold:false};
+}
+/* v1326: Run-1 intro stall -- three commons, one per slot.
+   A: party-wide stat booster matched to patron type.  B: patron-element booster (ATK variant for
+   PHYS, MAG variant for MAG, either for MIX).  C: Yauhtli Flower (answers Xochitonal's poison).
+   Earth has no ATK common and Fire's only damage common is Incense Burner -- ruled OK. */
+const INTRO_SLOT_A={PHYS:'eagle_warrior_effigy',MAG:'mallinalli_flower',MIX:'mecapalli_strap'};
+const INTRO_SLOT_B={
+  wind:['piquete_zina_wing','wind_jewel'], water:['huixtocihuatl_salt','tlaloc_olla'],
+  earth:['ilmenite_cube','ilmenite_cube'], fire:['incense_burner','incense_burner'],
+  thunder:['dog_sculpture','dog_sculpture'], night:['itztli_arrowhead','black_paper_flag'],
+  nature:['corn_necklace','cempasuchil_petals'], humanity:['rubber_ball','hueypachtli_dough'],
+  day:['cipactonal_amate','cipactonal_amate']}; // [PHYS pick, MAG pick]
+function rollIntroStock(){
+  var pool=pochtecaPool(),used={},ids=[];
+  var ok=function(id){return id&&pool.indexOf(id)>=0&&!used[id];};
+  var gd=G.god||{},ty=gd.type,pair=INTRO_SLOT_B[gd.element];
+  var b=pair?(ty==='PHYS'?pair[0]:ty==='MAG'?pair[1]:pair[Math.random()<0.5?0:1]):null;
+  [INTRO_SLOT_A[ty],b,'yauhtli_flower'].forEach(function(id){
+    if(!ok(id)){ // held / noStockIf / unknown patron -> any unused common
+      var c=pool.filter(function(x){return OFFERINGS[x].tier==='common'&&!used[x];});
+      id=c.length?c[Math.floor(Math.random()*c.length)]:null;
+    }
+    if(id){used[id]=1;ids.push(id);}
+  });
+  return ids.map(mkPochtecaItem);
+}
+/* v1326: run-1 Pochteca. No DT gate any more.
+   Run 1  : stall after L1 B4 (the intro stall), then miniboss/layer-boss wins only (guarantee flag
+            covers L1 B5 + B8 and every later layer). No 25% roll.
+   Run 2+ : legacy -- skip after B1, guaranteed after miniboss/boss, 25% otherwise.
+   Intro stall is owed to anyone whose first run reached a Tianguis; if run 1 ends before the B4
+   shop, it is dealt at the FIRST shop of the next run instead (ruling), overriding the B1 skip.
+   Veterans from before v1326 never get pochteca_intro_owed, so they never see it. */
 function maybeRollPochteca(isFirstRun){
-  G._tlacuiloPicker=null;
+  G._tlacuiloPicker=null;G._pochtecaIntro=false;
   if(POCHTECA_TEST_FREE){G._pochtecaStock=null;return;} // free stall has its own UI
-  if(isFirstRun||!getDTEffects().pochtecaUnlocked){G._pochtecaStock=null;G._pochtecaGuarantee=false;return;} // gated: non-first run + Trade Route DT node
-  if((G.battlesCompleted||0)<=1){G._pochtecaStock=null;G._pochtecaGuarantee=false;return;} // v363: skip the first shop (after B1) — can't afford an offering yet
   var guaranteed=!!G._pochtecaGuarantee;G._pochtecaGuarantee=false; // v357: guaranteed right after a miniboss/layer-boss
+  if(isFirstRun&&!hasV('pochteca_intro_owed'))markV('pochteca_intro_owed');
+  var introDue=hasV('pochteca_intro_owed')&&!hasV('pochteca_intro_dealt');
+  var b4=(G.layer===1&&G.battleNum===5);
+  if(introDue&&(b4||!isFirstRun)){
+    G._pochtecaStock=rollIntroStock();G._pochtecaIntro=true;markV('pochteca_intro_dealt');return;
+  }
+  if(isFirstRun){G._pochtecaStock=(guaranteed||b4)?rollPochtecaStock():null;return;}
+  if((G.battlesCompleted||0)<=1){G._pochtecaStock=null;return;} // v363: skip the first shop (after B1)
   G._pochtecaStock=(guaranteed||Math.random()<0.25)?rollPochtecaStock():null;
 }
 // v669: Offering Surplus (DT). Escalates across the WHOLE run, not per stall, so repeat rerolling
@@ -4626,8 +4688,9 @@ function rerollPochteca(){
 function buyOffering(i,payWith){
   var st=G._pochtecaStock||[];var it=st[i];if(!it||it.sold)return;
   var pt=payWith||it.priceType; // v684: player chooses cacao or flower
+  if(pt==='flower'&&!getDTEffects().offeringFlowerPay)return; /* v1326: Flower payment needs the Flower Barter node */
   var _tier=(OFFERINGS[it.id]||{}).tier; /* v902 */
-  var eff=(pt==='flower')?Math.round((it.flowerPrice||it.price)*offeringPriceMult('flower',_tier)):Math.round(it.price*offeringPriceMult('cacao',_tier));
+  var eff=(pt==='flower')?Math.round((it.flowerPrice||it.price)*offeringPriceMult('flower',_tier)):offeringCacaoCost(it);
   if((G.res[pt]||0)<eff){notify((pt==='flower'?t('ui.msg.noFlowers'):t('ui.msg.noCacaoBang')),'#e05050');return;}
   G.res[pt]-=eff;G.offeringsBought=(G.offeringsBought||0)+1;grantOffering(it.id);it.sold=true;
   var o=OFFERINGS[it.id];notify(t('ui.msg.acquired',{name:(o?o.icon+" "+o.name:it.id)}),'#c0e060');
@@ -4645,12 +4708,13 @@ function renderPochtecaReal(){
     '<div style="display:flex;gap:8px;align-items:stretch">'+
     stock.map(function(it,i){var o=OFFERINGS[it.id];
       var _tr=(OFFERINGS[it.id]||{}).tier; /* v902 */
-      var cEff=Math.round(it.price*offeringPriceMult('cacao',_tr));var fEff=Math.round((it.flowerPrice||it.price)*offeringPriceMult('flower',_tr));
+      var cEff=offeringCacaoCost(it);var fEff=Math.round((it.flowerPrice||it.price)*offeringPriceMult('flower',_tr));
+      var _fp=getDTEffects().offeringFlowerPay; /* v1326: Flower button hidden until Flower Barter */
       var canC=(G.res.cacao||0)>=cEff,canF=(G.res.flower||0)>=fEff;
       var btn=it.sold?'<span style="margin-top:auto;font-size:11px;color:#50c080;font-weight:600">Acquired ✦</span>':
         ('<div style="margin-top:auto;width:100%;display:flex;gap:4px">'+
          '<button class="btn btn-ca" '+(canC?'':'disabled')+' onclick="buyOffering('+i+',\'cacao\')" style="flex:1;font-size:14px;font-weight:600'+(canC?'':';opacity:.4')+'"><svg class="tl tl-cacao"><use href="#tl-cacao"/></svg> '+cEff+'</button>'+
-         '<button class="btn btn-ca" '+(canF?'':'disabled')+' onclick="buyOffering('+i+',\'flower\')" style="flex:1;font-size:14px;font-weight:600'+(canF?'':';opacity:.4')+'"><svg class="tl tl-quincunx"><use href="#tl-quincunx"/></svg> '+fEff+'</button>'+
+         (_fp?'<button class="btn btn-ca" '+(canF?'':'disabled')+' onclick="buyOffering('+i+',\'flower\')" style="flex:1;font-size:14px;font-weight:600'+(canF?'':';opacity:.4')+'"><svg class="tl tl-quincunx"><use href="#tl-quincunx"/></svg> '+fEff+'</button>':'')+
          '</div>');
       return '<div style="flex:1;min-width:0;background:var(--bm);border:1.5px solid var(--br);border-radius:12px;padding:11px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px'+(it.sold?';opacity:.55':'')+'">'+
         '<span style="font-size:30px;line-height:1">'+o.icon+'</span>'+
@@ -4813,7 +4877,7 @@ function getDTEffects(){
     synergyUnlocked:u.has('synergy_unlock'),
     godAffinity:u.has('god_affinity'), // v828: was folded into synergyUnlocked
     synergyUnlocked2:u.has('synergy_unlock_2'),
-    pochtecaUnlocked:u.has('trade_route'),
+    offeringFlowerPay:u.has('trade_route'), /* v1326: was pochtecaUnlocked -- the node now gates Flower payment, not the vendor */
     offeringRerollUnlocked:u.has('offering_surplus'),
     tlacuiloUnlocked:u.has('codex_services'),
   };
@@ -5387,7 +5451,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1321'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1334'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -6926,6 +6990,10 @@ ${t('ui.howto.prestige')}</div>`,
   );
 }
 function debugToggleForceCrit(){window.DBG_FORCECRIT=!window.DBG_FORCECRIT;const b=document.getElementById('dbg-forcecrit-btn');if(b)b.textContent='Force Crit: '+(window.DBG_FORCECRIT?'ON':'OFF');notify('⚡ Force Crit '+(window.DBG_FORCECRIT?'ENABLED — every hit crits':'disabled'),'#ffd700');}
+function dbgPochIntro(){ /* v1326: re-arm the run-1 intro stall + popup for the next Tianguis */
+  delete V['pochteca_intro_dealt'];delete V['pochteca_popup_seen'];V['pochteca_intro_owed']=true;saveV();
+  G._shopRolled=false;notify('💎 Pochteca intro re-armed — next Tianguis deals it','#c0a0e0');
+}
 function debugTogglePochteca(){
   POCHTECA_TEST_FREE=!POCHTECA_TEST_FREE;
   const onShop=document.getElementById('screen-shop')&&document.getElementById('screen-shop').classList.contains('active');
@@ -8360,6 +8428,16 @@ const OFFERING_PRICE_BANDS=[[5,0.25],[10,0.40],[15,0.60],[Infinity,0.85]];
    purchases are still near-identical between currencies and the gap opens as the count climbs. */
 const FLOWER_RATE_MULT=1.40;
 const FLOWER_TIER_RATE={common:1.00,uncommon:1.15,rare:1.30};
+/* v1326: commons rebased 100 -> 50 Cacao. Purchases 1-5 climb at +70% of base per purchase
+   (50/85/120/155/190) so the 6th lands on 225 -- exactly the old price -- and from there the
+   multiplier is the legacy one doubled, so every later purchase matches the old curve. Cacao +
+   common only; Flower prices and uncommon/rare tiers are untouched. */
+const COMMON_CACAO_BASE=50, LEGACY_COMMON_CACAO=100, COMMON_EARLY_RATE=0.70;
+function offeringCacaoCost(it){
+  const tier=(OFFERINGS[it.id]||{}).tier;
+  const base=(tier==='common')?COMMON_CACAO_BASE:it.price; /* ignores a pre-v1326 saved price:100 */
+  return Math.round(base*offeringPriceMult('cacao',tier));
+}
 function offeringPriceMult(priceType,tier){
   const bought=G.offeringsBought||0;
   const rateScale=(priceType==='flower')?FLOWER_RATE_MULT*(FLOWER_TIER_RATE[tier]||1):1;
@@ -8370,6 +8448,7 @@ function offeringPriceMult(priceType,tier){
     prev=upTo;
     if(bought<=upTo)break;
   }
+  if(priceType==='cacao'&&tier==='common')m=(bought<=5)?1+COMMON_EARLY_RATE*bought:m*(LEGACY_COMMON_CACAO/COMMON_CACAO_BASE); /* v1326 */
   const _d=(getOfferingEffects().windCacaoDiscount||0)*windDeployedCount(); // v580: Gold Serpent Ornament
   if(_d>0)m*=Math.max(0.5,1-_d); // floor at 50% off
   return m;
@@ -9897,6 +9976,12 @@ function isBlessedGod(id){
   if(typeof G!=='undefined'&&G&&G._blessedGodId)return G._blessedGodId===id;
   return !!(DT.unlocked.has('ometeotl_blessing')&&DT.blessedGod&&DT.blessedGod===id);
 }
+/* v1322: god-select names size by length so the long ones sit comfortably in the card:
+   14+ chars (Huitzilopochtli, Mictlantecuhtli, Malinalxochitl) 15px, 12-13 chars 16px, the rest 18px.
+   v1323: the middle tier was 16.5px -- NOT in the Typography tool's inline-size list, so under a size
+   scale those names stayed stock-size while every other name grew (they looked tiny). Whole px only
+   here, or add the value to that list. */
+function godNameFs(n){const L=String(n||'').length;return L>=14?15:L>=12?16:18;}
 function renderGods(){
   rollOmeteotlBlessing(); /* v935 */
   /* v833: the Champions entry stays hidden until Mictlan has been conquered at least once.
@@ -9954,7 +10039,7 @@ function renderGods(){
       const personalTp=DT.godTecpatl&&DT.godTecpatl[gd.id]?DT.godTecpatl[gd.id]:0;
       const tpHeader='';
       const _conq=godConquered(gd.id)?'<span class="god-conq" title="Mictlan conquered">\u2605</span>':''; // v824, v1184: out of flow so it cannot change tile height
-      d.innerHTML=`${tpHeader}<div style="height:64px;display:flex;align-items:center;justify-content:center;margin-bottom:4px">${godIconHtml(gd,52)}</div><div class="jersey" style="font-size:18px;color:${chosen?'#d4af37':'var(--tx)'}">${gd.name}${_conq}</div>`; // v630: tile pills reverted — the ask was pills in descriptions, not on tiles
+      d.innerHTML=`${tpHeader}<div style="height:64px;display:flex;align-items:center;justify-content:center;margin-bottom:4px">${godIconHtml(gd,52)}</div><div class="jersey" style="font-size:${godNameFs(gd.name)}px;color:${chosen?'#d4af37':'var(--tx)'}">${gd.name}${_conq}</div>`; // v630: tile pills reverted — the ask was pills in descriptions, not on tiles
       d.onclick=()=>{G.god=gd;G._lockedSel=null;/* v1170 */document.getElementById('confirm-god').disabled=false;renderGods();showGodDetail(gd);};
     }
     /* v935: four drifting sparks, positioned inside the card. The card is position:relative via
@@ -13147,7 +13232,7 @@ function startBattle(){
   // v610: silent safety net — no glow class survives into a new battle (diagnostic warn removed; it fired on v609's own soft glow, since retired)
   document.querySelectorAll('.uc.ftue-glow,.uc.ftue-glow-soft').forEach(e=>e.classList.remove('ftue-glow','ftue-glow-soft'));
   G.log=[];if(!G._fullLog)G._fullLog=[];G._fullLog.push("=== Battle "+G.battleNum+" ===");G.tutStep=0;G.captureProcessed=new Set();G.capturedDiedThisBattle=[];G._darClaim=null; // v509: Death and Rebirth claim resets each battle
-  G.captureQueue=[];G.capActive=false;G._actingEnemy=null;G._animQueue=[];G._unitStates={};
+  G.captureQueue=[];G.capActive=false;G._actingEnemy=null;G._animQueue=[];G._unitStates={};G._enemyHitsPending=false;G._enemyHitsDone=null; /* v1329 */
   G.spoils={killed:[],captured:[],allyDeaths:[]};G._spoilIds=new Set();G._deathProcessed=new Set();G.mercPool=null;G._shopRolled=false;
   G.cachedEasy=null;G.cachedHard=null;
   /* v776: clear the phase-gate flags at battle start, or a retry after a loss would find
@@ -14016,10 +14101,21 @@ function processCurrentSlot(){
           animateActor(slot.unit.id);
           flushAnimQueue(); /* v968 */
         }
-        G._actingEnemy=null;
-        if(G.captureQueue.length&&!G.capActive){setTimeout(()=>processNextCap(),400);return;}
-        // Phase 4: pause so player can read the damage (600ms)
-        setTimeout(advanceTurn,600);
+        /* v1329: an ability whose hits land on timers (River Judge) used to run past this point --
+           the turn advanced at 600ms while hits and poison were still landing at ~800ms, so late
+           kills, captures and statuses resolved inside the NEXT unit's turn. The ability now raises
+           G._enemyHitsPending and hands us back control when its last hit lands. The 3s backstop
+           only matters if the hit chain throws; it never double-fires (_done guard). */
+        let _done=false;
+        const _afterEnemy=()=>{
+          if(_done)return;_done=true;G._enemyHitsDone=null;
+          G._actingEnemy=null;
+          if(G.captureQueue.length&&!G.capActive){setTimeout(()=>processNextCap(),400);return;}
+          // Phase 4: pause so player can read the damage (600ms)
+          setTimeout(advanceTurn,600);
+        };
+        if(G._enemyHitsPending){G._enemyHitsDone=_afterEnemy;epochTimeout(()=>{if(!_done){G._enemyHitsPending=false;_afterEnemy();}},3000);}
+        else _afterEnemy();
       },600);
     },700);
   }
@@ -14348,6 +14444,17 @@ function scheduleXochiBossSerendipity(bossUnit){
     renderBattle();
   },300);
 }
+/* v1328: Yauhtli Flower sweep, shared. advanceTurn alone was not enough: an enemy whose hits
+   land on timers (River Judge: 5 x 160ms, poison applied at ~800ms) finishes AFTER the 600ms
+   Phase-4 advanceTurn, so the sweep ran on a clean board and the poison survived into the next
+   ally's own post-action tick. Now also swept (a) where River Judge applies its poison and
+   (b) at the top of an ally's resolveStatusAfterAction, so no ailment can tick inside the window. */
+function yauhtliSweep(only){
+  if(!hasOffering('yauhtli_flower'))return;
+  if(!(G.roundNum<=relicWindow(((OFFERINGS.yauhtli_flower||{}).eff||{}).roundCleanse||1)))return;
+  var _yl=(only||G.units).filter(function(u){return u&&u.isAlly!==false&&u.currentHp>0&&((u.poisonStacks||0)>0||(u.burnStacks||0)>0||(u.paralyzStacks||0)>0||(u.woundStacks||0)>0||(u.lethargyStacks||0)>0||(u.drunkStacks||0)>0||(G._slowedUnits&&G._slowedUnits.has(u.id)));});
+  if(_yl.length){_yl.forEach(function(u){cleanseUnit(u);animateStatusPop(u.id,'🌼','#80d0ff');});if(G._yauhtliLogRound!==G.roundNum){G._yauhtliLogRound=G.roundNum;addLog('<span class="log-cp">🌼 Yauhtli Flower — ailments cleansed</span>');}}
+}
 function advanceTurn(actorId){
   if(G.battlePhase==='done')return; // battle already ended — swallow all queued setTimeout callbacks
   if(G._ihiyotlUsed)G._ihiyotlArmed=false; /* v1073: the boosted ACTION is over — disarm for the rest of the battle */
@@ -14355,10 +14462,7 @@ function advanceTurn(actorId){
   const idToMark=actorId||G.selectedActorId;
   if(idToMark)G.actedIds.add(idToMark);
   // v362: Yauhtli Flower — after an enemy acts, strip ailments from allies (cleanseUnit respects Malinalxochitl's 1-stack scalding-miasma rule)
-  if(hasOffering('yauhtli_flower')&&G.roundNum<=relicWindow(((OFFERINGS.yauhtli_flower||{}).eff||{}).roundCleanse||1)&&!actorId){ // v563: nerfed 2 rounds → 1 · v893: reads its own eff through relicWindow
-    var _yl=G.units.filter(function(u){return u.currentHp>0&&((u.poisonStacks||0)>0||(u.burnStacks||0)>0||(u.paralyzStacks||0)>0||(u.woundStacks||0)>0||(u.lethargyStacks||0)>0||(u.drunkStacks||0)>0||(G._slowedUnits&&G._slowedUnits.has(u.id)));});
-    if(_yl.length){_yl.forEach(function(u){cleanseUnit(u);animateStatusPop(u.id,'🌼','#80d0ff');});if(G._yauhtliLogRound!==G.roundNum){G._yauhtliLogRound=G.roundNum;addLog('<span class="log-cp">🌼 Yauhtli Flower — ailments cleansed</span>');}}
-  }
+  if(!actorId)yauhtliSweep(); // v563: nerfed 2 rounds → 1 · v893: reads its own eff through relicWindow · v1328: body moved to yauhtliSweep()
   /* v860: the free branch used to fire for WHOEVER acted next, not for the unit the bonus was
      granted to. That is why selectActor had to cancel the bonus the moment the player clicked a
      different ally -- otherwise that ally's ordinary turn would have been made free and the queue
@@ -14548,6 +14652,7 @@ function animateBuff(unitId,label){
 
 function resolveStatusAfterAction(unit){
   if(unit.currentHp<=0)return;
+  if(unit.isAlly)yauhtliSweep([unit]); /* v1328: never let an ailment tick inside the Yauhtli window */
   // POISON — 5% of maxHP per stack. v763: the stale '10%' in Xolotl's passive text and the
   // status tutorial blurb has been corrected to match; the pip tooltip already read 5%.
   if((unit.poisonStacks||0)>0){
@@ -17777,22 +17882,25 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     // 5-hit multi: MAG×0.8 per hit, Poison ×1 each unique target hit
     const hits=5;const dmgPer=Math.max(1,Math.round(bpn(u)*(u.mag*0.8)));
     const hitTargets=new Set();let i=0;
+    G._enemyHitsPending=true; /* v1329: the slot waits for rjEDone before Phase 4 */
+    const rjEDone=()=>{G._enemyHitsPending=false;const cb=G._enemyHitsDone;G._enemyHitsDone=null;if(cb)cb();};
     function rjEHit(){
       if(i>=hits){
         let _rjP=0;hitTargets.forEach(id=>{const a=aa.find(x=>x.id===id&&x.currentHp>0);if(a&&applyPoison(a,1))_rjP++;}); /* v1174 */
         if(_rjP)addLog(`<span class="log-poison">☠ River Judge poisoned ${_rjP} target${_rjP>1?'s':''}!</span>`);
         addLog(`<span class="log-ab">🦎 River Judge! ${hits} hits ✨🤢</span>`);
+        yauhtliSweep(); /* v1328: poison lands after the turn already advanced -- cleanse it on contact */
         // Flush anim queue now — Phase 3 has already cleared it by the time we finish
         G._animQueue.forEach(a=>animateHit(a.uid,a.dmg,a.isHeal,a.isCrit));
         G._animQueue=[];
         renderBattle();
-        return;
+        rjEDone();return;
       }
-      const live=aa.filter(a=>a.currentHp>0);if(!live.length)return;
+      const live=aa.filter(a=>a.currentHp>0);if(!live.length){rjEDone();return;} /* v1329: party wiped mid-chain -- still hand back so advanceTurn can end the battle */
       const tgt=live[Math.floor(Math.random()*live.length)];
       const h=applyArmorDamage(tgt,dmgPer,true);
       if(h>0){tgt.currentHp=Math.max(0,tgt.currentHp-h);G._animQueue.push({uid:tgt.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});hitTargets.add(tgt.id);onHitContact(u,tgt);onHitContact(u,tgt);if(tgt.currentHp<=0)handleDeath(tgt);}
-      i++;setTimeout(rjEHit,160);
+      i++;epochTimeout(rjEHit,160); /* v1329: was setTimeout -- a chain from an abandoned battle must not hand back into a new one */
     }
     rjEHit();return;
   }
@@ -23082,6 +23190,22 @@ function showShop(){
   const pochHere=POCHTECA_TEST_FREE||(G._pochtecaStock&&G._pochtecaStock.length>0);
   if(pochtab)pochtab.style.display=pochHere?'':'none';
   if(!POCHTECA_TEST_FREE&&G._pochtecaStock&&G._pochtecaStock.length){notify(t('ui.msg.pochtecaHere'),'#d4af37');if(pochtab)pochtab.classList.add('tab-pulse');}
+  /* v1326: one-time Pochteca explainer. Shown with the intro stall, or on a veteran's first stall
+     if they never owned the old Trade Route. Keyed on G._pochtecaIntro (persisted) so a quit
+     before the popup still shows it on resume. Waits out any other open modal. */
+  if(!POCHTECA_TEST_FREE&&pochHere&&!hasV('pochteca_popup_seen')&&(G._pochtecaIntro||!DT.unlocked.has('trade_route'))){
+    markV('pochteca_popup_seen');
+    const _xochi=G._pochtecaIntro&&G.layer===1&&G.battleNum===5;
+    let _tries=0;
+    const _showPoch=()=>{
+      const mo=document.getElementById('mo');
+      if(mo&&mo.classList.contains('open')&&_tries++<40){setTimeout(_showPoch,400);return;}
+      showMo('💎',t('ui.pochteca.introTitle'),
+        '<div style="font-size:13px;line-height:1.7">'+t('ui.pochteca.introBody')+(_xochi?'<br><br><span style="color:#60a0e0">'+t('ui.pochteca.introXochi')+'</span>':'')+'</div>',
+        [{label:t('ui.pochteca.introBtn'),fn:()=>{switchTab('pochteca');}}]);
+    };
+    setTimeout(_showPoch,350);
+  }
   // Sacrifice Altar unlock popup — show once when B2 shop opens for the first time
   if(G.battleNum>=3&&!V['altar_intro_seen']){
     const isFirstRun=DT.teotl===0&&[...DT.unlocked].length===0&&DT.tecpatl_level===0;
@@ -24449,14 +24573,22 @@ async function loadSaveCode(){
   const dtUpgrades=unlockedSet.size;
   const teotlAmt=dtIn.teotl||0;
   const tpLevel=dtIn.tecpatl_level||0;
+  /* v1325: compact summary. The old body was one template line per row ending in <br>, and showMo turns
+     every newline into another <br> -- so each row was double-spaced. Built with no newlines now, as a
+     two-column grid. Divinity Tree is shown as completion % (the always-active hub isn't a purchase, so
+     it's excluded from both sides); Tecpatl only appears once it's been unlocked. The trailing
+     champion-merge note was removed. */
+  const _dtNodes=(typeof TREE_NODES!=='undefined'?TREE_NODES:[]).filter(n=>n.id!=='hub');
+  const dtPct=_dtNodes.length?Math.round(100*_dtNodes.filter(n=>unlockedSet.has(n.id)).length/_dtNodes.length):0;
+  const godsTotal=(typeof GODS!=='undefined'?GODS:[]).length;
+  const champCount=Object.values(dtIn.champions||{}).reduce((s,c)=>s+((c.recent||[]).length),0);
+  const _rows=[['TEOTL',teotlAmt,'#d4af37'],['Divinity Tree',dtPct+'%','#60e090'],['Gods Unlocked',godsUnlocked+'/'+godsTotal,'#7ec2ff'],['Champions Recorded',champCount,'#d4af37']];
+  if(tpLevel>0)_rows.push(['Highest Tecpatl Level',tpLevel,'#ff8080']);
   showMo('📥','Load This Save?',
-    `<div style="font-size:13px;line-height:1.8">This will <strong style="color:#e07070">replace your current progress</strong>.<br><br>
-     <strong>Save Summary:</strong><br>
-     ✦ TEOTL: <strong style="color:#d4af37">${teotlAmt}</strong><br>
-     ✦ Divinity Tree upgrades: <strong style="color:#60e090">${dtUpgrades}</strong><br>
-     ✦ Tecpatl Level: <strong style="color:#ff8080">${tpLevel}</strong><br>
-     ✦ Champion runs in this code: <strong style="color:#d4af37">${Object.values(dtIn.champions||{}).reduce((s,c)=>s+((c.recent||[]).length),0)}</strong>
-     <div style="font-size:11px;color:var(--td);margin-top:8px">Champion records are <strong>merged</strong>, not replaced — clears already on this device are kept.</div></div>`,
+    '<div style="font-size:13px;line-height:1.5">This will <strong style="color:#e07070">replace your current progress</strong>.'
+    +'<div style="display:inline-grid;grid-template-columns:auto auto;gap:4px 18px;margin-top:.7rem;text-align:left">'
+    +_rows.map(r=>'<span style="color:var(--td)">\u2726 '+r[0]+'</span><strong style="color:'+r[2]+';text-align:right">'+r[1]+'</strong>').join('')
+    +'</div></div>',
     [{label:'Replace Save',cls:'btn-sac',fn:()=>{applyImportedSave(parsed);el.value='';notify(t('ui.msg.saveLoaded'),'#50e090');}},
      {label:t('ui.common.cancel'),fn:()=>{}}]);
 }
@@ -24609,7 +24741,9 @@ function restart(){G.dte=getDTEffects();initG();showScr('screen-intro');if(typeo
      build currently uses so new inline sizes are covered automatically. */
   var INLINE = [];
   for(var p=6;p<=72;p++) INLINE.push(String(p));
-  INLINE = INLINE.concat(['9.5','10.5','12.5','13.5']);
+  /* v1323: every half step too -- 8.5/11.5/16.5 px weren't listed, so text at those sizes silently
+     ignored the size scale. */
+  for(var h=6;h<72;h++) INLINE.push(h+'.5');
 
   function px(n){ return (Math.round(n*100)/100) + 'px'; }
 
