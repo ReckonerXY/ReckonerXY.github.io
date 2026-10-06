@@ -657,13 +657,16 @@ body.fx-min.tgt-pulse .uc.targeting-valid:not(.aoe-picked){animation:none}
 /* v1315: the title screen's primary action is now unmistakable -- Begin (new player) or Continue Run
    (run in progress) gets .btn-cta; Start a New Run stays the quieter secondary. Set by
    refreshIntroButtons(). !important because the resume button carries inline colours. */
-.btn.btn-cta{font-size:18px!important;padding:13px 40px!important;font-weight:700;letter-spacing:.5px;border-width:1.5px!important;border-radius:10px}
-#intro-btn.btn-cta{background:linear-gradient(180deg,#f2b030,#c47a10)!important;color:#1a1009!important;border-color:#ffd878!important;
+/* v1377: Safari left the Begin button black -- a background transition switching to a gradient (added after
+   load, inside the title fade-in) never painted. CTAs transition only glow/brightness, and carry a solid
+   colour under the gradient so they can never render dark. */
+.btn.btn-cta{transition:box-shadow .15s,filter .15s!important;font-size:18px!important;padding:13px 40px!important;font-weight:700;letter-spacing:.5px;border-width:1.5px!important;border-radius:10px}
+#intro-btn.btn-cta{background-color:#d89a20!important;background-image:linear-gradient(180deg,#f2b030,#c47a10)!important;color:#1a1009!important;border-color:#ffd878!important;
   box-shadow:0 0 0 1px #6a4008,0 0 18px rgba(242,176,48,.45),inset 0 1px 0 rgba(255,240,200,.5)}
-#intro-btn.btn-cta:hover{background:linear-gradient(180deg,#ffc450,#d88a18)!important;box-shadow:0 0 0 1px #6a4008,0 0 26px rgba(255,196,80,.65),inset 0 1px 0 rgba(255,240,200,.6)}
-#resume-run-btn.btn-cta{background:linear-gradient(180deg,#3aa060,#1e6a3c)!important;color:#f0ffe8!important;border-color:#8af0b0!important;
+#intro-btn.btn-cta:hover{background-color:#e8a828!important;background-image:linear-gradient(180deg,#ffc450,#d88a18)!important;box-shadow:0 0 0 1px #6a4008,0 0 26px rgba(255,196,80,.65),inset 0 1px 0 rgba(255,240,200,.6)}
+#resume-run-btn.btn-cta{background-color:#2c8550!important;background-image:linear-gradient(180deg,#3aa060,#1e6a3c)!important;color:#f0ffe8!important;border-color:#8af0b0!important;
   box-shadow:0 0 0 1px #0e3a20,0 0 18px rgba(80,224,144,.4),inset 0 1px 0 rgba(220,255,230,.35)}
-#resume-run-btn.btn-cta:hover{background:linear-gradient(180deg,#48b870,#26804a)!important;box-shadow:0 0 0 1px #0e3a20,0 0 26px rgba(80,224,144,.6),inset 0 1px 0 rgba(220,255,230,.45)}
+#resume-run-btn.btn-cta:hover{background-color:#36985c!important;background-image:linear-gradient(180deg,#48b870,#26804a)!important;box-shadow:0 0 0 1px #0e3a20,0 0 26px rgba(80,224,144,.6),inset 0 1px 0 rgba(220,255,230,.45)}
 /* .is-slowed is the third dim source (opacity:.45 + grayscale, line ~42) and hits an ally who is
    waiting his turn -- precisely the one you are most likely to be aiming a heal at. Same defect,
    one class further out; folded in so the rule reads as one law: a legal target is never dimmed. */
@@ -5938,7 +5941,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1376'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1377'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -7488,10 +7491,10 @@ ${t('ui.howto.prestige')}</div>`,
   );
 }
 /* v1357: Codex battle UI test toggle (Genaro: default off while testing; flip CX_DEFAULT once happy). */
-const CX_DEFAULT=false;
-function cxUiOn(){try{const v=localStorage.getItem('teotlan_codexUI');return v===null?CX_DEFAULT:v==='1';}catch(e){return CX_DEFAULT;}}
+const CX_DEFAULT=true; /* v1377: ON by default (Genaro). Key bumped to teotlan_codexUI2 so OFF choices saved while testing don't hide it on any device. */
+function cxUiOn(){try{const v=localStorage.getItem('teotlan_codexUI2');return v===null?CX_DEFAULT:v==='1';}catch(e){return CX_DEFAULT;}}
 function cxApply(){const on=cxUiOn();document.body.classList.toggle('codex-ui',on);const b=document.getElementById('dbg-codexui-btn');if(b)b.textContent='Codex UI: '+(on?'ON':'OFF');}
-function debugToggleCodexUI(){const on=!cxUiOn();try{localStorage.setItem('teotlan_codexUI',on?'1':'0');}catch(e){}cxApply();}
+function debugToggleCodexUI(){const on=!cxUiOn();try{localStorage.setItem('teotlan_codexUI2',on?'1':'0');}catch(e){}cxApply();}
 try{if(document.body)cxApply();else document.addEventListener('DOMContentLoaded',cxApply);}catch(e){}
 /* v1358: battle-opening codex fold. Reuses the title screen's kaUnfold/kaUnroll at the returning-player
    pace (K 0.75): page frames unroll, then every card unfolds from its left edge, enemies first, left to right,
