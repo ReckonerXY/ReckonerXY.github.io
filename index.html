@@ -303,6 +303,143 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .chima-pip{white-space:nowrap;border-bottom:1px dotted #3a6a8a}
 .cleanse-pip{white-space:nowrap;border-bottom:1px dotted #3a8a70}
 .sac-pip{white-space:nowrap;border-bottom:1px dotted #6a5a20}
+/* v1335: structured special descriptions. Row 1 = what the move is (type, power, targets/hits, or
+   support heal + cleanse); row 2 = everything else, as prose with hoverable keywords. */
+.sf{margin-top:2px}
+.sf-r1{display:flex;flex-wrap:wrap;gap:3px;margin:2px 0 1px}
+.sf-c{display:inline-block;font-size:11px;line-height:15px;padding:0 5px;border:0.5px solid #5a4a38;border-radius:3px;background:#120d0a;white-space:nowrap}
+.sf-c{color:#e8dcc4}
+.sf-c b{font-weight:400;color:#9a8a70;margin-right:3px}
+.sf-nm{color:#f0d890;font-style:normal}
+.sf-r1n{align-items:center;gap:4px 5px}
+/* v1357: Codex battle UI (body.codex-ui). Side lives on the PAGE, never on the card: card border and
+   greca --fc stay the turn-state channels (v1130). Scoped so the toggle off is the old screen exactly. */
+.cx-fold{display:none}
+body.codex-ui .cx-page{position:relative;border:2px solid var(--pc);border-radius:6px;padding:16px 8px 9px;background:var(--pbg);box-shadow:inset 0 0 0 3px #120d0a,inset 0 0 0 4px var(--pc);margin-top:12px!important}
+body.codex-ui .cx-enemy{--pc:#a33a26;--pbg:linear-gradient(180deg,#1d120d,#170f0b)}
+body.codex-ui .cx-enemy.cx-boss{--pc:#c04a2a;--pbg:radial-gradient(ellipse at 50% 25%,#2a140d,#170f0b 75%)}
+body.codex-ui .cx-ally{--pc:#2f8a6e;--pbg:linear-gradient(180deg,#0f1712,#0d130f)}
+body.codex-ui .cx-page>.row-lbl{position:absolute;top:-10px;left:14px;margin:0!important;padding:0 8px;background:#120d0a;font-size:0;line-height:1;z-index:6}
+body.codex-ui .cx-page>.row-lbl::after{content:attr(data-cx);font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--pc)}
+body.codex-ui .battle-head .round-banner{display:none}
+body.codex-ui .cx-fold{display:flex;align-items:center;gap:8px;margin:10px 0 0;color:#d4af37;font-size:16px}
+body.codex-ui .cx-fold::before,body.codex-ui .cx-fold::after{content:"";flex:1;height:6px;background:repeating-linear-gradient(90deg,#3a2e22 0 6px,transparent 6px 10px)}
+body.codex-ui .cx-fold>span{white-space:nowrap}
+body.codex-ui .uc-foot{min-height:0}
+body.codex-ui .uc-foot .cx-acted{position:absolute;top:6px;right:6px;z-index:5;font-size:10px;line-height:13px;background:#120d0a;border:1px solid #5a4a38;border-radius:3px;padding:0 4px;color:#9a8a70!important}
+body.codex-ui .uc-name>span{white-space:nowrap}
+/* v1360: statuses ride the bottom of the portrait (CSS only -- the create and patch paths both keep writing
+   the same .status-row; it is simply drawn first and pulled up). Wraps to a 2nd row, never overflows;
+   buffs share the row (Genaro). Empty rows take no space. */
+body.codex-ui .uc-body{display:flex;flex-direction:column}
+body.codex-ui .uc-body>.status-row{order:-1;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px;position:relative;z-index:4;margin:-17px 2px 3px}
+body.codex-ui .uc-body>.status-row:empty{display:none}
+body.codex-ui .uc-body>.status-row>div{margin-top:0!important}
+body.codex-ui .uc-body>.status-row .burn-pip{margin-top:0;font-size:10px;line-height:13px;padding:0 3px;border-radius:3px;border-width:1px;box-shadow:0 1px 2px rgba(0,0,0,.6)}
+/* v1361: boss layouts. Layer boss ~2.2x, miniboss ~1.6x; side lives on the page, so no card-level glow
+   (box-shadow and border stay turn-state channels). */
+body.codex-ui #erow.cx-bf{display:grid!important;grid-template-columns:repeat(var(--cxbig,1),auto) 16px repeat(var(--cxcols,2),auto);grid-template-rows:1fr;justify-content:center;align-items:end;gap:6px} /* v1362: 1fr spacer row + bottom-aligned escorts */
+body.codex-ui #erow.cx-bf::before{content:"";grid-column:var(--cxdiv,2);grid-row:1 / span var(--cxrows,1);border-left:1px dashed #4a3a2a;justify-self:center;width:0}
+body.codex-ui #erow.cx-bf.cx-solo{grid-template-columns:repeat(var(--cxbig,1),auto);grid-template-rows:auto}
+body.codex-ui #erow.cx-bf.cx-solo::before{display:none}
+body.codex-ui #erow.cx-bf>.uc{grid-column:var(--cxc,auto);grid-row:var(--cxr,auto)}
+body.codex-ui #erow .uc.cx-big:not(.miniboss){min-width:230px!important;max-width:250px!important;width:240px}
+body.codex-ui #erow .uc.cx-big.miniboss{min-width:172px!important;max-width:190px!important;width:180px}
+body.codex-ui #erow .uc.cx-big:not(.miniboss) .uc-art{min-height:150px}
+body.codex-ui #erow .uc.cx-big.miniboss .uc-art{min-height:116px}
+body.codex-ui #erow .uc.cx-big:not(.miniboss) .uc-art img{width:140px!important;height:140px!important}
+body.codex-ui #erow .uc.cx-big.miniboss .uc-art img{width:100px!important;height:100px!important}
+body.codex-ui #erow .uc.cx-big:not(.miniboss) .ico-emoji{font-size:96px!important}
+body.codex-ui #erow .uc.cx-big.miniboss .ico-emoji{font-size:70px!important}
+body.codex-ui #erow .uc.cx-big:not(.miniboss) .uc-name{font-size:17px}
+body.codex-ui #erow .uc.cx-big.miniboss .uc-name{font-size:14px}
+body.codex-ui #erow .uc.cx-big .bar-wrap{height:17px}
+@media (max-width:559px){body.codex-ui #erow .uc.cx-big:not(.miniboss){min-width:220px!important;width:220px}body.codex-ui #erow .uc.cx-big:not(.miniboss) .uc-art img{width:140px!important;height:140px!important}}
+body.codex-ui .cip-body .uc[data-uid^="boss_cipactli_head"] .uc-art{padding:16px 3px 14px}
+body.codex-ui .cip-body .uc[data-uid^="boss_cipactli_head"] .uc-art img{transform:scale(1.3)}
+/* v1363: boss entrance -- rise, title plate, and (layer bosses) shake + red flare on impact */
+body.codex-ui .uc.cx-boss-rise{transform-origin:50% 60%;animation:cxBossRise calc(.95s*var(--kaK,1)) cubic-bezier(.2,.8,.25,1) var(--cxbd,0s) both}
+@keyframes cxBossRise{0%{opacity:0;transform:scale(1.45) translateY(-10px);filter:brightness(3) saturate(.2)}52%{opacity:1;transform:scale(.95);filter:brightness(1.7)}72%{transform:scale(1.03);filter:brightness(1.15)}100%{opacity:1;transform:none;filter:none}}
+body.codex-ui .cx-plate{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);z-index:8;pointer-events:none;text-align:center;padding:10px 0;
+  background:linear-gradient(90deg,transparent,rgba(10,6,4,.88) 18%,rgba(10,6,4,.88) 82%,transparent);border-top:1px solid var(--pc);border-bottom:1px solid var(--pc);
+  animation:cxPlate calc(1.8s*var(--kaK,1)) ease-out var(--cxpd,0s) both}
+body.codex-ui .cx-plate b{display:block;font-weight:400;font-size:30px;color:#ffb070;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 0 12px rgba(255,90,40,.6)}
+body.codex-ui .cx-plate span{display:block;font-size:14px;color:#d8c0a0;letter-spacing:.05em}
+body.codex-ui #screen-battle.cx-intro-mini .cx-plate b{color:#9ad0ff;text-shadow:0 0 12px rgba(80,160,230,.6)}
+@keyframes cxPlate{0%{opacity:0;clip-path:inset(0 50% 0 50%)}18%{opacity:1;clip-path:inset(0 0 0 0)}78%{opacity:1}100%{opacity:0}}
+body.codex-ui #screen-battle.cx-intro-boss #cx-enemy.cx-impact{animation:cxShake .38s linear both,cxFlare .9s ease-out both}
+body.codex-ui #screen-battle.cx-intro-mini #cx-enemy.cx-impact{animation:cxShake .38s linear both,cxFlareMini .9s ease-out both} /* v1364: minibosses get the full entrance (Genaro), in their blue */
+@keyframes cxShake{0%,100%{transform:none}15%{transform:translate(-6px,3px)}30%{transform:translate(6px,-3px)}45%{transform:translate(-4px,2px)}60%{transform:translate(4px,-1px)}80%{transform:translate(-2px,1px)}}
+@keyframes cxFlare{0%{box-shadow:inset 0 0 0 3px #120d0a,inset 0 0 0 4px var(--pc),0 0 0 0 rgba(255,70,30,0)}25%{box-shadow:inset 0 0 0 3px #120d0a,inset 0 0 0 4px var(--pc),0 0 46px 10px rgba(255,70,30,.55),inset 0 0 60px rgba(255,60,20,.35)}100%{box-shadow:inset 0 0 0 3px #120d0a,inset 0 0 0 4px var(--pc),0 0 0 0 rgba(255,70,30,0)}}
+@keyframes cxFlareMini{0%{box-shadow:inset 0 0 0 3px #120d0a,inset 0 0 0 4px var(--pc),0 0 0 0 rgba(80,160,230,0)}25%{box-shadow:inset 0 0 0 3px #120d0a,inset 0 0 0 4px var(--pc),0 0 46px 10px rgba(80,160,230,.55),inset 0 0 60px rgba(60,140,220,.35)}100%{box-shadow:inset 0 0 0 3px #120d0a,inset 0 0 0 4px var(--pc),0 0 0 0 rgba(80,160,230,0)}}
+/* v1366: victory */
+body.codex-ui .cx-fold{position:relative}
+body.codex-ui .cx-vplate{position:absolute;left:-8px;right:-8px;top:50%;transform:translateY(-50%);z-index:9;pointer-events:none;text-align:center;padding:12px 0;
+  background:linear-gradient(90deg,transparent,rgba(12,9,3,.9) 15%,rgba(12,9,3,.9) 85%,transparent);border-top:1px solid #d4af37;border-bottom:1px solid #d4af37;
+  animation:cxVPlate 1.5s ease-out both}
+body.codex-ui .cx-vplate.big{animation-duration:2.3s}
+body.codex-ui .cx-vplate b{display:block;font-weight:400;font-size:34px;color:#ffe080;letter-spacing:.16em;text-transform:uppercase;text-shadow:0 0 14px rgba(255,200,80,.65)}
+body.codex-ui .cx-vplate span{display:block;font-size:15px;color:#e8d4a8;letter-spacing:.05em}
+@keyframes cxVPlate{0%{opacity:0;clip-path:inset(0 50% 0 50%)}16%{opacity:1;clip-path:inset(0 0 0 0)}82%{opacity:1}100%{opacity:0}}
+body.codex-ui #cx-enemy.cx-won{animation:cxWonDrain .9s ease-out both}
+body.codex-ui #cx-enemy.cx-won.cx-won-big{animation:cxShake .4s linear both,cxWonDrain 1.2s ease-out both}
+@keyframes cxWonDrain{0%{filter:none;opacity:1}100%{filter:grayscale(.85) brightness(.7);opacity:.75}}
+body.codex-ui #party-section.cx-hail{animation:cxHail 1.2s ease-out both}
+@keyframes cxHail{0%{box-shadow:inset 0 0 0 3px #120d0a,inset 0 0 0 4px var(--pc),0 0 0 0 rgba(255,210,90,0)}30%{box-shadow:inset 0 0 0 3px #120d0a,inset 0 0 0 4px var(--pc),0 0 40px 8px rgba(255,210,90,.5),inset 0 0 50px rgba(255,200,80,.25)}100%{box-shadow:inset 0 0 0 3px #120d0a,inset 0 0 0 4px var(--pc),0 0 0 0 rgba(255,210,90,0)}}
+/* v1367: chunky greca bands on the boss-intro and victory plates (Genaro). A repeating stepped-fret
+   tile used as a mask, so one tile serves every colour: ember for bosses, blue for minibosses, gold for
+   victory. They live inside the plate, so they sweep open with it and fade at the ends like it does. */
+body.codex-ui .cx-plate,body.codex-ui .cx-vplate{border-top:0!important;border-bottom:0!important;padding-top:34px!important;padding-bottom:34px!important;--gc:#e0703a}
+body.codex-ui #screen-battle.cx-intro-mini .cx-plate{--gc:#6ab0e8}
+body.codex-ui .cx-vplate{--gc:#e8c050}
+body.codex-ui .cx-plate::before,body.codex-ui .cx-plate::after,body.codex-ui .cx-vplate::before,body.codex-ui .cx-vplate::after{
+  content:"";position:absolute;left:0;right:0;height:24px;background:var(--gc);pointer-events:none;
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27square%27%3E%3Cpath%20d%3D%27M0%202.5H24M0%2021.5H24%27%2F%3E%3Cpath%20d%3D%27M19.5%2021.5V8H6V16.5H14V12.5%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E"),linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);
+          mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27square%27%3E%3Cpath%20d%3D%27M0%202.5H24M0%2021.5H24%27%2F%3E%3Cpath%20d%3D%27M19.5%2021.5V8H6V16.5H14V12.5%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E"),linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);
+  -webkit-mask-size:24px 24px,100% 100%;mask-size:24px 24px,100% 100%;
+  -webkit-mask-repeat:repeat-x,no-repeat;mask-repeat:repeat-x,no-repeat;
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+  filter:drop-shadow(0 0 4px rgba(0,0,0,.8))}
+body.codex-ui .cx-plate::before,body.codex-ui .cx-vplate::before{top:4px}
+body.codex-ui .cx-plate::after,body.codex-ui .cx-vplate::after{bottom:4px;transform:scaleY(-1)}
+/* v1370: the chunky greca frame on the UI boxes (Genaro), each in its own colour: codex pages (side colour),
+   path choices (green easy / red hard / gold event), the battle-codex roster and the Pochteca's wares.
+   Same nine-slice fret as the v1369 training cards, drawn on ::after via --gkc; the thin border goes and the
+   padding grows by the frame weight so nothing sits under it. */
+.choice-card,.party-chips,.gk-ware{position:relative}
+body.codex-ui .cx-page::after,.choice-card::after,.party-chips::after,.gk-ware::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;
+  background:var(--gkc,#8a7048);
+  -webkit-mask-box-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2772%27%20height%3D%2772%27%20viewBox%3D%270%200%2072%2072%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27square%27%3E%3Cpath%20d%3D%27M2.5%202.5H69.5V69.5H2.5Z%27%2F%3E%3Cpath%20d%3D%27M21.5%2021.5H50.5V50.5H21.5Z%27%2F%3E%3Cpath%20d%3D%27M43.5%2021.5V8H30V16.5H38V12.5%27%2F%3E%3Cpath%20d%3D%27M43.5%2050.5V64H30V55.5H38V59.5%27%2F%3E%3Cpath%20d%3D%27M21.5%2043.5H8V30H16.5V38H12.5%27%2F%3E%3Cpath%20d%3D%27M50.5%2043.5H64V30H55.5V38H59.5%27%2F%3E%3Cpath%20d%3D%27M8%2016V8H16V12.5H12%27%2F%3E%3Cpath%20d%3D%27M64%2016V8H56V12.5H60%27%2F%3E%3Cpath%20d%3D%27M8%2056V64H16V59.5H12%27%2F%3E%3Cpath%20d%3D%27M64%2056V64H56V59.5H60%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") 24 round;-webkit-mask-box-image-width:var(--gkw,18px);
+  mask-border:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2772%27%20height%3D%2772%27%20viewBox%3D%270%200%2072%2072%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27square%27%3E%3Cpath%20d%3D%27M2.5%202.5H69.5V69.5H2.5Z%27%2F%3E%3Cpath%20d%3D%27M21.5%2021.5H50.5V50.5H21.5Z%27%2F%3E%3Cpath%20d%3D%27M43.5%2021.5V8H30V16.5H38V12.5%27%2F%3E%3Cpath%20d%3D%27M43.5%2050.5V64H30V55.5H38V59.5%27%2F%3E%3Cpath%20d%3D%27M21.5%2043.5H8V30H16.5V38H12.5%27%2F%3E%3Cpath%20d%3D%27M50.5%2043.5H64V30H55.5V38H59.5%27%2F%3E%3Cpath%20d%3D%27M8%2016V8H16V12.5H12%27%2F%3E%3Cpath%20d%3D%27M64%2016V8H56V12.5H60%27%2F%3E%3Cpath%20d%3D%27M8%2056V64H16V59.5H12%27%2F%3E%3Cpath%20d%3D%27M64%2056V64H56V59.5H60%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") 24 / var(--gkw,18px) round}
+body.codex-ui .cx-page{--gkc:var(--pc);border-color:transparent!important;box-shadow:none;padding:26px 20px 20px}
+body.codex-ui .cx-page>.row-lbl{top:-2px;z-index:6}
+.choice-card{border-color:transparent!important;padding:calc(.9rem + 10px)}
+.choice-card.easy{--gkc:#3a9a5a}.choice-card.hard{--gkc:#b04040}.choice-card.event{--gkc:#c8a030}
+.party-chips{border-color:transparent;padding:calc(.6rem + 10px) calc(.6rem + 12px)}
+.gk-ware{border-color:transparent!important;padding:20px 16px!important}
+/* v1371: LIGHT greca variant (single rail, short hooked fret, square corners) -- a subordinate of the
+   chunky page frame. Roster box: replaces the heavy frame so it no longer crowds the party slots.
+   Battle unit cards (codex mode): replaces the traced v1130 frame; colour is still --fc, the turn-state channel. */
+.party-chips::after{-webkit-mask-box-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2748%27%20height%3D%2748%27%20viewBox%3D%270%200%2048%2048%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%272.5%27%20stroke-linecap%3D%27square%27%3E%3Cpath%20d%3D%27M1.5%201.5H46.5V46.5H1.5Z%27%2F%3E%3Cpath%20d%3D%27M28%201.5V11H20V6H24.5%27%2F%3E%3Cpath%20d%3D%27M28%2046.5V37H20V42H24.5%27%2F%3E%3Cpath%20d%3D%27M1.5%2028H11V20H6V24.5%27%2F%3E%3Cpath%20d%3D%27M46.5%2028H37V20H42V24.5%27%2F%3E%3Cpath%20d%3D%27M6%206H10V10H6Z%27%2F%3E%3Cpath%20d%3D%27M38%206H42V10H38Z%27%2F%3E%3Cpath%20d%3D%27M6%2038H10V42H6Z%27%2F%3E%3Cpath%20d%3D%27M38%2038H42V42H38Z%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") 16 round;-webkit-mask-box-image-width:14px;mask-border:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2748%27%20height%3D%2748%27%20viewBox%3D%270%200%2048%2048%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%272.5%27%20stroke-linecap%3D%27square%27%3E%3Cpath%20d%3D%27M1.5%201.5H46.5V46.5H1.5Z%27%2F%3E%3Cpath%20d%3D%27M28%201.5V11H20V6H24.5%27%2F%3E%3Cpath%20d%3D%27M28%2046.5V37H20V42H24.5%27%2F%3E%3Cpath%20d%3D%27M1.5%2028H11V20H6V24.5%27%2F%3E%3Cpath%20d%3D%27M46.5%2028H37V20H42V24.5%27%2F%3E%3Cpath%20d%3D%27M6%206H10V10H6Z%27%2F%3E%3Cpath%20d%3D%27M38%206H42V10H38Z%27%2F%3E%3Cpath%20d%3D%27M6%2038H10V42H6Z%27%2F%3E%3Cpath%20d%3D%27M38%2038H42V42H38Z%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") 16 / 14px round}
+div.party-chips{padding:calc(.6rem + 8px) calc(.6rem + 10px)} /* v1371: div. so it outranks the original .party-chips{padding:.6rem} later in the sheet */
+body.codex-ui .uc::before{-webkit-mask-box-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2748%27%20height%3D%2748%27%20viewBox%3D%270%200%2048%2048%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%272.5%27%20stroke-linecap%3D%27square%27%3E%3Cpath%20d%3D%27M1.5%201.5H46.5V46.5H1.5Z%27%2F%3E%3Cpath%20d%3D%27M28%201.5V11H20V6H24.5%27%2F%3E%3Cpath%20d%3D%27M28%2046.5V37H20V42H24.5%27%2F%3E%3Cpath%20d%3D%27M1.5%2028H11V20H6V24.5%27%2F%3E%3Cpath%20d%3D%27M46.5%2028H37V20H42V24.5%27%2F%3E%3Cpath%20d%3D%27M6%206H10V10H6Z%27%2F%3E%3Cpath%20d%3D%27M38%206H42V10H38Z%27%2F%3E%3Cpath%20d%3D%27M6%2038H10V42H6Z%27%2F%3E%3Cpath%20d%3D%27M38%2038H42V42H38Z%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") 16 round;-webkit-mask-box-image-width:var(--fw,12px);mask-border:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2748%27%20height%3D%2748%27%20viewBox%3D%270%200%2048%2048%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%272.5%27%20stroke-linecap%3D%27square%27%3E%3Cpath%20d%3D%27M1.5%201.5H46.5V46.5H1.5Z%27%2F%3E%3Cpath%20d%3D%27M28%201.5V11H20V6H24.5%27%2F%3E%3Cpath%20d%3D%27M28%2046.5V37H20V42H24.5%27%2F%3E%3Cpath%20d%3D%27M1.5%2028H11V20H6V24.5%27%2F%3E%3Cpath%20d%3D%27M46.5%2028H37V20H42V24.5%27%2F%3E%3Cpath%20d%3D%27M6%206H10V10H6Z%27%2F%3E%3Cpath%20d%3D%27M38%206H42V10H38Z%27%2F%3E%3Cpath%20d%3D%27M6%2038H10V42H6Z%27%2F%3E%3Cpath%20d%3D%27M38%2038H42V42H38Z%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") 16 / var(--fw,12px) round}
+body.codex-ui .uc{--fw:12px;padding:12px}
+/* v1358: opening fold (classes only live during cxIntroThen) */
+body.codex-ui #screen-battle.cx-intro .cx-page,body.codex-ui #screen-battle.cx-intro .cx-fold{animation:kaUnroll calc(.5s*var(--kaK,1.25)) cubic-bezier(.3,.6,.2,1) both;pointer-events:none}
+body.codex-ui #screen-battle.cx-intro .unit-row,body.codex-ui #screen-battle.cx-intro .cip-body,body.codex-ui #screen-battle.cx-intro .cip-host{perspective:1200px}
+body.codex-ui .uc.cx-unfold{transform-origin:0 50%;animation:kaUnfold calc(.55s*var(--kaK,1.25)) cubic-bezier(.2,.7,.2,1) both;animation-delay:calc((.25s + var(--cxi,0)*.08s)*var(--kaK,1.25))}
+/* v1356: converted specials sit in a box -- header band (name, cost on the right) over a body. Built from
+   the existing .tc-spec/.tc-desc pair so every screen keeps its own markup; !important only to beat the
+   inline separator styles the oblation rows carry. */
+.sf-hd{display:flex;justify-content:space-between;align-items:center;gap:6px;border:1px solid #5a4a38!important;border-bottom:1px solid #3a2e22!important;border-radius:6px 6px 0 0;background:#1d150d;padding:4px 8px!important;margin:6px 0 0!important}
+.sf-hd .sf-nm,.sf-hd .tc-spec-name{font-style:normal}
+.sf-bd{border:1px solid #5a4a38;border-top:none;border-radius:0 0 6px 6px;background:rgba(0,0,0,.18);padding:4px 8px 6px;margin:0 0 4px}
+.sf-bd>.sf{margin-top:0}
+.sf.sf-boxed{border:1px solid #5a4a38;border-radius:6px;background:rgba(0,0,0,.18);padding:5px 8px 6px;margin-top:4px}
+.sf-r1n .sf-nm{margin-right:2px}
+.sf-r2{border-top:0.5px dashed #4a3a2a;margin-top:4px;padding-top:3px;line-height:1.4;color:#c8bca4;font-style:normal}
+.sf-kw{white-space:nowrap;border-bottom:1px dotted;cursor:help}
+.splash-pip{white-space:nowrap;border-bottom:1px dotted #8a6a3a;cursor:help}
 .tc-cost{font-size:11px;color:#c0a0e0;background:#1a0a2a;border:0.5px solid #503070;border-radius:8px;padding:1px 7px;white-space:nowrap}
 .tc-desc{font-size:11.5px;color:var(--td);line-height:1.35}
 .tc-sacpill{font-size:10px;color:#b09030;margin-top:2px}
@@ -731,6 +868,14 @@ body.fx-min .relic.relic-fire{animation:none}
 .train-card{position:relative;--fw:14px}
 .train-card.tc-patron{--fc:#f0cf62;--fw:16px}
 .train-card{--fc:#d8bd85}
+/* v1369: chunky greca frame for training cards (Genaro: the traced v1130 frame barely read at card size).
+   Nine-slice of the same stepped fret as the v1367 title plates; colour stays the card's --fc. Padding grows
+   by the extra frame weight so nothing inside the card moves under it. Battle cards keep the traced frame. */
+.train-card{--fw:20px;padding:calc(1.15rem + 8px) calc(1.2rem + 8px)}
+.train-card.tc-patron{--fw:22px}
+.train-card::before{
+  -webkit-mask-box-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2772%27%20height%3D%2772%27%20viewBox%3D%270%200%2072%2072%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27square%27%3E%3Cpath%20d%3D%27M2.5%202.5H69.5V69.5H2.5Z%27%2F%3E%3Cpath%20d%3D%27M21.5%2021.5H50.5V50.5H21.5Z%27%2F%3E%3Cpath%20d%3D%27M43.5%2021.5V8H30V16.5H38V12.5%27%2F%3E%3Cpath%20d%3D%27M43.5%2050.5V64H30V55.5H38V59.5%27%2F%3E%3Cpath%20d%3D%27M21.5%2043.5H8V30H16.5V38H12.5%27%2F%3E%3Cpath%20d%3D%27M50.5%2043.5H64V30H55.5V38H59.5%27%2F%3E%3Cpath%20d%3D%27M8%2016V8H16V12.5H12%27%2F%3E%3Cpath%20d%3D%27M64%2016V8H56V12.5H60%27%2F%3E%3Cpath%20d%3D%27M8%2056V64H16V59.5H12%27%2F%3E%3Cpath%20d%3D%27M64%2056V64H56V59.5H60%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") 24 round;-webkit-mask-box-image-width:var(--fw,20px);
+  mask-border:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2772%27%20height%3D%2772%27%20viewBox%3D%270%200%2072%2072%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27square%27%3E%3Cpath%20d%3D%27M2.5%202.5H69.5V69.5H2.5Z%27%2F%3E%3Cpath%20d%3D%27M21.5%2021.5H50.5V50.5H21.5Z%27%2F%3E%3Cpath%20d%3D%27M43.5%2021.5V8H30V16.5H38V12.5%27%2F%3E%3Cpath%20d%3D%27M43.5%2050.5V64H30V55.5H38V59.5%27%2F%3E%3Cpath%20d%3D%27M21.5%2043.5H8V30H16.5V38H12.5%27%2F%3E%3Cpath%20d%3D%27M50.5%2043.5H64V30H55.5V38H59.5%27%2F%3E%3Cpath%20d%3D%27M8%2016V8H16V12.5H12%27%2F%3E%3Cpath%20d%3D%27M64%2016V8H56V12.5H60%27%2F%3E%3Cpath%20d%3D%27M8%2056V64H16V59.5H12%27%2F%3E%3Cpath%20d%3D%27M64%2056V64H56V59.5H60%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") 24 / var(--fw,20px) round}
 
 /* ═══ v1130: TURN STATE — must be the last word on --fc ══════════════════════
    These live at the end of the stylesheet on purpose. Tier rules (.uc.tier-god
@@ -1015,7 +1160,7 @@ body.fx-min .relic.relic-fire{animation:none}
   opacity:0;pointer-events:none;transition:opacity .25s ease}
 .mm-nav.on{opacity:1;pointer-events:auto}
 /* 10px track padding + 46px medal radius - 17px half-chevron: lands the chevron on the road. */
-.mm-nav svg{display:block;margin-top:39px}
+.mm-nav svg{display:block;margin-top:calc(10px + 46px*var(--mmk,1) - 17px)}
 .mm-more{right:0;justify-content:flex-end;
   background:linear-gradient(to right,rgba(26,16,9,0) 0%,rgba(26,16,9,.86) 62%,var(--bd) 100%)}
 .mm-more svg{margin-right:6px}
@@ -1033,7 +1178,7 @@ body.fx-min .mm-nav{transition:none}
    medallion rim exactly like ink would be.
    The rotation needs its own selector: .mm-medal>* already sets a centring transform, and
    transform does not merge across rules, so two classes beat one and restate the whole thing. */
-.mm-stamp{position:absolute;left:50%;top:50%;width:62px;height:62px;z-index:2;
+.mm-stamp{position:absolute;left:50%;top:50%;width:calc(62px*var(--mmk,1));height:calc(62px*var(--mmk,1));z-index:2;
   color:#50c080;opacity:.55;pointer-events:none}
 .mm-medal .mm-stamp{transform:translate(-50%,-50%) rotate(-12deg)}
 .mm-stamp .tl{width:100%;height:100%;margin-right:0;vertical-align:0;
@@ -1044,9 +1189,9 @@ body.fx-min .mm-nav{transition:none}
 .mm-node.mm-start.done .mm-name{color:#6a5a38}
 .mm-node.mm-start.done .mm-sub{color:#4a3a22}
 .mm-node.mm-start.done .mm-num{color:#5a4a2a}
-.mm-track{position:relative;display:flex;width:max-content;padding:10px 48px 4px}
-.mm-node{position:relative;z-index:1;flex:0 0 160px;width:160px;text-align:center}
-.mm-medal{position:relative;width:92px;height:92px;margin:0 auto;border-radius:50%;
+.mm-track{position:relative;display:flex;width:max-content;padding:10px calc(48px*var(--mmk,1)) 4px}
+.mm-node{position:relative;z-index:1;flex:0 0 calc(160px*var(--mmk,1));width:calc(160px*var(--mmk,1));text-align:center}
+.mm-medal{position:relative;width:calc(92px*var(--mmk,1));height:calc(92px*var(--mmk,1));margin:0 auto;border-radius:50%;
   border:1.5px solid #4a3520;background:radial-gradient(circle at 50% 38%,#241a0c 0%,#140d06 70%);
   overflow:hidden;box-shadow:inset 0 0 10px rgba(0,0,0,.6)}
 .mm-medal>*{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
@@ -1061,14 +1206,14 @@ body.fx-min .mm-nav{transition:none}
 /* The layer you are standing on is not a silhouette -- you can see what is waiting -- but it is
    not a trophy either, because you have not beaten it. Held between the two. */
 .mm-dim{filter:brightness(.42) saturate(.7);opacity:.9}
-.mm-num{font-size:9px;letter-spacing:.5px;color:#5a4a2a;margin-top:6px}
-.mm-name{font-size:10.5px;line-height:1.25;color:#6a5a38;overflow-wrap:break-word}
+.mm-num{font-size:calc(9px*var(--mmk,1));letter-spacing:.5px;color:#5a4a2a;margin-top:6px}
+.mm-name{font-size:calc(10.5px*var(--mmk,1));line-height:1.25;color:#6a5a38;overflow-wrap:break-word}
 .mm-node.done .mm-name{color:#50c080}
 .mm-node.done .mm-num{color:#3a8050}
 .mm-node.here .mm-name{color:#e8c060;font-weight:500}
 .mm-node.here .mm-num{color:#9a7d3a}
 /* The name translation -- most of the flavour on this screen. */
-.mm-sub{font-size:8.5px;font-style:italic;line-height:1.2;color:#4a3a22;margin-top:1px;overflow-wrap:break-word}
+.mm-sub{font-size:calc(8.5px*var(--mmk,1));font-style:italic;line-height:1.2;color:#4a3a22;margin-top:1px;overflow-wrap:break-word}
 .mm-node.done .mm-sub{color:#50c080}
 /* Replaces the translation on a layer you have taken -- caps, upright, no italic, so it reads
    as a stamp rather than as more flavour text. */
@@ -1080,7 +1225,7 @@ body.fx-min .mm-nav{transition:none}
 .mm-line-lit{position:absolute;height:2px;background:#3a8050;z-index:0;transition:width .85s cubic-bezier(.4,0,.2,1)}
 /* v1194: the marker stands in the gap to the LEFT of the medallion, facing it -- the two sprites
    square up rather than being drawn on top of one another. */
-.mm-marker{position:absolute;width:52px;z-index:3;pointer-events:none;
+.mm-marker{position:absolute;width:calc(52px*var(--mmk,1));z-index:3;pointer-events:none;
   transition:left .85s cubic-bezier(.4,0,.2,1);filter:drop-shadow(0 0 5px rgba(212,175,55,.55))}
 .mm-marker img,.mm-marker span{display:block;width:100%;height:auto}
 /* Minimal FX and prefers-reduced-motion drop both the glide and the road fill to an instant. */
@@ -1177,6 +1322,7 @@ body.fx-min .bless-spark{display:none}
     <div class="debug-row"><div><div style="font-size:12px">Free Pochteca Stall</div><div style="font-size:10px;color:#a070c0">Show all offerings, acquire free (for testing)</div></div><button id="dbg-pochteca-btn" class="btn btn-debug" onclick="debugTogglePochteca()" style="font-size:11px;padding:4px 10px">Free Stall: OFF</button></div>
     <div class="debug-row"><div><div style="font-size:12px;color:#c0a0e0">🎲 Altar God Reroll</div><div style="font-size:10px;color:#a070c0">Adds a Reroll button on the Altar itself — eligible list logged to console</div></div><button id="dbg-altarreroll-btn" class="btn btn-debug" onclick="debugToggleAltarReroll()" style="font-size:11px;padding:4px 10px">Altar Reroll: OFF</button></div>
     <div class="debug-row"><div><div style="font-size:12px;color:#ffd700">⚡ Force Crit (100%)</div><div style="font-size:10px;color:#a070c0">Every strike &amp; special always crits — verify crit paths</div></div><button id="dbg-forcecrit-btn" class="btn btn-debug" onclick="debugToggleForceCrit()" style="font-size:11px;padding:4px 10px">Force Crit: OFF</button></div>
+    <div class="debug-row"><div><div style="font-size:12px;color:#d4af37">📜 Codex Battle UI</div><div style="font-size:10px;color:#a070c0">Codex pages, round fold, acted tag (test toggle, remembered)</div></div><button id="dbg-codexui-btn" class="btn btn-debug" onclick="debugToggleCodexUI()" style="font-size:11px;padding:4px 10px">Codex UI: OFF</button></div>
     <div class="debug-row"><div><div style="font-size:12px;color:#e0a040">🍺 DRUNK Misfire Test</div><div style="font-size:10px;color:#a070c0">Test Battle: instant random battle, everyone Drunk ×2 &middot; Apply: drunk a battle already in progress</div></div><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-debug" onclick="debugDrunkBattle()" style="font-size:11px;padding:4px 10px;background:#2a1a0a;border-color:#8a5010;color:#e0a040">⚔️ Test Battle</button><button class="btn btn-debug" onclick="debugDrunkAll()" style="font-size:11px;padding:4px 10px">🍺 Apply</button></div></div>
     <div class="debug-row"><div><div style="font-size:12px;color:#b090e0">⚡ BELIC RUSH Test</div><div style="font-size:10px;color:#a070c0">Mixcoatl patron + Tlapetlanmichin / Void Xolo / Spirit Hound / Xolo Guardian / Xolotl vs 6 foes, full TP, party pre-damaged &amp; statused &middot; Audit logs each cascaded action's target count against the ability's cap</div></div><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-debug" onclick="debugBelicRushBattle()" style="font-size:11px;padding:4px 10px;background:#1a0a2a;border-color:#6a40a0;color:#c0a0ff">⚡ Test Battle</button><button id="dbg-belicaudit-btn" class="btn btn-debug" onclick="debugToggleBelicAudit()" style="font-size:11px;padding:4px 10px">Audit: OFF</button></div></div>
     <div class="debug-row"><div style="font-size:12px">✦ Ometeotl Blessing</div><div style="display:flex;gap:4px;flex-wrap:wrap">
@@ -1322,10 +1468,10 @@ body.fx-min .bless-spark{display:none}
 </div>
 
 <div id="screen-mictlan-map" class="screen">
-  <div style="max-width:560px;margin:0 auto;padding-top:.5rem">
-    <div style="font-size:11px;color:#6a5a30;text-align:center;margin-bottom:.4rem;letter-spacing:1px;font-style:italic" data-i18n="ui.map.eyebrow">THE NINE LAYERS OF MICTLAN</div>
-    <h2 style="text-align:center;color:var(--am);margin-bottom:.25rem;font-size:17px">Mictlan</h2>
-    <p style="text-align:center;font-size:11px;color:var(--td);margin-bottom:.75rem;font-style:italic" data-i18n="ui.map.desc">The realm of the dead. Nine layers stand between you and your godhood.</p>
+  <div style="max-width:min(calc(560px*var(--mmk,1)),96vw);margin:0 auto;padding-top:.5rem">
+    <div style="font-size:calc(11px*var(--mmk,1));color:#6a5a30;text-align:center;margin-bottom:.4rem;letter-spacing:1px;font-style:italic" data-i18n="ui.map.eyebrow">THE NINE LAYERS OF MICTLAN</div>
+    <h2 style="text-align:center;color:var(--am);margin-bottom:.25rem;font-size:calc(17px*var(--mmk,1))">Mictlan</h2>
+    <p style="text-align:center;font-size:calc(11px*var(--mmk,1));color:var(--td);margin-bottom:.75rem;font-style:italic" data-i18n="ui.map.desc">The realm of the dead. Nine layers stand between you and your godhood.</p>
     <div id="mictlan-map-list" class="mm-view"></div>
     <div style="text-align:center;margin-top:1.25rem">
       <button class="btn" id="mictlan-map-btn" style="padding:9px 24px" data-i18n="ui.common.continue">Continue</button>
@@ -1431,8 +1577,9 @@ body.fx-min .bless-spark{display:none}
   </div>
   <div class="action-msg" id="action-msg"></div>
   <div id="tut-area"></div><div id="cap-area"></div>
-  <div><div class="row-lbl" data-i18n="ui.battle.enemies">Enemies</div><div class="unit-row" id="erow"></div></div>
-  <div style="margin-top:.75rem" id="party-section"></div>
+  <div class="cx-page cx-enemy" id="cx-enemy"><div class="row-lbl" data-i18n="ui.battle.enemies">Enemies</div><div class="unit-row" id="erow"></div></div>
+  <div class="cx-fold" id="cx-fold"></div>
+  <div style="margin-top:.75rem" id="party-section" class="cx-page cx-ally"></div>
   <div id="act-panel-area"></div>
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
     <button onclick="(function(){const b=document.getElementById('blog');const open=b.style.display!=='none';b.style.display=open?'none':'block';this.textContent=open?t('ui.battle.logClosed'):t('ui.battle.logOpen')}).call(this)" style="font-size:10px;color:var(--td);background:none;border:none;cursor:pointer;padding:0">📜 Battle Log ▸</button>
@@ -2272,6 +2419,9 @@ Object.assign(T_EN,{
   'ui.battle.logClosed':'📜 Battle Log ▸',
   'ui.battle.logOpen':'📜 Battle Log ▾',
   'ui.battle.roundBanner':'⚔ Round {n}',
+  'ui.battle.cxEnemy':'Enemy codex','ui.battle.cxBoss':'Boss codex','ui.battle.cxAlly':'Your codex', /* v1357 */
+  'ui.battle.cxVictory':'Victory!','ui.battle.cxFallen':'{name} has fallen', /* v1366 */
+  'ui.battle.cxFallenPl':'{name} have fallen', /* v1368 */
   'ui.battle.roundLog':'Round {n}',
   'ui.battle.deadStir':' · 💀 The dead stir',
   'ui.spoils.killed':'killed',
@@ -2280,17 +2430,17 @@ Object.assign(T_EN,{
   'ui.party.emptySlots':'💡 {n} empty party {slots} — {action} to fight at full strength',
   'ui.party.slotWord':'slot',
   'ui.party.slotWordPl':'slots',
-  'ui.party.fillReserve':'deploy a reserve unit via ✕ Edit Party',
+  'ui.party.fillReserve':'deploy a reserve unit via ✕ Edit Battle Codex',
   'ui.party.fillMerc':'hire a mercenary',
   'ui.common.dismissRun':'Dismiss for this run',
-  'ui.party.overflowTip':'You have more units than deployment slots — use Edit Party to choose who fights',
+  'ui.party.overflowTip':'You have more units than deployment slots — use Edit Battle Codex to choose who fights',
   'ui.party.fullTitle':'Party Full',
-  'ui.party.fullBody':'{icon} <b>{name}</b> joined your roster — but your party is already full!<br><br>Open <b>Edit Party</b> to swap them in if you want them in the next battle.',
-  'ui.party.editAction':'⚔ Edit Party',
+  'ui.party.fullBody':'{icon} <b>{name}</b> joined your roster — but your party is already full!<br><br>Open <b>Edit Battle Codex</b> to swap them in if you want them in the next battle.',
+  'ui.party.editAction':'Edit Battle Codex',
   'ui.common.later':'Later',
   'ui.type.phys':'PHYS',
-  'ui.party.edit':'✕ Edit Party',
-  'ui.party.edit2':'Edit Party',
+  'ui.party.edit':'Edit Battle Codex',
+  'ui.party.edit2':'Edit Battle Codex',
   'ui.party.slots':'Slots: {n}/{max}.',
   'ui.common.done':'Done',
   'ui.party.patronTag':'★ Patron',
@@ -2301,6 +2451,7 @@ Object.assign(T_EN,{
   'ui.altar.hintSac':'Check units to select for multi-sacrifice',
   'ui.altar.deployedNote':'⚔ Units in the battle party cannot be sacrificed',
   'ui.pochteca.intro':'💎 The Wandering Pochteca lays out his wares. Effects apply at the start of each battle and persist for the run.',
+  'ui.pochteca.firstFree':'🎁 Your first purchase is free!','ui.pochteca.free':'Free!', /* v1372 */
   'ui.pochteca.introTitle':'The Pochteca Has Arrived',
   'ui.pochteca.introBody':'A wandering merchant has set up in the Tianguis under the <strong>✨ Special</strong> tab. He sells <strong style="color:#c0e060">Offerings</strong> — relics that boost your party for the rest of the run. They apply automatically at the start of every battle.',
   'ui.pochteca.introXochi':'Xochitonal waits ahead — choose wisely.',
@@ -2335,6 +2486,7 @@ Object.assign(T_EN,{
   'ui.cleanse.word':'cleanse',
   'ui.cleanse.title':'Cleanse',
   'ui.cleanse.body':'Removes every negative status from the target.',
+  'ui.chima.body':'HP armor that protects your {h} HP and blocks status.', /* v1338 */
   'ui.status.tutTitle':'Status Effects',
   'ui.status.tutLead':'Your unit was afflicted with {icon} {name}.',
   'ui.common.gotIt':'Got it',
@@ -2808,6 +2960,9 @@ Object.assign(T_ES,{
   'ui.battle.logClosed':'📜 Registro de batalla ▸',
   'ui.battle.logOpen':'📜 Registro de batalla ▾',
   'ui.battle.roundBanner':'⚔ Ronda {n}',
+  'ui.battle.cxEnemy':'Códice enemigo','ui.battle.cxBoss':'Códice del jefe','ui.battle.cxAlly':'Tu códice', /* v1357 */
+  'ui.battle.cxVictory':'¡Victoria!','ui.battle.cxFallen':'{name} ha caído', /* v1366 */
+  'ui.battle.cxFallenPl':'{name} han caído', /* v1368 */
   'ui.battle.roundLog':'Ronda {n}',
   'ui.battle.deadStir':' · 💀 Los muertos se agitan',
   'ui.spoils.killed':'abatido',
@@ -2816,17 +2971,17 @@ Object.assign(T_ES,{
   'ui.party.emptySlots':'💡 Tienes {n} {slots} en el equipo — {action} para pelear a plena fuerza',
   'ui.party.slotWord':'espacio libre',
   'ui.party.slotWordPl':'espacios libres',
-  'ui.party.fillReserve':'despliega una unidad de reserva con ✕ Editar Equipo',
+  'ui.party.fillReserve':'despliega una unidad de reserva con ✕ Editar Códice de Batalla',
   'ui.party.fillMerc':'contrata un mercenario',
   'ui.common.dismissRun':'Descartar por esta partida',
-  'ui.party.overflowTip':'Tienes más unidades que espacios de despliegue — usa Editar Equipo para elegir quién pelea',
+  'ui.party.overflowTip':'Tienes más unidades que espacios de despliegue — usa Editar Códice de Batalla para elegir quién pelea',
   'ui.party.fullTitle':'Equipo lleno',
-  'ui.party.fullBody':'{icon} <b>{name}</b> se unió a tu roster, ¡pero tu equipo ya está lleno!<br><br>Abre <b>Editar Equipo</b> para intercambiarlo si lo quieres en la siguiente batalla.',
-  'ui.party.editAction':'⚔ Editar Equipo',
+  'ui.party.fullBody':'{icon} <b>{name}</b> se unió a tu roster, ¡pero tu equipo ya está lleno!<br><br>Abre <b>Editar Códice de Batalla</b> para intercambiarlo si lo quieres en la siguiente batalla.',
+  'ui.party.editAction':'Editar Códice de Batalla',
   'ui.common.later':'Más tarde',
   'ui.type.phys':'FÍS',
-  'ui.party.edit':'✕ Editar Equipo',
-  'ui.party.edit2':'Editar Equipo',
+  'ui.party.edit':'Editar Códice de Batalla',
+  'ui.party.edit2':'Editar Códice de Batalla',
   'ui.party.slots':'Espacios: {n}/{max}.',
   'ui.common.done':'Listo',
   'ui.party.patronTag':'★ Patrón',
@@ -2837,6 +2992,7 @@ Object.assign(T_ES,{
   'ui.altar.hintSac':'Marca unidades para sacrificar en grupo',
   'ui.altar.deployedNote':'⚔ Las unidades del grupo de batalla no se pueden sacrificar',
   'ui.pochteca.intro':'💎 El Pochteca Errante extiende su mercancía. Los efectos se aplican al inicio de cada batalla y duran toda la partida.',
+  'ui.pochteca.firstFree':'🎁 ¡Tu primera compra es gratis!','ui.pochteca.free':'¡Gratis!', /* v1372 */
   'ui.pochteca.introTitle':'Llegó el Pochteca',
   'ui.pochteca.introBody':'Un mercader errante se instaló en el Tianguis, en la pestaña <strong>✨ Especial</strong>. Vende <strong style="color:#c0e060">Ofrendas</strong>: reliquias que fortalecen a tu grupo por el resto de la partida. Se aplican solas al inicio de cada batalla.',
   'ui.pochteca.introXochi':'Xochitonal te espera más adelante: elige con cuidado.',
@@ -2891,6 +3047,7 @@ Object.assign(T_ES,{
   'ui.cleanse.word':'limpieza',
   'ui.cleanse.title':'Limpieza',
   'ui.cleanse.body':'Elimina todos los estados negativos del objetivo.',
+  'ui.chima.body':'Armadura de PV que protege tus {h} PV y bloquea estados.', /* v1338 */
   'ui.status.tutTitle':'Efectos de estado',
   'ui.status.tutLead':'Tu unidad recibió {icon} {name}.',
   'ui.common.gotIt':'Entendido',
@@ -2994,7 +3151,7 @@ function i18nResyncRun(){
   const syncF=function(holder,key,tpl,f){
     const raw=tpl&&_proseRaw.get(tpl);if(!raw||raw[f]===undefined)return;
     const live=tpl[f];
-    if(typeof live==='string'&&holder[key]!==live&&same(holder[key],raw,f)){holder[key]=live;n++;}
+    if(typeof live==='string'&&holder[key]!==live&&(same(holder[key],raw,f)||/data-sty="/.test(String(holder[key]||'')))){holder[key]=live;n++;} /* v1342: structured blocks follow the language too */
   };
   const syncObj=function(o,tpl){
     const raw=tpl&&_proseRaw.get(tpl);if(!raw)return;
@@ -3095,10 +3252,10 @@ const TREE_NODES=[
   {id:'pantheon_boost',label:'Pantheon Boost',labelEs:'Impulso del Panteón',desc:'Each additional deployed god grants all gods +2.5% ATK/MAG/DEF/RES',descEs:'Cada dios desplegado adicional otorga a todos los dioses +2.5% ATQ/MAG/DEF/RES',cost:700,cat:'gods',req:['synergy_unlock'],tier:3,x:357,y:114},
   {id:'pantheon_boost_2',label:'Pantheon Boost II',labelEs:'Impulso del Panteón II',desc:'Each additional deployed god grants all gods another +2.5% ATK/MAG/DEF/RES (total +5%)',descEs:'Cada dios desplegado adicional otorga a todos los dioses otro +2.5% ATQ/MAG/DEF/RES (total +5%)' /* v1334 */,cost:2500,cat:'gods',req:['pantheon_boost'],tier:4,x:357,y:32},
   // ═══ SOUTH — ALLIES ═══
-  {id:'ally_slot_3',label:'3 Ally Slots',labelEs:'3 Espacios de Aliado',desc:'Unlock 3rd ally deployment slot',descEs:'Desbloquea el 3er espacio de despliegue de aliados',cost:2,cat:'allies',req:['hub'],tier:1,x:450,y:442},
-  {id:'ally_slot_4',label:'4 Ally Slots',labelEs:'4 Espacios de Aliado',desc:'Unlock a 4th ally slot',descEs:'Desbloquea un 4º espacio de aliado',cost:245,cat:'allies',req:['ally_slot_3'],tier:2,x:450,y:520},
+  {id:'ally_slot_3',label:'3 Ally Slots',labelEs:'3 Espacios de Aliado',desc:'Unlocks a 3rd ally slot on the battle codex.',descEs:'Desbloquea un 3er espacio de aliado en el códice de batalla.',cost:2,cat:'allies',req:['hub'],tier:1,x:450,y:442},
+  {id:'ally_slot_4',label:'4 Ally Slots',labelEs:'4 Espacios de Aliado',desc:'Unlocks a 4th ally slot on the battle codex.',descEs:'Desbloquea un 4º espacio de aliado en el códice de batalla.',cost:245,cat:'allies',req:['ally_slot_3'],tier:2,x:450,y:520},
   {id:'vassal_affinity',label:'Vassal Affinity',labelEs:'Afinidad de Vasallos',desc:'50% chance each non-boss battle guarantees at least one enemy of the same element as your patron god (replaces one enemy slot)',descEs:'50% de probabilidad en cada batalla sin jefe de garantizar al menos un enemigo del mismo elemento que tu dios patrón (reemplaza un espacio de enemigo)',cost:550,cat:'allies',req:['ally_slot_4'],tier:2,x:312,y:520},
-  {id:'ally_slot_5',label:'5 Ally Slots',labelEs:'5 Espacios de Aliado',desc:'Unlock a 5th ally slot',descEs:'Desbloquea un 5º espacio de aliado',cost:4200,cat:'allies',req:['ally_slot_4'],tier:3,x:374,y:594},
+  {id:'ally_slot_5',label:'5 Ally Slots',labelEs:'5 Espacios de Aliado',desc:'Unlocks a 5th ally slot on the battle codex.',descEs:'Desbloquea un 5º espacio de aliado en el códice de batalla.',cost:4200,cat:'allies',req:['ally_slot_4'],tier:3,x:374,y:594},
   {id:'ally_special_up',label:'Vassal Health Boost I',labelEs:'Aumento de Vida de Vasallos I',desc:'Increase all Vassal HP by 10%',descEs:'Aumenta los PV de todos los vasallos en 10%',cost:350,cat:'allies',req:['ally_slot_4'],tier:3,x:545,y:594},
   // ═══ ECONOMY — STARTERS ═══
   {id:'blood_starter_1',label:'Blood Starter I',labelEs:'Sangre Inicial I',desc:'Start each run with +100 Blood',descEs:'Empieza cada partida con +100 de Sangre',cost:200,cat:'qol',req:['cost_reduce_1'],tier:2,x:130,y:510},
@@ -3106,7 +3263,7 @@ const TREE_NODES=[
   {id:'blood_starter_2',label:'Blood Starter II',labelEs:'Sangre Inicial II',desc:'Start each run with another +150 Blood (total +250)',descEs:'Empieza cada partida con otros +150 de Sangre (total +250)' /* v1334 */,cost:2000,cat:'qol',req:['blood_starter_1'],tier:3,x:25,y:510},
   {id:'cacao_starter_2',label:'Cacao Starter II',labelEs:'Cacao Inicial II',desc:'Start each run with another +100 Cacao (total +150)',descEs:'Empieza cada partida con otros +100 de Cacao (total +150)' /* v1334 */,cost:2000,cat:'qol',req:['cacao_starter_1'],tier:3,x:25,y:580},
   {id:'minion_rebirth',label:'Minion Rebirth',labelEs:'Renacimiento de Súbdito',desc:'Patron starts the run with one free same-element ally (L1 B1, persists to roster)',descEs:'El patrón empieza la partida con un aliado gratis de su mismo elemento (Nv1 B1, se conserva en el roster)',cost:3200,cat:'allies',req:['vassal_affinity'],tier:4,x:294,y:662},
-  {id:'ally_slot_6',label:'6 Ally Slots',labelEs:'6 Espacios de Aliado',desc:'Unlock a 6th ally slot',descEs:'Desbloquea un 6º espacio de aliado',cost:12500,cat:'allies',req:['ally_slot_5'],tier:4,x:458,y:662},
+  {id:'ally_slot_6',label:'6 Ally Slots',labelEs:'6 Espacios de Aliado',desc:'Unlocks a 6th ally slot on the battle codex.',descEs:'Desbloquea un 6º espacio de aliado en el códice de batalla.',cost:12500,cat:'allies',req:['ally_slot_5'],tier:4,x:458,y:662},
   {id:'minion_rebirth_2',label:'Double Rebirth',labelEs:'Doble Renacimiento',desc:'Patron starts the run with TWO free same-element allies (L1 B1, persist to roster)',descEs:'El patrón empieza la partida con DOS aliados gratis de su mismo elemento (Nv1 B1, se conservan en el roster)',cost:6000,cat:'allies',req:['minion_rebirth'],tier:5,x:294,y:725},
   // ═══ EAST — COMBAT ═══
   {id:'dmg_preview',label:'Combat Insight',labelEs:'Visión de Combate',desc:'Shows damage range on Strike and Special actions',descEs:'Muestra el rango de daño en las acciones de Golpe y Especial' /* v1332 */,cost:5,cat:'combat',req:['hub'],tier:1,x:565,y:360},
@@ -3151,7 +3308,7 @@ const CHAMPIONS_RECENT_CAP=20;
 function loadDT(){
   try{
     const d=localStorage.getItem('teotlan_dt');
-    if(d){const p=JSON.parse(d);DT.teotl=p.teotl||0;DT.unlocked=new Set(p.unlocked||[]);DT.tecpatl_level=p.tecpatl_level||0;DT.tecpatlBeaten=p.tecpatlBeaten||0;DT.tecpatl_seen=new Set(p.tecpatl_seen||[]);DT.godTecpatl=p.godTecpatl||{};DT.champions=p.champions||{};DT.blessedGod=p.blessedGod||null;DT.blessedUsed=!!p.blessedUsed;DT.fxMode=p.fxMode||null;} /* v1019 */ // v830 · v937: loadDT rebuilds DT from a fixed whitelist, so anything absent here is silently dropped on reload -- which is exactly how the blessing vanished
+    if(d){const p=JSON.parse(d);DT.teotl=p.teotl||0;DT.unlocked=new Set(p.unlocked||[]);DT.tecpatl_level=p.tecpatl_level||0;DT.tecpatlBeaten=p.tecpatlBeaten||0;DT.pochFreeUsed=!!p.pochFreeUsed; /* v1372 */DT.tecpatl_seen=new Set(p.tecpatl_seen||[]);DT.godTecpatl=p.godTecpatl||{};DT.champions=p.champions||{};DT.blessedGod=p.blessedGod||null;DT.blessedUsed=!!p.blessedUsed;DT.fxMode=p.fxMode||null;} /* v1019 */ // v830 · v937: loadDT rebuilds DT from a fixed whitelist, so anything absent here is silently dropped on reload -- which is exactly how the blessing vanished
     // v303 migration: dmg_preview became Strike Boost's prereq — grant it free to saves that already own strike_boost
     if(DT.unlocked.has('strike_boost')&&!DT.unlocked.has('dmg_preview'))DT.unlocked.add('dmg_preview');
     // No auto-unlocks: player must interact with Divinity Tree
@@ -3164,7 +3321,7 @@ function loadDT(){
     DT.teotl=(typeof p.teotl==='number')?p.teotl:(DT.teotl||0);
     DT.unlocked=new Set(Array.isArray(p.unlocked)?p.unlocked:[]);
     DT.tecpatl_level=p.tecpatl_level||0;
-    DT.tecpatlBeaten=p.tecpatlBeaten||0;
+    DT.tecpatlBeaten=p.tecpatlBeaten||0;DT.pochFreeUsed=!!p.pochFreeUsed; /* v1372 */
     DT.tecpatl_seen=new Set(Array.isArray(p.tecpatl_seen)?p.tecpatl_seen:[]);
     DT.godTecpatl=(p.godTecpatl&&typeof p.godTecpatl==='object')?p.godTecpatl:{};
     DT.champions=(p.champions&&typeof p.champions==='object')?p.champions:(DT.champions||{});
@@ -3172,7 +3329,7 @@ function loadDT(){
     DT.fxMode=p.fxMode||null;
   } // v830
 }
-function saveDT(){try{localStorage.setItem('teotlan_dt',JSON.stringify({teotl:DT.teotl,unlocked:[...DT.unlocked],tecpatl_level:DT.tecpatl_level,tecpatlBeaten:DT.tecpatlBeaten||0,tecpatl_seen:[...DT.tecpatl_seen],godTecpatl:DT.godTecpatl,champions:DT.champions,blessedGod:DT.blessedGod||null,blessedUsed:!!DT.blessedUsed,fxMode:DT.fxMode||null}));}catch(e){}} /* v1186: fxMode was set by cycleFxMode and then dropped here, so the Battle FX toggle reset on every reload -- the same whitelist trap the v937 note flags for blessedGod */
+function saveDT(){try{localStorage.setItem('teotlan_dt',JSON.stringify({teotl:DT.teotl,unlocked:[...DT.unlocked],tecpatl_level:DT.tecpatl_level,tecpatlBeaten:DT.tecpatlBeaten||0,tecpatl_seen:[...DT.tecpatl_seen],godTecpatl:DT.godTecpatl,champions:DT.champions,blessedGod:DT.blessedGod||null,blessedUsed:!!DT.blessedUsed,fxMode:DT.fxMode||null,pochFreeUsed:!!DT.pochFreeUsed}));}catch(e){}} /* v1372: pochFreeUsed */ /* v1186: fxMode was set by cycleFxMode and then dropped here, so the Battle FX toggle reset on every reload -- the same whitelist trap the v937 note flags for blessedGod */
 loadDT();
 /* v1187: the v1186 touch-device auto-seed is gone. Genaro's call -- Full is the intended
    presentation and should be what an iPad player sees by default. The persistence fix and the
@@ -4292,6 +4449,30 @@ function pipAttrs(kind,stacks,ally,rounds){ // shared handlers for every status 
 let _tipAnchor=null;
 function _tipOwn(e){try{_tipAnchor=(e&&(e.currentTarget||e.target))||null;}catch(_){_tipAnchor=null;}}
 function relicTipHide(){const tt=document.getElementById('relic-tooltip');if(tt)tt.style.display='none';_tipAnchor=null;}
+/* v1337: viewport guard for the shared tooltip. Every tip positions itself with a guessed height
+   (innerHeight-96 / -120), so a tall one -- the special blocks, or any long body in the game font --
+   ran off the bottom edge. This runs after ANY tip writes its content or position, measures the real
+   box, and if it overflows flips it above the hovered element (or clamps it inside the window).
+   Converges: once the box fits, nothing is written, so the observer goes quiet. */
+(function(){
+  const tt=document.getElementById('relic-tooltip');
+  if(!tt||typeof MutationObserver==='undefined')return;
+  const fit=function(){
+    if(tt.style.display==='none')return;
+    const W=window.innerWidth,H=window.innerHeight,m=6;
+    const r=tt.getBoundingClientRect();if(!r||!r.height)return;
+    let left=r.left,top=r.top;
+    if(r.right>W-m)left=Math.max(m,W-r.width-m);
+    if(r.bottom>H-m){
+      let up=-1;
+      try{if(_tipAnchor&&_tipAnchor.getBoundingClientRect){const a=_tipAnchor.getBoundingClientRect();if(a&&(a.top||a.bottom))up=a.top-r.height-6;}}catch(_){}
+      top=(up>=m)?up:Math.max(m,H-r.height-m);
+    }
+    if(Math.abs(left-r.left)>0.5)tt.style.left=Math.round(left)+'px';
+    if(Math.abs(top-r.top)>0.5)tt.style.top=Math.round(top)+'px';
+  };
+  new MutationObserver(fit).observe(tt,{attributes:true,attributeFilter:['style'],childList:true,subtree:true,characterData:true});
+})();
 function relicTipReap(){
   const tt=document.getElementById('relic-tooltip');
   if(!tt||tt.style.display==='none')return;
@@ -4320,7 +4501,7 @@ function statTip(e,key){_tipOwn(e);
 }
 function statTipTap(e,key){if(e&&e.stopPropagation)e.stopPropagation();statTip(e,key);setTimeout(()=>{document.addEventListener('click',relicTipHide,{once:true});},50);}
 // v620: special move typing derived from its description — 🗡️ physical, 🪄 magical, both for hybrid, ❤️ heal/support (no damage multiplier)
-function specTypeEmoji(ad){const s=String(ad||'');const a=/(×\s*ATK|ATK\s*[×+])/i.test(s),m=/(×\s*MAG|MAG\s*[×+])/i.test(s);if(a&&m)return '🗡️🪄';if(a)return '🗡️';if(m)return '🪄';return '❤️';} // v620: matches both '1.5×MAG' and 'MAG×0.55' / '(MAG+2)' notations; buff text like 'ATK/MAG UP ×1' stays support
+function specTypeEmoji(ad){const s=String(ad||'');const _sty=/data-sty="(\w+)"/.exec(s);if(_sty)return _sty[1]==='MAG'?'\u{1FA84}':_sty[1]==='ATK'?'\u{1F5E1}\ufe0f':'\u2764\ufe0f'; /* v1335 */const a=/(×\s*ATK|ATK\s*[×+])/i.test(s),m=/(×\s*MAG|MAG\s*[×+])/i.test(s);if(a&&m)return '🗡️🪄';if(a)return '🗡️';if(m)return '🪄';return '❤️';} // v620: matches both '1.5×MAG' and 'MAG×0.55' / '(MAG+2)' notations; buff text like 'ATK/MAG UP ×1' stays support
 function synTip(e){_tipOwn(e); // v643: hover the 🔗 label for the live synergy explanation
   const tt=document.getElementById('relic-tooltip');if(!tt)return;
   const az=hasPassive('azureZephyr');
@@ -4343,7 +4524,7 @@ const CHIMA_ATTRS='style="cursor:help" onmouseenter="chimaTip(event)" onmouselea
 function chimaTip(e){_tipOwn(e);
   const tt=document.getElementById('relic-tooltip');if(!tt)return;
   tt.innerHTML='<div style="font-weight:700;color:#60c0e0;margin-bottom:3px"><svg class="tl tl-chimalli"><use href="#tl-chimalli"/></svg> Chimalli</div>'
-    +'<div style="font-size:12px">HP armor that protects your <span style="color:#e05050">\u2764</span> HP and blocks status.</div>';
+    +'<div style="font-size:12px">'+t('ui.chima.body',{h:'<span style="color:#e05050">\u2764</span>'})+'</div>'; /* v1338: was English-only */
   tt.style.display='block';
   const x=(e.clientX!==undefined?e.clientX:(e.touches&&e.touches[0]?e.touches[0].clientX:0));
   const y=(e.clientY!==undefined?e.clientY:(e.touches&&e.touches[0]?e.touches[0].clientY:0));
@@ -4397,11 +4578,12 @@ function cleanseWord(txt){
 function chimaWord(txt){
   if(!txt||String(txt).indexOf('chima-pip')>=0)return txt;
   return String(txt).replace(/\bChimalli\b/g,
-    '<span class="chima-pip" '+CHIMA_ATTRS+'><span style="color:#60c0e0"><svg class="tl tl-chimalli"><use href="#tl-chimalli"/></svg></span> Chimalli</span>');
+    '<span class="chima-pip" '+CHIMA_ATTRS+'><span style="color:#60c0e0"><svg class="tl tl-chimalli"><use href="#tl-chimalli"/></svg></span>Chimalli</span>'); /* v1338: .tl already carries margin-right; the extra space doubled the gap */
 }
 function specTip(e,name,ad){_tipOwn(e); // v635: hover a special's name for its full detail (altar cards)
   const tt=document.getElementById('relic-tooltip');if(!tt)return;
-  tt.innerHTML='<strong style="color:#6090e0">🔮 '+name+'</strong><br><span style="color:var(--td)">'+ad+'</span>';
+  tt.innerHTML=/data-sty="/.test(String(ad||''))?('<div class="sf-hd"><strong class="sf-nm">'+name+'</strong></div><div class="sf-bd">'+ad+'</div>') /* v1336 · v1356 boxed */
+    :('<strong style="color:#6090e0">🔮 '+name+'</strong><br><span style="color:var(--td)">'+ad+'</span>');
   tt.style.display='block';
   const x=(e.clientX!==undefined?e.clientX:(e.touches&&e.touches[0]?e.touches[0].clientX:0));
   const y=(e.clientY!==undefined?e.clientY:(e.touches&&e.touches[0]?e.touches[0].clientY:0));
@@ -4501,6 +4683,303 @@ function expandPips(str){
   return str.replace(/\{\{elem:(\w+)\}\}/g,function(_,e){return elemPip(e);})
             .replace(/\{\{st:(\w+)\}\}/g,function(_,k){return stPip(k);});
 }
+/* v1335: structured special descriptions (Genaro's Oct 2026 mockup). Player-side GODS only, keyed
+   by ak; boss templates that share an ak (Tepeyollotl's 1.8x Epicenter Roar) are separate objects
+   and keep their prose. Anything not in this table keeps its legacy ad text. fx strings take
+   {st:key} (status pip + tooltip) and {splash}; the word Chimalli is wrapped by chimaWord(). */
+const SPEC_FMT={
+  deluge:{ty:'MAG',pow:'1.35\u00d7',tg:4,upTo:1,
+    fx:'First kill rises as a Tlaloque ally at the same level.',
+    fxEs:'La primera baja se levanta como aliado Tlaloque del mismo nivel.'},
+  cripplingShock:{ty:'MAG',pow:'0.6\u00d7',perHit:1,hits:4,random:1,
+    fx:'Each enemy hit gets {st:paralyze} \u00d71 and {st:poison} \u00d71.',
+    fxEs:'Cada enemigo alcanzado recibe {st:paralyze} \u00d71 y {st:poison} \u00d71.'},
+  oldFire:{ty:'MAG',pow:'1.6\u00d7',tg:1,
+    fx:'Applies {st:burn} \u00d72. +40% damage per {st:burn} stack already on the target.',
+    fxEs:'Aplica {st:burn} \u00d72. +40% de da\u00f1o por cada carga de {st:burn} que ya tenga el objetivo.'},
+  ophidianMother:{ty:'SUP',heal:'25%',cleanse:1,
+    fx:'The lowest-HP ally gains Chimalli worth 5% max HP.',
+    fxEs:'El aliado con menos PV gana Chimalli por 5% de PV m\u00e1x.'},
+  peyoteConcoction:{ty:'SUP',heal:'25%',cleanse:1,
+    fx:'All allies gain {st:atkup} \u00d71.',
+    fxEs:'Todos los aliados ganan {st:atkup} \u00d71.'},
+  aurumBreak:{ty:'ATK',pow:'1.5\u00d7',tg:1,
+    fx:'Heals the lowest-HP ally for all damage dealt.',
+    fxEs:'Cura al aliado con menos PV por todo el da\u00f1o infligido.'},
+  seismicRoar:{ty:'ATK',pow:'1.5\u00d7',tg:1,
+    fx:'Deals 10% {splash} to the rest and inflicts {st:slow} on all enemies.',
+    fxEs:'Inflige 10% de {splash} al resto y aplica {st:slow} a todos los enemigos.'},
+  /* v1339: the remaining player gods. Each line checked against its fireGodSpecial branch. */
+  featherEmbrace:{ty:'MAG',pow:'1.5\u00d7',tg:1,
+    fx:'A defeated target is caught automatically, with double rewards.',
+    fxEs:'Un objetivo derrotado queda atrapado autom\u00e1ticamente, con recompensa doble.'},
+  obsidianStorm:{ty:'ATK',pow:'1.25\u00d7',tg:5,upTo:1,
+    fx:'Each enemy hit gets {st:wound} \u00d71.',
+    fxEs:'Cada enemigo alcanzado recibe {st:wound} \u00d71.'},
+  holyHarvest:{ty:'SUP',heal:'25%',cleanse:1,
+    fx:'All allies also restore +10% TP.',
+    fxEs:'Todos los aliados tambi\u00e9n restauran +10% de PT.'},
+  zappingStrike:{ty:'ATK',pow:'1.1\u00d7',tg:1,
+    fx:'Applies {st:paralyze} \u00d71. Strikes twice if Mixcoatl acts first this round.',
+    fxEs:'Aplica {st:paralyze} \u00d71. Golpea dos veces si Mixcoatl act\u00faa primero en la ronda.'},
+  patolliGamble:{ty:'MAG',powL:'Roll a die!',powLEs:'\u00a1Tira un dado!',tgL:'varies',tgLEs:'var\u00eda',
+    fx:'1: 1 damage to all \u00b7 2: 1.1\u00d7 to 1 random \u00b7 3: 1.3\u00d7, 2 random hits \u00b7 4: 1.6\u00d7, 3 random hits \u00b7 5: 1.8\u00d7 to all \u00b7 6: 3.0\u00d7 to all.',
+    fxEs:'1: 1 de da\u00f1o a todos \u00b7 2: 1.1\u00d7 a 1 al azar \u00b7 3: 1.3\u00d7, 2 golpes al azar \u00b7 4: 1.6\u00d7, 3 golpes al azar \u00b7 5: 1.8\u00d7 a todos \u00b7 6: 3.0\u00d7 a todos.'},
+  frostMacuahuitl:{ty:'ATK',pow:'1.5\u00d7',tg:1,
+    fx:'Applies {st:wound} \u00d71 and {st:lethargy} \u00d72.',
+    fxEs:'Aplica {st:wound} \u00d71 y {st:lethargy} \u00d72.'},
+  fieryStinger:{ty:'MAG',pow:'1.5\u00d7',tg:1,
+    fx:'Deals 10% {splash} to the rest. Every enemy hit gets {st:burn} \u00d72.',
+    fxEs:'Inflige 10% de {splash} al resto. Cada enemigo alcanzado recibe {st:burn} \u00d72.'},
+  torridTornado:{ty:'MAG',pow:'0.55\u00d7',perHit:1,hitsL:'4 spread',hitsLEs:'4 repartidos',
+    fx:'Each hit favors an enemy not yet hit and inflicts {st:slow}. Every enemy hit gets {st:burn} \u00d71.',
+    fxEs:'Cada golpe prefiere a un enemigo a\u00fan no alcanzado y aplica {st:slow}. Cada enemigo alcanzado recibe {st:burn} \u00d71.'},
+  sinistralMinacachalli:{ty:'ATK',pow:'1.2\u00d7',tg:3,upTo:1,
+    fx:'+15% crit chance. Any crit grants {st:atkup} \u00d71 to all allies.',
+    fxEs:'+15% de probabilidad de cr\u00edtico. Cualquier cr\u00edtico otorga {st:atkup} \u00d71 a todos los aliados.'},
+  octliDrench:{ty:'MAG',pow:'1.5\u00d7',tg:1,
+    fx:'Deals 10% {splash} to the rest and {st:drunk} \u00d71 to all enemies. As Patron, also {st:drunk} \u00d71 to all allies.',
+    fxEs:'Inflige 10% de {splash} al resto y {st:drunk} \u00d71 a todos los enemigos. Como patr\u00f3n, tambi\u00e9n {st:drunk} \u00d71 a todos los aliados.'},
+  sheWhoEatsFilth:{ty:'SUP',heal:'25%',cleanse:1,
+    fx:'All enemies get {st:poison} \u00d71. As Patron, all allies do too.',
+    fxEs:'Todos los enemigos reciben {st:poison} \u00d71. Como patr\u00f3n, tambi\u00e9n todos los aliados.'},
+  ixiptlatliBloom:{ty:'MAG',pow:'1.1\u00d7',tg:5,upTo:1,
+    fx:'Every {elem:nature} ally gains Chimalli worth 3% max HP.',
+    fxEs:'Cada aliado {elem:nature} gana Chimalli por 3% de PV m\u00e1x.'},
+  xiuhcoatlMight:{ty:'ATK',pow:'0.5\u00d7',perHit:1,hits:3,random:1,
+    fx:'Each kill restores 10% TP and grants {st:atkup} \u00d71 to all allies.',
+    fxEs:'Cada baja restaura 10% de PT y otorga {st:atkup} \u00d71 a todos los aliados.'},
+  tlalliSteam:{ty:'SUP',heal:'25%',cleanse:1,
+    fx:'All enemies get {st:burn} \u00d71.',
+    fxEs:'Todos los enemigos reciben {st:burn} \u00d71.'},
+  cihuateteoFury:{ty:'ATK',pow:'0.6\u00d7',perHit:1,hitsL:'1+ random',hitsLEs:'1+ al azar',
+    fx:'+1 hit per damaged ally (herself excluded). All allies gain {st:defup} \u00d71.',
+    fxEs:'+1 golpe por cada aliado da\u00f1ado (ella no cuenta). Todos los aliados ganan {st:defup} \u00d71.'},
+  godbaneBlowgun:{ty:'ATK',pow:'0.5\u00d7',perHit:1,hits:5,random:1,
+    fx:'2\u00d7 damage against gods.',
+    fxEs:'2\u00d7 de da\u00f1o contra dioses.'},
+  mictlanClaspPlayer:{ty:'MAG',pow:'0.5\u00d7',tg:6,upTo:1,
+    fx:'Survivors get {st:lethargy} \u00d71. Enemies it defeats join you as undead allies in the spoils (except gods).',
+    fxEs:'Los sobrevivientes reciben {st:lethargy} \u00d71. Los enemigos que derrota se unen como aliados reanimados en el bot\u00edn (excepto dioses).'}
+};
+const SF_LBL={
+  power:{label:'POWER',labelEs:'POTENCIA'},targets:{label:'TARGETS',labelEs:'OBJETIVOS'},
+  hits:{label:'HITS',labelEs:'GOLPES'},heal:{label:'HEAL',labelEs:'CURA'},
+  support:{label:'SUPPORT',labelEs:'APOYO'},perHit:{label:'per hit',labelEs:'por golpe'},
+  random:{label:'random',labelEs:'al azar'},upTo:{label:'up to',labelEs:'hasta'},
+  allAllies:{label:'all allies',labelEs:'todos los aliados'},lowAlly:{label:'lowest-HP ally',labelEs:'aliado con menos PV'},summon:{label:'SUMMON',labelEs:'INVOCA'},
+  splash:{label:'splash',labelEs:'salpicadura'},splashT:{label:'Splash',labelEs:'Salpicadura'},
+  splashB:{label:'The other enemies take a share of the main hit\u2019s damage, before crits. Chimalli still absorbs it.',
+           labelEs:'Los dem\u00e1s enemigos reciben una parte del da\u00f1o del golpe principal, antes de cr\u00edticos. El Chimalli a\u00fan lo absorbe.'}
+};
+function _sfL(k){return L(SF_LBL[k],'label');}
+function _kwAttrs(k){return 'onmouseenter="kwTip(event,\''+k+'\')" onmouseleave="relicTipHide()" ontouchstart="kwTipTap(event,\''+k+'\')" onclick="event.stopPropagation();kwTipTap(event,\''+k+'\')"';}
+function kwTip(e,k){_tipOwn(e);
+  const tt=document.getElementById('relic-tooltip');if(!tt)return;
+  let col='#e0a060',head='',body='';
+  if(k==='splash'){head='\u{1F4A6} '+_sfL('splashT');body=_sfL('splashB');}
+  else{const si=STATUS_INFO[k];if(!si)return;col=si.color||col;head=si.icon+' '+L(si,'name');body=L(si,'base');}
+  tt.innerHTML='<div style="font-weight:700;color:'+col+';margin-bottom:3px">'+head+'</div><div style="font-size:12px">'+body+'</div>';
+  tt.style.display='block';
+  const x=(e.clientX!==undefined?e.clientX:(e.touches&&e.touches[0]?e.touches[0].clientX:0));
+  const y=(e.clientY!==undefined?e.clientY:(e.touches&&e.touches[0]?e.touches[0].clientY:0));
+  tt.style.left=Math.min(x+12,window.innerWidth-216)+'px';tt.style.top=Math.min(y+14,window.innerHeight-120)+'px';
+}
+function kwTipTap(e,k){if(e&&e.stopPropagation)e.stopPropagation();kwTip(e,k);setTimeout(()=>{document.addEventListener('click',relicTipHide,{once:true});},50);}
+function specFmtHtml(ak,tbl){
+  const f=(tbl||SPEC_FMT)[ak];if(!f)return null;
+  const chip=(lbl,val,col)=>'<span class="sf-c"'+(col?' style="color:'+col+'"':'')+'>'+(lbl?'<b>'+lbl+'</b>':'')+val+'</span>';
+  let r1='';
+  if(f.ty==='SUP'){
+    r1+=chip('','\u2764\ufe0f '+_sfL('support'),'#70d0a0');
+    if(f.sumL)r1+=chip(_sfL('summon'),L(f,'sumL')); /* v1349: summoners (Call of the Sun) */
+    else if(f.heal)r1+=chip(_sfL('heal'),f.heal+' \u00b7 '+_sfL(f.healLow?'lowAlly':'allAllies')); /* v1344: healLow = single lowest-HP ally */
+    else r1+=chip(_sfL('targets'),f.tgL?L(f,'tgL'):_sfL('allAllies')); /* v1342: pure-buff supports (Cinder Mend) · v1347: tgL (Basalt Shield) */
+    if(f.cleanse)r1+='<span class="sf-c" style="border-color:#70e0b066"><span class="cleanse-pip" '+CLEANSE_ATTRS+'><span style="color:#70e0b0">\u2726</span> '+t('ui.cleanse.title')+'</span></span>';
+  }else{
+    r1+=f.ty==='MAG'?chip('','\u{1FA84} '+statLbl('mag'),'#b08cf0'):chip('','\u{1F5E1}\ufe0f '+statLbl('atk'),'#f0a070');
+    r1+=chip(_sfL('power'),f.powL?L(f,'powL'):(f.pow+(f.perHit?' '+_sfL('perHit'):'')));
+    if(f.hits||f.hitsL)r1+=chip(_sfL('hits'),f.hitsL?L(f,'hitsL'):(f.hits+(f.random?' '+_sfL('random'):'')));
+    else r1+=chip(_sfL('targets'),f.tgL?L(f,'tgL'):((f.upTo?_sfL('upTo')+' ':'')+f.tg)); /* v1339: powL/hitsL/tgL overrides */
+  }
+  let fx=L(f,'fx')||'';
+  fx=fx.replace(/\{st:(\w+)\}/g,function(_,k){const si=STATUS_INFO[k];if(!si)return k;const c=si.color||'#c0b090';
+         return '<span class="sf-kw" style="color:'+c+';border-bottom-color:'+c+'99" '+_kwAttrs(k)+'>'+si.icon+' '+L(si,'name')+'</span>';}) /* v1336 */
+       .replace(/\{elem:(\w+)\}/g,function(_,e){return elemPip(e);}) /* v1339 */
+       .replace(/\{splash\}/g,'<span class="splash-pip" '+_kwAttrs('splash')+'>\u{1F4A6} '+_sfL('splash')+'</span>');
+  fx=chimaWord(fx);
+  return '<div class="sf" data-sty="'+f.ty+'"><div class="sf-r1">'+r1+'</div>'+(fx?'<div class="sf-r2">'+fx+'</div>':'')+'</div>';
+}
+/* v1342: vassals, keyed by TEMPLATE ID. The same template drives the enemy version, so enemy tooltips
+   switch too. Wording is side-neutral ("target", "allies") because it reads from either side.
+   Batch 1 = L1 (MICTLAN_CAPS), each checked against singleDmgMap / its fireUnitSpecial branch and the
+   enemy sMap / enemyFireSpecial branch. */
+const SPEC_FMT_U={
+  met1:{ty:'ATK',pow:'1.2\u00d7',tg:1},
+  mwt1:{ty:'MAG',pow:'1.2\u00d7',tg:1},
+  mw1:{ty:'ATK',pow:'1.5\u00d7',tg:1,fx:'+10% crit chance.',fxEs:'+10% de probabilidad de cr\u00edtico.'},
+  mw2:{ty:'MAG',pow:'1.3\u00d7',tg:1,fx:'Heals itself for the damage dealt.',fxEs:'Se cura por el da\u00f1o infligido.'},
+  mw3:{ty:'SUP',heal:'18%',cleanse:1},
+  mw4:{ty:'MAG',pow:'1.4\u00d7',tg:3,upTo:1},
+  me1:{ty:'ATK',pow:'0.5\u00d7',perHit:1,hits:3,random:1,fx:'+10% crit chance.',fxEs:'+10% de probabilidad de cr\u00edtico.'},
+  me2:{ty:'ATK',pow:'1.4\u00d7',tg:3,upTo:1},
+  me3:{ty:'SUP',heal:'16%',fx:'All allies gain {st:defup} \u00d71.',fxEs:'Todos los aliados ganan {st:defup} \u00d71.'},
+  me4:{ty:'ATK',pow:'1.7\u00d7',tg:1,fx:'Applies {st:slow}.',fxEs:'Aplica {st:slow}.'},
+  mq1:{ty:'MAG',pow:'1.2\u00d7',tg:1,fx:'Applies {st:poison} \u00d72.',fxEs:'Aplica {st:poison} \u00d72.'},
+  mq2:{ty:'SUP',heal:'16%',fx:'All allies gain {st:atkup} \u00d71.',fxEs:'Todos los aliados ganan {st:atkup} \u00d71.'},
+  mq3:{ty:'MAG',pow:'1.2\u00d7',tg:3,upTo:1,fx:'Every target gets {st:slow}.',fxEs:'Cada objetivo recibe {st:slow}.'},
+  mq4:{ty:'MAG',pow:'1.35\u00d7',tg:1,fx:'Heals itself for the damage dealt.',fxEs:'Se cura por el da\u00f1o infligido.'},
+  mf1:{ty:'ATK',pow:'0.6\u00d7',perHit:1,hits:3,random:1,fx:'Every target hit gets {st:burn} \u00d71.',fxEs:'Cada objetivo alcanzado recibe {st:burn} \u00d71.'},
+  mf2:{ty:'SUP',fx:'All allies gain {st:atkup} \u00d71 and {st:defup} \u00d71.',fxEs:'Todos los aliados ganan {st:atkup} \u00d71 y {st:defup} \u00d71.'},
+  mf3:{ty:'MAG',pow:'1.2\u00d7',tg:3,upTo:1,fx:'Every target hit gets {st:burn} \u00d71.',fxEs:'Cada objetivo alcanzado recibe {st:burn} \u00d71.'},
+  mf4:{ty:'ATK',pow:'1.3\u00d7',tg:1,fx:'Applies {st:burn} \u00d72.',fxEs:'Aplica {st:burn} \u00d72.'},
+  mt1:{ty:'ATK',pow:'1.3\u00d7',tg:1,fx:'Applies {st:poison} \u00d71 and {st:paralyze} \u00d71.',fxEs:'Aplica {st:poison} \u00d71 y {st:paralyze} \u00d71.'},
+  mt2:{ty:'ATK',pow:'1.6\u00d7',tg:1,fx:'Applies {st:paralyze} \u00d71.',fxEs:'Aplica {st:paralyze} \u00d71.'},
+  mt3:{ty:'MAG',pow:'1.25\u00d7',tg:3,upTo:1,fx:'Every target hit gets {st:poison} \u00d71.',fxEs:'Cada objetivo alcanzado recibe {st:poison} \u00d71.'},
+  mt4:{ty:'SUP',heal:'20%',cleanse:1},
+  /* v1344: batch 2 = L2 (TEPEME_CAPS) + the Xochitonal/Patecatl event units (NATURE_CAPS, HUMANITY_CAPS).
+     Rulings (v1345): Earth Bloom's ally heal raised to 20% to match; Static Burst keeps the ally 0.7x for now
+     (the enemy side stays 0.55x). */
+  te1:{ty:'SUP',heal:'35%',healLow:1,fx:'The healed ally also gains Chimalli worth 3% max HP.',fxEs:'El aliado curado tambi\u00e9n gana Chimalli por 3% de PV m\u00e1x.'},
+  te2:{ty:'ATK',pow:'1.3\u00d7',tg:3,upTo:1,fx:'Every target gets {st:slow}.',fxEs:'Cada objetivo recibe {st:slow}.'},
+  te3:{ty:'ATK',pow:'0.8\u00d7',perHit:1,hits:4,random:1},
+  te4:{ty:'MAG',pow:'0.9\u00d7',tg:5,upTo:1,fx:'Every target hit gets {st:paralyze} \u00d71.',fxEs:'Cada objetivo alcanzado recibe {st:paralyze} \u00d71.'},
+  te5:{ty:'SUP',heal:'20%',fx:'All allies gain {st:atkup} \u00d71.',fxEs:'Todos los aliados ganan {st:atkup} \u00d71.'},
+  tt1:{ty:'ATK',pow:'1.4\u00d7',tg:1,fx:'Applies {st:burn} \u00d71.',fxEs:'Aplica {st:burn} \u00d71.'},
+  tt2:{ty:'SUP',heal:'43%',healLow:1,fx:'The healed ally also gains Chimalli worth 4% max HP.',fxEs:'El aliado curado tambi\u00e9n gana Chimalli por 4% de PV m\u00e1x.'},
+  tt3:{ty:'ATK',pow:'1.4\u00d7',tg:1,fx:'Applies {st:poison} \u00d72.',fxEs:'Aplica {st:poison} \u00d72.'},
+  tt4:{ty:'MAG',pow:'0.7\u00d7',perHit:1,hits:4,random:1,fx:'Every target hit gets {st:paralyze} \u00d71.',fxEs:'Cada objetivo alcanzado recibe {st:paralyze} \u00d71.'},
+  tt5:{ty:'ATK',pow:'1.6\u00d7',tg:1,fx:'Applies {st:paralyze} \u00d71.',fxEs:'Aplica {st:paralyze} \u00d71.'},
+  ce1:{ty:'ATK',pow:'1.5\u00d7',tg:1,fx:'Applies {st:poison} \u00d71.',fxEs:'Aplica {st:poison} \u00d71.'},
+  ce2:{ty:'MAG',pow:'1.1\u00d7',tg:2,upTo:1,fx:'All allies gain {st:atkup} \u00d71.',fxEs:'Todos los aliados ganan {st:atkup} \u00d71.'},
+  ce3:{ty:'ATK',pow:'1.25\u00d7',tg:4,upTo:1,fx:'Every target hit gets {st:slow}.',fxEs:'Cada objetivo alcanzado recibe {st:slow}.'},
+  ce4:{ty:'ATK',pow:'1.3\u00d7',tg:1,fx:'Heals itself for the damage dealt.',fxEs:'Se cura por el da\u00f1o infligido.'},
+  xe1:{ty:'ATK',pow:'0.55\u00d7',perHit:1,hits:5,random:1,fx:'Each hit inflicts {st:slow}.',fxEs:'Cada golpe aplica {st:slow}.'},
+  xe2:{ty:'MAG',pow:'1.1\u00d7',tg:4,upTo:1,fx:'Every target hit gets {st:burn} \u00d71.',fxEs:'Cada objetivo alcanzado recibe {st:burn} \u00d71.'},
+  xe3:{ty:'ATK',pow:'1.2\u00d7',tg:1,fx:'All allies gain {st:atkup} \u00d71.',fxEs:'Todos los aliados ganan {st:atkup} \u00d71.'},
+  xe4:{ty:'ATK',pow:'1.3\u00d7',tg:1,fx:'Applies {st:wound} \u00d71.',fxEs:'Aplica {st:wound} \u00d71.'},
+  xe5:{ty:'SUP',heal:'20%',cleanse:1},
+  xe6:{ty:'SUP',heal:'18%',cleanse:1},
+  xe7:{ty:'MAG',pow:'1.2\u00d7',tg:1,fx:'Applies {st:poison} \u00d72.',fxEs:'Aplica {st:poison} \u00d72.'},
+  xe8:{ty:'ATK',pow:'1.3\u00d7',tg:1,fx:'Grants itself {st:atkup} \u00d71 before striking.',fxEs:'Se otorga {st:atkup} \u00d71 antes de golpear.'},
+  /* v1347: batch 3 = L3 (OBSIDIAN_CAPS) + captured minibosses (MINIBOSS_CAP_STATS keys). Ocetekuani joined
+     in v1348 once his ally side was ported to the boss version. */
+  oe1:{ty:'ATK',pow:'1.6\u00d7',tg:1,fx:'Applies {st:wound} \u00d71.',fxEs:'Aplica {st:wound} \u00d71.'},
+  oe2:{ty:'SUP',tgL:'self + 1 random ally',tgLEs:'s\u00ed mismo + 1 aliado al azar',fx:'Itself and one random ally gain Chimalli worth 12% max HP.',fxEs:'\u00c9l mismo y un aliado al azar ganan Chimalli por 12% de PV m\u00e1x.'},
+  oe3:{ty:'ATK',pow:'1.2\u00d7',tg:4,upTo:1,fx:'Every target hit gets {st:wound} \u00d71.',fxEs:'Cada objetivo alcanzado recibe {st:wound} \u00d71.'},
+  oe4:{ty:'ATK',pow:'1.6\u00d7',tg:1,fx:'Applies {st:burn} \u00d71 and {st:poison} \u00d71.',fxEs:'Aplica {st:burn} \u00d71 y {st:poison} \u00d71.'},
+  oe5:{ty:'ATK',pow:'0.9\u00d7',tg:5,upTo:1,fx:'Every target gets {st:slow}.',fxEs:'Cada objetivo recibe {st:slow}.'},
+  on1:{ty:'ATK',pow:'1.5\u00d7',tg:1,fx:'Applies {st:wound} \u00d72.',fxEs:'Aplica {st:wound} \u00d72.'},
+  on2:{ty:'MAG',pow:'0.9\u00d7',tg:5,upTo:1,fx:'Every target hit gets {st:wound} \u00d71 and {st:poison} \u00d71.',fxEs:'Cada objetivo alcanzado recibe {st:wound} \u00d71 y {st:poison} \u00d71.'},
+  on3:{ty:'ATK',pow:'1.3\u00d7',tg:1,fx:'Applies {st:poison} \u00d72 and {st:wound} \u00d71.',fxEs:'Aplica {st:poison} \u00d72 y {st:wound} \u00d71.'},
+  on4:{ty:'ATK',pow:'1.3\u00d7',tg:1,fx:'Applies {st:wound} \u00d71. Heals itself for the damage dealt.',fxEs:'Aplica {st:wound} \u00d71. Se cura por el da\u00f1o infligido.'},
+  on5:{ty:'ATK',pow:'0.3\u00d7',perHit:1,hits:6,random:1,fx:'Every target hit gets {st:slow} and {st:wound} \u00d71.',fxEs:'Cada objetivo alcanzado recibe {st:slow} y {st:wound} \u00d71.'},
+  xochitonal:{ty:'MAG',pow:'0.4\u00d7',perHit:1,hits:5,random:1,fx:'Every target hit gets {st:poison} \u00d71.',fxEs:'Cada objetivo alcanzado recibe {st:poison} \u00d71.'},
+  quinametzin:{ty:'ATK',pow:'1.4\u00d7',tg:4,upTo:1,fx:'Every target hit gets {st:paralyze} \u00d71. All allies gain {st:defup} \u00d71.',fxEs:'Cada objetivo alcanzado recibe {st:paralyze} \u00d71. Todos los aliados ganan {st:defup} \u00d71.'},
+  xiuhnel:{ty:'ATK',pow:'1.8\u00d7',tg:1,fx:'+15% crit chance. Heals itself and Mimich (or a random ally) for the damage dealt.',fxEs:'+15% de probabilidad de cr\u00edtico. Se cura a s\u00ed mismo y a Mimich (o a un aliado al azar) por el da\u00f1o infligido.'},
+  ocetekuani:{ty:'ATK',pow:'1.5\u00d7',perHit:1,hitsL:'1\u20135 random',hitsLEs:'1\u20135 al azar',
+    fx:'1 hit at full HP, +1 for every 20% HP missing (up to 5). Each hit applies {st:wound} \u00d72.',
+    fxEs:'1 golpe con los PV completos, +1 por cada 20% de PV que le falte (hasta 5). Cada golpe aplica {st:wound} \u00d72.'}, /* v1348 */
+  /* v1349: batch 4 = L4 (CEHUYLOAN water/wind + TONATIUH_DAY) + L5 (PANCUET fire/wind) + their minibosses
+     (Mictlampehecatl, Tlacateocotl). cw3 Cold Dash states the LIVE 1.2x: both live branches (ally + enemy) use
+     1.2x; the old text and a shadowed second ally branch say 0.9x. Ruling pending. Day units' recoil = 5% own max HP. */
+  cw1:{ty:'SUP',tgL:'self + 1 random ally',tgLEs:'s\u00ed mismo + 1 aliado al azar',fx:'Itself and one random ally gain Chimalli worth 10% max HP.',fxEs:'\u00c9l mismo y un aliado al azar ganan Chimalli por 10% de PV m\u00e1x.'},
+  cw2:{ty:'SUP',heal:'22%',fx:'One random ally also gains Chimalli worth 7% max HP.',fxEs:'Un aliado al azar tambi\u00e9n gana Chimalli por 7% de PV m\u00e1x.'},
+  cw3:{ty:'ATK',pow:'1.2\u00d7',perHit:1,hitsL:'2 on 1 target',hitsLEs:'2 a 1 objetivo',fx:'Each hit applies {st:burn} \u00d71.',fxEs:'Cada golpe aplica {st:burn} \u00d71.'},
+  cw4:{ty:'ATK',pow:'1.5\u00d7',tg:1,fx:'Applies {st:poison} \u00d72 and {st:wound} \u00d71.',fxEs:'Aplica {st:poison} \u00d72 y {st:wound} \u00d71.'},
+  cw5:{ty:'MAG',pow:'1.6\u00d7',tg:2,upTo:1,fx:'Every target hit gets {st:burn} \u00d71, and every target gets {st:slow}.',fxEs:'Cada objetivo alcanzado recibe {st:burn} \u00d71 y cada objetivo recibe {st:slow}.'},
+  cv1:{ty:'ATK',pow:'1.6\u00d7',tg:1,fx:'Applies {st:wound} \u00d72.',fxEs:'Aplica {st:wound} \u00d72.'},
+  cv2:{ty:'ATK',pow:'1.3\u00d7',tg:1,fx:'Then grants itself {st:atkup} \u00d72.',fxEs:'Luego se otorga {st:atkup} \u00d72.'},
+  cv3:{ty:'MAG',pow:'1.2\u00d7',tg:4,upTo:1,fx:'Every target gets {st:wound} \u00d72.',fxEs:'Cada objetivo recibe {st:wound} \u00d72.'},
+  cv4:{ty:'MAG',pow:'1.05\u00d7',tg:3,upTo:1,fx:'Every target gets {st:lethargy} \u00d71 and {st:slow}.',fxEs:'Cada objetivo recibe {st:lethargy} \u00d71 y {st:slow}.'},
+  cv5:{ty:'ATK',pow:'1.2\u00d7',tg:1,fx:'All allies gain {st:atkup} \u00d71.',fxEs:'Todos los aliados ganan {st:atkup} \u00d71.'},
+  dy1:{ty:'ATK',pow:'2.0\u00d7',tg:1,fx:'Applies {st:wound} \u00d72. Costs itself 5% max HP (recoil).',fxEs:'Aplica {st:wound} \u00d72. Le cuesta 5% de sus PV m\u00e1x. (retroceso).'},
+  dy2:{ty:'ATK',pow:'0.9\u00d7',tg:5,upTo:1,fx:'Every target hit gets {st:burn} \u00d71. Costs itself 5% max HP (recoil).',fxEs:'Cada objetivo alcanzado recibe {st:burn} \u00d71. Le cuesta 5% de sus PV m\u00e1x. (retroceso).'},
+  dy3:{ty:'SUP',heal:'30%',fx:'All allies gain {st:atkup} \u00d71. Costs itself 5% max HP (recoil).',fxEs:'Todos los aliados ganan {st:atkup} \u00d71. Le cuesta 5% de sus PV m\u00e1x. (retroceso).'},
+  dy4:{ty:'SUP',sumL:'1 random Day ally',sumLEs:'1 aliado de D\u00eda al azar',fx:'Fails if the party is full or every Day unit is already in battle. Costs itself 5% max HP (recoil).',fxEs:'Falla si el grupo est\u00e1 lleno o todas las unidades de D\u00eda ya est\u00e1n en batalla. Le cuesta 5% de sus PV m\u00e1x. (retroceso).'},
+  dy5:{ty:'ATK',pow:'0.7\u00d7',perHit:1,hits:4,random:1,fx:'Each hit inflicts {st:slow}. Costs itself 5% max HP (recoil).',fxEs:'Cada golpe aplica {st:slow}. Le cuesta 5% de sus PV m\u00e1x. (retroceso).'},
+  dy6:{ty:'ATK',pow:'1.6\u00d7',tg:2,upTo:1,fx:'Every target hit gets {st:burn} \u00d71 and {st:lethargy} \u00d71. Costs itself 5% max HP (recoil).',fxEs:'Cada objetivo alcanzado recibe {st:burn} \u00d71 y {st:lethargy} \u00d71. Le cuesta 5% de sus PV m\u00e1x. (retroceso).'},
+  dy7:{ty:'SUP',heal:'30%',cleanse:1,fx:'Costs itself 5% max HP (recoil).',fxEs:'Le cuesta 5% de sus PV m\u00e1x. (retroceso).'},
+  dy8:{ty:'MAG',pow:'0.85\u00d7',tg:5,upTo:1,fx:'Every target hit gets {st:slow}. Costs itself 5% max HP (recoil).',fxEs:'Cada objetivo alcanzado recibe {st:slow}. Le cuesta 5% de sus PV m\u00e1x. (retroceso).'},
+  df1:{ty:'ATK',pow:'1.1\u00d7',tg:4,upTo:1,fx:'Every target gets {st:burn} \u00d71 and {st:slow}.',fxEs:'Cada objetivo recibe {st:burn} \u00d71 y {st:slow}.'},
+  df2:{ty:'ATK',pow:'1.7\u00d7',tg:1,fx:'Applies {st:poison} \u00d72.',fxEs:'Aplica {st:poison} \u00d72.'},
+  df3:{ty:'MAG',pow:'0.9\u00d7',tg:5,upTo:1,fx:'Every target gets {st:burn} \u00d71.',fxEs:'Cada objetivo recibe {st:burn} \u00d71.'},
+  df4:{ty:'SUP',heal:'15%',fx:'Itself and one random ally gain Chimalli worth 15% max HP.',fxEs:'\u00c9l mismo y un aliado al azar ganan Chimalli por 15% de PV m\u00e1x.'},
+  df5:{ty:'ATK',pow:'1.6\u00d7',tg:2,upTo:1,fx:'Every target gets {st:burn} \u00d71 and {st:lethargy} \u00d71.',fxEs:'Cada objetivo recibe {st:burn} \u00d71 y {st:lethargy} \u00d71.'},
+  dv1:{ty:'ATK',pow:'1.9\u00d7',tg:1,fx:'Applies {st:poison} \u00d71.',fxEs:'Aplica {st:poison} \u00d71.'},
+  dv2:{ty:'MAG',pow:'0.9\u00d7',tg:5,upTo:1,fx:'Every target gets {st:lethargy} \u00d71.',fxEs:'Cada objetivo recibe {st:lethargy} \u00d71.'},
+  dv3:{ty:'ATK',pow:'0.85\u00d7',perHit:1,hitsL:'2 on 1 target',hitsLEs:'2 a 1 objetivo',fx:'The first hit applies {st:poison} \u00d71.',fxEs:'El primer golpe aplica {st:poison} \u00d71.'},
+  dv4:{ty:'MAG',pow:'0.9\u00d7',tg:5,upTo:1,fx:'Every target gets {st:wound} \u00d71.',fxEs:'Cada objetivo recibe {st:wound} \u00d71.'},
+  dv5:{ty:'MAG',pow:'0.9\u00d7',tg:5,upTo:1,fx:'Every target gets {st:poison} \u00d71.',fxEs:'Cada objetivo recibe {st:poison} \u00d71.'},
+  mictlampehecatl:{ty:'MAG',pow:'1.1\u00d7',tg:5,upTo:1,fx:'Every target hit gets {st:burn} \u00d72.',fxEs:'Cada objetivo alcanzado recibe {st:burn} \u00d72.'},
+  tlacateocotl:{ty:'MAG',pow:'1.4\u00d7',tg:3,upTo:1,fx:'Strips every target\u2019s Chimalli first. Every target gets {st:burn} \u00d71 and {st:wound} \u00d71.',fxEs:'Primero destruye el Chimalli de cada objetivo. Cada objetivo recibe {st:burn} \u00d71 y {st:wound} \u00d71.'},
+  /* v1351: batch 5 = L6 (TEMIMINA water/human) + L7 (TEYOLLO nature/day) + minibosses Amimitl, Atlaua,
+     Acuecueyotl, Ometochtli. Ruling (v1352): Atlatl Throw has no other effect, so it
+     gained a real +20% crit on both sides; Atlatl Rush applies Wound, so it stays without one. */
+  tm1:{ty:'ATK',pow:'1.2\u00d7',tg:1,fx:'All allies gain {st:critup} \u00d71.',fxEs:'Todos los aliados ganan {st:critup} \u00d71.'},
+  tm2:{ty:'ATK',pow:'1.6\u00d7',tg:1,fx:'+50% damage if the target is at full HP.',fxEs:'+50% de da\u00f1o si el objetivo tiene los PV completos.'},
+  tm3:{ty:'ATK',pow:'0.55\u00d7',perHit:1,hitsL:'3\u20134 random',hitsLEs:'3\u20134 al azar'},
+  tm4:{ty:'MAG',pow:'1.2\u00d7',tg:3,upTo:1,fx:'Every target hit gets {st:poison} \u00d71 and {st:lethargy} \u00d71.',fxEs:'Cada objetivo alcanzado recibe {st:poison} \u00d71 y {st:lethargy} \u00d71.'},
+  tm5:{ty:'ATK',pow:'1.5\u00d7',tg:1,fx:'Applies {st:wound} \u00d71.',fxEs:'Aplica {st:wound} \u00d71.'},
+  th1:{ty:'ATK',pow:'1.6\u00d7',tg:1,fx:'+20% crit chance.',fxEs:'+20% de probabilidad de cr\u00edtico.'}, /* v1352: crit added to code (ruling) */
+  th2:{ty:'ATK',pow:'0.9\u00d7',tg:5,upTo:1,fx:'+10% crit chance.',fxEs:'+10% de probabilidad de cr\u00edtico.'},
+  th3:{ty:'MAG',pow:'0.8\u00d7',tg:5,upTo:1,fx:'Every target hit gets {st:slow}.',fxEs:'Cada objetivo alcanzado recibe {st:slow}.'},
+  th4:{ty:'ATK',pow:'0.6\u00d7',perHit:1,hits:3,random:1,fx:'Every target hit gets {st:paralyze} \u00d71.',fxEs:'Cada objetivo alcanzado recibe {st:paralyze} \u00d71.'},
+  th5:{ty:'SUP',heal:'22%',cleanse:1},
+  yn1:{ty:'ATK',pow:'0.8\u00d7',perHit:1,hits:3,random:1,fx:'Costs itself 5% max HP (recoil).',fxEs:'Le cuesta 5% de sus PV m\u00e1x. (retroceso).'},
+  yn2:{ty:'ATK',pow:'1.7\u00d7',tg:1,fx:'Heals itself for the damage dealt. Costs itself 5% max HP (recoil).',fxEs:'Se cura por el da\u00f1o infligido. Le cuesta 5% de sus PV m\u00e1x. (retroceso).'},
+  yn3:{ty:'ATK',pow:'1.8\u00d7',tg:1,fx:'Applies {st:wound} \u00d72. Costs itself 5% max HP (recoil).',fxEs:'Aplica {st:wound} \u00d72. Le cuesta 5% de sus PV m\u00e1x. (retroceso).'},
+  yn4:{ty:'MAG',pow:'1.3\u00d7',tg:4,upTo:1,fx:'Every target hit gets {st:poison} \u00d72. Costs itself 5% max HP (recoil).',fxEs:'Cada objetivo alcanzado recibe {st:poison} \u00d72. Le cuesta 5% de sus PV m\u00e1x. (retroceso).'},
+  yn5:{ty:'ATK',pow:'1.7\u00d7',tg:1,fx:'+50% damage if the target is below 35% HP. Costs itself 5% max HP (recoil).',fxEs:'+50% de da\u00f1o si el objetivo tiene menos del 35% de PV. Le cuesta 5% de sus PV m\u00e1x. (retroceso).'},
+  yd1:{ty:'ATK',pow:'1.7\u00d7',tg:1,fx:'Applies {st:drunk} \u00d71.',fxEs:'Aplica {st:drunk} \u00d71.'},
+  yd2:{ty:'MAG',pow:'0.9\u00d7',tg:5,upTo:1,fx:'Every target hit gets {st:drunk} \u00d71 and {st:poison} \u00d71.',fxEs:'Cada objetivo alcanzado recibe {st:drunk} \u00d71 y {st:poison} \u00d71.'},
+  yd3:{ty:'SUP',heal:'30%',fx:'Every unit on both sides gets {st:drunk} \u00d71.',fxEs:'Todas las unidades de ambos bandos reciben {st:drunk} \u00d71.'},
+  yd4:{ty:'ATK',pow:'0.7\u00d7',perHit:1,hits:4,random:1},
+  yd5:{ty:'SUP',fx:'All allies gain {st:atkup} \u00d71. Every unit on both sides gets {st:drunk} \u00d71.',fxEs:'Todos los aliados ganan {st:atkup} \u00d71. Todas las unidades de ambos bandos reciben {st:drunk} \u00d71.'},
+  amimitl:{ty:'MAG',pow:'1.2\u00d7',tg:4,upTo:1,fx:'Strips every target\u2019s Chimalli first. Every target hit gets {st:paralyze} \u00d71.',fxEs:'Primero destruye el Chimalli de cada objetivo. Cada objetivo alcanzado recibe {st:paralyze} \u00d71.'},
+  atlaua:{ty:'ATK',pow:'1.4\u00d7',tg:2,upTo:1,fx:'Every target gets {st:wound} \u00d71.',fxEs:'Cada objetivo recibe {st:wound} \u00d71.'},
+  acuecueyotl:{ty:'SUP',heal:'23%',fx:'Up to 4 random foes get {st:slow}.',fxEs:'Hasta 4 enemigos al azar reciben {st:slow}.'},
+  ometochtli:{ty:'MAG',pow:'0.3\u00d7',tg:6,upTo:1,fx:'Every target gets {st:drunk} \u00d72. Summons one of the Centzon Totochtin if the party has room.',fxEs:'Cada objetivo recibe {st:drunk} \u00d72. Invoca a uno de los Centzon Totochtin si hay espacio en el grupo.'},
+  /* v1354: batch 6 (final) = L8 (APANO night/thunder) + minibosses Ixpuxtequi, Nexoxcho. L9's gauntlet reuses
+     minibosses already converted. After this every ALL_CAPS template and every MINIBOSS_CAP_STATS entry is converted. */
+  an1:{ty:'ATK',pow:'1.5\u00d7',tg:2,upTo:1,fx:'Every target gets {st:lethargy} \u00d72.',fxEs:'Cada objetivo recibe {st:lethargy} \u00d72.'},
+  an2:{ty:'ATK',pow:'1.9\u00d7',tg:1,fx:'+50% damage if the target is below 40% HP.',fxEs:'+50% de da\u00f1o si el objetivo tiene menos del 40% de PV.'},
+  an3:{ty:'SUP',heal:'20%',fx:'All allies gain {st:defup} \u00d71.',fxEs:'Todos los aliados ganan {st:defup} \u00d71.'},
+  an4:{ty:'MAG',pow:'1.2\u00d7',tg:4,upTo:1,fx:'Every target gets {st:wound} \u00d71.',fxEs:'Cada objetivo recibe {st:wound} \u00d71.'},
+  an5:{ty:'MAG',pow:'0.75\u00d7',tg:5,upTo:1,fx:'Every target gets {st:poison} \u00d71 and {st:slow}.',fxEs:'Cada objetivo recibe {st:poison} \u00d71 y {st:slow}.'},
+  at1:{ty:'MAG',pow:'1.3\u00d7',tg:1,fx:'Applies {st:drunk} \u00d72.',fxEs:'Aplica {st:drunk} \u00d72.'},
+  at2:{ty:'ATK',pow:'1.3\u00d7',tg:1,fx:'All allies gain {st:critup} \u00d71.',fxEs:'Todos los aliados ganan {st:critup} \u00d71.'},
+  at3:{ty:'MAG',pow:'0.9\u00d7',tg:5,upTo:1,fx:'Every target gets {st:paralyze} \u00d71.',fxEs:'Cada objetivo recibe {st:paralyze} \u00d71.'},
+  at4:{ty:'SUP',heal:'20%',fx:'All allies gain {st:atkup} \u00d71.',fxEs:'Todos los aliados ganan {st:atkup} \u00d71.'},
+  at5:{ty:'MAG',pow:'1.5\u00d7',tg:2,upTo:1,fx:'Every target gets {st:paralyze} \u00d72.',fxEs:'Cada objetivo recibe {st:paralyze} \u00d72.'},
+  ixpuxtequi:{ty:'MAG',pow:'1.5\u00d7',tg:1,fx:'Deals 10% {splash} to the rest. Every target gets a random status \u00d72.',fxEs:'Inflige 10% de {splash} al resto. Cada objetivo recibe un estado al azar \u00d72.'},
+  nexoxcho:{ty:'MAG',pow:'1.1\u00d7',tg:5,upTo:1,fx:'+50% damage against targets with any status. Heals itself and Ixpuxtequi for 40% of the damage dealt.',fxEs:'+50% de da\u00f1o contra objetivos con alg\u00fan estado. Se cura a s\u00ed misma y a Ixpuxtequi por el 40% del da\u00f1o infligido.'},
+  mimich:{ty:'ATK',pow:'1.5\u00d7',tg:3,upTo:1,fx:'Every target hit gets {st:wound} \u00d71. Itself and the lowest-HP ally gain Chimalli worth 5% max HP.',fxEs:'Cada objetivo alcanzado recibe {st:wound} \u00d71. \u00c9l mismo y el aliado con menos PV ganan Chimalli por 5% de PV m\u00e1x.'}
+};
+/* Runs at the end of every i18nExpandProse(), so it follows language switches; i18nResyncRun()
+   then copies the new text into the oblation snapshots exactly as it does for the prose. */
+/* v1336: a converted special carries its type in the chip row, so the header is just the name
+   (gold, per the mockup). Unconverted specials get exactly the markup they had before. */
+function _sfHd(ad){return /data-sty="/.test(String(ad||''))?' sf-hd':'';} /* v1356 */
+function _sfBd(ad){return /data-sty="/.test(String(ad||''))?' sf-bd':'';}
+function specNameHtml(name,ad,pre){
+  if(/data-sty="/.test(String(ad||'')))return pre?(pre+name):('<span class="sf-nm">'+name+'</span>');
+  return (pre||'\u{1F52E} ')+name+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(ad)+'</span>';
+}
+function specFmtApply(){
+  try{
+    GODS.forEach(function(g){
+      const h=g&&g.ak&&specFmtHtml(g.ak);if(!h)return;
+      g.ad=h;
+      const d=(typeof GOD_SELECT_DESC!=='undefined')&&GOD_SELECT_DESC[g.id];
+      if(d&&typeof d==='object')d.ad=h;
+    });
+  }catch(e){} /* GODS not initialised yet on an early call -- the 9754 call covers it */
+  try{ /* v1342 */
+    ALL_CAPS().forEach(function(c){const h=c&&c.id&&specFmtHtml(c.id,SPEC_FMT_U);if(h)c.ad=h;});
+    Object.keys(MINIBOSS_CAP_STATS).forEach(function(k){const h=specFmtHtml(k,SPEC_FMT_U);if(h)MINIBOSS_CAP_STATS[k].ad=h;}); /* v1347: captured minibosses (the boss-fight templates keep their own text) */
+  }catch(e){}
+}
 /* Originals are held off-object in a WeakMap: writing them onto the god would put
    _i18nRaw into anything that serialises a GODS entry. */
 const _proseRaw=new WeakMap();
@@ -4536,6 +5015,7 @@ function i18nExpandProse(){
       });
     });
   });
+  specFmtApply(); /* v1335 */
 }
 function elemLbl(el){
   const m=(typeof ELEM_META!=='undefined')&&ELEM_META[el];
@@ -4685,14 +5165,19 @@ function rerollPochteca(){
   notify(t('ui.msg.waresRerolled'),'#c0e060');
   renderPochteca();renderRes('rb-shop');
 }
+/* v1372: the first Pochteca purchase EVER is free (Genaro) -- one time across all runs, kept in DT so a
+   reload can't hand out a second. Normal prices afterwards. */
+function pochFreeAvail(){return !DT.pochFreeUsed;}
 function buyOffering(i,payWith){
   var st=G._pochtecaStock||[];var it=st[i];if(!it||it.sold)return;
   var pt=payWith||it.priceType; // v684: player chooses cacao or flower
   if(pt==='flower'&&!getDTEffects().offeringFlowerPay)return; /* v1326: Flower payment needs the Flower Barter node */
   var _tier=(OFFERINGS[it.id]||{}).tier; /* v902 */
   var eff=(pt==='flower')?Math.round((it.flowerPrice||it.price)*offeringPriceMult('flower',_tier)):offeringCacaoCost(it);
+  const _free=pochFreeAvail();if(_free){pt='cacao';eff=0;} /* v1372 */
   if((G.res[pt]||0)<eff){notify((pt==='flower'?t('ui.msg.noFlowers'):t('ui.msg.noCacaoBang')),'#e05050');return;}
   G.res[pt]-=eff;G.offeringsBought=(G.offeringsBought||0)+1;grantOffering(it.id);it.sold=true;
+  if(_free){DT.pochFreeUsed=true;saveDT();} /* v1372: spent the moment it's used */
   var o=OFFERINGS[it.id];notify(t('ui.msg.acquired',{name:(o?o.icon+" "+o.name:it.id)}),'#c0e060');
   renderPochteca();renderRelicBar();renderRes('rb-shop');
   /* v932: pulse whoever this offering actually boosts. renderPartyChips() first so the chips
@@ -4705,18 +5190,20 @@ function renderPochtecaReal(){
   var stock=G._pochtecaStock;
   if(!stock||!stock.length){el.innerHTML='<div style="font-size:12px;color:var(--td)">The Pochteca has not set up his stall this time. He may return after a future battle.</div>';return;}
   el.innerHTML='<p style="font-size:11px;color:#d4af37;margin-bottom:.6rem">'+t('ui.pochteca.intro')+'</p>'+
+    (pochFreeAvail()?'<p class="poch-free" style="font-size:13px;color:#50c080;font-weight:600;margin:-.3rem 0 .6rem">'+t('ui.pochteca.firstFree')+'</p>':'')+ /* v1372 */
     '<div style="display:flex;gap:8px;align-items:stretch">'+
     stock.map(function(it,i){var o=OFFERINGS[it.id];
       var _tr=(OFFERINGS[it.id]||{}).tier; /* v902 */
       var cEff=offeringCacaoCost(it);var fEff=Math.round((it.flowerPrice||it.price)*offeringPriceMult('flower',_tr));
       var _fp=getDTEffects().offeringFlowerPay; /* v1326: Flower button hidden until Flower Barter */
+      var _free=pochFreeAvail();if(_free){cEff=0;_fp=false;} /* v1372 */
       var canC=(G.res.cacao||0)>=cEff,canF=(G.res.flower||0)>=fEff;
       var btn=it.sold?'<span style="margin-top:auto;font-size:11px;color:#50c080;font-weight:600">Acquired ✦</span>':
         ('<div style="margin-top:auto;width:100%;display:flex;gap:4px">'+
-         '<button class="btn btn-ca" '+(canC?'':'disabled')+' onclick="buyOffering('+i+',\'cacao\')" style="flex:1;font-size:14px;font-weight:600'+(canC?'':';opacity:.4')+'"><svg class="tl tl-cacao"><use href="#tl-cacao"/></svg> '+cEff+'</button>'+
+         '<button class="btn btn-ca" '+(canC?'':'disabled')+' onclick="buyOffering('+i+',\'cacao\')" style="flex:1;font-size:14px;font-weight:600'+(canC?'':';opacity:.4')+'"><svg class="tl tl-cacao"><use href="#tl-cacao"/></svg> '+(_free?t('ui.pochteca.free'):cEff)+'</button>'+
          (_fp?'<button class="btn btn-ca" '+(canF?'':'disabled')+' onclick="buyOffering('+i+',\'flower\')" style="flex:1;font-size:14px;font-weight:600'+(canF?'':';opacity:.4')+'"><svg class="tl tl-quincunx"><use href="#tl-quincunx"/></svg> '+fEff+'</button>':'')+
          '</div>');
-      return '<div style="flex:1;min-width:0;background:var(--bm);border:1.5px solid var(--br);border-radius:12px;padding:11px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px'+(it.sold?';opacity:.55':'')+'">'+
+      return '<div class="gk-ware" style="flex:1;min-width:0;background:var(--bm);border:1.5px solid var(--br);border-radius:12px;padding:11px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px'+(it.sold?';opacity:.55':'')+'">'+ /* v1370: gk-ware frame */
         '<span style="font-size:30px;line-height:1">'+o.icon+'</span>'+
         '<div style="font-size:12px;font-weight:600;line-height:1.15">'+o.name+'</div>'+
         '<div style="font-size:8px;color:var(--td);text-transform:uppercase;letter-spacing:.5px">'+tierLabel(o.tier)+'</div>'+
@@ -5451,7 +5938,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1334'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1376'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -5509,7 +5996,17 @@ let _mictlanMapNext=null;
 /* v1194 strip geometry, in px. Mirrored by .mm-node / .mm-medal / .mm-marker in the stylesheet;
    the tests assert the two never drift. MM_PAD keeps the first node's marker, which sits to the
    LEFT of its medallion, from being clipped against the start of the track. */
-const MM_PITCH=160, MM_MEDAL=92, MM_MARK=52, MM_PAD=48;
+/* v1365: the strip scales with the screen (Genaro: the map read too small). One factor, MM_K, drives both
+   this geometry and the stylesheet (--mmk on #screen-mictlan-map), so lines, marker and medals stay
+   locked together. Factors chosen so every scaled value is a whole pixel: 1.5 desktop, 1.25 tablet,
+   1 on phones (where the 1x strip already fills the screen). */
+let MM_PITCH=160, MM_MEDAL=92, MM_MARK=52, MM_PAD=48, MM_K=1;
+function mmApplyScale(){
+  const w=(typeof window!=='undefined'&&window.innerWidth)||1024;
+  MM_K=w>=900?1.5:w>=640?1.25:1;
+  MM_PITCH=160*MM_K;MM_MEDAL=92*MM_K;MM_MARK=52*MM_K;MM_PAD=48*MM_K;
+  const scr=document.getElementById('screen-mictlan-map');if(scr)scr.style.setProperty('--mmk',String(MM_K));
+}
 const MM_GLIDE=850, MM_BEAT=250;
 /* v1195: node 0 is START, the origin you leave on the way to layer 1, so layer n now sits at
    index n rather than n-1. Everything downstream -- marker, road, auto-scroll -- reads through
@@ -5554,6 +6051,7 @@ function mictlanScrollTo(sc,n,smooth){
 }
 function showMictlanMap(nextFn){
   _mictlanMapNext=nextFn;
+  mmApplyScale(); /* v1365 */
   const sc=document.getElementById('mictlan-map-list');if(!sc)return;
   sc.innerHTML='';
   const btn=document.getElementById('mictlan-map-btn');
@@ -5604,7 +6102,7 @@ function showMictlanMap(nextFn){
     const node=document.createElement('div');
     node.className='mm-node'+(done?' done':cur?' here':'');
     node.innerHTML='<div class="mm-medal">'
-      +mictlanSpriteHtml(mictlanBossKey(l),l.icon,68,mode)
+      +mictlanSpriteHtml(mictlanBossKey(l),l.icon,68*MM_K,mode)
       /* v1197: struck across the boss, inside the medallion, so the clip trims it to the rim.
          Same glyph the game already uses for captured units -- no second visual language. */
       +(done?'<div class="mm-stamp"><svg class="tl tl-captive"><use href="#tl-captive"/></svg></div>':'')
@@ -6989,6 +7487,150 @@ ${t('ui.howto.prestige')}</div>`,
     [{label:t('ui.common.gotIt'),fn:()=>{}}]
   );
 }
+/* v1357: Codex battle UI test toggle (Genaro: default off while testing; flip CX_DEFAULT once happy). */
+const CX_DEFAULT=false;
+function cxUiOn(){try{const v=localStorage.getItem('teotlan_codexUI');return v===null?CX_DEFAULT:v==='1';}catch(e){return CX_DEFAULT;}}
+function cxApply(){const on=cxUiOn();document.body.classList.toggle('codex-ui',on);const b=document.getElementById('dbg-codexui-btn');if(b)b.textContent='Codex UI: '+(on?'ON':'OFF');}
+function debugToggleCodexUI(){const on=!cxUiOn();try{localStorage.setItem('teotlan_codexUI',on?'1':'0');}catch(e){}cxApply();}
+try{if(document.body)cxApply();else document.addEventListener('DOMContentLoaded',cxApply);}catch(e){}
+/* v1358: battle-opening codex fold. Reuses the title screen's kaUnfold/kaUnroll at the returning-player
+   pace (K 0.75): page frames unroll, then every card unfolds from its left edge, enemies first, left to right,
+   and only THEN does the fight begin (done = buildRoundQueue). Clicks are blocked while it plays; any
+   click or key skips it. Off when codex mode is off, under Minimal FX, or with reduced motion -- then done()
+   runs at once, exactly as before. Classes are removed at the end so kaUnfold's fill can never override
+   the acted/slowed filters afterwards. */
+/* v1361: boss layouts (codex mode). Layer/event boss -- or, failing that, a miniboss -- stands on the left
+   spanning the rows; a dashed divider; escorts fill two columns on the right (Genaro: like Cipactli +
+   Mictlantecuhtli's minions). Cells travel as CSS custom properties (--cxc/--cxr), which do nothing unless
+   body.codex-ui is set, so the toggle-off screen is untouched. Re-applied after every render: the create
+   branch resets className, the patch branch keeps it, and both end here. Cipactli keeps its own grid. */
+/* v1368: miniboss groups are introduced, laid out and mourned as one (Genaro). Matched by base id; any
+   other set of 2+ minibosses falls back to their names joined. Layer bosses never group. */
+const CX_GROUPS=[
+  {ids:['xiuhnel','mimich'],name:'Xiuhnel & Mimich',nameEs:'Xiuhnel y Mimich',sub:'The Cloud Serpents',subEs:'Las Serpientes de Nubes'},
+  {ids:['amimitl','atlaua','acuecueyotl'],name:'The Lake Demigods',nameEs:'Los Semidioses del Lago',sub:'Amimitl \u00b7 Atlaua \u00b7 Acuecueyotl',subEs:'Amimitl \u00b7 Atlaua \u00b7 Acuecueyotl'},
+  {ids:['ixpuxtequi','nexoxcho'],name:'Ixpuxtequi & Nexoxcho',nameEs:'Ixpuxtequi y Nexoxcho',sub:'The Eagle-Footed One & the Jestress',subEs:'El de Pies de \u00c1guila y la Bufona'}
+];
+function cxMiniGroup(includeDead){
+  const es=(G.enemies||[]).filter(e=>e&&(includeDead||e.currentHp>0));
+  if(es.some(e=>e.isBoss&&!e.isMiniBoss))return null;
+  const minis=es.filter(e=>e.isMiniBoss);if(minis.length<2)return null;
+  const base=e=>e.baseId||e.id;
+  const g=CX_GROUPS.find(gr=>minis.every(e=>gr.ids.includes(base(e))));
+  return {minis,name:g?L(g,'name'):minis.map(e=>e.name).join(' & '),sub:g?L(g,'sub'):''};
+}
+function cxBossLayout(er){
+  if(!er)return;
+  const cards=[...er.children].filter(c=>c.classList&&c.classList.contains('uc'));
+  cards.forEach(c=>{c.classList.remove('cx-big');c.style.removeProperty('--cxc');c.style.removeProperty('--cxr');});
+  er.classList.remove('cx-bf','cx-solo');['--cxrows','--cxcols','--cxbig','--cxdiv'].forEach(p=>er.style.removeProperty(p));
+  if(G._cipactliPhase)return;
+  const en=id=>(G.enemies||[]).find(e=>e&&e.id===id);
+  const alive=c=>{const e=en(c.dataset.uid);return e&&e.currentHp>0?e:null;};
+  const boss=cards.find(c=>{const e=alive(c);return e&&e.isBoss&&!e.isMiniBoss;})||cards.find(c=>{const e=alive(c);return e&&(e.isBoss||e.isMiniBoss);});
+  if(!boss)return;
+  const grp=cxMiniGroup(false);
+  const bigs=grp?cards.filter(c=>grp.minis.some(e=>e.id===c.dataset.uid)):[boss]; /* v1368: the whole group stands big */
+  bigs.forEach(c=>c.classList.add('cx-big'));
+  if((window.innerWidth||1024)<560)return; /* narrow: big boss, escorts flow beneath */
+  const esc=cards.filter(c=>!bigs.includes(c));
+  /* v1363: as many escort columns as the page width allows (one row for typical fights), so the boss
+     codex is only as tall as the boss card. ~156px per escort column, ~270px for boss + divider. */
+  const _w=er.clientWidth||0;
+  const _bw=bigs.length*(grp?196:250)+20;
+  const cols=Math.max(1,Math.min(esc.length||1,_w?Math.floor((_w-_bw)/156):4));
+  const rows=Math.max(1,Math.ceil(esc.length/cols));
+  er.style.setProperty('--cxcols',String(cols));
+  er.classList.add('cx-bf');if(!esc.length)er.classList.add('cx-solo');
+  /* v1362: escorts sit at the BOTTOM of the boss codex (Genaro). Row 1 is an empty 1fr spacer that soaks up
+     the boss's extra height; the boss spans it plus every escort row; escorts start at row 2. */
+  er.style.setProperty('--cxrows',String(rows+1));
+  const nb=bigs.length;er.style.setProperty('--cxbig',String(nb));er.style.setProperty('--cxdiv',String(nb+1));
+  bigs.forEach((c,i)=>{c.style.setProperty('--cxc',String(1+i));c.style.setProperty('--cxr','1 / span '+(rows+1));});
+  esc.forEach((c,i)=>{c.style.setProperty('--cxc',String(nb+2+(i%cols)));c.style.setProperty('--cxr',String(2+Math.floor(i/cols)));});
+}
+/* v1366: victory sequence (codex mode). VICTORY! sweeps across the centre fold, the enemy codex drains, your
+   codex flares gold; boss/miniboss wins add "{name} has fallen", a shake and a longer hold. Never overlaps a
+   popup: it waits for an open #mo to close, holds any showMo() that fires while it plays (god unlocks are
+   scheduled from the boss's death and land here), and releases them one at a time afterwards. Skippable;
+   off under Minimal FX / reduced motion / codex off, where next() runs at once. */
+function cxVictoryThen(next){
+  let fired=false;const go=()=>{if(fired)return;fired=true;try{next();}catch(e){console.error(e);}};
+  const reduce=(typeof matchMedia==='function')&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!document.body.classList.contains('codex-ui')||reduce||(typeof fxOn==='function'&&!fxOn()))return go();
+  const fold=document.getElementById('cx-fold'),ep=document.getElementById('cx-enemy'),ap=document.getElementById('party-section');
+  if(!fold||!ep||!ap)return go();
+  const mo=document.getElementById('mo');
+  if(mo&&mo.classList.contains('open')){setTimeout(()=>cxVictoryThen(next),250);return;} /* wait for an open popup */
+  const bossE=(G.enemies||[]).find(e=>e&&e.isBoss&&!e.isMiniBoss)||(G.enemies||[]).find(e=>e&&(e.isBoss||e.isMiniBoss));
+  const big=!!bossE;
+  window._cxHoldMo=true;
+  const plate=document.createElement('div');plate.className='cx-vplate'+(big?' big':'');
+  const _vg=cxMiniGroup(true); /* v1368 */
+  plate.innerHTML='<b>'+t('ui.battle.cxVictory')+'</b>'+(big?'<span>'+(_vg?t('ui.battle.cxFallenPl',{name:_vg.name}):t('ui.battle.cxFallen',{name:(G._cipactliPhase&&bossE.id&&bossE.id.indexOf('cipactli')>=0)?'Cipactli':bossE.name}))+'</span>':'');
+  fold.appendChild(plate);
+  ep.classList.add('cx-won');if(big)ep.classList.add('cx-won-big');ap.classList.add('cx-hail');
+  const dur=big?2300:1500;let tm=null;
+  const release=()=>{window._cxHoldMo=false;const q=window._cxMoQ||[];
+    const flush=()=>{if(!q.length)return;if(mo&&mo.classList.contains('open')){setTimeout(flush,250);return;}showMo.apply(null,q.shift());setTimeout(flush,250);};
+    setTimeout(flush,60);};
+  const finish=()=>{if(tm){clearTimeout(tm);tm=null;}window._cxVictoryFinish=null;
+    document.removeEventListener('pointerdown',finish,true);document.removeEventListener('keydown',finish,true);
+    if(plate.parentNode)plate.parentNode.removeChild(plate);
+    ep.classList.remove('cx-won','cx-won-big');ap.classList.remove('cx-hail');
+    go();release();};
+  setTimeout(()=>{document.addEventListener('pointerdown',finish,true);document.addEventListener('keydown',finish,true);},120); /* the killing click must not skip it */
+  tm=setTimeout(finish,dur);window._cxVictoryFinish=finish; /* v1374: startBattle can end a victory still playing */
+}
+function cxIntroThen(done){
+  let fired=false;const go=()=>{if(fired)return;fired=true;try{done();}catch(e){console.error(e);}};
+  const reduce=(typeof matchMedia==='function')&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!document.body.classList.contains('codex-ui')||reduce||(typeof fxOn==='function'&&!fxOn()))return go();
+  const scr=document.getElementById('screen-battle');if(!scr)return go();
+  try{renderBattle();}catch(e){return go();}
+  const K=0.825;scr.style.setProperty('--kaK',String(K)); /* v1359: 10% slower (Genaro) */
+  /* v1359: one sweep across the whole field, left to right by on-screen position (both pages together);
+     cards sharing a column go top to bottom. Each distinct column is one step of the stagger. */
+  const cards=[...document.querySelectorAll('#erow .uc'),...document.querySelectorAll('#party-section .uc')];
+  /* v1363: boss entrance. The boss (layer/event boss, miniboss, or Cipactli's head) is held out of the sweep
+     and arrives last with its own rise, a title plate and -- layer bosses only -- a shake + red flare. */
+  const _bigs=[...document.querySelectorAll('#erow .uc.cx-big')];
+  const bossEl=_bigs[0]||document.querySelector('#erow .cip-body .uc[data-uid^="boss_cipactli_head"]');
+  const bossEls=_bigs.length?_bigs:(bossEl?[bossEl]:[]); /* v1368: a miniboss group rises together */
+  const bossE=bossEl?(G.enemies||[]).find(e=>e&&e.id===bossEl.dataset.uid):null;
+  const isMini=!!(bossE&&bossE.isMiniBoss);
+  const grp=isMini?cxMiniGroup(false):null;
+  const sweep=cards.filter(c=>!bossEls.includes(c));
+  const pos=sweep.map(c=>{const r=c.getBoundingClientRect();return {c,x:Math.round(r.left),y:Math.round(r.top)};});
+  pos.sort((a,b)=>a.x-b.x||a.y-b.y);
+  const cols=[];pos.forEach(p=>{if(!cols.length||Math.abs(p.x-cols[cols.length-1])>8)cols.push(p.x);});
+  pos.forEach(p=>{const col=cols.findIndex(x=>Math.abs(p.x-x)<=8);p.c.style.setProperty('--cxi',String(col<0?0:col));p.c.classList.add('cx-unfold');});
+  const steps=Math.max(1,cols.length);
+  scr.classList.add('cx-intro');
+  let total=((.25+Math.max(0,steps-1)*.08+.55)*K+.05)*1000;
+  let tm=null;const timers=[];let plate=null;const ep=document.getElementById('cx-enemy');
+  if(bossEl&&bossE){
+    const sweepEnd=(.25+Math.max(0,steps-1)*.08+.55)*K;
+    const bd=Math.max(.35*K,sweepEnd-.1*K);            /* boss starts as the sweep lands */
+    bossEls.forEach((b,i)=>{b.classList.add('cx-boss-rise');b.style.setProperty('--cxbd',(bd+i*.12*K).toFixed(3)+'s');});
+    scr.classList.add(isMini?'cx-intro-mini':'cx-intro-boss');
+    if(ep){plate=document.createElement('div');plate.className='cx-plate';
+      plate.innerHTML=grp?('<b>'+grp.name+'</b>'+(grp.sub?'<span>'+grp.sub+'</span>':'')):('<b>'+(G._cipactliPhase?'Cipactli':bossE.name)+'</b>'+(bossE.flavor?'<span>'+L(bossE,'flavor')+'</span>':''));
+      plate.style.setProperty('--cxpd',Math.max(0,bd-.35*K).toFixed(3)+'s');ep.appendChild(plate);}
+    const impact=(bd+.5*K)*1000;
+    timers.push(setTimeout(()=>{if(ep){ep.classList.remove('cx-impact');void ep.offsetWidth;ep.classList.add('cx-impact');}},impact));
+    total=Math.max(total,(bd+(bossEls.length-1)*.12*K+.95*K)*1000,(Math.max(0,bd-.35*K)+1.8*K)*1000)+50;
+  }
+  const finish=()=>{if(tm){clearTimeout(tm);tm=null;}
+    document.removeEventListener('pointerdown',finish,true);document.removeEventListener('keydown',finish,true);
+    timers.forEach(clearTimeout);
+    cards.forEach(c=>{c.classList.remove('cx-unfold','cx-boss-rise');c.style.removeProperty('--cxi');c.style.removeProperty('--cxbd');});
+    if(plate&&plate.parentNode)plate.parentNode.removeChild(plate);
+    if(ep)ep.classList.remove('cx-impact');
+    scr.classList.remove('cx-intro','cx-intro-boss','cx-intro-mini');go();};
+  document.addEventListener('pointerdown',finish,true);document.addEventListener('keydown',finish,true);
+  tm=setTimeout(finish,total);
+}
 function debugToggleForceCrit(){window.DBG_FORCECRIT=!window.DBG_FORCECRIT;const b=document.getElementById('dbg-forcecrit-btn');if(b)b.textContent='Force Crit: '+(window.DBG_FORCECRIT?'ON':'OFF');notify('⚡ Force Crit '+(window.DBG_FORCECRIT?'ENABLED — every hit crits':'disabled'),'#ffd700');}
 function dbgPochIntro(){ /* v1326: re-arm the run-1 intro stall + popup for the next Tianguis */
   delete V['pochteca_intro_dealt'];delete V['pochteca_popup_seen'];V['pochteca_intro_owed']=true;saveV();
@@ -8203,7 +8845,7 @@ function notify(msg,col){const n=document.getElementById('notif');
   /* v1178: innerHTML, not textContent -- offering icons can be tl- SVG tokens (Moctezuma
      Shield) and were being printed as raw tags. All callers build from internal strings. */
   n.innerHTML=msg;n.style.color=col||'#50c080';n.style.display='block';clearTimeout(n._t);n._t=setTimeout(()=>n.style.display='none',2400);}
-function showMo(icon,title,body,actions,onDismiss){ /* v785: onDismiss also fires when the modal is closed via its X or by clicking the backdrop -- both of those call hideMo() directly and never reach an action callback, which soft-locked the Cipactli cutscene */document.getElementById('mo-icon').innerHTML=icon;document.getElementById('mo-title').textContent=title;document.getElementById('mo-body').innerHTML=body.replace(/\n/g,'<br>');const ac=document.getElementById('mo-actions');ac.innerHTML='';actions.forEach(a=>{const b=document.createElement('button');b.className='btn '+(a.cls||'');b.textContent=a.label;b.onclick=()=>{if(typeof G!=='undefined'&&G)G._moDismiss=null;hideMo();if(typeof a.fn==='function')a.fn();}; /* v836: a label-only action is a reasonable thing to write; it should close the modal, not throw */ac.appendChild(b);});document.getElementById('mo').classList.add('open');if(typeof G!=='undefined'&&G)G._moDismiss=onDismiss||null;}
+function showMo(icon,title,body,actions,onDismiss){if(window._cxHoldMo){(window._cxMoQ=window._cxMoQ||[]).push([icon,title,body,actions,onDismiss]);return;} /* v1366: held while the victory plays */ /* v785: onDismiss also fires when the modal is closed via its X or by clicking the backdrop -- both of those call hideMo() directly and never reach an action callback, which soft-locked the Cipactli cutscene */document.getElementById('mo-icon').innerHTML=icon;document.getElementById('mo-title').textContent=title;document.getElementById('mo-body').innerHTML=body.replace(/\n/g,'<br>');const ac=document.getElementById('mo-actions');ac.innerHTML='';actions.forEach(a=>{const b=document.createElement('button');b.className='btn '+(a.cls||'');b.textContent=a.label;b.onclick=()=>{if(typeof G!=='undefined'&&G)G._moDismiss=null;hideMo();if(typeof a.fn==='function')a.fn();}; /* v836: a label-only action is a reasonable thing to write; it should close the modal, not throw */ac.appendChild(b);});document.getElementById('mo').classList.add('open');if(typeof G!=='undefined'&&G)G._moDismiss=onDismiss||null;}
 function hideMo(){
   document.getElementById('mo').classList.remove('open');
   /* v785: run any pending dismiss handler exactly once, whichever way the modal was closed. */
@@ -8370,6 +9012,7 @@ function fmtPassiveLine(p){
   return '<span style="color:#d4af37;font-weight:700">⭐ '+(i>0?p.slice(0,i):p)+(i>0?':':'')+'</span> '+(i>0?p.slice(i+1).trim():'');
 }
 function fmtAbilityLine(name,ad){
+  if(/data-sty="/.test(String(ad||'')))return String(ad).replace('<div class="sf" ','<div class="sf sf-boxed" ').replace('<div class="sf-r1">','<div class="sf-r1 sf-r1n"><strong class="sf-nm">\u{1F52E} '+name+'</strong>'); /* v1340: name joins the chip row here only · v1356: boxed */
   return '<strong>🔮 '+name+':</strong> <span style="color:#4a80c0">'+(ad||'—')+'</span>';
 }
 function godPronoun(g,which){
@@ -8585,7 +9228,7 @@ const RANDOM_STATUS_POOL=['burn','poison','paralyze','drunk','wound','lethargy',
 const STATUS_META={
   burn:{label:'Burn',labelEs:'Quemadura',icon:'🔥'},      poison:{label:'Poison',labelEs:'Veneno',icon:'🤢'},
   paralyze:{label:'Paralyze',labelEs:'Parálisis',icon:'⚡'}, drunk:{label:'Drunk',labelEs:'Ebriedad',icon:'🍺'},
-  wound:{label:'Wound',labelEs:'Herida',icon:'🩸'},     lethargy:{label:t('ui.common.letsGo'),labelEs:'Letargo',icon:'🥶'},
+  wound:{label:'Wound',labelEs:'Herida',icon:'🩸'},     lethargy:{label:'Lethargy',labelEs:'Letargo',icon:'🥶'} /* v1338: was t('ui.common.letsGo') -- logged "Let's go!" */,
   slow:{label:'Slow',labelEs:'Lentitud',icon:'🐢'}
 };
 function isSlowedUnit(u){ // mirrors slowBadge()'s check — slow has no stack counter
@@ -10101,7 +10744,7 @@ function showGodDetail(gd){
      matters most here. Decorating the local copy leaves GOD_SELECT_DESC untouched. */
   desc.passive=cleanseWord(sacWord(chimaWord(desc.passive)));desc.ad=cleanseWord(sacWord(chimaWord(desc.ad)));
   const typeEmoji=gd.type==='MAG'?'🪄':gd.type==='PHYS'?'🗡️':'🗡️🪄';
-  const healEmoji=(gd.ad||'').toLowerCase().includes('heal')?'❤️ ':'';
+  const healEmoji=String(i18nRaw(gd,'ad')||'').toLowerCase().includes('heal')?'❤️ ':''; /* v1338: the live ad is Spanish or structured */
   const typeLabel=gd.type==='MAG'?`<span style="font-size:10px;color:#5080d0;background:#0a0820;border-radius:3px;padding:1px 5px">${typeEmoji} MAG</span>${healEmoji?` <span style="font-size:11px">${healEmoji}</span>`:''}`:gd.type==='PHYS'?`<span style="font-size:10px;color:#c05050;background:#1a0404;border-radius:3px;padding:1px 5px">${typeEmoji} PHY</span>${healEmoji?` <span style="font-size:11px">${healEmoji}</span>`:''}`:(`<span style="font-size:10px;color:#d4af37;background:#1a1000;border-radius:3px;padding:1px 5px">${typeEmoji} MIX</span>`+` <span style="font-size:11px">${healEmoji}</span>`);
   document.getElementById('gdp-icon').innerHTML=godIconHtml(gd,96);
   /* v824: textContent, so the star has to go in as markup on the element instead. */
@@ -13228,7 +13871,7 @@ function l9TauntSummon(done){ /* v1000: done() replaces the hardcoded buildRound
     if(typeof done==='function')done(); else buildRoundQueue(); /* v1000 */
   },L9_TAUNT_HOLD_MS);
 }
-function startBattle(){
+function startBattle(){try{if(window._cxVictoryFinish)window._cxVictoryFinish();}catch(_cxv){} /* v1374: never carry a popup hold into a new fight */
   // v610: silent safety net — no glow class survives into a new battle (diagnostic warn removed; it fired on v609's own soft glow, since retired)
   document.querySelectorAll('.uc.ftue-glow,.uc.ftue-glow-soft').forEach(e=>e.classList.remove('ftue-glow','ftue-glow-soft'));
   G.log=[];if(!G._fullLog)G._fullLog=[];G._fullLog.push("=== Battle "+G.battleNum+" ===");G.tutStep=0;G.captureProcessed=new Set();G.capturedDiedThisBattle=[];G._darClaim=null; // v509: Death and Rebirth claim resets each battle
@@ -13381,17 +14024,17 @@ function startBattle(){
     G._nextBattleNPPenalty=0;
   }
   // Scalding Miasma: active when Malinalxochitl is patron or her passive was obtained via oblation
-  if(p.pk==='scaldingMiasma'||G._oblationPk==='scaldingMiasma'){
+  if(hasPassive('scaldingMiasma')){ /* v1373: same check, via the shared helper */
     G._scaldingMiasmaActive=true;
     addLog(`<span class="log-burn">🌵 Scalding Miasma: all BURN specials will also inflict Poison!</span>`);
   }
   // Mountain Heart: Earth allies +30% DEF this battle (vassals and gods)
-  if(p.pk==='mountainHeart'){
+  if(hasPassive('mountainHeart')){ /* v1373: was p.pk=== -- an oblated Mountain Heart did nothing */
     G.units.filter(u=>u.element==='earth').forEach(u=>{u.def=Math.round(u.def*1.30);});
     addLog(`<span class="log-god">🐆 Mountain Heart: all Earth allies +30% DEF this battle!</span>`);
   }
   // Endless Torrent: Water allies +15% ATK/MAG this battle (vassals and gods)
-  if(p.pk==='endlessTorrent'){
+  if(hasPassive('endlessTorrent')){ /* v1373: was p.pk=== (oblation ignored) */
     G.units.filter(u=>u.element==='water').forEach(u=>{
       if(u.atk>0)u.atk=Math.round(u.atk*1.15);
       if(u.mag>0)u.mag=Math.round(u.mag*1.15);
@@ -13402,7 +14045,7 @@ function startBattle(){
      A Day PHYS/MIX ally therefore gets +20%; a Day MAG or a non-Day PHYS/MIX gets +10%.
      Computed as a single multiplier per unit rather than two sequential rounds of Math.round,
      so the stacked case is a true +20% instead of 1.10*1.10 = +21% with rounding drift. */
-  if(p.pk==='goldenWarCry'){
+  if(hasPassive('goldenWarCry')){ /* v1373: was p.pk=== -- oblated Huitzilopochtli's War Cry never fired */
     let _gwcBoth=0,_gwcOne=0;
     G.units.forEach(u=>{
       if(!(u.atk>0))return;
@@ -13426,7 +14069,7 @@ function startBattle(){
     if(_rbLog)addLog(`<span class="log-god">🍶 Apothecary blessing: ${_rbLog}!</span>`);
   }
   // Coatlicue Snake Skirt: free chimalli on random ally
-  if(p.pk==='freeChimalli'){
+  if(hasPassive('freeChimalli')){ /* v1373: was p.pk=== (oblation ignored) */
     const aliveAllies=G.units.filter(u=>u.currentHp>0&&u.isAlly);
     /* v967: this threshold was a flat 40, left over from when every Chimalli grant was a small
        integer. Since v964 shields are a PERCENTAGE of max HP and routinely run into the hundreds,
@@ -13522,7 +14165,7 @@ function startBattle(){
     runSacrificeRites(()=>buildRoundQueue());
     return;
   }
-  buildRoundQueue();
+  cxIntroThen(()=>buildRoundQueue()); /* v1358: codex unfold plays first (codex mode only; otherwise immediate) */
 }
 /* v1116 ROOT CAUSE of "Solar Sacrifice did not fire on my continued run" [Genaro].
    G.pendingEnemies is NOT in RUN_SKIP, so an accepted encounter is serialized whole and restored
@@ -13987,6 +14630,7 @@ function buildRoundQueue(){
     const _stw=hasOffering('sak_tahn_waax')?(' \u00b7 \u{1F4C5} '+(12-(G.sakTahnRounds||0))):'';
     banEl.textContent=t('ui.battle.roundBanner',{n:G.roundNum})+(mictlanSummonPending()?t('ui.battle.deadStir'):'')+_stw; // v758/v806 · v1262
     banEl.className='round-banner new-round';
+    {const _cf=document.getElementById('cx-fold');if(_cf){_cf.innerHTML='<span>'+banEl.innerHTML+'</span>';_cf.classList.remove('new-round');void _cf.offsetWidth;_cf.classList.add('new-round');}} /* v1357: codex fold carries the round */
     setTimeout(()=>{if(banEl)banEl.classList.remove('new-round');},1500);
   }
   renderBattle();
@@ -15265,6 +15909,7 @@ function specIsMagic(actor){
 }
 function isAoeOrAutoSpecial(actor){
   if(!actor)return true;
+  if(!actor.isGod&&(actor.baseId||actor.id)==='ocetekuani')return true; /* v1348: random multi-hit, no target prompt */
   const gd=actor.isGod?GODS.find(g=>g.id===actor.baseGodId):null;
   // v535: oblated specials route on the oblated ak, so a single-target oblated special
   // (e.g. a patron holding Cihuacoatl's kit) no longer forces the AoE/auto path.
@@ -16077,8 +16722,9 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
       const live=ae.filter(e=>e.currentHp>0);
       if(!live.length)break;
       const tgt=live[Math.floor(Math.random()*live.length)];
-      const isG=isGodTarget(tgt); if(isG)godHits++;
-      let raw=Math.max(1,Math.round(bpn(u)*(((u.atk||0)*0.5*(isG?2:1)-(tgt.def||0)*0.4)*(G.dte.specialBoostMult||1))));
+      /* v1341: no bonus vs gods -- that is Xbalanque's Godbane Blowgun alone (Genaro). godHits stays 0,
+         so the log's "struck a god" clause never fires. The enemy-side branch never had it. */
+      let raw=Math.max(1,Math.round(bpn(u)*(((u.atk||0)*0.5-(tgt.def||0)*0.4)*(G.dte.specialBoostMult||1))));
       if(rollCrit(0,false,u))raw=Math.round(raw*(u._critMult||2));
       const h=applyArmorDamage(tgt,raw,false);onHitContact(u,tgt);
       if(h>0){
@@ -16698,7 +17344,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   // ── Layer 6 Water roster — captured-ally (player) versions ──
   if(ab==='Toxic Bloom'&&ae.length){
     let total=0;
-    ae.forEach(e=>{if(e.currentHp<=0)return;const dmg=critify(Math.max(1,Math.round((u.mag||0)*1.2-(e.res||0)*0.4)),u,true);const h=applyArmorDamage(e,dmg,true);if(h>0){e.currentHp=Math.max(0,e.currentHp-h);total+=h;animateHit(e.id,h,false,rollCrit._lc);applyPoison(e,1);applyLethargy(e,1);onHitContact(u,e);refreshCaptureTargets();if(e.currentHp<=0)handleDeath(e);}});
+    ae.forEach(e=>{if(e.currentHp<=0)return;const dmg=critify(Math.max(1,Math.round((u.mag||0)*1.2-(e.res||0)*0.4)),u,true);const h=applyArmorDamage(e,dmg,false);if(h>0){e.currentHp=Math.max(0,e.currentHp-h);total+=h;animateHit(e.id,h,false,rollCrit._lc);applyPoison(e,1);applyLethargy(e,1);onHitContact(u,e);refreshCaptureTargets();if(e.currentHp<=0)handleDeath(e);}}); /* v1350: applyArmorDamage was passed isEnemyAttacking=true -- skipped Ihiyotl Steam, Coyolxauhqui Disk and Popocatepetl Ashes */
     addLog(`<span class="log-ab">🐡 Toxic Bloom! 1.2×MAG AoE ${total} + Poison ×1 + Lethargy ×1!</span>`);return;
   }
   if(ab==='Feeding Frenzy'&&ae.length){
@@ -16731,18 +17377,18 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   // ── Layer 6 Humanity roster — captured-ally (player) versions ──
   if(ab==='Atlatl Throw'){
     if(!t)return;
-    const h=applyArmorDamage(t,critify(Math.max(1,Math.round((u.atk||0)*1.6-(t.def||0)*0.4)),u,false),false);if(h>0){t.currentHp=Math.max(0,t.currentHp-h);animateHit(t.id,h,false,rollCrit._lc);onHitContact(u,t);refreshCaptureTargets();if(t.currentHp<=0)handleDeath(t);}
+    const h=(()=>{const _sv=u._critBonus||0;u._critBonus=_sv+0.20;const _d=critify(Math.max(1,Math.round((u.atk||0)*1.6-(t.def||0)*0.4)),u,false);u._critBonus=_sv;return applyArmorDamage(t,_d,false);})() /* v1352: +20% crit (Genaro: no other effects -> keep it) */;if(h>0){t.currentHp=Math.max(0,t.currentHp-h);animateHit(t.id,h,false,rollCrit._lc);onHitContact(u,t);refreshCaptureTargets();if(t.currentHp<=0)handleDeath(t);}
     addLog(`<span class="log-ab">🏹 Atlatl Throw! ${h}</span>`);return;
   }
   if(ab==='Arrow Rain'&&ae.length){
     let total=0;const _sv=u._critBonus||0;u._critBonus=_sv+0.10;
-    ae.forEach(e=>{if(e.currentHp<=0)return;const h=applyArmorDamage(e,critify(Math.max(1,Math.round((u.atk||0)*0.9-(e.def||0)*0.4)),u,true),true);if(h>0){e.currentHp=Math.max(0,e.currentHp-h);total+=h;animateHit(e.id,h,false,rollCrit._lc);onHitContact(u,e);refreshCaptureTargets();if(e.currentHp<=0)handleDeath(e);}});
+    ae.forEach(e=>{if(e.currentHp<=0)return;const h=applyArmorDamage(e,critify(Math.max(1,Math.round((u.atk||0)*0.9-(e.def||0)*0.4)),u,true),false);if(h>0){e.currentHp=Math.max(0,e.currentHp-h);total+=h;animateHit(e.id,h,false,rollCrit._lc);onHitContact(u,e);refreshCaptureTargets();if(e.currentHp<=0)handleDeath(e);}}); /* v1350: applyArmorDamage was passed isEnemyAttacking=true -- skipped Ihiyotl Steam, Coyolxauhqui Disk and Popocatepetl Ashes */
     u._critBonus=_sv;
     addLog(`<span class="log-ab">🎯 Arrow Rain! 0.9×ATK AoE ${total}</span>`);return;
   }
   if(ab==='Net Cast'&&ae.length){
     let total=0;
-    ae.forEach(e=>{if(e.currentHp<=0)return;const preArmor=e.armor||0;const h=applyArmorDamage(e,critify(Math.max(1,Math.round((u.mag||0)*0.8-(e.res||0)*0.4)),u,true),true);if(h>0){e.currentHp=Math.max(0,e.currentHp-h);total+=h;animateHit(e.id,h,false,rollCrit._lc);onHitContact(u,e);}applySlowToUnit(e,preArmor);refreshCaptureTargets();if(e.currentHp<=0)handleDeath(e);});
+    ae.forEach(e=>{if(e.currentHp<=0)return;const preArmor=e.armor||0;const h=applyArmorDamage(e,critify(Math.max(1,Math.round((u.mag||0)*0.8-(e.res||0)*0.4)),u,true),false);if(h>0){e.currentHp=Math.max(0,e.currentHp-h);total+=h;animateHit(e.id,h,false,rollCrit._lc);onHitContact(u,e);}applySlowToUnit(e,preArmor);refreshCaptureTargets();if(e.currentHp<=0)handleDeath(e);}); /* v1350: applyArmorDamage was passed isEnemyAttacking=true -- skipped Ihiyotl Steam, Coyolxauhqui Disk and Popocatepetl Ashes */
     addLog(`<span class="log-ab">🕸️ Net Cast! 0.8×MAG AoE ${total} + Slow ×1!</span>`);return;
   }
   if(ab==='Trident Lunge'&&ae.length){
@@ -16768,7 +17414,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   if(ab==='Drunken Revel'){
     let totalDR=0;
     ae.filter(e=>e.currentHp>0).slice(0,6).forEach(e=>{
-      const h=applyArmorDamage(e,critify(Math.max(1,Math.round(bpn(u)*(((u.mag||0)*0.3-(e.res||0)*0.4)*(G.dte.specialBoostMult||1)))),u,true),true);
+      const h=applyArmorDamage(e,critify(Math.max(1,Math.round(bpn(u)*(((u.mag||0)*0.3-(e.res||0)*0.4)*(G.dte.specialBoostMult||1)))),u,true),false); /* v1350: applyArmorDamage was passed isEnemyAttacking=true -- skipped Ihiyotl Steam, Coyolxauhqui Disk and Popocatepetl Ashes */
       if(h>0){e.currentHp=Math.max(0,e.currentHp-h);totalDR+=h;animateHit(e.id,h,false,rollCrit._lc);onHitContact(u,e);}
       applyDrunk(e,2);refreshCaptureTargets();if(e.currentHp<=0)handleDeath(e);
     });
@@ -16814,11 +17460,32 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   if(ab==='Carrion Breath'&&ae.length){
     let total=0;
     ae.filter(e=>e.currentHp>0).slice(0,4).forEach(e=>{
-      const h=applyArmorDamage(e,critify(Math.max(1,Math.round(bpn(u)*(((u.mag||0)*1.3-(e.res||0)*0.4)*(G.dte.specialBoostMult||1)))),u,true),true);
+      const h=applyArmorDamage(e,critify(Math.max(1,Math.round(bpn(u)*(((u.mag||0)*1.3-(e.res||0)*0.4)*(G.dte.specialBoostMult||1)))),u,true),false); /* v1350: applyArmorDamage was passed isEnemyAttacking=true -- skipped Ihiyotl Steam, Coyolxauhqui Disk and Popocatepetl Ashes */
       if(h>0){e.currentHp=Math.max(0,e.currentHp-h);total+=h;animateHit(e.id,h,false,rollCrit._lc);applyPoison(e,2);onHitContact(u,e);}
       refreshCaptureTargets();if(e.currentHp<=0)handleDeath(e);
     });
     addLog(`<span class="log-poison">🪶 Carrion Breath! ${total} to 4 + Poison ×2 each</span>`);applyDayRecoil(u);return;
+  }
+  /* v1348: captured Ocetekuani gets the boss's Open the Chest (Genaro). Name-keyed dispatch sent him into
+     Chest-Render's branch below (1.7x, +50% vs low HP, day recoil), which shares the ability name. Mirrors
+     the enemy openChestJag: 1.5xATK per hit, hits scale with HIS OWN missing HP (1 at full -> 5 at <=20%),
+     Wound x2 on each hit, random living targets. Player-side damage terms (bpn, specialBoostMult, rollCrit). */
+  if(ab==='Open the Chest'&&(u.baseId||u.id)==='ocetekuani'){
+    if(!ae.length)return;
+    const hpFrac=(u.maxHp>0)?u.currentHp/u.maxHp:1;
+    const hits=Math.max(1,Math.min(5,1+Math.floor((1-hpFrac)/0.20+1e-9)));
+    let tot=0,done=0;
+    for(let i=0;i<hits;i++){
+      const live=ae.filter(e=>e.currentHp>0);if(!live.length)break;
+      const tgt=live[Math.floor(Math.random()*live.length)];
+      let raw=Math.max(1,Math.round(bpn(u)*(((u.atk||0)*1.5-(tgt.def||0)*0.4)*(G.dte.specialBoostMult||1))));
+      if(rollCrit(0,false,u)){raw=Math.round(raw*(u._critMult||2));addLog(`<span style="color:#ffd700;font-size:10px">\u26a1 Critical!</span>`);}
+      const h=applyArmorDamage(tgt,raw,false);
+      if(h>0){tgt.currentHp=Math.max(0,tgt.currentHp-h);tot+=h;animateHit(tgt.id,h,false,rollCrit._lc);applyWound(tgt,2);onHitContact(u,tgt);refreshCaptureTargets();if(tgt.currentHp<=0)handleDeath(tgt);}
+      done++;
+    }
+    addLog(`<span class="log-wound">\u{1F406} Open the Chest! ${done} hit${done>1?'s':''} \u2014 ${tot} + WOUND \u00d72 each${hits>=5?' \u2014 the beast is cornered and frenzied!':''}</span>`);
+    renderBattle();return;
   }
   if(ab==='Open the Chest'){
     if(!t)return;
@@ -16838,7 +17505,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   if(ab==='Five-Rabbit Haze'&&ae.length){
     let total=0;
     ae.filter(e=>e.currentHp>0).slice(0,5).forEach(e=>{
-      const h=applyArmorDamage(e,critify(Math.max(1,Math.round(bpn(u)*(((u.mag||0)*0.9-(e.res||0)*0.4)*(G.dte.specialBoostMult||1)))),u,true),true);
+      const h=applyArmorDamage(e,critify(Math.max(1,Math.round(bpn(u)*(((u.mag||0)*0.9-(e.res||0)*0.4)*(G.dte.specialBoostMult||1)))),u,true),false); /* v1350: applyArmorDamage was passed isEnemyAttacking=true -- skipped Ihiyotl Steam, Coyolxauhqui Disk and Popocatepetl Ashes */
       if(h>0){e.currentHp=Math.max(0,e.currentHp-h);total+=h;animateHit(e.id,h,false,rollCrit._lc);applyDrunk(e,1);applyPoison(e,1);onHitContact(u,e);}
       refreshCaptureTargets();if(e.currentHp<=0)handleDeath(e);
     });
@@ -16868,7 +17535,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   if(ab==='Mystical Shots'&&ae.length){
     ae.forEach(e=>{if(e.currentHp>0&&(e.armor||0)>0)e.armor=0;});
     let total=0;
-    ae.forEach(e=>{if(e.currentHp<=0)return;const dmg=critify(Math.max(1,Math.round((u.mag||0)*1.2-(e.res||0)*0.4)),u,true);const h=applyArmorDamage(e,dmg,true);if(h>0){e.currentHp=Math.max(0,e.currentHp-h);total+=h;animateHit(e.id,h,false,rollCrit._lc);applyParalyze(e,1);onHitContact(u,e);refreshCaptureTargets();if(e.currentHp<=0)handleDeath(e);}});
+    ae.forEach(e=>{if(e.currentHp<=0)return;const dmg=critify(Math.max(1,Math.round((u.mag||0)*1.2-(e.res||0)*0.4)),u,true);const h=applyArmorDamage(e,dmg,false);if(h>0){e.currentHp=Math.max(0,e.currentHp-h);total+=h;animateHit(e.id,h,false,rollCrit._lc);applyParalyze(e,1);onHitContact(u,e);refreshCaptureTargets();if(e.currentHp<=0)handleDeath(e);}}); /* v1350: applyArmorDamage was passed isEnemyAttacking=true -- skipped Ihiyotl Steam, Coyolxauhqui Disk and Popocatepetl Ashes */
     addLog(`<span class="log-ab">🏹 Mystical Shots! shields shattered + 1.2×MAG AoE ${total} + Paralyze ×1!</span>`);return;
   }
   if(ab==='Atlatl Rush'){ // v667: 1.8x single (Wound on crit) -> 1.4x on 2 targets, Wound guaranteed
@@ -16888,7 +17555,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     addLog(`<span class="log-heal">🌊 Surging Tide! +23% HP all allies + Slow ×1 to ${foes.length} foes!</span>`);return;
   }
   if(ab==='Earth Bloom'){
-    const pct=0.15+spLv*0.02;
+    const pct=0.20+spLv*0.02; /* v1345: was 0.15 -- raised to match the enemy side and the original text (Genaro) */
     aa.forEach(a=>{a.currentHp=healTo(a,Math.round(a.maxHp*pct));applyAtkBuff(a,1);});
     addLog(`<span class="log-heal">${u.icon} Earth Bloom: +${Math.round(pct*100)}% all + ATK/MAG UP ×1!</span>`);return;
   }
@@ -17033,7 +17700,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     let h=0;
     function sbHit(){
       if(h>=hits){
-        hitTargets.forEach(id=>{const e=ae.find(x=>x.id===id&&x.currentHp>0);if(e)applyPoison(e,1);}); /* v1174 */
+        hitTargets.forEach(id=>{const e=ae.find(x=>x.id===id&&x.currentHp>0);if(e)applyParalyze(e,1);}); /* v1343: was applyPoison -- the v1174 River Judge line pasted in here. Description, log and the enemy side all say Paralyze. */
         addLog(`<span class="log-thunder">${u.icon} Static Burst! ${hits} hits + Paralyze on each target!</span>`);
         G._multiHitPending=false;return;
       }
@@ -17106,9 +17773,9 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
       if(e.currentHp<=0)return;
       const dmg=Math.max(1,Math.round(bpn(u)*(((u.mag||0)*0.9-(e.res||0)*0.4)*(G.dte.specialBoostMult||1)))); // v342 rounding · v598: 5-target cap 0.9
       const h=applyArmorDamage(e,dmg,false);
-      if(h>0){e.currentHp=Math.max(0,e.currentHp-h);animateHit(e.id,h,false,rollCrit._lc);applyWound(e,1);applyPoison(e,1);onHitContact(u,e);onHitContact(u,e);refreshCaptureTargets();if(e.currentHp<=0)handleDeath(e);}
+      if(h>0){e.currentHp=Math.max(0,e.currentHp-h);animateHit(e.id,h,false,rollCrit._lc);applyWound(e,1);applyPoison(e,1);onHitContact(u,e);/* v1346: was called twice -- double-procced contact effects (Itzpapalotl, Deadly Butterfly, Flayed Skin) */refreshCaptureTargets();if(e.currentHp<=0)handleDeath(e);}
     });
-    addLog(`<span class="log-wound">${u.icon} Haunt! 1.1×MAG AoE + WOUND×1 + Poison all!</span>`);return;
+    addLog(`<span class="log-wound">${u.icon} Haunt! 0.9×MAG AoE + WOUND×1 + Poison all!</span>`);return;
   }
   // ── L4 PLAYER ABILITIES ──
   if(ab==='Spiny Guard'){
@@ -17269,10 +17936,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     return;
   }
   // ── HUMANITY (player side) ──
-  if(ab==='Uapantotli'){
-    aa.forEach(a=>{const h=Math.round(a.maxHp*0.20);a.currentHp=healTo(a,h);animateHit(a.id,h,true);cleanseUnit(a);});
-    addLog(`<span class="log-heal">🙏 Uapantotli! All allies +20% HP + cleanse!</span>`);return;
-  }
+  /* v1355: removed a duplicate Uapantotli branch here -- unreachable (an earlier branch always returns first) */
   if(ab==='Ball Strike'){
     G._multiHitPending=true;let total=0;let h2=0;
     function bsHit(){
@@ -17302,14 +17966,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     const h=applyArmorDamage(t,dmg,false);if(h>0){t.currentHp=Math.max(0,t.currentHp-h);animateHit(t.id,h,false,rollCrit._lc);onHitContact(u,t);refreshCaptureTargets();if(t.currentHp<=0)handleDeath(t);}
     applyWound(t,1);addLog(`<span class="log-wound">⚔️ Heavy Cleave! ${h||0} + WOUND ×${t.woundStacks}!</span>`);return;
   }
-  if(ab==='Spiny Guard'){
-    grantChimalli(u,0.1,'Spiny Guard');
-    const others=aa.filter(a=>a.id!==u.id&&a.currentHp>0&&a.isAlly);
-    if(others.length){const ally=others[Math.floor(Math.random()*others.length)];grantChimalli(ally,0.1,'Spiny Guard');
-      addLog(`<span class="log-heal">🦎 Spiny Guard: ${u.icon} Chimalli + ${ally.icon} ${ally.name} Chimalli!</span>`);}
-    else addLog(`<span class="log-heal">🦎 Spiny Guard: ${u.icon} Chimalli up!</span>`);
-    renderBattle();return;
-  }
+  /* v1355: removed a duplicate Spiny Guard branch here -- unreachable (an earlier branch always returns first) */
   // L4/L5 AoE player-side handlers
   if(ab==='Ash Surge'||ab==='Solar Crush'||ab==='Sandblast'||ab==='Howling Drift'||ab==='Virulent Gale'||ab==='Death Screech'||ab==='Biting Draft'||ab==='Writhing Bloom'||ab==='Filthwater Plume'||ab==='Colony Sting'||ab==='Voltaic Discharge'){ // v682: L8 NIGHT AoEs join the generic block // v335: Biting Draft had no player handler (no-op fallback) — Cutting Gale now fires 1.1×MAG AoE + Burn ×1
     let tot=0;const boost=G.dte.specialBoostMult||1;
@@ -17324,7 +17981,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
       const atkMult=1+(0.10*(u.atkBuffStacks||0));
       const dmg=applyArmorDamage(e,Math.max(1,Math.round(base*mult*atkMult*boost-def)),false);
       if(dmg>0){e.currentHp=Math.max(0,e.currentHp-dmg);tot+=dmg;animateHit(e.id,dmg,false,rollCrit._lc);onHitContact(u,e);refreshCaptureTargets();if(e.currentHp<=0)handleDeath(e);}
-      if(ab==='Ash Surge'||ab==='Death Screech')applyBurn(e,1);
+      if(ab==='Ash Surge')applyBurn(e,1); /* v1353: Death Screech removed here -- its own line below already applies Burn x1, so it was stacking Burn x2 */
       if(ab==='Biting Draft')applyWound(e,2);
       if(ab==='Sandblast')applyLethargy(e,1);
       if(ab==='Howling Drift')applyWound(e,1);
@@ -17440,7 +18097,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   if(ab==='Lava Fang'&&t){const dmg=applyArmorDamage(t,Math.max(1,Math.round(bpn(u)*(((u.atk||0)*1.7-(t.def||0)*0.4)*(G.dte.specialBoostMult||1)))),false);if(dmg>0){t.currentHp=Math.max(0,t.currentHp-dmg);animateHit(t.id,dmg,false,rollCrit._lc);}applyPoison(t,2);onHitContact(u,t);refreshCaptureTargets();if(t.currentHp<=0)handleDeath(t);addLog(`<span class="log-ab">${u.icon} Lava Fang! ${dmg}+Poison×2</span>`);return;}
   if(ab==='Gale Strike'&&t){const dmg=applyArmorDamage(t,Math.max(1,Math.round(bpn(u)*(((u.atk||0)*1.9-(t.def||0)*0.4)*(G.dte.specialBoostMult||1)))),false);if(dmg>0){t.currentHp=Math.max(0,t.currentHp-dmg);animateHit(t.id,dmg,false,rollCrit._lc);}applyPoison(t,1);onHitContact(u,t);refreshCaptureTargets();if(t.currentHp<=0)handleDeath(t);addLog(`<span class="log-ab">${u.icon} Gale Strike! ${dmg}+Poison</span>`);return;}
   if(ab==='Wind Lash'){const tgt=t||(ae.length?ae[0]:null);if(!tgt)return;let tot=0;for(let i=0;i<2;i++){if(tgt.currentHp<=0)break;const h=applyArmorDamage(tgt,Math.max(1,Math.round(bpn(u)*(((u.atk||0)*0.85-(tgt.def||0)*0.4)*(G.dte.specialBoostMult||1)))),false);if(h>0){tgt.currentHp=Math.max(0,tgt.currentHp-h);tot+=h;animateHit(tgt.id,h,false,rollCrit._lc);if(i===0)applyPoison(tgt,1);onHitContact(u,tgt);}};refreshCaptureTargets();if(tgt.currentHp<=0)handleDeath(tgt);addLog(`<span class="log-ab">${u.icon} Wind Lash! ${tot}+Poison</span>`);return;}
-  if(ab==='Cold Dash'){const tgt=t||(ae.length?ae[0]:null);if(!tgt)return;let tot=0;for(let i=0;i<2;i++){if(tgt.currentHp<=0)break;const h=applyArmorDamage(tgt,Math.max(1,Math.round(bpn(u)*(((u.atk||0)*0.9-(tgt.def||0)*0.4)*(G.dte.specialBoostMult||1)))),false);if(h>0){tgt.currentHp=Math.max(0,tgt.currentHp-h);tot+=h;animateHit(tgt.id,h,false,rollCrit._lc);applyBurn(tgt,1);onHitContact(u,tgt);}};refreshCaptureTargets();if(tgt.currentHp<=0)handleDeath(tgt);addLog(`<span class="log-ab">${u.icon} Cold Dash! ${tot}+Burn</span>`);return;}
+  /* v1355: removed a duplicate Cold Dash branch here -- unreachable (an earlier branch always returns first) */
   const d=singleDmgMap[ab];
   if(!d){addLog(`<span class="log-ab">${u.icon} ${abD}!</span>`);return;}
   // Skull Flame: 2-hit
@@ -17786,7 +18443,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   // ── Layer 6 Humanity roster — enemy versions ──
   if(ak==='atlatlThrow'&&aa.length){
     const live=aa.filter(a=>a.currentHp>0);if(!live.length)return;const t=live[Math.floor(Math.random()*live.length)];
-    const h=applyArmorDamage(t,critify(Math.max(1,Math.round((u.atk||0)*1.6-(t.def||0)*0.4)),u,false),false);if(h>0){t.currentHp=Math.max(0,t.currentHp-h);G._animQueue.push({uid:t.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,t);if(t.currentHp<=0)handleDeath(t);}
+    const h=(()=>{const _sv=u._critBonus||0;u._critBonus=_sv+0.20;const _d=critify(Math.max(1,Math.round((u.atk||0)*1.6-(t.def||0)*0.4)),u,false);u._critBonus=_sv;return applyArmorDamage(t,_d,false);})() /* v1352: +20% crit (Genaro: no other effects -> keep it) */;if(h>0){t.currentHp=Math.max(0,t.currentHp-h);G._animQueue.push({uid:t.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,t);if(t.currentHp<=0)handleDeath(t);}
     addLog(`<span class="log-ab">🏹 Atlatl Throw! ${h}</span>`);return;
   }
   if(ak==='arrowRain'&&aa.length){
@@ -20951,7 +21608,7 @@ function ucFootHtml(u){
     return '<span style="color:#5080a0">\u{1F422} Waiting (Slowed)</span>';
   if(belicActing(u))return '<span style="color:#e0c060">\u26a1 Acting now\u2026</span>';
   if(belicQueued(u))return '<span style="color:#b090e0">\u26a1 Belic Rush \u2014 queued</span>';
-  if(acted&&u.isAlly)return '<span style="color:#4a3a10">\u2713 Acted</span>';
+  if(acted&&u.isAlly)return '<span class="cx-acted" style="color:#4a3a10">\u2713 Acted</span>'; /* v1357: class lets codex mode pin it to the corner */
   return '';
 }
 function mkUnitCard(u){
@@ -21196,7 +21853,10 @@ function renderBattle(){
     }
   });
   if(_erSync)syncChildren(er,_erBuilt); // v952
+  try{cxBossLayout(er);}catch(_cxE){console.warn('[cx] boss layout',_cxE);} /* v1361 */
   // Party — patron + allies in one row
+  {const _cxE=document.getElementById('cx-enemy'),_cxL=_cxE&&_cxE.querySelector(':scope > .row-lbl'); /* v1357: BOSS CODEX for layer/event bosses, not minibosses */
+   if(_cxL){const _bf=(G.enemies||[]).some(e=>e&&e.isBoss&&!e.isMiniBoss);_cxL.dataset.cx=t(_bf?'ui.battle.cxBoss':'ui.battle.cxEnemy');_cxE.classList.toggle('cx-boss',_bf);}}
   const ps=document.getElementById('party-section');
   const _psOldCards=new Map([...ps.querySelectorAll('.uc[data-uid]')].map(el=>[el.dataset.uid,el]));
   const allUnits=[...G.units].sort((a,b)=>(b.isPatron?1:0)-(a.isPatron?1:0)||(b.isGod?1:0)-(a.isGod?1:0));
@@ -21207,6 +21867,7 @@ function renderBattle(){
     let al=ps.querySelector(':scope > .row-lbl');
     if(!al){al=document.createElement('div');al.className='row-lbl';}
     al.textContent='Your Party';
+    al.dataset.cx=t('ui.battle.cxAlly'); /* v1357 */
     let ar=ps.querySelector(':scope > .unit-row');
     if(!ar){ar=document.createElement('div');ar.className='unit-row';}
     const _psBuilt=[];
@@ -21579,7 +22240,7 @@ function renderActionPanel(){
     Object.keys(AOE_CAP_AB).forEach(function(_ab){if(AOE_CAP_AB[_ab]>=5&&vassalSpecMult[_ab]!==undefined&&vassalSpecMult[_ab]>0.9)vassalSpecMult[_ab]=0.9;});
     let flatBonus=singleDmgRef[specLabel]??5;
     if(gd?.ak&&godSpecFlat[gd.ak]!==undefined)flatBonus=godSpecFlat[gd.ak];
-    const specMult=gd?.ak&&godSpecMult[gd.ak]?godSpecMult[gd.ak]:(vassalSpecMult[specLabel]||1);
+    const specMult=gd?.ak&&godSpecMult[gd.ak]?godSpecMult[gd.ak]:((actor&&!actor.isGod&&(actor.baseId||actor.id)==='ocetekuani')?1.5:(vassalSpecMult[specLabel]||1)); /* v1348: per-hit 1.5x; Chest-Render keeps 1.7 */
     if(vassalSpecMult[specLabel])flatBonus=0; // mult-based abilities don't use flat additive
     const mixBurnPenalty=(actor.type==='MIX'&&(actor.burnStacks||0)>0)?(1-Math.min(actor.burnStacks,4)*0.15):1;
     const burnPenalty=(actor.burnStacks||0)>0?(1-Math.min(actor.burnStacks,4)*0.15):1;
@@ -21608,9 +22269,9 @@ function renderActionPanel(){
           <div>🔮 ${specLabel||'Special'} ${isHealSpec?'❤️':specIsMagic(actor)?'🪄':'🗡️'}</div>
           ${specSub}
         </button>
-        ${(()=>{if(!(actor.isGod&&G._oblationAk&&actor.id===('god_'+G.god?.id)))return '';const oblCost=oblationNpCost(actor);const canOb=actor.currentNP>=oblCost;const oblLabel=G._oblationAbility||'Oblated';/* v1030: estimate the OBLATED special exactly as the native one is estimated a few lines above. Now that the v1030 MIX flip gives the patron a REAL stat for the borrowed ability, the same base*mult-def arithmetic applies with no special-casing. */var _oblSub='';try{var _oak=G._oblationAk;var _oMag=(oblationSpecStat(_oak)==='mag');var _obase=_oMag?(actor.mag||0):(actor.atk||0);var _ot=(typeof ae!=='undefined'&&ae&&ae.length)?ae[0]:null;var _odef=_ot?(_oMag?(_ot.res||0):(_ot.def||0)):0;var _oboost=G.dte.specialBoostMult||1;var _OGM={'deluge':1.35,'tlalocanDeluge':1.35,'obsidianStorm':1.25,'aurumBreak':1.5,'frostMacuahuitl':1.5,'cihuateteoFury':0.6,'cripplingShock':0.6,'featherEmbrace':1.5,'godbaneBlowgun':0.5,'mictlanClaspPlayer':0.5,'octliDrench':1.5,'oldFire':1.6,'seismicRoar':1.5,'sinistralMinacachalli':1.2,'zappingStrike':1.1,'torridTornado':0.55,'torridTornadoBoss':0.6};var _OGH={'torridTornado':4,'torridTornadoBoss':5,'cripplingShock':4,'godbaneBlowgun':5};var _OGF={'seismicRoar':8,'oldFire':20,'obsidianStorm':14};var _omult=_OGM[_oak]||1;var _oflat=(_OGF[_oak]!==undefined?_OGF[_oak]:0);/* mixBurnPenalty/burnPenalty are block-scoped to the estimate branch above and are NOT visible here -- referencing them threw into the catch and the preview silently degraded to a bare cost. Computed inline instead, matching that branch's rule: MIX takes the reduced penalty. */var _obp=((actor.burnStacks||0)>0)?(1-Math.min(actor.burnStacks,4)*(actor.type==='MIX'?0.15:0.15)):1;if(/heal|cleanse|restore/i.test(String(G._oblationAd||''))){_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">💚 Heal · '+oblCost+' ✨</div>';}else if(_ot){var _olo=Math.max(1,Math.round(((_obase*_omult)+_oflat-_odef*0.4-2)*_oboost*_obp));var _ohi=Math.max(1,Math.round(((_obase*_omult)+_oflat-_odef*0.4+2)*_oboost*_obp));var _ohits=_OGH[_oak]||1;_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">'+(_ohits>1?(_ohits+'× '):'')+'~'+_olo+'–'+_ohi+' '+(_oMag?'🪄 MAG':'🗡️ ATK')+(_ohits>1?' hits':'')+' · '+oblCost+' ✨</div>';}}catch(e){}if(!_oblSub)_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">Cost '+oblCost+' ✨</div>';return '<button class=\"btn btn-special\" onclick=\"doPlayerSpecial(true)\"'+(canOb?'':' disabled')+' style=\"line-height:1.35;opacity:'+(canOb?1:0.45)+'\"><div>✟ '+oblLabel+'</div>'+_oblSub+'</button>';})()}
+        ${(()=>{if(!(actor.isGod&&G._oblationAk&&actor.id===('god_'+G.god?.id)))return '';const oblCost=oblationNpCost(actor);const canOb=actor.currentNP>=oblCost;const oblLabel=G._oblationAbility||'Oblated';/* v1030: estimate the OBLATED special exactly as the native one is estimated a few lines above. Now that the v1030 MIX flip gives the patron a REAL stat for the borrowed ability, the same base*mult-def arithmetic applies with no special-casing. */var _oblSub='';try{var _oak=G._oblationAk;var _oMag=(oblationSpecStat(_oak)==='mag');var _obase=_oMag?(actor.mag||0):(actor.atk||0);var _ot=(typeof ae!=='undefined'&&ae&&ae.length)?ae[0]:null;var _odef=_ot?(_oMag?(_ot.res||0):(_ot.def||0)):0;var _oboost=G.dte.specialBoostMult||1;var _OGM={'deluge':1.35,'tlalocanDeluge':1.35,'obsidianStorm':1.25,'aurumBreak':1.5,'frostMacuahuitl':1.5,'cihuateteoFury':0.6,'cripplingShock':0.6,'featherEmbrace':1.5,'godbaneBlowgun':0.5,'mictlanClaspPlayer':0.5,'octliDrench':1.5,'oldFire':1.6,'seismicRoar':1.5,'sinistralMinacachalli':1.2,'zappingStrike':1.1,'torridTornado':0.55,'torridTornadoBoss':0.6};var _OGH={'torridTornado':4,'torridTornadoBoss':5,'cripplingShock':4,'godbaneBlowgun':5};var _OGF={'seismicRoar':8,'oldFire':20,'obsidianStorm':14};var _omult=_OGM[_oak]||1;var _oflat=(_OGF[_oak]!==undefined?_OGF[_oak]:0);/* mixBurnPenalty/burnPenalty are block-scoped to the estimate branch above and are NOT visible here -- referencing them threw into the catch and the preview silently degraded to a bare cost. Computed inline instead, matching that branch's rule: MIX takes the reduced penalty. */var _obp=((actor.burnStacks||0)>0)?(1-Math.min(actor.burnStacks,4)*(actor.type==='MIX'?0.15:0.15)):1;if((()=>{const _oa=String(G._oblationAd||''),_os=/data-sty="(\w+)"/.exec(_oa);if(_os)return _os[1]==='SUP';return healAbilities.has(G._oblationAbility)||/heal|cleanse|restore/i.test(_oa);})()){/* v1375: was a text regex -- "restores 10% TP" made Xiuhcoatl Might a heal; the block's own type decides now */_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">💚 Heal · '+oblCost+' TP</div>';}else if(_ot){var _olo=Math.max(1,Math.round(((_obase*_omult)+_oflat-_odef*0.4-2)*_oboost*_obp));var _ohi=Math.max(1,Math.round(((_obase*_omult)+_oflat-_odef*0.4+2)*_oboost*_obp));var _ohits=_OGH[_oak]||1;_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">'+(_ohits>1?(_ohits+'× '):'')+'~'+_olo+'–'+_ohi+' '+(_oMag?'🪄 MAG':'🗡️ ATK')+(_ohits>1?' hits':'')+' · '+oblCost+' TP</div>';}}catch(e){}if(!_oblSub)_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">Cost '+oblCost+' TP</div>';return '<button class=\"btn btn-special\" onclick=\"doPlayerSpecial(true)\"'+(canOb?'':' disabled')+' style=\"line-height:1.35;opacity:'+(canOb?1:0.45)+'\"><div>✟ '+oblLabel+'</div>'+_oblSub+'</button>';})()}
       </div>
-      ${specDesc?`<div style="font-size:11px;color:#5a7a9a;margin-top:6px;padding-top:5px;border-top:0.5px solid #2a3a4a">🔮 ${isHealSpec?'❤️':specIsMagic(actor)?'🪄':'🗡️'} <em>${specLabel}</em>: ${specDesc}</div>`:''}
+      ${specDesc?`<div style="font-size:11px;color:#5a7a9a;margin-top:6px;padding-top:5px;border-top:0.5px solid #2a3a4a">${/data-sty="/.test(String(specDesc))?`<div class="sf-hd"><span class="sf-nm">${specLabel}</span></div><div class="sf-bd">${specDesc}</div>`:`🔮 ${isHealSpec?'❤️':specIsMagic(actor)?'🪄':'🗡️'} <em>${specLabel}</em>: ${specDesc}`}</div>`:''}
       ${(()=>{
         /* v1248: the oblated special had a button but no description line, so the borrowed
            ability was the only action on the panel you could not read. Same gate as the button.
@@ -21862,7 +22523,7 @@ function endBattle(win){
     const drainAndEnd=()=>{
       if(G.captureQueue.length){processNextCap();setTimeout(drainAndEnd,900);return;}
       if(G.capActive){setTimeout(drainAndEnd,400);return;} // wait for player to resolve current window
-      showSpoils();
+      cxVictoryThen(()=>showSpoils()); /* v1366 */
     };
     drainAndEnd();return;
   }
@@ -21882,9 +22543,9 @@ function endBattle(win){
      DT.tecpatlBeaten=Math.max(DT.tecpatlBeaten||0,_beat);
      DT.tecpatl_level=Math.min(20,Math.max(DT.tecpatl_level||0,_beat+1));
      saveDT();}
-    showConquest();return;
+    cxVictoryThen(()=>showConquest());return; /* v1366 */
   }
-  showSpoils();
+  cxVictoryThen(()=>showSpoils()); /* v1366 */
 }
 
 /* v835: MICTLAN CONQUERED reveal. Deliberately slow -- the banner fades, then the party
@@ -23445,6 +24106,9 @@ function showUnitTooltip(u){
   if(G.god&&hasPassive('ueyiatlTactics'))_buffs.push(`🎣 Ueyiatl Tactics <span style="color:#3a8050">+15% crit</span>`);
   if(_pTorrent)_buffs.push(`🌧 Endless Torrent <span style="color:#3a8050">+15% ATK/MAG</span>`);
   if(_pMountain)_buffs.push(`🐆 Mountain Heart <span style="color:#3a8050">+30% DEF</span>`);
+  {const _gwT=u.type||bo.type,_gwA=(u.atk||bo.atk||0); /* v1374: shop/training pass a wrapper -- type and atk live on baseObj */
+   const _gwD=(u.element||bo.element)==='day',_gwP=(_gwT==='PHYS'||_gwT==='MIX'),_gwAlly=String(u.id||'').indexOf('en_')!==0; /* v1373: Golden War Cry was never listed */
+   if(G.god&&_gwAlly&&hasPassive('goldenWarCry')&&_gwA>0&&(_gwD||_gwP))_buffs.push(`\u{1F426} Golden War Cry <span style="color:#3a8050">+${10*((_gwD?1:0)+(_gwP?1:0))}% ATK</span>`);}
   // v569: surface the Reverie conversion + New Fire Knife low-TP state explicitly
   {const _revAllySide=u.isAlly||u.isGod||!u.enemyLevel; const _revOn=(u.drunkStacks||0)>0&&(_revAllySide?hasPassive('inebriatedReverie'):enemyReverieActive()); if(_revOn)_buffs.push(`✦ Inebriated Reverie <span style="color:#3a8050">+${5*Math.min(4,u.drunkStacks)}% ATK/MAG/DEF/RES (🍺×${Math.min(4,u.drunkStacks)})</span>`);} // v572: patron card has no isAlly flag
   if(u.isAlly&&azHas(u,'fire')&&typeof hasOffering==='function'&&hasOffering('new_fire_knife')&&(u.maxNP||0)>0&&(u.currentNP||0)/(u.maxNP)<=0.40)_buffs.push(`🔪 New Fire Knife <span style="color:#3a8050">+${Math.round((FIRE_KNIFE_MULT-1)*100)}% ATK & MAG (TP ≤ 40%)</span>`);
@@ -23476,14 +24140,14 @@ function showUnitTooltip(u){
   const patronLine=u.isPatron?('<div style="margin-top:4px"><span style="color:#d4af37;font-weight:700;font-size:13.5px">⭐ '+(_pi>0?_pv.slice(0,_pi):_pv)+(_pi>0?':':'')+'</span> <em style="color:#a08040;font-size:11px">'+(_pi>0?_pv.slice(_pi+1).trim():'')+'</em></div>'
     +(_ov?('<div style="margin-top:3px"><span style="color:#a060e0;font-weight:700;font-size:13.5px">✟ '+(_oi>0?_ov.slice(0,_oi):_ov)+(_oi>0?':':'')+'</span> <em style="color:#8a6ab0;font-size:11px">'+(_oi>0?_ov.slice(_oi+1).trim():'')+'</em></div>'):'')):'';
   const _adTxt=cleanseWord(chimaWord(((unitDefById((bo&&bo.id)||u.id)||bo).ad)||'')); /* v976 */
-  const abilLine=bo.ability?('<div class="tc-spec"><span class="tc-spec-name">🔮 '+L(bo,'ability')+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(_adTxt)+'</span></span><span class="tc-cost" '+statAttrs('cost')+'>✨ Cost: '+npCostDisplayHtml(npCostAtLv,_npPlainTT)+'</span></div><div class="tc-desc">'+_adTxt+'</div>'):'';
+  const abilLine=bo.ability?('<div class="tc-spec'+_sfHd(_adTxt)+'"><span class="tc-spec-name">'+specNameHtml(L(bo,'ability'),_adTxt)+'</span><span class="tc-cost" '+statAttrs('cost')+'>✨ Cost: '+npCostDisplayHtml(npCostAtLv,_npPlainTT)+'</span></div><div class="tc-desc'+_sfBd(_adTxt)+'">'+_adTxt+'</div>'):'';
   const _oblCostLv=oblationCostAtLv(lv,u); /* v997: gate is inside now -- multiplying by _tpLvMult here would apply it twice */
   const _oblPlainLv=modelNpCost(G._oblationNpCost||20,lv,oblationSurgeCost(),u&&u.element,u?!!u.isPatron:true,true); /* v1021 pre-offering figure · v1237 surge */
   /* v771: the oblated special now mirrors the native special's markup (tc-spec + tc-cost +
      tc-desc) rather than being a cramped one-liner, so the two read as peers. The cost was
      already level-scaled via _oblCostLv -- it just was not presented like the real one. The
      oblated PASSIVE moved up beside the native passive; see the card head below. */
-  const oblLine=(u.isPatron&&G._oblationAk&&G._oblationAbility)?('<div class="tc-spec" style="margin-top:4px;border-top:0.5px dashed #4a2a6a;padding-top:5px"><span class="tc-spec-name" style="color:#a060e0">✟ '+G._oblationAbility+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(G._oblationAd||'')+'</span></span><span class="tc-cost" '+statAttrs('cost')+'>✨ Cost: '+npCostDisplayHtml(_oblCostLv,_oblPlainLv)+'</span></div><div class="tc-desc">'+(G._oblationAd||'')+'</div>'):'';
+  const oblLine=(u.isPatron&&G._oblationAk&&G._oblationAbility)?('<div class="tc-spec'+_sfHd(G._oblationAd)+'" style="margin-top:4px;border-top:0.5px dashed #4a2a6a;padding-top:5px"><span class="tc-spec-name" style="color:#a060e0">'+specNameHtml(G._oblationAbility,G._oblationAd||'','\u271f ')+'</span><span class="tc-cost" '+statAttrs('cost')+'>✨ Cost: '+npCostDisplayHtml(_oblCostLv,_oblPlainLv)+'</span></div><div class="tc-desc'+_sfBd(G._oblationAd)+'">'+(G._oblationAd||'')+'</div>'):'';
   const offSec=_ol.affecting.length?('<div style="margin-top:6px;border-top:0.5px solid var(--br);padding-top:6px"><div style="font-size:10px;color:var(--td);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">🪶 Offerings boosting this unit</div>'+_ol.affecting.map(id=>{const o=OFFERINGS[id];return '<div style="font-size:11px;color:#c0e060;margin-bottom:2px">'+o.icon+' '+o.name+': <span style="color:var(--td)">'+o.desc+'</span></div>';}).join('')+'</div>'):'';
   const cardBody='<div class="train-card'+(u.isPatron?' tc-patron':'')+'" style="text-align:left;max-width:520px;margin:0 auto">'
     +'<div class="tc-head"><div class="tc-name">'+liveName(u)+(u.isPatron?' ⭐':u.isGod?' ✦':'')
@@ -23785,9 +24449,9 @@ function renderTraining(){
     if(_F.tonalli.lv)_fParts.push('<span>🔮 Tonalli L'+_F.tonalli.lv+'</span>');
     const forcesRow=_fParts.length?('<div class="tc-forces">'+_fParts.join(' · ')+'</div>'):'';
     const costFlash=(fl&&fl.cost>0)?('<span class="stat-up-glow"> ▼−'+fl.cost+'</span>'):((lvf&&lvf.cost>0)?('<span class="stat-up-glow-red"> +'+lvf.cost+'</span>'):'');
-    const specBlock=u.ability?('<div class="tc-spec"><span class="tc-spec-name">🔮 '+L(u,'ability')+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(liveAd(u))+'</span></span>'
+    const specBlock=u.ability?('<div class="tc-spec'+_sfHd(liveAd(u))+'"><span class="tc-spec-name">'+specNameHtml(L(u,'ability'),liveAd(u))+'</span>'
       +'<span class="tc-cost" '+statAttrs('cost')+'>✨ Cost: <span data-stat="cost">'+npCostDisplayHtml(npCostNow,_npPlainTR)+costFlash+'</span></span></div>'
-      +'<div class="tc-desc">'+cleanseWord(chimaWord(liveAd(u)))+'</div>'):''; /* v976 */
+      +'<div class="tc-desc'+_sfBd(liveAd(u))+'">'+cleanseWord(chimaWord(liveAd(u)))+'</div>'):''; /* v976 */
     /* v774: renderTraining is a SEPARATE renderer from showUnitTooltip -- the oblation lines
        added there in v771/v772 never appeared here, which is why the training card showed
        neither. Mirrors the native specBlock exactly, with the cost on the shared
@@ -23797,9 +24461,9 @@ function renderTraining(){
        oblated one showed only the final figure, so a discount or a Mushroom penalty on it was
        invisible. noOfferings=true is exactly what modelNpCost's last argument is for. */
     const _oblPlainTC=modelNpCost(G._oblationNpCost||20,lv,oblationSurgeCost(),u&&u.element,u?!!u.isPatron:true,true); /* v1237: surge, as the native _npPlainTR does */
-    const oblBlock=(u.isPatron&&G._oblationAk&&G._oblationAbility)?('<div class="tc-spec" style="margin-top:4px;border-top:0.5px dashed #4a2a6a;padding-top:5px"><span class="tc-spec-name" style="color:#a060e0">\u271f '+G._oblationAbility+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(G._oblationAd||'')+'</span></span>'
+    const oblBlock=(u.isPatron&&G._oblationAk&&G._oblationAbility)?('<div class="tc-spec'+_sfHd(G._oblationAd)+'" style="margin-top:4px;border-top:0.5px dashed #4a2a6a;padding-top:5px"><span class="tc-spec-name" style="color:#a060e0">'+specNameHtml(G._oblationAbility,G._oblationAd||'','\u271f ')+'</span>'
       +'<span class="tc-cost" '+statAttrs('cost')+'>\u2728 Cost: <span data-stat="cost">'+npCostDisplayHtml(_oblCostTC,_oblPlainTC)+costFlash+'</span></span></div>' /* v1021 \u00b7 v1237: data-stat + flash, mirroring the native cell */
-      +'<div class="tc-desc">'+(G._oblationAd||'')+'</div>'):'';
+      +'<div class="tc-desc'+_sfBd(G._oblationAd)+'">'+(G._oblationAd||'')+'</div>'):'';
     /* v1030: branch on _trType, and fold the granted stat into both rows. */
     const statMid=_trType==='MIX'
       ?('<span data-stat="atk" '+statAttrs('atk')+'>🗡️ <b>'+statLbl('atk')+'</b> '+sg(scR(u.atk||0,lv,_uG)+sbT.atk+_xAtk,scR(u.atk||0,lv+1,_uG)+sbT.atk+_xAtk,'atk')+'</span><span data-stat="mag" '+statAttrs('mag')+'>🪄 <b>'+statLbl('mag')+'</b> '+sg(scR(u.mag||0,lv,_uG)+sbT.mag+_xMag,scR(u.mag||0,lv+1,_uG)+sbT.mag+_xMag,'mag')+'</span>')
@@ -23924,8 +24588,8 @@ function renderMercs(){
       +'<span data-stat="tp" '+statAttrs('tp')+'>✨ <b>'+statLbl('tp')+'</b> '+tpMax+'</span>'
       +(_altarOn?'<span class="tc-sacpill">Sacrifice: '+sacFPAtLv(u,lv)+' <svg class="tl tl-quincunx"><use href="#tl-quincunx"/></svg></span>':'')
       +'</div></div>'
-      +'<div class="tc-spec"><span class="tc-spec-name">🔮 '+L(u,'ability')+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(u.ad)+'</span></span></div>'
-      +'<div class="tc-desc">'+cleanseWord(chimaWord(u.ad))+'</div>' /* v976 */
+      +'<div class="tc-spec'+_sfHd(u.ad)+'"><span class="tc-spec-name">'+specNameHtml(L(u,'ability'),u.ad)+'</span></div>'
+      +'<div class="tc-desc'+_sfBd(u.ad)+'">'+cleanseWord(chimaWord(u.ad))+'</div>' /* v976 */
       +'<div class="tc-action">'+(hired?'<div style="text-align:center;font-size:12px;color:#50c080;padding:6px">Hired ✦</div>':'<button class="btn btn-ca'+((ftueGateActive()&&G._ftueDidTemazcal&&!G._ftueDidMerc&&canAfford)?' tab-pulse':'')+'" onclick="doHireMerc(\''+u.id+'\')" '+(canAfford?'':'disabled')+' style="width:100%;font-size:15px">Hire <span style="font-size:13px;opacity:.9"><svg class="tl tl-cacao"><use href="#tl-cacao"/></svg> '+tier.cost+'</span></button>') /* v652: FTUE glow on affordable hires */+'</div>';
     el.appendChild(card);
   });
@@ -24039,7 +24703,7 @@ function toggleSacSel(capId){
 }
 function godTypeBadge(gd){
   const desc=GOD_SELECT_DESC&&GOD_SELECT_DESC[gd.id];
-  const adText=(desc?.ad||gd.ad||'').toLowerCase();
+  const adText=String((desc&&i18nRaw(desc,'ad'))||i18nRaw(gd,'ad')||'').toLowerCase(); /* v1338: same */
   const isHeal=adText.includes('heal')||adText.includes('cleanse');
   let type='';
   if(gd.type==='PHYS')type='🗡️';
@@ -24325,8 +24989,8 @@ function renderAltar(){
         +'<div style="margin-top:2px">'+eb(gd.element)+' '+godTypeBadge(gd)+'</div>'
         +'<div class="tc-mid"><div class="tc-art">'+godIconHtml(gd,72)+'</div></div>'
         +'<div style="font-size:11px;color:#c8a060;font-style:italic;text-align:center">'+gd.flavor+'</div>'
-        +'<div class="tc-spec"><span class="tc-spec-name">🔮 '+gd.ability+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(gd.ad)+'</span></span></div>'
-        +'<div class="tc-desc">'+cleanseWord(chimaWord(gd.ad))+'</div>' /* v976 */
+        +'<div class="tc-spec'+_sfHd(gd.ad)+'"><span class="tc-spec-name">'+specNameHtml(gd.ability,gd.ad)+'</span></div>'
+        +'<div class="tc-desc'+_sfBd(gd.ad)+'">'+cleanseWord(chimaWord(gd.ad))+'</div>' /* v976 */
         +'<div class="tc-action"><button class="btn btn-fl" onclick="doRecruitGod(\''+gd.id+'\')" '+(G.res.flower>=rcG?'':'disabled')+' style="width:100%;font-size:15px">Recruit <span style="font-size:13px;opacity:.9"><svg class="tl tl-quincunx" style="width:1.3em;height:1.3em;vertical-align:-.28em"><use href="#tl-quincunx"/></svg> '+rcG+(rcG===0?' · her gift':'')+'</span></button></div>';
       ggrid.appendChild(card);
     });
