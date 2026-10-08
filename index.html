@@ -159,6 +159,12 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 /* v1391: enemies get the same "Acted" plate once they have taken their turn this round */
 .uc .cx-acted-e{display:none;position:absolute;top:6px;right:6px;z-index:5;font-size:10px;line-height:13px;background:#120d0a;border:1px solid #5a4a38;border-radius:3px;padding:0 4px;color:#9a8a70}
 .uc.enemy-did-act .cx-acted-e{display:inline-block}
+/* v1395: targeting arrow overlay */
+#tgt-arrows{position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:60;overflow:visible}
+#tgt-arrows path.ta-line{fill:none;stroke-width:3.5;stroke-linecap:round;stroke-dasharray:10 7;animation:taFlow .6s linear infinite;filter:drop-shadow(0 0 3px rgba(0,0,0,.9))}
+#tgt-arrows path.ta-halo{fill:none;stroke-width:8;stroke-linecap:round;opacity:.25}
+@keyframes taFlow{to{stroke-dashoffset:-17}}
+body.fx-min #tgt-arrows path.ta-line{animation:none}
 /* v1393: STRONGER synergy read. The plate turns gold and breathes, the element icon glows, and a warm
    halo sits behind the sprite. Applies to the patron and every bonded ally alike. */
 @keyframes synPlate{from{box-shadow:0 0 4px #ffd70066;border-color:#a08020}to{box-shadow:0 0 12px #ffd700dd,0 0 3px #fff3;border-color:#ffd700}}
@@ -6026,7 +6032,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1394'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1398'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -8704,7 +8710,7 @@ const RUN_SKIP=new Set(['units','enemies','log','battlePhase','roundNum','roundQ
   '_tecpatlSeen','_contFn','currentEvent','_xochipilliEventFight','_slowedUnits','selectedActorId',
   'pendingAction','captureTargets','captureQueue','capActive','_capturePending','_actingEnemy',
   '_actingAllyElem','_actingAllyLethSpec','_cipactliRound', /* v1012 */
-  '_targetedAllyId','_animQueue','_unitStates','captureProcessed','spoils',
+  '_targetedAllyId','_taRec','_taPred','_taPreview','_enemyWillSpecial','_animQueue','_unitStates','captureProcessed','spoils',
   'sacSelected','chosenDifficulty','dte','aoeSelected','aoeCap',
   '_paraRolled']); /* v951: holds a nested Set -- see selectActor. Round-scoped, so nothing is lost by skipping it. */
 function serializeRun(){
@@ -14836,6 +14842,7 @@ function processCurrentSlot(){
     }
     G._actingEnemy=slot.unit.id;
     G._targetedAllyId=null;
+    G._taRec=null;G._taPred=null; /* v1396 · v1398 */
     G._animQueue=[];
     // Phase 1: show attacker highlighted (700ms)
     renderBattle();
@@ -14843,13 +14850,35 @@ function processCurrentSlot(){
       if(slot.unit.currentHp<=0){G._actingEnemy=null;setTimeout(advanceTurn,paceMs(100));return;}
       // Phase 2: highlight the likely target (600ms)
       const aa=G.units.filter(x=>x.currentHp>0);
-      if(aa.length)G._targetedAllyId=aa.reduce((a,b)=>a.currentHp<b.currentHp?a:b).id;
+      /* v1396: a special can heal its own side or hit several units, so a single predicted target
+         was wrong for heals and AoEs (playtest). Predict only for a plain Strike -- the same
+         currentNP>=cost test enemyActsTurn uses -- and let a special show its REAL targets on impact. */
+      G._enemyWillSpecial=slot.unit.currentNP>=enemyNpCost(slot.unit);
+      G._taPred=null;
+      if(aa.length){
+        const _low=aa.reduce((a,b)=>a.currentHp<b.currentHp?a:b).id;
+        if(!G._enemyWillSpecial)G._targetedAllyId=_low;
+        else{
+          /* v1398: arrows are a WARNING before the hit, so a special's targets are predicted here:
+             support specials (heal/buff own side) -> nothing; AoE / auto / random specials -> every
+             living ally they can reach; single-target specials -> the lowest-HP ally, the same pick
+             enemyFireSpecial's own kickoff uses. */
+          let _sup=false,_aoe=false;
+          try{const _ad=String((typeof liveAd==='function'?liveAd(slot.unit):slot.unit.ad)||'');
+              const _ab=(typeof liveAbility==='function'?liveAbility(slot.unit):slot.unit.ability)||'';
+              _sup=/data-sty="SUP"/.test(_ad)||isHealAbl(_ab);_aoe=isAoeOrAutoSpecial(slot.unit);}catch(_e){}
+          if(!_sup){if(_aoe)G._taPred={from:slot.unit.id,ids:aa.map(x=>x.id)};else G._targetedAllyId=_low;}
+        }
+      }
       renderBattle();
       setTimeout(()=>{
         // Phase 3: deal damage, show results
         if(slot.unit.currentHp>0&&!slot._fired){
           slot._fired=true; // v577: mark BEFORE acting — a mid-turn capture window (e.g. a drunk misfire
           // killing an ally) can re-enter processCurrentSlot while qIdx still points here → double action
+          /* v1398: the warning arrows clear the moment the attack itself starts -- they must not sit on
+             top of the hit animation and damage numbers. */
+          G._taPred=null;G._targetedAllyId=null;G._enemyWillSpecial=false;try{tgtArrowUpdate();}catch(_e){}
           enemyActsTurn(slot.unit);
           G._targetedAllyId=null;
           renderBattle();
@@ -15211,6 +15240,7 @@ function yauhtliSweep(only){
   if(_yl.length){_yl.forEach(function(u){cleanseUnit(u);animateStatusPop(u.id,'🌼','#80d0ff');});if(G._yauhtliLogRound!==G.roundNum){G._yauhtliLogRound=G.roundNum;addLog('<span class="log-cp">🌼 Yauhtli Flower — ailments cleansed</span>');}}
 }
 function advanceTurn(actorId){
+  G._taRec=null; /* v1396: the resolved enemy action's arrows stay up through the read-the-damage pause, then clear here */
   if(G.battlePhase==='done')return; // battle already ended — swallow all queued setTimeout callbacks
   if(G._ihiyotlUsed)G._ihiyotlArmed=false; /* v1073: the boosted ACTION is over — disarm for the rest of the battle */
   G._actingAllyElem=null;G._actingAllyLethSpec=false; /* v1012: the ally action is finished -- never let these go stale */
@@ -15395,6 +15425,7 @@ function applyCritBuff(unit,stacks){
   animateBuff(unit.id,'CRIT UP');
 }
 function animateBuff(unitId,label){
+  taRecord(unitId,'heal');
   // Show ATK/MAG UP visual — reuse animateHit with a special marker
   const el=document.getElementById('unit-'+unitId)||document.querySelector(`[data-uid="${unitId}"]`);
   if(!el)return;
@@ -15831,8 +15862,13 @@ function flushAnimQueue(){
   });
   G._animQueue=[];
 }
+function taRecord(uid,kind){ /* v1396 */
+  const r=G&&G._taRec;if(!r||!uid||uid===r.from)return;
+  if(!r.hits[uid]||(r.hits[uid]==='fx'&&kind!=='fx'))r.hits[uid]=kind;
+}
 function animateHit(uid,dmg,isHeal,isCrit,_pastFx){
   if(!dmg&&dmg!==0)return;
+  taRecord(uid,isHeal?'heal':'dmg');
   if(dmg===0&&isHeal){animateBuff(uid);return;} // v562: legacy '+0 heal' buff markers → buff sparkle
   if(G._drunkDelayIds&&G._drunkDelayIds.has(uid)){G._drunkDelayIds.delete(uid);setTimeout(()=>animateHit(uid,dmg,isHeal,isCrit),650);return;} // v543: misfire victim — number waits so the pop reads first
   if(G._fxDelayMap&&G._fxDelayMap[uid]!==undefined){const _fd=G._fxDelayMap[uid];delete G._fxDelayMap[uid];if(_fd>0){setTimeout(()=>animateHit(uid,dmg,isHeal,isCrit),_fd);return;}} // v556: lunge contact timing
@@ -20218,6 +20254,7 @@ function effectiveNpCost(unit){
 // v318 (item 1): generic status float — used for paralysis skips and poison ticks so a
 // paralyzed unit visibly "doesn't move" and the poison damage that follows is attributed.
 function animateStatusPop(uid,text,color,size){
+  taRecord(uid,'fx');
   // v322: pops on the same unit within 900ms cascade (delayed + offset) instead of overlapping
   if(!window._popLast)window._popLast={};
   const now=Date.now();const rec=window._popLast[uid]||{t:0,n:0};
@@ -21173,6 +21210,10 @@ function moveIsMagicForRecoil(actor){
 /* v850: isSpecial tells beginAllyAction which kind of move is being paid for. Defaults to false so
    any call site added later behaves like a strike (charges recoil) rather than silently exempting. */
 function beginAllyAction(actor,isSpecial){
+  /* v1397: player AoE / auto specials record what they hit, like enemy actions (v1396), so the arrows
+     show every enemy struck. Single-target specials and Strike keep their hover arrow only. */
+  G._taPreview=null;
+  /* v1398: no post-cast arrows -- arrows are pre-attack only */
   // v377: snapshot enemy HP + record killer so handleDeath can credit Huitzi/Coyolxauhqui on defeat
   if(!actor||!actor.isAlly){G._curKiller=null;return;}
   G._curKiller=actor;G._huitziAcc=0;G._paPre={};
@@ -21950,7 +21991,106 @@ function cxTurnTag(){
   if(side){void el.offsetWidth;el.classList.add('cx-turn-pop');} /* v1390: pop on every swap */
   if(document.body){document.body.classList.toggle('turn-you',side==='you');document.body.classList.toggle('turn-enemy',side==='enemy');}
 }
+/* v1395: TARGETING ARROWS (playtest: "not clear which unit is going to be targeted").
+   One fixed SVG overlay. Arrows are derived from state every time, never stored:
+     - enemy turn, target chosen (G._targetedAllyId) -> red arrow, acting enemy -> that ally
+     - player picking a target (single / ally / AoE) -> gold arrow, selected actor -> hovered valid
+       card, plus one per AoE pick already locked in.
+   Redrawn after every renderBattle, on hover, and every frame while visible so scrolls and the
+   v1154 auto-scroll can never leave an arrow pointing at empty space. */
+let _taHover=null,_taRaf=0;
+function tgtArrowPairs(){
+  const out=[];
+  if(typeof G==='undefined'||!G||G.battlePhase==='done')return out;
+  /* v1396: once an enemy action resolves, draw to EVERY unit it touched -- red for damage/ailments,
+     green for heals and buffs on its own side. Before that, only a predicted plain Strike is drawn. */
+  /* v1397: hover preview on an auto-cast AoE special button -- every enemy it can hit */
+  if(G._taPreview&&G.battlePhase==='player_selected'&&G._taPreview.from===G.selectedActorId)
+    G._taPreview.ids.forEach(id=>out.push({from:G._taPreview.from,to:id,col:'#ffd04a'}));
+  /* v1398: enemy warning arrows only (cleared when the attack starts) -- AoE prediction or the single target */
+  if(G._taPred&&G._actingEnemy===G._taPred.from)G._taPred.ids.forEach(id=>out.push({from:G._taPred.from,to:id,col:'#ff5a46'}));
+  else if(G._actingEnemy&&G._targetedAllyId)out.push({from:G._actingEnemy,to:G._targetedAllyId,col:'#ff5a46'});
+  const ph=G.battlePhase||'';
+  if(G.selectedActorId&&/^player_(targeting|ally_targeting|aoe_targeting)$/.test(ph)){
+    const picked=Array.isArray(G.aoeSelected)?G.aoeSelected:[];
+    picked.forEach(id=>out.push({from:G.selectedActorId,to:id,col:'#ffd04a'}));
+    if(_taHover&&_taHover!==G.selectedActorId&&picked.indexOf(_taHover)<0){
+      const h=document.querySelector('.uc[data-uid="'+_taHover+'"]');
+      if(h&&h.classList.contains('targeting-valid'))out.push({from:G.selectedActorId,to:_taHover,col:'#ffd04a'});
+    }
+  }
+  /* v1397: arrows only ever cross between the two sides. Same-side arcs (heals, buffs, ally-targeted
+     specials) read badly in playtest and were removed -- the heal numbers already show who got what. */
+  const _isE=id=>(G.enemies||[]).some(e=>e.id===id);
+  return out.filter(p=>_isE(p.from)!==_isE(p.to));
+}
+function tgtArrowDraw(){
+  _taRaf=0;
+  let svg=document.getElementById('tgt-arrows');
+  const scr=document.getElementById('screen-battle');
+  const pairs=(scr&&scr.offsetParent!==null)?tgtArrowPairs():[];
+  if(!pairs.length){if(svg&&svg._taLast){svg.innerHTML='';svg._taLast='';}return;}
+  if(!svg){svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.id='tgt-arrows';document.body.appendChild(svg);}
+  const cols=[...new Set(pairs.map(p=>p.col))];
+  let h='<defs>';
+  cols.forEach((c,i)=>{h+='<marker id="ta-m'+i+'" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="'+c+'"/></marker>';});
+  h+='</defs>';
+  pairs.forEach(p=>{
+    const a=document.querySelector('.uc[data-uid="'+p.from+'"]'),b=document.querySelector('.uc[data-uid="'+p.to+'"]');
+    if(!a||!b)return;
+    const ra=a.getBoundingClientRect(),rb=b.getBoundingClientRect();
+    const ax=ra.left+ra.width/2,bx=rb.left+rb.width/2;
+    let ay,by,cx,cy;
+    if(Math.abs((ra.top+ra.height/2)-(rb.top+rb.height/2))<20){
+      /* same row (ally heal / buff): arc over the top of both cards */
+      ay=ra.top+8;by=rb.top+8;cx=(ax+bx)/2;cy=Math.min(ay,by)-Math.max(40,Math.abs(bx-ax)*.35);
+    }else{
+      if(rb.top<ra.top){ay=ra.top+6;by=rb.bottom-6;}else{ay=ra.bottom-6;by=rb.top+6;}
+      /* bow the line a little so several arrows from one actor fan out instead of stacking */
+      cx=(ax+bx)/2+(bx>=ax?-1:1)*Math.min(60,Math.abs(by-ay)*.18)+(Math.abs(bx-ax)<4?30:0);cy=(ay+by)/2;
+    }
+    const d='M'+ax.toFixed(1)+','+ay.toFixed(1)+' Q'+cx.toFixed(1)+','+cy.toFixed(1)+' '+bx.toFixed(1)+','+by.toFixed(1);
+    const mi=cols.indexOf(p.col);
+    h+='<path class="ta-halo" d="'+d+'" stroke="'+p.col+'"/><path class="ta-line" d="'+d+'" stroke="'+p.col+'" marker-end="url(#ta-m'+mi+')"/>';
+    h+='<circle cx="'+ax.toFixed(1)+'" cy="'+ay.toFixed(1)+'" r="4" fill="'+p.col+'"/>';
+  });
+  if(svg._taLast!==h){svg.innerHTML=h;svg._taLast=h;} /* only touch the DOM when geometry changed -- keeps the dash animation running */
+  _taRaf=requestAnimationFrame(tgtArrowDraw); /* keep tracking while anything is drawn */
+}
+function tgtArrowUpdate(){if(_taRaf){cancelAnimationFrame(_taRaf);_taRaf=0;}tgtArrowDraw();}
+(function(){
+  const over=function(e){const c=e.target&&e.target.closest&&e.target.closest('#screen-battle .uc[data-uid]');const id=c?c.getAttribute('data-uid'):null;if(id!==_taHover){_taHover=id;tgtArrowUpdate();}};
+  document.addEventListener('mouseover',over,{passive:true});
+  /* v1397: hovering the Special (or Oblation special) button of an AUTO-CAST offensive AoE previews
+     its targets. Specials that open a pick step (more enemies than their cap), single-target and
+     support specials show nothing here. */
+  const prev=function(e){
+    const btn=e.target&&e.target.closest&&e.target.closest('#screen-battle button');
+    let want=null;
+    if(btn&&!btn.disabled&&/doPlayerSpecial\(/.test(btn.getAttribute('onclick')||'')&&typeof G!=='undefined'&&G&&G.battlePhase==='player_selected'&&G.selectedActorId){
+      const actor=G.units.find(u=>u.id===G.selectedActorId);
+      const ob=/doPlayerSpecial\(true\)/.test(btn.getAttribute('onclick')||'');
+      const _sv=G._useOblationSpecial;G._useOblationSpecial=ob; /* isAoeOrAutoSpecial reads the oblated kit off this flag */
+      try{
+        if(actor&&isAoeOrAutoSpecial(actor)){
+          const ad=String((typeof liveAd==='function'?liveAd(actor):actor.ad)||'');
+          const ab=actor.isGod?(ob?G._oblationAbility:actor.ability):(typeof liveAbility==='function'?liveAbility(actor):actor.ability);
+          const support=/data-sty="SUP"/.test(ad)||(typeof isHealAbl==='function'&&isHealAbl(ab));
+          const ae=G.enemies.filter(x=>x.currentHp>0&&!G.captureProcessed.has(x.id));
+          const cap=aoeCapFor(actor);
+          if(!support&&ae.length&&!(cap&&ae.length>cap))want={from:actor.id,ids:ae.map(x=>x.id)};
+        }
+      }catch(_e){}
+      G._useOblationSpecial=_sv;
+    }
+    const k=want?want.from+'|'+want.ids.join(','):'';
+    const cur=G&&G._taPreview?G._taPreview.from+'|'+G._taPreview.ids.join(','):'';
+    if(k!==cur){G._taPreview=want;tgtArrowUpdate();}
+  };
+  document.addEventListener('mouseover',prev,{passive:true});
+})();
 function renderBattle(){
+  try{queueMicrotask(tgtArrowUpdate);}catch(e){} /* v1395: arrows follow every render */
   renderRelicBar();
   // Hide tutorial after round 2 completes (gives room for hint 3 at round 2 start)
   const _tutEl=document.getElementById('tut-area');
@@ -22160,6 +22300,7 @@ function renderBattle(){
       if(eu){
         const ta=G._targetedAllyId?G.units.find(u=>u.id===G._targetedAllyId):null;
         if(ta)amEl.innerHTML=`${eu.icon} <strong>${eu.name}</strong> targets ${ta.icon} <strong>${ta.name}</strong>!`;
+        else if(G._enemyWillSpecial)amEl.innerHTML=`${eu.icon} <strong>${eu.name}</strong> readies <span style="color:#c090f0">${(typeof liveAbility==='function'?liveAbility(eu):eu.ability)||'a special'}</span>!`; /* v1396 */
         else amEl.innerHTML=`${eu.icon} <strong>${eu.name}</strong> is acting…`;
       }else amEl.innerHTML='';
     }else amEl.innerHTML='';
