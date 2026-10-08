@@ -149,6 +149,40 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .uc-art{position:relative;display:flex;align-items:center;justify-content:center;padding:8px 3px 6px;min-height:60px;background:radial-gradient(ellipse at 50% 36%,#2c2110 0%,#1a1208 66%,#120c05 100%);border-bottom:1px solid rgba(212,175,55,.22)}
 .uc-body{padding:5px 7px 7px;background:linear-gradient(180deg,#241a0b,#170f06)}
 .uc-name{font-size:11px;font-weight:600;text-align:center;margin-bottom:3px;line-height:1.15}
+/* v1390: level + element corner tag on the portrait (top-left), dark plate so it reads over any art */
+/* v1391: restyled to MATCH the v1357 "Acted" label (same plate, same size, same frame offset) so it
+   sits on the card's greca frame -- top-left, mirroring Acted at top-right -- instead of over the sprite.
+   It lives on the card root (not .uc-art) so it is positioned against the card, exactly like Acted. */
+.uc-lvtag{position:absolute;top:6px;left:6px;z-index:5;display:inline-flex;align-items:center;gap:2px;font-size:10px;line-height:13px;background:#120d0a;border:1px solid #5a4a38;border-radius:3px;padding:0 4px;color:#9a8a70;font-weight:600;white-space:nowrap}
+.uc-lvtag>span[style]{font-size:10px!important;margin-left:1px!important;line-height:1!important;vertical-align:0!important;display:inline-flex;align-items:center}
+.uc-lvtag img,.uc-lvtag svg{width:11px!important;height:11px!important}
+/* v1391: enemies get the same "Acted" plate once they have taken their turn this round */
+.uc .cx-acted-e{display:none;position:absolute;top:6px;right:6px;z-index:5;font-size:10px;line-height:13px;background:#120d0a;border:1px solid #5a4a38;border-radius:3px;padding:0 4px;color:#9a8a70}
+.uc.enemy-did-act .cx-acted-e{display:inline-block}
+/* v1393: STRONGER synergy read. The plate turns gold and breathes, the element icon glows, and a warm
+   halo sits behind the sprite. Applies to the patron and every bonded ally alike. */
+@keyframes synPlate{from{box-shadow:0 0 4px #ffd70066;border-color:#a08020}to{box-shadow:0 0 12px #ffd700dd,0 0 3px #fff3;border-color:#ffd700}}
+@keyframes synIco{from{filter:drop-shadow(0 0 2px #ffd70088)}to{filter:drop-shadow(0 0 6px #ffd700) brightness(1.25)}}
+.uc.syn-on .uc-lvtag{color:#f0d890;background:#2a1e08;animation:synPlate .9s ease-in-out infinite alternate}
+.uc.syn-on .uc-elico{display:inline-flex;animation:synIco .9s ease-in-out infinite alternate}
+.uc.syn-on .uc-art{box-shadow:inset 0 0 22px #ffd70030,inset 0 -10px 18px -8px #ffd70045}
+body.fx-min .uc.syn-on .uc-lvtag{animation:none;border-color:#ffd700;box-shadow:0 0 6px #ffd70099}
+body.fx-min .uc.syn-on .uc-elico{animation:none}
+/* v1393: round change gets the same treatment as the turn tag. The round text pops in with a gold flash
+   and the dashed rails sweep outward from it. Round 1 waits for the codex unroll, then lands bigger. */
+@keyframes cxRoundPop{0%{transform:scale(.5);opacity:0;filter:brightness(2.2)}55%{transform:scale(1.2);opacity:1;text-shadow:0 0 14px #ffd700}100%{transform:scale(1);filter:brightness(1);text-shadow:none}}
+@keyframes cxRoundPop1{0%{transform:scale(1.9);opacity:0;filter:brightness(2.6);letter-spacing:6px}60%{transform:scale(.95);opacity:1;text-shadow:0 0 18px #ffd700;letter-spacing:1px}100%{transform:scale(1);filter:brightness(1);text-shadow:none;letter-spacing:normal}}
+@keyframes cxRailL{from{transform:scaleX(0);opacity:.2}to{transform:scaleX(1);opacity:1}}
+body.codex-ui .cx-fold.new-round>span{animation:cxRoundPop .5s cubic-bezier(.2,.9,.3,1.3) both}
+body.codex-ui .cx-fold.new-round.cx-r1>span{animation:cxRoundPop1 .7s cubic-bezier(.2,.8,.3,1) both;animation-delay:calc(.55s*var(--kaK,1.25))}
+body.codex-ui .cx-fold.new-round::before{transform-origin:100% 50%;animation:cxRailL .45s ease-out both}
+body.codex-ui .cx-fold.new-round::after{transform-origin:0 50%;animation:cxRailL .45s ease-out both}
+body.codex-ui .cx-fold.new-round.cx-r1::before,body.codex-ui .cx-fold.new-round.cx-r1::after{animation-delay:calc(.55s*var(--kaK,1.25))}
+body.fx-min .cx-fold.new-round>span,body.fx-min .cx-fold.new-round::before,body.fx-min .cx-fold.new-round::after{animation:none!important}
+/* v1392: tall sprites (Quetzalcoatl) start at the very top of the art box and ran under the plates.
+   Reserve a strip above the art so the Lv/element and Acted plates sit on clear frame. */
+.uc>.uc-lvtag~.uc-art{padding-top:16px}
+body.codex-ui .uc>.uc-lvtag~.uc-art{padding-top:14px}
 .uc.tier-patron .uc-art{border-bottom-color:rgba(212,175,55,.5)}
 .uc.miniboss .uc-art,.uc.active-enemy .uc-art{border-bottom-color:rgba(96,160,224,.4)}
 .bar-lbl{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;letter-spacing:.3px;color:#fff;text-shadow:0 0 3px #000,1px 0 0 #000,-1px 0 0 #000,0 1px 0 #000,0 -1px 0 #000;z-index:2;pointer-events:none}
@@ -338,6 +372,17 @@ body.codex-ui .cx-fold>span{white-space:nowrap;display:inline-flex;align-items:c
 .cx-turn{display:none;margin-left:10px;padding:2px 9px;border-radius:5px;font-size:12px;font-weight:700;letter-spacing:1.2px;line-height:1.4;border:1px solid}
 .cx-turn-you{display:inline-block;color:#7af0a8;background:#0e2e1c;border-color:#2e8a52;box-shadow:0 0 8px #2e8a5266}
 .cx-turn-enemy{display:inline-block;color:#ff9a8a;background:#2e1210;border-color:#a0382c;box-shadow:0 0 8px #a0382c66} /* v1385 */
+/* v1390: Gamepalooza -- the tag read as static, so a side change was easy to miss.
+   (1) the tag pops in on every swap, (2) YOUR TURN breathes while it waits for input,
+   (3) the side that is acting gets a lit edge so the eye knows which row to watch. */
+@keyframes cxTurnPop{0%{transform:scale(.6);opacity:0;filter:brightness(2)}55%{transform:scale(1.18);opacity:1}100%{transform:scale(1);filter:brightness(1)}}
+@keyframes cxTurnBreath{0%,100%{box-shadow:0 0 6px #2e8a5255}50%{box-shadow:0 0 16px #2e8a52cc}}
+.cx-turn.cx-turn-pop{animation:cxTurnPop .42s cubic-bezier(.2,.9,.3,1.3) both}
+.cx-turn-you.cx-turn-pop{animation:cxTurnPop .42s cubic-bezier(.2,.9,.3,1.3) both,cxTurnBreath 1.6s ease-in-out .42s infinite}
+#cx-enemy,#party-section{transition:box-shadow .3s ease,background-color .3s ease;border-radius:8px}
+body.turn-enemy #cx-enemy{box-shadow:inset 0 0 0 1px #a0382c99,0 0 14px #a0382c44;background-color:#2e121022}
+body.turn-you #party-section{box-shadow:inset 0 0 0 1px #2e8a5299,0 0 14px #2e8a5244;background-color:#0e2e1c22}
+body.fx-min .cx-turn.cx-turn-pop,body.fx-min .cx-turn-you.cx-turn-pop{animation:none}
 body.codex-ui .uc-foot{min-height:0}
 body.codex-ui .uc-foot .cx-acted{position:absolute;top:6px;right:6px;z-index:5;font-size:10px;line-height:13px;background:#120d0a;border:1px solid #5a4a38;border-radius:3px;padding:0 4px;color:#9a8a70!important}
 body.codex-ui .uc-name>span{white-space:nowrap}
@@ -494,6 +539,17 @@ body.codex-ui .uc.cx-unfold{transform-origin:0 50%;animation:kaUnfold calc(.55s*
 #mercs-list{display:grid;grid-template-columns:repeat(3,minmax(230px,320px));gap:10px;justify-content:center} /* v654: capped + centered like the training cards */
 @media(max-width:520px){#mercs-list{grid-template-columns:1fr}} /* v633: 760px breakpoint was tripping on ~690px viewports (Retina windows), stacking the cards — 3-up holds fine down to ~520px */
 #mercs-list>*:not(.merc-card){grid-column:1/-1}
+/* v1390: Gamepalooza -- the special's stat-chip row (type / power / targets) wrapped onto a second
+   line on merc cards, and players could not tell how the special box was meant to read. Keep it
+   on ONE line: no wrap, no ellipsis. Room comes from a wider column cap (320 -> 340), slimmer side
+   padding on merc cards only, and slightly tighter chips. */
+#mercs-list{grid-template-columns:repeat(3,minmax(230px,340px))}
+#mercs-list .merc-card{padding-left:calc(.8rem + 8px);padding-right:calc(.8rem + 8px)}
+.merc-card .sf-r1{flex-wrap:nowrap;gap:2px}
+.merc-card .sf-c{padding:0 3px;font-size:10.5px;letter-spacing:-.1px}
+.merc-card .sf-bd{padding-left:5px;padding-right:5px}
+.merc-card .sf-r1.sf-fit-wrap{flex-wrap:wrap} /* v1390: set by renderMercs only when a row genuinely cannot fit */
+.merc-card .sf-c b{margin-right:2px}
 /* v635: Sacrifice Altar card grids */
 .sac-grid,.rg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,320px));gap:10px;margin-top:6px;justify-content:center} /* v654 */
 @media(max-width:520px){.sac-grid,.rg-grid{grid-template-columns:1fr}}
@@ -5970,7 +6026,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1389'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1394'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -8547,6 +8603,16 @@ let G={};
    battle -- it swallows callbacks left over from a battle that has already ended. */
 let BATTLE_EPOCH=0;
 function bumpBattleEpoch(){BATTLE_EPOCH++;}
+/* v1390: Gamepalooza -- first-time players found battles too fast to follow. A gentle 1.25x on
+   the battle beats (enemy turn phases, post-action settle, Belic cascade) for the player's FIRST
+   run only. Snapshotted lazily on the run's first battle beat, because DT.teotl starts paying out
+   after the first win and would otherwise switch the pace off mid-run. */
+const FIRST_RUN_PACE=1.25;
+function paceMs(ms){
+  if(!G)return ms;
+  if(G._firstRunPace===undefined)G._firstRunPace=(DT.teotl===0&&[...DT.unlocked].length===0&&DT.tecpatl_level===0);
+  return G._firstRunPace?Math.round(ms*FIRST_RUN_PACE):ms;
+}
 function epochTimeout(fn,ms){
   const e=BATTLE_EPOCH;
   return setTimeout(function(){ if(e!==BATTLE_EPOCH)return; fn(); },ms);
@@ -11329,7 +11395,12 @@ function buildEnemySet(bn,diff){
   // and paid nothing. Hard's bespoke HP curve is replaced by easy's curve x the per-layer ratio,
   // so HARD_HP_BY_LAYER is the single source of truth for the difficulty gap.
   const _ehs=(0.5+bn*.065)*((isL4||isL5||isL6)?1.25:1);
-  if(diff==='easy'){count=Math.max(1,bc-1);lv=Math.max(1,bl-1);hs=_ehs;} // v679: bc-1 — was bc (equal to base), which made some easy battles as dense as hard
+  if(diff==='easy'){count=Math.max(1,bc-1);lv=Math.max(1,bl-1);hs=_ehs;
+    /* v1390: Gamepalooza -- L1 easy openers (B1-B4) rolled bc-1 = 1 lone enemy, no variety.
+       Floor at 2 on L1, and split the old single enemy's HP across the pair (x0.5 each) so
+       the total HP pool stays ~the same and the run's balance doesn't shift. */
+    if(!isL2&&!isL3&&!isL4&&!isL5&&!isL6&&!isL7&&!isL8&&!isL9&&count<2){count=2;hs*=0.5;}
+  } // v679: bc-1 — was bc (equal to base), which made some easy battles as dense as hard
   else{count=Math.min(bc+1,maxCnt);lv=bl+1;hs=_ehs*hardHpRatio();}
   let picks=Array.from({length:count},(_,i)=>mkEnemy(capPool[Math.floor(Math.random()*capPool.length)],i,hs,lv));
   // v671: cross-layer GUEST cohorts (Nature via Chicomecoatl, Day via Tonatiuh) get merged wholesale
@@ -13919,6 +13990,12 @@ function startBattle(){try{if(window._cxVictoryFinish)window._cxVictoryFinish();
   G._undeadForcesUsed=false; // v810: Undead Forces is once per battle
   G._reedRaftUsed=false; // v827: single battle-scoped charge
   G.battlePhase='idle';G.roundNum=0;G.roundQueue=[];G.qIdx=0;
+  /* v1394: wipe the previous battle's round display here. The banner and codex fold were only ever
+     rewritten when round 1 began, and a miniboss/boss intro delays that -- so "Round 3" from the last
+     fight sat on screen through the whole intro, then snapped to Round 1. Blank until round 1 lands. */
+  {const _rb=document.getElementById('round-banner');if(_rb){_rb.textContent='';_rb.className='round-banner';}
+   const _cf=document.getElementById('cx-fold');if(_cf){_cf.innerHTML='';_cf.classList.remove('new-round','cx-r1');}
+   G._cxTurn='';if(document.body)document.body.classList.remove('turn-you','turn-enemy');}
   G._ihiyotlArmed=!!(getOfferingEffects().ihiyotlSteam>1);G._ihiyotlUsed=false; /* v1073 */
   G.actedIds=new Set();G._belicQueue=new Set();G._belicActing=null; /* v1045 */G.nextRoundSlowIds=new Set();G.thisRoundSlowTail=[];G.slowedThisRound=new Set();G._serendipityUsed=false;G._serendipityFreeAction=false;G._tlaloqueSpawnedThisBattle=false;G._coyolPending=0;G._curKiller=null;G._huitziAcc=0;G._xoloLast=null;G._kukulkanRound=-1; // v657: was never reset — the statue was silently skipped on the round matching its last firing
   // unitHpPenalty is preserved — applied in mkCap and then cleared per unit by overrideHp logic
@@ -14664,7 +14741,7 @@ function buildRoundQueue(){
     const _stw=hasOffering('sak_tahn_waax')?(' \u00b7 \u{1F4C5} '+(12-(G.sakTahnRounds||0))):'';
     banEl.textContent=t('ui.battle.roundBanner',{n:G.roundNum})+(mictlanSummonPending()?t('ui.battle.deadStir'):'')+_stw; // v758/v806 · v1262
     banEl.className='round-banner new-round';
-    {const _cf=document.getElementById('cx-fold');if(_cf){_cf.innerHTML='<span>'+banEl.innerHTML+'<span class="cx-turn" id="cx-turn"></span></span>';G._cxTurn='';cxTurnTag();_cf.classList.remove('new-round');void _cf.offsetWidth;_cf.classList.add('new-round');}} /* v1357: codex fold carries the round */
+    {const _cf=document.getElementById('cx-fold');if(_cf){_cf.innerHTML='<span>'+banEl.innerHTML+'<span class="cx-turn" id="cx-turn"></span></span>';G._cxTurn='';cxTurnTag();_cf.classList.remove('new-round','cx-r1');void _cf.offsetWidth;_cf.classList.add('new-round');if(G.roundNum===1)_cf.classList.add('cx-r1'); /* v1393 */}} /* v1357: codex fold carries the round */
     setTimeout(()=>{if(banEl)banEl.classList.remove('new-round');},1500);
   }
   renderBattle();
@@ -14763,7 +14840,7 @@ function processCurrentSlot(){
     // Phase 1: show attacker highlighted (700ms)
     renderBattle();
     setTimeout(()=>{
-      if(slot.unit.currentHp<=0){G._actingEnemy=null;setTimeout(advanceTurn,100);return;}
+      if(slot.unit.currentHp<=0){G._actingEnemy=null;setTimeout(advanceTurn,paceMs(100));return;}
       // Phase 2: highlight the likely target (600ms)
       const aa=G.units.filter(x=>x.currentHp>0);
       if(aa.length)G._targetedAllyId=aa.reduce((a,b)=>a.currentHp<b.currentHp?a:b).id;
@@ -14790,12 +14867,12 @@ function processCurrentSlot(){
           G._actingEnemy=null;
           if(G.captureQueue.length&&!G.capActive){setTimeout(()=>processNextCap(),400);return;}
           // Phase 4: pause so player can read the damage (600ms)
-          setTimeout(advanceTurn,600);
+          setTimeout(advanceTurn,paceMs(600));
         };
         if(G._enemyHitsPending){G._enemyHitsDone=_afterEnemy;epochTimeout(()=>{if(!_done){G._enemyHitsPending=false;_afterEnemy();}},3000);}
         else _afterEnemy();
-      },600);
-    },700);
+      },paceMs(600));
+    },paceMs(700));
   }
 }
 
@@ -14814,7 +14891,7 @@ const BELIC_BOOST=1.30;
    bonus burst rather than five separate turns, but far enough from the original 300ms that each
    action can be followed. The debug Pace knob that produced this number has been retired. */
 const BELIC_PACE={lead:450,gap:375,focus:400,settle:500,hit:225,aoeStagger:90};
-function belicMs(k){return BELIC_PACE[k]||0;}
+function belicMs(k){return paceMs(BELIC_PACE[k]||0);} /* v1390: first-run pace */
 
 // Multi-hit specs — fire N random hits sequentially with animation
 const BELIC_MULTIHIT={
@@ -15420,7 +15497,7 @@ function selectActor(unitId){
     animateStatusPop(u.id,'⚡ Paralyzed!','#c0c030'); // v318
     resolveStatusAfterAction(u);
     G.actedIds.add(unitId);renderBattle();
-    setTimeout(advanceTurn,700);return;
+    setTimeout(advanceTurn,paceMs(700));return;
   }
   G.selectedActorId=unitId;G.battlePhase='player_selected';
   /* v332/v853 removed in v860: cancelling an un-fired bonus on selection-switch only existed to
@@ -15442,6 +15519,48 @@ const FX_ELEM_COLORS={fire:'#ff7030',water:'#40a0ff',wind:'#a0e8d8',earth:'#c080
 function elemColor(el){return FX_ELEM_COLORS[el]||'#d4af37';}
 function fxOn(){try{if((DT.fxMode||'full')==='minimal')return false;if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return false;}catch(e){}return true;}
 function fxCard(uid){return document.querySelector(`[data-uid="${uid}"]`);}
+/* v1390 FX SCROLL ANCHOR (Gamepalooza: "heals and captures play outside the unit").
+   Every card FX (damage/heal numbers, motes, capture binding, slain blood) is spawned on <body>
+   at position:fixed, measured from the card's rect AT SPAWN. The v1154 battle auto-scroll then
+   smooth-scrolls the board, the card moves and the FX stays behind on screen. Rather than touch
+   ~40 spawn sites, one observer pins each new FX node to the card underneath its spawn point and,
+   on any scroll, offsets it by how far that card has moved (CSS `translate`, which composes with
+   the FX's own transform animations instead of fighting them). Viewport-level overlays (modals,
+   toasts, oblation) are not on the class list and are never moved. */
+(function(){
+  const FX_RX=/(^|\s)(dmg-pop|dmg-pip|fx-part|bind-|blood-|flay-pip|fx-flay|lv-column|lv-spark|tz-|sac-flash|slain|st-callout|status-pop)/;
+  const live=new Set();
+  function cardAt(x,y){
+    try{const els=document.elementsFromPoint(x,y);for(const e of els){const c=e.closest&&e.closest('[data-uid]');if(c)return c;}}catch(e){}
+    return null;
+  }
+  function track(n){
+    let x=parseFloat(n.style.left),y=parseFloat(n.style.top);
+    if(isNaN(x)||isNaN(y)){const r=n.getBoundingClientRect();x=r.left+r.width/2;y=r.top+r.height/2;}
+    const card=cardAt(x,y);if(!card)return;
+    const r=card.getBoundingClientRect();
+    live.add({n:n,uid:card.getAttribute('data-uid'),x0:r.left,y0:r.top});
+  }
+  function follow(){
+    if(!live.size)return;
+    for(const t of live){
+      if(!t.n.isConnected){live.delete(t);continue;}
+      const c=document.querySelector('[data-uid="'+t.uid+'"]');if(!c)continue;
+      const r=c.getBoundingClientRect();
+      t.n.style.translate=Math.round(r.left-t.x0)+'px '+Math.round(r.top-t.y0)+'px';
+    }
+  }
+  function boot(){
+    new MutationObserver(function(ms){
+      for(const m of ms)for(const n of m.addedNodes){
+        if(n.nodeType===1&&typeof n.className==='string'&&FX_RX.test(n.className))track(n);
+      }
+    }).observe(document.body,{childList:true});
+    document.addEventListener('scroll',follow,{capture:true,passive:true}); // capture: catches inner scrollers too
+    window.addEventListener('resize',follow,{passive:true});
+  }
+  if(document.body)boot();else document.addEventListener('DOMContentLoaded',boot);
+})();
 function fxClass(el,cls,ms){if(!el)return;el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);setTimeout(()=>{try{el.classList.remove(cls);}catch(e){}},ms);}
 function fxSetCtx(attacker,originId,mainId,base){
   G._fxCtx={element:(attacker&&attacker.element)||'',t:Date.now(),originId:originId||(attacker&&attacker.id),mainId:mainId||null,base:base||0,ally:!!(attacker&&attacker.isAlly)};
@@ -16069,7 +16188,7 @@ function doPlayerSpecial(useOblation){
     renderBattle();
     // Delay advanceTurn past any async multi-hit animations
     const delay=G._multiHitPending?4*160+500:450;
-    setTimeout(()=>advanceTurn(actorId),delay);
+    setTimeout(()=>advanceTurn(actorId),paceMs(delay));
   }else{
     // Single-target: check if it targets an ally or enemy
     if(isAllyTargetAbl(actor.ability)){
@@ -16115,7 +16234,7 @@ function doPlayerAllyTarget(allyId){
   }
   actor.currentNP=Math.max(0,actor.currentNP-(G._useOblationSpecial?oblationNpCost(actor):effectiveNpCost(actor)));
   resolveStatusAfterAction(actor);renderBattle();
-  setTimeout(()=>advanceTurn(actor.id),450);
+  setTimeout(()=>advanceTurn(actor.id),paceMs(450));
 }
 function doPlayerAoeTarget(enemyId){
   if(G.battlePhase==='player_acting')return;
@@ -16154,7 +16273,7 @@ function doPlayerAoeTarget(enemyId){
   resolveStatusAfterAction(actor);
   renderBattle();
   const delay=G._multiHitPending?4*160+500:450;
-  setTimeout(()=>advanceTurn(actorId),delay);
+  setTimeout(()=>advanceTurn(actorId),paceMs(delay));
 }
 function doPlayerTarget(enemyId){
   if(G.battlePhase==='player_acting')return; // action animating — block input
@@ -16174,7 +16293,7 @@ function doPlayerTarget(enemyId){
     resolveStatusAfterAction(actor);
     renderBattle();
     if(dmg>0){animateActor(actorId);animateHit(target.id,dmg,false,strikeDmg._lastCrit);}
-    setTimeout(()=>advanceTurn(actorId),350);
+    setTimeout(()=>advanceTurn(actorId),paceMs(350));
   }else{
     // Hint 2: first special ever used in B1
     if(G._b1HintState&&!G._b1SpecHintSeen){G._b1SpecHintSeen=true;setB1Hint('✨ Specials consume <strong>Tonalli Points</strong> — the purple ✨ bar on each unit');}
@@ -18388,6 +18507,9 @@ function mictlanUndeadForces(u){
    snapshotted before Undead Forces resolves and it first acts the round after. Expressing it
    as "no slot" rather than a round counter means it stays correct for any other unit that
    joins mid-battle. Guarded on an empty queue so cards are not dimmed during setup. */
+/* v1391: "Acted" label for enemies. Narrower than enemyIsDimmed -- a unit summoned at end of round is
+   dimmed (no slot yet) but has NOT acted, so it must not claim to have. */
+function enemyDidAct(e){return !!(e&&e.currentHp>0&&e.id!==G._actingEnemy&&G._enemyActedIds&&G._enemyActedIds.has(e.id));}
 function enemyIsDimmed(e){
   if(!e||e.currentHp<=0)return false;
   if(e.id===G._actingEnemy)return false;
@@ -20598,6 +20720,15 @@ function synergyPulse(uids){
    disagreement below was invisible in normal play.
    This is now THE rule: calcSynergy, applySyn, eb() and all four card labels call it, so they
    cannot drift apart again. Before this build they implemented three different rules. */
+/* v1393: is this battle card part of a LIVE bond? Patron included -- the bond is the patron's.
+   Driven as a card class (.syn-on) set on create AND on every in-place patch, because the old
+   inline pulse was baked into the badge HTML at creation and never reconciled: a bond that formed
+   later (capture, summon, deployment) lit the vassals' fresh cards and left the patron dark. */
+function synCardOn(u){
+  if(!u||!u.isAlly||u.currentHp<=0||!G||!G.god)return false;
+  if(!synMatchesPatron(u.element))return false;
+  return calcSynergy().count>0;
+}
 function synMatchesPatron(el){
   if(!G.god)return false;
   return el===G.god.element||(hasPassive('azureZephyr')&&(el==='fire'||el==='wind'));
@@ -21689,8 +21820,11 @@ function unitDisplayLevel(u){
    and it is exactly what would have made a Belic-queued card keep insisting it had already acted. */
 function ucFootHtml(u){
   if(!u)return '';
-  if(u.id===G._targetedAllyId)return '<span style="color:#e07070">\u26a0 Targeted!</span>';
   const acted=G.actedIds.has(u.id);
+  /* v1392: an enemy's phase-2 target highlight used to RETURN here, so an ally that had already acted
+     lost its pinned "Acted" plate for that beat and got it back after the hit -- the flicker seen in
+     playtest. Targeted is a transient overlay on top of the acted state, not a replacement for it. */
+  if(u.id===G._targetedAllyId)return '<span style="color:#e07070">\u26a0 Targeted!</span>'+((acted&&u.isAlly)?'<span class="cx-acted" style="color:#4a3a10">\u2713 Acted</span>':'');
   const slowedSet=G.slowedThisRound||new Set();
   if(slowedSet.has(u.id)&&!acted&&G.units.some(x=>x.currentHp>0&&!G.actedIds.has(x.id)&&!slowedSet.has(x.id)))
     return '<span style="color:#5080a0">\u{1F422} Waiting (Slowed)</span>';
@@ -21739,7 +21873,7 @@ function mkUnitCard(u){
   d.dataset.uid=u.id;
   if(isSelectable||isSelected){d.onclick=()=>{selectActor(u.id);if(u.isPatron)triggerPatronTurnPassive(u);};}
   // Element emoji with synergy glow support
-  const typeTag=eb(u.element,true)?`<span style="font-size:14px;vertical-align:middle;margin-left:3px">${eb(u.element,true)}</span>`:'';
+  const typeTag=ELEM_META[u.element]?`<span class="uc-elico" style="font-size:14px;vertical-align:middle;margin-left:3px">${ELEM_META[u.element].icon}</span>`:''; /* v1393: plain icon -- the synergy glow is now the card's .syn-on class, reconciled every render */
   const curNP=u.currentNP||0,maxNP=u.maxNP||1,npCost=u.npCost||0;
   const effCostCard=effectiveNpCost(u);
   const npPct=Math.round(curNP/maxNP*100),canSpec=curNP>=effCostCard;
@@ -21757,7 +21891,7 @@ function mkUnitCard(u){
   const _normalUnacted=G.units.filter(x=>x.currentHp>0&&!G.actedIds.has(x.id)&&!(G.slowedThisRound&&G.slowedThisRound.has(x.id)));
   const _isActSlowed=G.slowedThisRound&&G.slowedThisRound.has(u.id)&&!G.actedIds.has(u.id)&&_normalUnacted.length>0;
   const _slowCls=_isActSlowed?' is-slowed':'';
-  d.className=cls+' '+_tierCls+(_cardSz?' '+_cardSz:'')+_slowCls;
+  d.className=cls+' '+_tierCls+(_cardSz?' '+_cardSz:'')+_slowCls+(synCardOn(u)?' syn-on':''); /* v1393 */
   const _armPct=u.maxHp>0?Math.min(100,Math.round((u.armor||0)/u.maxHp*100)):0;
   /* v1075: overheal tint. The bar width is pinned at 100% above MAX and the Chimalli overlay sits
      on top of it, so 240/200 was visually identical to 200/200. Colour is the only channel left. */
@@ -21765,8 +21899,11 @@ function mkUnitCard(u){
      5-digit endgame shield ran straight through the centred HP text. */
   const _over=u.maxHp>0&&u.currentHp>u.maxHp;
   const _hpBg=_over?'linear-gradient(90deg,#2e8b57,#4fd67f)':'var(--hp)';
-  d.innerHTML=`<div class="uc-art"><div class="${u.isAlly?'uc-icon':''}">${unitIconHtml(u,_iconSz)}</div></div><div class="uc-body">
-    <div class="uc-name" style="color:${u.isGod?'#c8a050':'var(--tx)'}">${liveName(u)} <span class="unit-lv" style="font-size:9px;color:var(--td)">Lv${lv}</span>${typeTag}</div>
+  /* v1390: Gamepalooza -- Lv + element moved off the name row into a corner tag on the portrait,
+     so long names get the full width and the badge no longer clips. .unit-lv keeps its class:
+     the in-place patch (renderBattle, v816) still finds and updates it. */
+  d.innerHTML=`<div class="uc-lvtag"><span class="unit-lv">Lv${lv}</span>${typeTag}</div><div class="uc-art"><div class="${u.isAlly?'uc-icon':''}">${unitIconHtml(u,_iconSz)}</div></div><div class="uc-body">
+    <div class="uc-name" style="color:${u.isGod?'#c8a050':'var(--tx)'}">${liveName(u)}</div>
     <div class="bar-row"><span class="bar-icon">❤️</span><div class="bar-wrap${(u.armor||0)>0?' has-shield':''}"><div class="bar-fill" style="width:${pct}%;background:${_hpBg}"></div><div class="bar-armor" style="width:${_armPct}%${(u.armor||0)>0?'':';display:none'}"></div><div class="bar-lbl">${fmtN(u.currentHp)}/${fmtN(u.maxHp)}${_over?' \u2191':''}</div><div class="bar-shield-badge"${(u.armor||0)>0?'':' style="display:none"'}><svg class="tl tl-chimalli" style="width:16px;height:16px;vertical-align:-.18em"><use href="#tl-chimalli"/></svg> ${fmtN(Math.round(u.armor||0))}</div></div></div>
     <div class="bar-row"><span class="bar-icon">✨</span><div class="bar-wrap" style="background:#110820"><div class="bar-fill" style="width:${npPct}%;background:linear-gradient(90deg,#5a208a,#9050c0)"></div><div class="bar-lbl">${Math.round(curNP)}/${maxNP}${lthTagCard}</div></div></div>
     <div class="status-row">${pPips(u.poisonStacks,true)}${bPips(u.burnStacks)}${paraPips(u.paralyzStacks||0)}${slowBadge(u.id)}${woundBadge(u.woundStacks||0)}${lethargyBadge(u.lethargyStacks||0)}${drunkBadge(u.drunkStacks||0)}${atkBuffBadge(u.atkBuffStacks||0,u.atkBuffRounds||0)}${defBuffBadge(u.defBuffStacks||0,u.defBuffRounds||0)}${critBuffBadge(u.critBuffStacks||0,u.critBuffRounds||0)}${turquoiseBadge(u)}${remedyBadge(u._remedy||0)}</div>
@@ -21810,6 +21947,8 @@ function cxTurnTag(){
   const es=LANG==='es';
   el.textContent=side==='you'?(es?'TU TURNO':'YOUR TURN'):side==='enemy'?(es?'TURNO ENEMIGO':'ENEMY TURN'):'';
   el.className='cx-turn'+(side?' cx-turn-'+side:'');
+  if(side){void el.offsetWidth;el.classList.add('cx-turn-pop');} /* v1390: pop on every swap */
+  if(document.body){document.body.classList.toggle('turn-you',side==='you');document.body.classList.toggle('turn-enemy',side==='enemy');}
 }
 function renderBattle(){
   renderRelicBar();
@@ -21881,6 +22020,7 @@ function renderBattle(){
     let cls='uc'+(e.isMiniBoss?' miniboss':'');
     if(isActing)cls+=' active-enemy';
     else if(enemyIsDimmed(e))cls+=' acted-enemy'; // v767
+    if(enemyDidAct(e))cls+=' enemy-did-act'; /* v1391 */
     if(isTargetable||isQuickStrike||isAoeTgt)cls+=' targeting-valid';
     if(isAoeTgt&&Array.isArray(G.aoeSelected)&&G.aoeSelected.includes(e.id))cls+=' aoe-picked';
     d.className=cls;
@@ -21910,8 +22050,8 @@ function renderBattle(){
     const _eHpBg=_eOver?'linear-gradient(90deg,#2e8b57,#4fd67f)':'var(--en)';
     const _enpPct=e.maxNP>0?Math.round(e.currentNP/e.maxNP*100):0;
     const _eArmPct=e.maxHp>0?Math.min(100,Math.round((e.armor||0)/e.maxHp*100)):0;
-    d.innerHTML=`<div class="uc-art"><div class="uc-eicon">${(()=>{const _eid=e.id.replace(/^boss_/,'').replace(/_\d+.*/,'').replace(/^en_/,'').replace(/_ev$/,'').replace(/_[a-z0-9]{3}$/,'');const _bg=GODS.find(g=>g.name===e.name||g.id===_eid); /* v1075: was e.id.includes(g.id) -- 'opochtli' is a substring of 'huitzilopochtli', so the War God drew Opochtli's portrait. Exact match on the same stripped id unitIconHtml uses. */if(_bg)return godIconHtml(_bg,_eSz);/* v750: was an emoji fallback, so any enemy without a GODS entry lost its portrait even when GOD_PORTRAITS had one -- Mictlantecuhtli is a boss template, not a playable god. unitIconHtml resolves boss_/species keys and falls back to the same emoji itself. */return unitIconHtml(e,_eSz<=18?18:_eSz);})()}</div></div><div class="uc-body">
-      <div class="uc-name" style="color:${e.isMiniBoss?'#60a0e0':e.isBoss?'#ff8060':'#e07070'}">${e.name} <span style="font-size:9px;color:var(--td)">Lv${e.enemyLevel||1} ${typeTag}</span></div>
+    d.innerHTML=`<div class="uc-lvtag"><span>Lv${e.enemyLevel||1}</span>${typeTag}</div><span class="cx-acted-e">\u2713 Acted</span><div class="uc-art"><div class="uc-eicon">${(()=>{const _eid=e.id.replace(/^boss_/,'').replace(/_\d+.*/,'').replace(/^en_/,'').replace(/_ev$/,'').replace(/_[a-z0-9]{3}$/,'');const _bg=GODS.find(g=>g.name===e.name||g.id===_eid); /* v1075: was e.id.includes(g.id) -- 'opochtli' is a substring of 'huitzilopochtli', so the War God drew Opochtli's portrait. Exact match on the same stripped id unitIconHtml uses. */if(_bg)return godIconHtml(_bg,_eSz);/* v750: was an emoji fallback, so any enemy without a GODS entry lost its portrait even when GOD_PORTRAITS had one -- Mictlantecuhtli is a boss template, not a playable god. unitIconHtml resolves boss_/species keys and falls back to the same emoji itself. */return unitIconHtml(e,_eSz<=18?18:_eSz);})()}</div></div><div class="uc-body">
+      <div class="uc-name" style="color:${e.isMiniBoss?'#60a0e0':e.isBoss?'#ff8060':'#e07070'}">${e.name}</div>
       ${e.isBoss||e.isMiniBoss?`<div style="font-size:9px;color:${e.isBoss?'#c06060':'#60a0e0'};font-style:italic">${e.flavor}</div>`:''}
       <div class="bar-row"><span class="bar-icon">❤️</span><div class="bar-wrap${(e.armor||0)>0?' has-shield':''}"><div class="bar-fill" style="width:${_eppPct}%;background:${_eHpBg}"></div><div class="bar-armor" style="width:${_eArmPct}%${(e.armor||0)>0?'':';display:none'}"></div><div class="bar-lbl">${fmtN(e.currentHp)}/${fmtN(e.maxHp)}${_eOver?' \u2191':''}</div><div class="bar-shield-badge"${(e.armor||0)>0?'':' style="display:none"'}><svg class="tl tl-chimalli" style="width:16px;height:16px;vertical-align:-.18em"><use href="#tl-chimalli"/></svg> ${fmtN(Math.round(e.armor||0))}</div></div></div>
       <div class="bar-row"><span class="bar-icon">✨</span><div class="bar-wrap" style="background:#110820"><div class="bar-fill" style="width:${_enpPct}%;background:linear-gradient(90deg,#5a208a,#9050c0)"></div><div class="bar-lbl">${Math.round(e.currentNP||0)}/${e.maxNP||0}</div></div></div>
@@ -21941,6 +22081,7 @@ function renderBattle(){
          G._actingEnemy, so this is a NO-OP against today's behaviour -- it exists so the code states
          what the comment claims and stays correct if that predicate is ever retuned. */
       _existingEnemy.classList.toggle('acted-enemy',!_isA&&enemyIsDimmed(e)); // v767: same predicate as the create branch above
+      _existingEnemy.classList.toggle('enemy-did-act',enemyDidAct(e)); /* v1391: same predicate as create */
       if(_isT)_existingEnemy.onclick=()=>doPlayerTarget(e.id);
       else if(_isAoe)_existingEnemy.onclick=()=>doPlayerAoeTarget(e.id);
       else if(_isQS)_existingEnemy.onclick=()=>{doPlayerStrike();doPlayerTarget(e.id);};
@@ -21983,6 +22124,7 @@ function renderBattle(){
         const isAllyTarget=G.battlePhase==='player_ally_targeting'&&u.isAlly&&u.currentHp>0;
         const isSelectable=(G.battlePhase==='player_choose'&&u.isAlly&&!isAct)||(G.battlePhase==='player_selected'&&u.isAlly&&!isAct&&!isSel)||(G.battlePhase==='player_aoe_targeting'&&u.isAlly&&!isAct&&!isSel); // v303 (1A)
         // Update level text for ALL units (gods and vassals)
+        existing.classList.toggle('syn-on',synCardOn(u)); /* v1393: same predicate as create */
         {const _lvEl=existing.querySelector('.unit-lv');if(_lvEl){_lvEl.textContent='Lv'+unitDisplayLevel(u);}} // v816: was its own getLevel chain, which ignored u.level and reset raised allies to Lv1
         existing.classList.toggle('selected-actor',isSel);
         existing.classList.toggle('selectable',isSelectable&&!isSel);
@@ -22502,6 +22644,7 @@ function endBattle(win){
   if(G.battlePhase==='done')return; // already ended — prevent double defeat screen and double TEOTL
   G._belicCascading=false; // stop any pending cascade polls immediately
   G.battlePhase='done';
+  if(document.body)document.body.classList.remove('turn-you','turn-enemy'); /* v1390: drop the active-row glow */
   bumpBattleEpoch(); // v1180: retires every deferred callback from this battle
   /* v830: same condition the conquest bonus uses -- _cipactliPhase only becomes true once the
      second wave has actually been summoned, so reaching Layer 9 is not enough by itself. */
@@ -24722,6 +24865,9 @@ function renderMercs(){
       +'<div class="tc-action">'+(hired?'<div style="text-align:center;font-size:12px;color:#50c080;padding:6px">Hired ✦</div>':'<button class="btn btn-ca'+((ftueGateActive()&&G._ftueDidTemazcal&&!G._ftueDidMerc&&canAfford)?' tab-pulse':'')+'" onclick="doHireMerc(\''+u.id+'\')" '+(canAfford?'':'disabled')+' style="width:100%;font-size:15px">Hire <span style="font-size:13px;opacity:.9"><svg class="tl tl-cacao"><use href="#tl-cacao"/></svg> '+tier.cost+'</span></button>') /* v652: FTUE glow on affordable hires */+'</div>';
     el.appendChild(card);
   });
+  /* v1390: one line wherever it fits. Long chip sets (multi-hit, 'up to 3') at narrow windows
+     can't, and spilling past the box is worse than a second line -- so wrap only those rows. */
+  requestAnimationFrame(function(){try{el.querySelectorAll('.merc-card .sf-r1').forEach(function(r){r.classList.toggle('sf-fit-wrap',r.scrollWidth>r.clientWidth+1);});}catch(e){}});
 }
 // v563: Teotecuilli Brazier — every 3 sacrifices, 1 random deployed FIRE unit (patron included)
 // gains a free Soul Surge (pending pick in Training). If no eligible fire unit is deployed (none in
