@@ -1408,6 +1408,7 @@ body.fx-min .bless-spark{display:none}
     <div class="debug-row"><div><div style="font-size:12px">Free Pochteca Stall</div><div style="font-size:10px;color:#a070c0">Show all offerings, acquire free (for testing)</div></div><button id="dbg-pochteca-btn" class="btn btn-debug" onclick="debugTogglePochteca()" style="font-size:11px;padding:4px 10px">Free Stall: OFF</button></div>
     <div class="debug-row"><div><div style="font-size:12px;color:#c0a0e0">🎲 Altar God Reroll</div><div style="font-size:10px;color:#a070c0">Adds a Reroll button on the Altar itself — eligible list logged to console</div></div><button id="dbg-altarreroll-btn" class="btn btn-debug" onclick="debugToggleAltarReroll()" style="font-size:11px;padding:4px 10px">Altar Reroll: OFF</button></div>
     <div class="debug-row"><div><div style="font-size:12px;color:#ffd700">⚡ Force Crit (100%)</div><div style="font-size:10px;color:#a070c0">Every strike &amp; special always crits — verify crit paths</div></div><button id="dbg-forcecrit-btn" class="btn btn-debug" onclick="debugToggleForceCrit()" style="font-size:11px;padding:4px 10px">Force Crit: OFF</button></div>
+    <div class="debug-row" style="flex-wrap:wrap"><div><div style="font-size:12px;color:#a888e0">✦ Boss Hints (v1409)</div><div style="font-size:10px;color:#a070c0">Auto-lose ends any B5/B8 boss fight on start. Jump, lose twice, see the hint.</div><div id="dbg-bosshint-state" style="font-size:10px;color:#c0a0e0;margin-top:2px">Streak: none · auto-lose OFF</div></div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px"><button id="dbg-autolose-btn" class="btn btn-debug" onclick="dbgToggleAutoLoseBoss()" style="font-size:11px;padding:4px 9px">Auto-lose: OFF</button><select id="dbg-bosshint-layer" title="Layer" style="font-size:11px;padding:3px 6px;background:#1a0a2a;border:0.5px solid #4a2a6a;color:#c0a0e0;border-radius:6px"><option value="1">L1</option><option value="2">L2</option><option value="3">L3</option><option value="4">L4</option><option value="5">L5</option><option value="6">L6</option><option value="7">L7</option><option value="8">L8</option><option value="9">L9</option></select><button class="btn btn-debug" onclick="dbgBossHintJump(5)" style="font-size:11px;padding:4px 9px">Jump B5</button><button class="btn btn-debug" onclick="dbgBossHintJump(8)" style="font-size:11px;padding:4px 9px">Jump B8</button><button class="btn btn-debug" onclick="dbgBossHintReset()" style="font-size:11px;padding:4px 9px">Reset streak</button><select id="dbg-bosshint-key" title="Hint to preview" style="font-size:11px;padding:3px 6px;background:#1a0a2a;border:0.5px solid #4a2a6a;color:#c0a0e0;border-radius:6px"><option value="L1-B5">L1-B5</option><option value="L1-B8">L1-B8</option><option value="L2-B5">L2-B5</option><option value="L2-B8">L2-B8</option><option value="L3-B5">L3-B5</option><option value="L3-B8">L3-B8</option><option value="L4-B5">L4-B5</option><option value="L4-B8">L4-B8</option><option value="L5-B5">L5-B5</option><option value="L5-B8-malinalxochitl">L5-B8-malinalxochitl</option><option value="L5-B8-xiuhtecuhtli">L5-B8-xiuhtecuhtli</option><option value="L6-B5">L6-B5</option><option value="L6-B8">L6-B8</option><option value="L7-B5">L7-B5</option><option value="L7-B8">L7-B8</option><option value="L8-B5">L8-B5</option><option value="L8-B8">L8-B8</option><option value="L9-B5">L9-B5</option><option value="L9-B8">L9-B8</option></select><button class="btn btn-debug" onclick="dbgBossHintPreview()" style="font-size:11px;padding:4px 9px">Preview</button></div></div>
     <div class="debug-row"><div><div style="font-size:12px;color:#d4af37">📜 Codex Battle UI</div><div style="font-size:10px;color:#a070c0">Codex pages, round fold, acted tag (test toggle, remembered)</div></div><button id="dbg-codexui-btn" class="btn btn-debug" onclick="debugToggleCodexUI()" style="font-size:11px;padding:4px 10px">Codex UI: OFF</button></div>
     <div class="debug-row"><div><div style="font-size:12px;color:#e0a040">🍺 DRUNK Misfire Test</div><div style="font-size:10px;color:#a070c0">Test Battle: instant random battle, everyone Drunk ×2 &middot; Apply: drunk a battle already in progress</div></div><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-debug" onclick="debugDrunkBattle()" style="font-size:11px;padding:4px 10px;background:#2a1a0a;border-color:#8a5010;color:#e0a040">⚔️ Test Battle</button><button class="btn btn-debug" onclick="debugDrunkAll()" style="font-size:11px;padding:4px 10px">🍺 Apply</button></div></div>
     <div class="debug-row"><div><div style="font-size:12px;color:#b090e0">⚡ BELIC RUSH Test</div><div style="font-size:10px;color:#a070c0">Mixcoatl patron + Tlapetlanmichin / Void Xolo / Spirit Hound / Xolo Guardian / Xolotl vs 6 foes, full TP, party pre-damaged &amp; statused &middot; Audit logs each cascaded action's target count against the ability's cap</div></div><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-debug" onclick="debugBelicRushBattle()" style="font-size:11px;padding:4px 10px;background:#1a0a2a;border-color:#6a40a0;color:#c0a0ff">⚡ Test Battle</button><button id="dbg-belicaudit-btn" class="btn btn-debug" onclick="debugToggleBelicAudit()" style="font-size:11px;padding:4px 10px">Audit: OFF</button></div></div>
@@ -1530,6 +1531,11 @@ body.fx-min .bless-spark{display:none}
     <div style="font-size:52px;color:#e05050"><svg class="tl tl-skull"><use href="#tl-skull"/></svg></div>
     <h2 style="color:#e05050;font-size:22px;margin:.5rem 0" data-i18n="ui.defeat.title">Defeated</h2>
     <p style="color:var(--td);font-size:13px;margin-bottom:.75rem" data-i18n="ui.defeat.sub">Your soul could not cross the Mictlan.</p>
+    <div id="boss-hint-box" style="display:none;background:#160e26;border:0.5px solid #6a4aa0;border-radius:10px;padding:.85rem .9rem;margin-bottom:1rem;text-align:left;box-shadow:0 0 14px rgba(168,136,224,.18)"><!-- v1409: Ometeotl boss hint -->
+      <div id="boss-hint-title" style="font-size:12px;font-weight:600;color:#a888e0;letter-spacing:.5px;margin-bottom:.4rem"></div>
+      <div id="boss-hint-body" style="font-size:13px;line-height:1.55;color:#e8dcff;min-height:3.1em"></div>
+      <div id="boss-hint-ok-wrap" style="text-align:right;margin-top:.6rem;transition:opacity .4s ease"><button id="boss-hint-ok" class="btn" onclick="hideBossHint()" style="font-size:12px;padding:5px 14px;border-color:#6a4aa0;color:#c8b4f0"></button></div>
+    </div>
     <div id="teotl-earned-box" style="background:#0e1a2a;border:0.5px solid #2a5a8a;border-radius:10px;padding:.85rem .9rem;margin-bottom:1rem;display:none;text-align:left">
       <div style="font-size:12px;font-weight:600;color:#60c0ff;letter-spacing:.5px;margin-bottom:.5rem" data-i18n="ui.defeat.earned"><svg class="tl tl-teotl"><use href="#tl-teotl"/></svg> TEOTL EARNED</div>
       <div id="go-teotl-rows"></div>
@@ -2604,6 +2610,26 @@ Object.assign(T_EN,{
   'god.quetzalcoatl.passiveCompassion':"Divinity Mercy: Captures give bonus {{res:blood}} & {{res:cacao}}; releases pay double", /* v1387 */
   'ui.cleanse.word':'cleanse',
   'ui.cleanse.title':'Cleanse',
+  'ui.bossHint.title':'✦ Ometeotl speaks', /* v1409: boss hints */
+  "hint.boss.L1-B5":"The river iguana's venom outlasts your warriors. Bring a healer with Cleanse, or Chimalli to block the poison, and fell its weaker allies first.",
+  "hint.boss.L1-B8":"The Spirit Hound mends Xolotl's pack. Silence the healer first, and carry Cleanse against his poison and paralysis.",
+  "hint.boss.L2-B5":"Chimalli shields Quinametzin's side and blocks your statuses. Break it first, then lean on magic; the giant resists weapons more.",
+  "hint.boss.L2-B8":"The jaguar's roar slows your whole line, and his Quake Crawler slows it again. Fell the Crawler early, and shield your line with Chimalli.",
+  "hint.boss.L3-B5":"Xiuhnel heals with every blow he lands, and his RES is thin. Fell him first with magic; Wound halves what he drinks.",
+  "hint.boss.L3-B8":"Itzpapalotl wounds your whole line, and every blow against her night host wounds the striker. Favor few heavy hits, and Cleanse the Wounds before they pile up.",
+  "hint.boss.L4-B5":"The north wind burns your whole line and weakens every strike. Cleanse the Burn and raise RES against his magic.",
+  "hint.boss.L4-B8":"His frost makes your specials cost more TP. Cleanse Lethargy early, and fell the Mountain Badger that heals his escort.",
+  "hint.boss.L5-B5":"The Owlman's screech shatters every Chimalli. Don't trust shields here: heal, Cleanse, and raise RES.",
+  "hint.boss.L5-B8-malinalxochitl":"Her miasma clings: your Cleanse lifts only one Poison and one Burn at a time. Cleanse steadily alongside healing, or end the fight fast.",
+  "hint.boss.L5-B8-xiuhtecuhtli":"The turquoise wind scatters Burn and Slow across your line. Chimalli blocks his statuses before they land; Cleanse what slips through.",
+  "hint.boss.L6-B5":"Acuecueyotl heals the trio every turn. Fell her first, or Wound her to halve the flow; otherwise the river never runs dry.",
+  "hint.boss.L6-B8":"Opochtli's critical strikes rally his host, raising their ATK each time. Thin his escort first, starting with Acuecueyotl's healing.",
+  "hint.boss.L7-B5":"Drunkenness turns your blows against your own. Cleanse it early, and fell Ometochtli before his rabbits fill the field.",
+  "hint.boss.L7-B8":"Mayahuel's octli intoxicates both sides. Cleanse your own warriors and let her host strike itself.",
+  "hint.boss.L8-B5":"Nexoxcho feeds on the statuses Ixpuxtequi sows. Cleanse quickly, and fell the Jestress first.",
+  "hint.boss.L8-B8":"Tlazolteotl eats filth: Poison feeds her side, and she washes her allies clean. Leave poison behind; bring Wound to halve her healing.",
+  "hint.boss.L9-B5":"Five fallen gods stand again, each with a power you have already broken once. Remember how you beat them, and fell the healers among them first.",
+  "hint.boss.L9-B8":"Save strength for the second phase, when Cipactli rises and the Lord of the Dead returns whole. Fell the limbs fast, then Wound the Head to halve what it devours.",
   'ui.cleanse.body':'Removes every negative status from the target.',
   'ui.chima.body':'HP armor that protects your {h} HP and blocks status.', /* v1338 */
   'ui.status.tutTitle':'Status Effects',
@@ -3480,6 +3506,26 @@ Object.assign(T_ES,{
   'god.quetzalcoatl.passiveCompassion':'Piedad Divina: las capturas dan {{res:blood}} y {{res:cacao}} extra; las liberaciones pagan el doble', /* v1387 */
   'ui.cleanse.word':'limpieza',
   'ui.cleanse.title':'Limpieza',
+  'ui.bossHint.title':'✦ Habla Ometeotl', /* v1409: boss hints */
+  "hint.boss.L1-B5":"El veneno de la iguana del río dura más que tus guerreros. Lleva un sanador con Limpieza, o Chimalli para bloquear el veneno, y acaba primero con sus aliados más débiles.",
+  "hint.boss.L1-B8":"El Sabueso Espiritual cura a la jauría de Xolotl. Elimina primero al sanador y lleva Limpieza contra su veneno y su parálisis.",
+  "hint.boss.L2-B5":"El Chimalli protege al bando de Quinametzin y bloquea tus estados. Rómpelo primero y luego usa magia; el gigante resiste más las armas.",
+  "hint.boss.L2-B8":"El rugido del jaguar ralentiza a todo tu grupo, y su Reptador Sísmico lo ralentiza otra vez. Derriba pronto al Reptador y protege a tu grupo con Chimalli.",
+  "hint.boss.L3-B5":"Xiuhnel se cura con cada golpe que da, y su RES es baja. Derríbalo primero con magia; la Herida reduce a la mitad lo que bebe.",
+  "hint.boss.L3-B8":"Itzpapalotl hiere a todo tu grupo, y cada golpe contra su séquito nocturno hiere a quien golpea. Prefiere pocos golpes fuertes y usa Limpieza antes de que se acumulen las Heridas.",
+  "hint.boss.L4-B5":"El viento del norte quema a todo tu grupo y debilita cada golpe. Usa Limpieza contra la Quemadura y sube la RES contra su magia.",
+  "hint.boss.L4-B8":"Su hielo hace que tus especiales cuesten más PT. Limpia el Letargo pronto y derriba al Tejón de Montaña que cura a su escolta.",
+  "hint.boss.L5-B5":"El chillido del Hombre-Búho rompe todo el Chimalli. Aquí no confíes en escudos: cura, usa Limpieza y sube la RES.",
+  "hint.boss.L5-B8-malinalxochitl":"Su miasma se aferra: tu Limpieza solo quita una carga de Veneno y una de Quemadura a la vez. Limpia sin descanso mientras curas, o termina la pelea rápido.",
+  "hint.boss.L5-B8-xiuhtecuhtli":"El viento turquesa reparte Quemadura y Lentitud por todo tu grupo. El Chimalli bloquea sus estados antes de que lleguen; limpia lo que se cuele.",
+  "hint.boss.L6-B5":"Acuecueyotl cura al trío cada turno. Derríbala primero, o hiérela para reducir su curación a la mitad; si no, el río nunca se seca.",
+  "hint.boss.L6-B8":"Los golpes críticos de Opochtli animan a su séquito y suben su ATQ cada vez. Reduce primero su escolta, empezando por la curación de Acuecueyotl.",
+  "hint.boss.L7-B5":"La Ebriedad vuelve tus golpes contra tus aliados. Límpiala pronto y derriba a Ometochtli antes de que sus conejos llenen el campo.",
+  "hint.boss.L7-B8":"El octli de Mayahuel embriaga a ambos bandos. Limpia a tus guerreros y deja que su séquito se golpee a sí mismo.",
+  "hint.boss.L8-B5":"Nexoxcho se alimenta de los estados que siembra Ixpuxtequi. Limpia rápido y derriba primero a la Bufona.",
+  "hint.boss.L8-B8":"Tlazolteotl come la inmundicia: el Veneno alimenta a su bando y ella limpia a sus aliados. Deja el veneno; lleva Herida para reducir su curación a la mitad.",
+  "hint.boss.L9-B5":"Cinco dioses caídos se levantan otra vez, cada uno con un poder que ya venciste una vez. Recuerda cómo los derrotaste y derriba primero a los que curan.",
+  "hint.boss.L9-B8":"Guarda fuerzas para la segunda fase: Cipactli se alza y el Señor de los Muertos vuelve entero. Derriba las extremidades rápido y luego hiere a la Cabeza para reducir a la mitad lo que devora.",
   'ui.cleanse.body':'Elimina todos los estados negativos del objetivo.',
   'ui.chima.body':'Armadura de PV que protege tus {h} PV y bloquea estados.', /* v1338 */
   'ui.status.tutTitle':'Efectos de estado',
@@ -4057,7 +4103,7 @@ const CHAMPIONS_RECENT_CAP=20;
 function loadDT(){
   try{
     const d=localStorage.getItem('teotlan_dt');
-    if(d){const p=JSON.parse(d);DT.teotl=p.teotl||0;DT.unlocked=new Set(p.unlocked||[]);DT.tecpatl_level=p.tecpatl_level||0;DT.tecpatlBeaten=p.tecpatlBeaten||0;DT.pochFreeUsed=!!p.pochFreeUsed; /* v1372 */DT.tecpatl_seen=new Set(p.tecpatl_seen||[]);DT.godTecpatl=p.godTecpatl||{};DT.champions=p.champions||{};DT.blessedGod=p.blessedGod||null;DT.blessedUsed=!!p.blessedUsed;DT.fxMode=p.fxMode||null;} /* v1019 */ // v830 · v937: loadDT rebuilds DT from a fixed whitelist, so anything absent here is silently dropped on reload -- which is exactly how the blessing vanished
+    if(d){const p=JSON.parse(d);DT.teotl=p.teotl||0;DT.unlocked=new Set(p.unlocked||[]);DT.tecpatl_level=p.tecpatl_level||0;DT.tecpatlBeaten=p.tecpatlBeaten||0;DT.pochFreeUsed=!!p.pochFreeUsed; /* v1372 */DT.tecpatl_seen=new Set(p.tecpatl_seen||[]);DT.godTecpatl=p.godTecpatl||{};DT.champions=p.champions||{};DT.blessedGod=p.blessedGod||null;DT.blessedUsed=!!p.blessedUsed;DT.fxMode=p.fxMode||null;DT.bossLoss=(p.bossLoss&&typeof p.bossLoss==='object')?p.bossLoss:null; /* v1409 */} /* v1019 */ // v830 · v937: loadDT rebuilds DT from a fixed whitelist, so anything absent here is silently dropped on reload -- which is exactly how the blessing vanished
     // v303 migration: dmg_preview became Strike Boost's prereq — grant it free to saves that already own strike_boost
     if(DT.unlocked.has('strike_boost')&&!DT.unlocked.has('dmg_preview'))DT.unlocked.add('dmg_preview');
     // No auto-unlocks: player must interact with Divinity Tree
@@ -4078,7 +4124,7 @@ function loadDT(){
     DT.fxMode=p.fxMode||null;
   } // v830
 }
-function saveDT(){try{localStorage.setItem('teotlan_dt',JSON.stringify({teotl:DT.teotl,unlocked:[...DT.unlocked],tecpatl_level:DT.tecpatl_level,tecpatlBeaten:DT.tecpatlBeaten||0,tecpatl_seen:[...DT.tecpatl_seen],godTecpatl:DT.godTecpatl,champions:DT.champions,blessedGod:DT.blessedGod||null,blessedUsed:!!DT.blessedUsed,fxMode:DT.fxMode||null,pochFreeUsed:!!DT.pochFreeUsed}));}catch(e){}} /* v1372: pochFreeUsed */ /* v1186: fxMode was set by cycleFxMode and then dropped here, so the Battle FX toggle reset on every reload -- the same whitelist trap the v937 note flags for blessedGod */
+function saveDT(){try{localStorage.setItem('teotlan_dt',JSON.stringify({teotl:DT.teotl,unlocked:[...DT.unlocked],tecpatl_level:DT.tecpatl_level,tecpatlBeaten:DT.tecpatlBeaten||0,tecpatl_seen:[...DT.tecpatl_seen],godTecpatl:DT.godTecpatl,champions:DT.champions,blessedGod:DT.blessedGod||null,blessedUsed:!!DT.blessedUsed,fxMode:DT.fxMode||null,pochFreeUsed:!!DT.pochFreeUsed,bossLoss:DT.bossLoss||null}));}catch(e){}} /* v1372: pochFreeUsed */ /* v1186: fxMode was set by cycleFxMode and then dropped here, so the Battle FX toggle reset on every reload -- the same whitelist trap the v937 note flags for blessedGod */
 loadDT();
 /* v1187: the v1186 touch-device auto-seed is gone. Genaro's call -- Full is the intended
    presentation and should be what an iPad player sees by default. The persistence fix and the
@@ -6691,7 +6737,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1408'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1411'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -7382,7 +7428,7 @@ const OBSIDIAN_NIGHT_CAPS=OBSIDIAN_CAPS.filter(c=>c.element==='night');
 const XIUHNEL_TPL={id:'xiuhnel',name:'Xiuhnel',flavor:'The Cloud Serpent Who Drank',flavorEs:'La Serpiente de Nubes que Bebió',icon:'🐊',isMiniBoss:true,isBoss:false,isAlly:false,element:'night',type:'PHYS',ability:'Blood Drink',abilityEs:'Bebida de Sangre',ad:'1.8×ATK to 1 target + heals Xiuhnel for all damage dealt',adEs:'1.8×ATQ a 1 enemigo + cura a Xiuhnel por todo el daño infligido',ak:'bloodDrink',hp:330,atk:24,mag:0,def:14,res:6,np:40,npCost:29,fv:0};
 const MIMICH_TPL={id:'mimich',name:'Mimich',flavor:'The Cloud Serpent Who Ran',flavorEs:'La Serpiente de Nubes que Corrió',icon:'🐍',isMiniBoss:true,isBoss:false,isAlly:false,element:'earth',type:'PHYS',ability:'Thorn Mangle',abilityEs:'Desgarro de Espinas',ad:'1.5×ATK to 3 targets + {{st:wound}} ×1 all + 5% max-HP Chimalli to self and a random ally',adEs:'1.5×ATQ a 3 enemigos + {{st:wound}} ×1 a todos + Chimalli por 5% de PV máx. a sí mismo y a un aliado al azar',ak:'thornMangle',hp:290,atk:19,mag:0,def:11,res:5,np:40,npCost:29,fv:0};
 const OPOCHTLI_TPL={id:'boss_opochtli',name:'Opochtli',flavor:'Swift God of Fishing',icon:'🎣',isBoss:true,isAlly:false,element:'water',type:'PHYS',ability:'Sinistral Minacachalli',ad:'1.2×ATK (3 targets), +15% CRIT; on any crit grant {{st:atkup}} ×1 to allies',ak:'sinistralMinacachalli',hp:760,atk:31,mag:0,def:17,res:13,np:54,npCost:23,fv:0};
-const ITZPAPALOTL_TPL={id:'boss_itzpap',name:'Itzpapalotl',flavor:'Warrior Goddess of Obsidian',icon:'🦋',isBoss:true,isAlly:false,element:'night',type:'MIX',magStrike:true,ability:'Obsidian Storm',ad:'1.4\xd7ATK AoE + 20% CRIT per hit',ak:'obsidianStorm',hp:620,atk:22,mag:26,def:12,res:10,np:50,npCost:22,fv:0};
+const ITZPAPALOTL_TPL={id:'boss_itzpap',name:'Itzpapalotl',flavor:'Warrior Goddess of Obsidian',flavorEs:'Diosa Guerrera de la Obsidiana',icon:'🦋',isBoss:true,isAlly:false,element:'night',type:'MIX',magStrike:true,ability:'Obsidian Storm',abilityEs:'Tormenta de Obsidiana',ad:'1.4\xd7ATK to all enemies + {{st:wound}} \xd71 each',adEs:'1.4\xd7ATQ a todos los enemigos + {{st:wound}} \xd71 a cada uno',ak:'obsidianStorm', /* v1411: was the retired crit AoE; matches the boss branch of obsidianStorm */hp:620,atk:22,mag:26,def:12,res:10,np:50,npCost:22,fv:0};
 // v547 L7 MINIBOSS — bulky by design: an annoyance that snowballs (self-refilling warren) if unfocused
 const OMETOCHTLI_TPL={id:'ometochtli',name:'Ometochtli',flavor:'Leader of the Centzon Totochtin',flavorEs:'Líder de los Centzon Totochtin',icon:'🐇',isMiniBoss:true,isBoss:false,isAlly:false,element:'nature',type:'MAG',ability:'Drunken Revel',abilityEs:'Juerga Ebria',ad:'0.3×MAG to 6 targets + {{st:drunk}} ×2 each + summon 1 Centzon Totochtin',adEs:'0.3×MAG a 6 enemigos + {{st:drunk}} ×2 a cada uno + invoca 1 Centzon Totochtin',ak:'drunkenRevel',hp:620,atk:0,mag:26,def:14,res:13,np:50,npCost:26,fv:0};
 // v552 L7 BOSS — pk drives the enemy-side Reverie mirror (see enemyReverieActive)
@@ -7754,7 +7800,7 @@ const XIUHTECUHTLI_BOSS_TPL={id:'boss_xiu',name:'Xiuhtecuhtli',flavor:'Turquoise
 
 /* v1238: the sixteen god-boss templates as one list, so the audit and the in-place
    expansion can walk them without naming each const. */
-const BOSS_TPLS=[XOCHIPILLI_BOSS_TPL,MIXCOATL_BOSS_TPL,CHICOMECOATL_BOSS_TPL,TLAZOLTEOTL_BOSS_TPL,XBALANQUE_BOSS_TPL,MICTLANTECUHTLI_BOSS_TPL,XOLOTL_BOSS_TPL,CIHUACOATL_BOSS_TPL,TONATIUH_BOSS_TPL,XOCHIQUETZAL_BOSS_TPL,TOCI_BOSS_TPL,HUITZILOPOCHTLI_BOSS_TPL,MAYAHUEL_BOSS_TPL,IXQUIMILLI_BOSS_TPL,MALINALXOCHITL_BOSS_TPL,XIUHTECUHTLI_BOSS_TPL];
+const BOSS_TPLS=[XOCHIPILLI_BOSS_TPL,MIXCOATL_BOSS_TPL,CHICOMECOATL_BOSS_TPL,TLAZOLTEOTL_BOSS_TPL,XBALANQUE_BOSS_TPL,MICTLANTECUHTLI_BOSS_TPL,XOLOTL_BOSS_TPL,CIHUACOATL_BOSS_TPL,TONATIUH_BOSS_TPL,XOCHIQUETZAL_BOSS_TPL,TOCI_BOSS_TPL,HUITZILOPOCHTLI_BOSS_TPL,MAYAHUEL_BOSS_TPL,IXQUIMILLI_BOSS_TPL,MALINALXOCHITL_BOSS_TPL,XIUHTECUHTLI_BOSS_TPL,ITZPAPALOTL_TPL]; /* v1411: Itzpapalotl joins so her flavor/ad localise and {{st:}} tokens expand */
 function malinalxochitlUnlocked(){return Object.keys(V).some(k=>k.startsWith('layer5_mal_')&&V[k]);}
 function xiuhtecuhtliUnlocked(){return Object.keys(V).some(k=>k.startsWith('layer5_xiu_')&&V[k]);}
 function layer5Unlocked(){return Object.keys(V).some(k=>k.startsWith('layer5_')&&V[k]);}
@@ -8965,7 +9011,7 @@ function dbgClearDebugUnlocks(){
       if(typeof renderGods==='function'&&document.getElementById('god-grid'))renderGods(); /* v918: matches dbgRelockGod's own refresh call */
     }},{label:t('ui.common.cancel'),fn:()=>{}}]);
 }
-function debugJumpBoss(layer){
+function debugJumpBoss(layer,slot){ /* v1409: slot 5 = mid-boss, default 8 */
   /* v917: REGRESSION FIX for v915. The seeds below were historically dead -- saveV() had been
      swallowed by a trailing comment, so loadV() on the next line discarded them. v915 restored the
      saveV() and the seeds started working... by writing every debug unlock into the player's REAL
@@ -8993,7 +9039,7 @@ function debugJumpBoss(layer){
   const pool=[...MICTLAN_CAPS].slice(0,3);
   pool.forEach((cu,i)=>{const cid='dbg_'+cu.id+'_'+i;G.captured.push({...cu,_captureId:cid,baseId:cu.id});G.levels[cid]=100;G.deplSel.push(cid);});
   G.res={blood:999000,cacao:999000,flower:999000};
-  G.layer=layer;G.battleNum=8;G.battlesCompleted=7;
+  G.layer=layer;G.battleNum=(slot===5?5:8);G.battlesCompleted=G.battleNum-1;
   G.l5BossChoice=null;G._scaldingMiasmaActive=false;
   G.chosenDifficulty=null;G.pendingEnemies=null;G.cachedEasy=null;G.cachedHard=null;
   G.pendingEvent=null;G._pendingEventRolled=true;
@@ -14906,6 +14952,12 @@ function startBattle(){try{if(window._cxVictoryFinish)window._cxVictoryFinish();
                 :`<div class="tut-box">✦ <strong>Turn-Based Combat</strong> — Select your Patron God, then choose <strong>💥 Strike</strong> or <strong>🔮 ${specName}</strong>. Player always moves first!</div>`;})()
     :'';
   showScr('screen-battle');
+  G._bossHintKey=bossHintKeyNow(); /* v1409: fixed at battle start -- dead bosses may leave G.enemies */
+  if(window.DBG_AUTOLOSE_BOSS&&G._bossHintKey){ /* v1409 debug: lose this boss fight through the real path */
+    renderBattle();const _L=G.layer,_B=G.battleNum;
+    setTimeout(()=>{if(G.layer===_L&&G.battleNum===_B&&G.battlePhase!=='done')endBattle(false);},900);
+    return;
+  }
   /* v799: the taunt resolves before the round begins. buildRoundQueue fires start-of-round
      passives, so building it first would start the fight underneath the modal -- the same
      mistake v782 fixed for the Cipactli gate. onDismiss covers the X and the backdrop, which
@@ -23461,6 +23513,95 @@ function recordChampionRun(chapter){
     saveDT();
   }catch(e){console.error('champion record failed',e);}
 }
+/* v1409: OMETEOTL BOSS HINTS. Two consecutive run-ending defeats at the same mid-boss (B5) or
+   layer boss (B8) show one tip from Ometeotl on the defeat screen. Rulings (Oct 9 scope doc):
+   only real defeats count (endBattle(false) is the sole route); the streak resets on beating that
+   encounter or losing anywhere else; after a hint fires the count restarts, so the next repeat is
+   loss 4, not loss 3; run 1 gets no special handling. State lives in DT (meta-save) because the
+   defeat branch calls clearRun() before the screen shows. L5 B8 is keyed per boss choice. */
+const BOSS_HINT_KEYS=['L1-B5','L1-B8','L2-B5','L2-B8','L3-B5','L3-B8','L4-B5','L4-B8','L5-B5','L5-B8-malinalxochitl','L5-B8-xiuhtecuhtli','L6-B5','L6-B8','L7-B5','L7-B8','L8-B5','L8-B8','L9-B5','L9-B8'];
+function bossHintKeyNow(){
+  const bn=G.battleNum;if(bn!==5&&bn!==8)return null;
+  if(G._evFight&&G._evFight.layer===G.layer&&G._evFight.bn===bn)return null; /* an accepted event battle is not the boss */
+  if(!(G.enemies||[]).some(e=>e&&(e.isBoss||e.isMiniBoss||e._l9Taunt||e._summonedGod)))return null;
+  let k='L'+G.layer+'-B'+bn;
+  if(G.layer===5&&bn===8)k+='-'+(G.l5BossChoice||'malinalxochitl');
+  return BOSS_HINT_KEYS.includes(k)?k:null;
+}
+/* Called once per run-ending defeat. Returns the key whose hint should show, or null. */
+function bossHintOnDefeat(key){
+  const st=(DT.bossLoss&&typeof DT.bossLoss==='object')?DT.bossLoss:{key:null,count:0};
+  let fire=null;
+  if(!key){st.key=null;st.count=0;}
+  else if(st.key===key){st.count=(st.count|0)+1;}
+  else{st.key=key;st.count=1;}
+  if(key&&st.count>=2){fire=key;st.count=0;}
+  DT.bossLoss=st;saveDT();
+  return fire;
+}
+function bossHintOnWin(key){
+  if(key&&DT.bossLoss&&DT.bossLoss.key===key){DT.bossLoss={key:null,count:0};saveDT();}
+}
+function showBossHint(key){
+  const box=document.getElementById('boss-hint-box');if(!box)return;
+  if(!key){hideBossHint();return;}
+  document.getElementById('boss-hint-title').textContent=t('ui.bossHint.title');
+  document.getElementById('boss-hint-ok').textContent=t('ui.common.gotIt');
+  box.style.display='block';
+  bossHintType(t('hint.boss.'+key));
+}
+/* v1410: the tip types itself out. textContent only (plain-text tips). Tapping the panel finishes it
+   at once; reduced-motion users get the whole line immediately. A run token cancels any earlier reveal. */
+let _bossHintRun=0;
+function bossHintType(text){
+  const box=document.getElementById('boss-hint-box'),body=document.getElementById('boss-hint-body'),
+        wrap=document.getElementById('boss-hint-ok-wrap');
+  const run=++_bossHintRun;
+  const reduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const finish=()=>{if(run!==_bossHintRun)return;_bossHintRun++;body.textContent=text;
+    if(wrap){wrap.style.opacity='1';wrap.style.pointerEvents='';}box.onclick=null;};
+  if(reduce){finish();return;}
+  body.textContent='';if(wrap){wrap.style.opacity='0';wrap.style.pointerEvents='none';}
+  box.style.transition='opacity .5s ease';box.style.opacity='0';
+  requestAnimationFrame(()=>{box.style.opacity='1';});
+  box.onclick=e=>{if(e&&e.target&&e.target.id==='boss-hint-ok')return;finish();};
+  let i=0;
+  const step=()=>{
+    if(run!==_bossHintRun)return;
+    i++;body.textContent=text.slice(0,i);
+    if(i>=text.length){finish();return;}
+    const ch=text[i-1];
+    setTimeout(step,/[.:;]/.test(ch)?260:ch===','?120:28);
+  };
+  setTimeout(step,450);
+}
+function hideBossHint(){_bossHintRun++;const b=document.getElementById('boss-hint-box');if(b){b.style.display='none';b.onclick=null;}}
+/* debug (OMETEOTL panel): auto-lose boss fights, jump to B5/B8, reset the streak, preview a tip */
+window.DBG_AUTOLOSE_BOSS=false;
+function dbgBossHintState(){
+  const el=document.getElementById('dbg-bosshint-state');if(!el)return;
+  const st=DT.bossLoss||{key:null,count:0};
+  el.textContent='Streak: '+(st.key?st.key+' ×'+(st.count|0):'none')+' · auto-lose '+(window.DBG_AUTOLOSE_BOSS?'ON':'OFF');
+}
+function dbgToggleAutoLoseBoss(){
+  window.DBG_AUTOLOSE_BOSS=!window.DBG_AUTOLOSE_BOSS;
+  const b=document.getElementById('dbg-autolose-btn');if(b)b.textContent='Auto-lose: '+(window.DBG_AUTOLOSE_BOSS?'ON':'OFF');
+  notify('✦ Auto-lose boss fights '+(window.DBG_AUTOLOSE_BOSS?'ENABLED':'DISABLED'),'#a888e0');dbgBossHintState();
+}
+function dbgBossHintJump(slot){
+  const L=parseInt((document.getElementById('dbg-bosshint-layer')||{}).value||'1',10)||1;
+  debugJumpBoss(L,slot);
+}
+function dbgBossHintReset(){DT.bossLoss=null;saveDT();notify('✦ Boss-hint streak cleared','#a888e0');dbgBossHintState();}
+function dbgBossHintPreview(){
+  const k=(document.getElementById('dbg-bosshint-key')||{}).value||'L1-B5';
+  showBossHint(k);showScr('screen-defeat');
+}
+function dbgLoseNow(){ /* console helper: lose the current battle through the real defeat path */
+  const scr=document.getElementById('screen-battle');
+  if(!scr||!scr.classList.contains('active')||G.battlePhase==='done'){notify('Not in a battle','#e07070');return;}
+  endBattle(false);
+}
 function endBattle(win){
   /* v610: glow can never outlive B1, even if the selectActor disarm was bypassed */
   if(G.layer===1&&G.battleNum===1&&!hasV('ftue_b1_glow_done'))markV('ftue_b1_glow_done');
@@ -23549,6 +23690,7 @@ function endBattle(win){
       }catch(e){console.error('deathAndRebirth',e);}
     }
     G.battlesCompleted++;
+    bossHintOnWin(G._bossHintKey||null); /* v1409 */
     if(G.chosenDifficulty==='hard')G.hardBattles++;
     if((G.enemies||[]).some(e=>e&&(e.isBoss||e.isMiniBoss)))G._pochtecaGuarantee=true; // v357: guarantee Pochteca next shop after a miniboss/layer-boss win
     if(G.battleNum>=8){
@@ -23574,6 +23716,7 @@ function endBattle(win){
     }
   }
   if(!win){
+    { const _hk=bossHintOnDefeat(G._bossHintKey||null);showBossHint(_hk); } /* v1409: before clearRun() wipes G */
     // Clear any pending capture state so next run starts clean
     G.captureTargets=new Set();G.captureQueue=[];G.capActive=false;
     G.captureProcessed=new Set();G.capturedDiedThisBattle=[];
