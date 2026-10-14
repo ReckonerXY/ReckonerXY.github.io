@@ -7347,7 +7347,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1461'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1462'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -10483,6 +10483,23 @@ function amoxLeaveDivTree(){
   goMainMenu();
   try{const A=amoxLoad();if(!A.unl)setTimeout(amoxReveal,250);}catch(e){console.warn('amoxLeaveDivTree',e);}
 }
+/* v1462: saves that finished a run before the Logs existed never pass the "leave the Divinity
+   Tree after run 1" moment again, so they get the same reveal on the title screen instead.
+   A finished run = any TEOTL banked or any Divinity node bought. Only on the idle title screen
+   with no popup up; re-checked after the delay so it never stacks on another modal. */
+function amoxVeteranReveal(){
+  try{
+    const A=amoxLoad();if(A.unl||window._amxVetT)return;
+    if(!(typeof DT!=='undefined'&&DT&&((DT.teotl||0)>0||(DT.unlocked&&DT.unlocked.size>0))))return;
+    window._amxVetT=setTimeout(function(){
+      window._amxVetT=null;
+      const intro=document.getElementById('screen-intro'),mo=document.getElementById('mo');
+      if(!intro||!intro.classList.contains('active'))return;
+      if(mo&&mo.classList.contains('open'))return;
+      if(!amoxLoad().unl)amoxReveal();
+    },700);
+  }catch(e){console.warn('amoxVeteranReveal',e);}
+}
 function amoxReveal(){
   const A=amoxLoad();if(A.unl)return;
   A.unl=true;A.p=[];amoxSave();
@@ -12897,6 +12914,7 @@ function bindButtons(){
     const db=document.getElementById('divtree-btn');
     if(db)db.style.display=played?'inline-block':'none';
     try{if(typeof amoxSyncGods==='function'&&amoxLoad().unl)amoxSyncGods();}catch(_){} /* v1448: badge counts starters too */
+    try{if(typeof amoxVeteranReveal==='function')amoxVeteranReveal();}catch(_){} /* v1462 */
     try{const _ab=document.getElementById('amox-btn');if(_ab){_ab.style.display=(typeof amoxLoad==='function'&&amoxLoad().unl)?'inline-block':'none';
       const _pb=_ab.querySelector('.amx-pend');if(_pb)_pb.remove();const _pn=(typeof amoxPendingCount==='function')?amoxPendingCount():0;
       if(amoxLoad().unl&&!amoxLoad().opened)_ab.insertAdjacentHTML('beforeend','<span class="amx-pend amx-new">'+t('ui.amox.newTag')+'</span>'); /* v1446: NEW until first opened */
