@@ -7347,7 +7347,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1462'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1464'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -13660,7 +13660,7 @@ function buildEnemySet(bn,diff){
       const mh7=Math.round(sc(OMETOCHTLI_TPL.hp||0,lv7)*hs*bHpM);const mn7=Math.round(sc(OMETOCHTLI_TPL.np||50,lv7));
       const mb7={...OMETOCHTLI_TPL,id:'ometochtli_5',baseId:'ometochtli',maxHp:mh7,currentHp:mh7,atk:0,mag:Math.round(sc(OMETOCHTLI_TPL.mag||0,lv7)*(diff==='hard'?1.15:1)),def:Math.round(sc(OMETOCHTLI_TPL.def||0,lv7)*0.6),res:Math.round(sc(OMETOCHTLI_TPL.res||0,lv7)*0.6),maxNP:mn7,currentNP:mn7,npCost:OMETOCHTLI_TPL.npCost,enemyLevel:lv7,isGod:false,isAlly:false,poisonStacks:0,burnStacks:0,paralyzStacks:0,defBuff:0,armor:0,slowStacks:0,woundStacks:0,lethargyStacks:0,atkBuffStacks:0,atkBuffRounds:0,defBuffStacks:0,defBuffRounds:0,critBuffStacks:0,critBuffRounds:0,fv:0};
       const rb7=id=>TEYOLLO_DAY_CAPS.find(c=>c.id===id);
-      const escorts7=[mkEnemy(rb7('yd1'),1,0.95,lv7),mkEnemy(rb7('yd2'),2,0.95,lv7),mkEnemy(rb7('yd3'),3,0.95,lv7),mkEnemy(rb7('yd5'),4,0.95,lv7)].filter(Boolean);
+      const escorts7=[mkEnemy(rb7('yd1'),1,0.95,lv7),mkEnemy(rb7('yd2'),2,0.95,lv7),mkEnemy(rb7('yd3'),3,0.95,lv7),mkEnemy(rb7('yd4'),4,0.95,lv7),mkEnemy(rb7('yd5'),5,0.95,lv7)].filter(Boolean); /* v1463: +Toltecatl (yd4) -- Ometochtli now leads all five of his brothers */
       return[mb7,...escorts7];
     }
     if(isL6){
@@ -13706,7 +13706,7 @@ function buildEnemySet(bn,diff){
         poisonStacks:0,burnStacks:0,paralyzStacks:0,defBuff:0,armor:0,slowStacks:0,woundStacks:0,lethargyStacks:0,atkBuffStacks:0,atkBuffRounds:0,defBuffStacks:0,defBuffRounds:0,fv:0};
       if(diff==='hard'){
         const pool=getCEHUPool();
-        const escorts=Array.from({length:3},(_,i)=>mkEnemy(pool[Math.floor(Math.random()*pool.length)],i+1,0.875,lv4));
+        const escorts=Array.from({length:4},(_,i)=>mkEnemy(pool[Math.floor(Math.random()*pool.length)],i+1,0.875,lv4)); /* v1463: 3 -> 4 (L4 was the one dip: 5 enemies on L3, 4 here) */
         return[mictEntry,...escorts];
       }
       // Easy path: 2 escorts at lower level
@@ -21237,7 +21237,14 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   if(!ae)ae=G.enemies.filter(x=>x.currentHp>0&&!G.captureProcessed.has(x.id));
   aa=drunkTwistArr(u,aa,'off');ae=drunkTwistArr(u,ae,'ben'); // v537 DRUNK: per-target misfires for enemy specials
   aa=enemyAoeTargets(u,aa); // v664: cap AFTER the drunk twist, so the ability still reaches N units even when some were misdirected
-  {const _fxT=(aa&&aa.length)?aa.filter(x=>x.currentHp>0).reduce((m,x)=>!m||x.currentHp<m.currentHp?x:m,null):null;fxKickoff(u,_fxT,isAoeOrAutoSpecial(u));} // v556: enemy special kinetics
+  /* v1464: _spT is the ONE single-target pick -- the lunge (fxKickoff) and the hit now use the same
+     unit. Eight enemy specials used to lunge at the lowest-HP ally and then hit a random one
+     (Fang Flash, Marlin Pierce, Dolphin Dash, Gar Chomp, Atlatl Throw, War Rhythm, Thorn Lash,
+     Vine Grasp). Marlin Pierce keeps its niche: it hunts a full-HP target when one exists. */
+  const _spLive=(aa||[]).filter(x=>x.currentHp>0);
+  let _spT=_spLive.length?_spLive.reduce((m,x)=>!m||x.currentHp<m.currentHp?x:m,null):null;
+  if(u.ak==='marlinPierce'){const _full=_spLive.filter(x=>x.currentHp>=x.maxHp);if(_full.length)_spT=_full[Math.floor(Math.random()*_full.length)];}
+  fxKickoff(u,_spT,isAoeOrAutoSpecial(u)); // v556: enemy special kinetics
   // Ixquimilli boss: prioritize healers as target
   let lowestAlly;
   if(u.isBoss&&!u._summonedGod&&u.id&&u.id.startsWith('boss_ixqui')){ /* v944: her hunt-the-healer AI is part of her own encounter; the prefix also matches the L9 B5 raised 'boss_ixqui_5_N' */
@@ -21277,25 +21284,25 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     addLog(isEs()?`<span class="log-ab">🐟 ¡Frenesí Alimenticio! ${hits} golpes, ${tot}</span>`:`<span class="log-ab">🐟 Feeding Frenzy! ${hits}-hit ${tot}</span>`);return;
   }
   if(ak==='marlinPierce'&&aa.length){
-    const live=aa.filter(a=>a.currentHp>0);if(!live.length)return;const t=live[Math.floor(Math.random()*live.length)];
+    const live=aa.filter(a=>a.currentHp>0);if(!live.length)return;const t=(_spT&&_spT.currentHp>0)?_spT:live[0]; /* v1464 */
     const wasFull=t.currentHp>=t.maxHp;let base=bpn(u)*((u.atk||0)*1.6-(t.def||0)*0.4);if(wasFull)base*=1.5;
     const h=applyArmorDamage(t,critify(Math.max(1,Math.round(base)),u,false),false);if(h>0){t.currentHp=Math.max(0,t.currentHp-h);G._animQueue.push({uid:t.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,t);if(t.currentHp<=0)handleDeath(t);}
     addLog(isEs()?`<span class="log-ab">🗡️ ¡Perforación de Marlín! ${h}${wasFull?' (bono por PV completos)':''}</span>`:`<span class="log-ab">🗡️ Marlin Pierce! ${h}${wasFull?' (full-HP bonus)':''}</span>`);return;
   }
   if(ak==='dolphinDash'&&aa.length){
-    const live=aa.filter(a=>a.currentHp>0);if(!live.length)return;const t=live[Math.floor(Math.random()*live.length)];
+    const live=aa.filter(a=>a.currentHp>0);if(!live.length)return;const t=(_spT&&_spT.currentHp>0)?_spT:live[0]; /* v1464 */
     const h=applyArmorDamage(t,critify(Math.max(1,Math.round((u.atk||0)*1.2-(t.def||0)*0.4)),u,false),false);if(h>0){t.currentHp=Math.max(0,t.currentHp-h);G._animQueue.push({uid:t.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,t);if(t.currentHp<=0)handleDeath(t);}
     ae.forEach(a=>{if(a.currentHp>0)applyCritBuff(a,1);});
     addLog(isEs()?`<span class="log-ab">🐬 ¡Embestida de Delfín! ${h} + ¡AUMENTO CRIT ×1 a todos!</span>`:`<span class="log-ab">🐬 Dolphin Dash! ${h} + CRIT UP ×1 all!</span>`);return;
   }
   if(ak==='garChomp'&&aa.length){
-    const live=aa.filter(a=>a.currentHp>0);if(!live.length)return;const t=live[Math.floor(Math.random()*live.length)];
+    const live=aa.filter(a=>a.currentHp>0);if(!live.length)return;const t=(_spT&&_spT.currentHp>0)?_spT:live[0]; /* v1464 */
     const h=applyArmorDamage(t,critify(Math.max(1,Math.round((u.atk||0)*1.5-(t.def||0)*0.4)),u,false),false);const wasCrit=rollCrit._lc;if(h>0){t.currentHp=Math.max(0,t.currentHp-h);G._animQueue.push({uid:t.id,dmg:h,isHeal:false,isCrit:wasCrit});applyWound(t,1);onHitContact(u,t);if(t.currentHp<=0)handleDeath(t);}
     addLog(isEs()?`<span class="log-ab">🐊 ¡Mordida de Pejelagarto! ${h} + HERIDA ×1${wasCrit?' ⚡':''}</span>`:`<span class="log-ab">🐊 Gar Chomp! ${h} + WOUND ×1${wasCrit?' ⚡':''}</span>`);return;
   }
   // ── Layer 6 Humanity roster — enemy versions ──
   if(ak==='atlatlThrow'&&aa.length){
-    const live=aa.filter(a=>a.currentHp>0);if(!live.length)return;const t=live[Math.floor(Math.random()*live.length)];
+    const live=aa.filter(a=>a.currentHp>0);if(!live.length)return;const t=(_spT&&_spT.currentHp>0)?_spT:live[0]; /* v1464 */
     const h=(()=>{const _sv=u._critBonus||0;u._critBonus=_sv+0.20;const _d=critify(Math.max(1,Math.round((u.atk||0)*1.6-(t.def||0)*0.4)),u,false);u._critBonus=_sv;return applyArmorDamage(t,_d,false);})() /* v1352: +20% crit (Genaro: no other effects -> keep it) */;if(h>0){t.currentHp=Math.max(0,t.currentHp-h);G._animQueue.push({uid:t.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,t);if(t.currentHp<=0)handleDeath(t);}
     addLog(isEs()?`<span class="log-ab">🏹 ¡Lanzamiento de Atlatl! ${h}</span>`:`<span class="log-ab">🏹 Atlatl Throw! ${h}</span>`);return;
   }
@@ -22148,7 +22155,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     addLog(isEs()?`<span class="log-ab">🗿 ¡Esquirla Labrada! ${tot} en área + Quemadura</span>`:`<span class="log-ab">🗿 Craft Shard! ${tot} AoE + Burn</span>`);return;
   }
   if(ab==='War Rhythm'&&aa.length){
-    const tgt=aa[Math.floor(Math.random()*aa.length)];
+    const tgt=(_spT&&_spT.currentHp>0)?_spT:aa[0]; /* v1464 */
     const d=applyArmorDamage(tgt,critify(Math.max(1,Math.round(u.atk*1.1-(tgt.def||0)*0.4)),u,false),true);
     if(d>0){tgt.currentHp=Math.max(0,tgt.currentHp-d);G._animQueue.push({uid:tgt.id,dmg:d,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,tgt);if(tgt.currentHp<=0)handleDeath(tgt);}
     ae.filter(e=>e.currentHp>0).forEach(e=>{e.atkBuffStacks=Math.min(buffCap(e),(e.atkBuffStacks||0)+1);e.atkBuffRounds=Math.max(e.atkBuffRounds||0,4);});
@@ -22204,7 +22211,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     addLog(isEs()?`<span class="log-heal">🌽 ¡Cultivos Sagrados! Todos los aliados +20% PV + ¡limpieza!</span>`:`<span class="log-heal">🌽 Holy Harvest! All allies +20% HP + cleanse!</span>`);return;
   }
   if(ab==='Thorn Lash'&&aa.length){
-    const tgt=aa[Math.floor(Math.random()*aa.length)];
+    const tgt=(_spT&&_spT.currentHp>0)?_spT:aa[0]; /* v1464 */
     const dmg=applyArmorDamage(tgt,critify(Math.max(1,Math.round(u.atk*1.5-(tgt.def||0)*0.4)),u,false),true);
     tgt.currentHp=Math.max(0,tgt.currentHp-dmg);const _etlOK=applyPoison(tgt,1);
     G._animQueue.push({uid:tgt.id,dmg,isHeal:false,isCrit:rollCrit._lc});
@@ -22227,7 +22234,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     addLog(isEs()?`<span class="log-slow">🌾 ¡Toque Marchitador! ${tot} en área + Lentitud a todos</span>`:`<span class="log-slow">🌾 Withering Touch! ${tot} AoE + Slow all</span>`);return;
   }
   if(ab==='Vine Grasp'&&aa.length){
-    const tgt=aa[Math.floor(Math.random()*aa.length)];
+    const tgt=(_spT&&_spT.currentHp>0)?_spT:aa[0]; /* v1464 */
     const dmg=applyArmorDamage(tgt,critify(Math.max(1,Math.round(u.atk*1.3-(tgt.def||0)*0.4)),u,false),true);
     tgt.currentHp=Math.max(0,tgt.currentHp-dmg);
     const selfHeal=Math.min(u.maxHp-u.currentHp,dmg);if(selfHeal>0){u.currentHp+=selfHeal;G._animQueue.push({uid:u.id,dmg:selfHeal,isHeal:true});}
@@ -22344,7 +22351,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     addLog(isEs()?`<span class="log-ab">\u{1F0CF} ¡Pesadilla de la Bufona! ${totJN} \u2014 ${statHits} con estado (\u00d71.5)${drained.length?' \u2014 drenó a '+drained.join(', '):''}</span>`:`<span class="log-ab">\u{1F0CF} Jestress Nightmare! ${totJN} \u2014 ${statHits} statused (\u00d71.5)${drained.length?' \u2014 drained '+drained.join(', '):''}</span>`);return;
   }
   if(ab==='Fang Flash'&&aa.length){ /* v700: 1.2xATK + CRIT UP x1 to the whole enemy host — left sMap, which cannot buff allies */
-    const live=aa.filter(a=>a.currentHp>0);if(!live.length)return;const t=live[Math.floor(Math.random()*live.length)];
+    const live=aa.filter(a=>a.currentHp>0);if(!live.length)return;const t=(_spT&&_spT.currentHp>0)?_spT:live[0]; /* v1464 */
     const h=applyArmorDamage(t,critify(Math.max(1,Math.round((u.atk||0)*1.3-(t.def||0)*0.4)),u,false),false);if(h>0){t.currentHp=Math.max(0,t.currentHp-h);G._animQueue.push({uid:t.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,t);if(t.currentHp<=0)handleDeath(t);}
     ae.forEach(a=>{if(a.currentHp>0)applyCritBuff(a,1);});
     addLog(isEs()?`<span class="log-ab">\u{1F9B7} ¡Destello de Colmillo! ${h||0} + ¡AUMENTO CRIT \u00d71 a todos!</span>`:`<span class="log-ab">\u{1F9B7} Fang Flash! ${h||0} + CRIT UP \u00d71 all!</span>`);return;
