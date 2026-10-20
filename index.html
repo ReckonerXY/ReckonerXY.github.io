@@ -366,9 +366,9 @@ body.codex-ui .uc>.uc-lvtag~.uc-art{padding-top:14px}
    greca --fc stay the turn-state channels (v1130). Scoped so the toggle off is the old screen exactly. */
 .cx-fold{display:none}
 body.codex-ui .cx-page{position:relative;border:2px solid var(--pc);border-radius:6px;padding:16px 8px 9px;background:var(--pbg);box-shadow:inset 0 0 0 3px #120d0a,inset 0 0 0 4px var(--pc);margin-top:12px!important}
-body.codex-ui .cx-enemy{--pc:#a33a26;--pbg:linear-gradient(180deg,#1d120d,#170f0b)}
-body.codex-ui .cx-enemy.cx-boss{--pc:#c04a2a;--pbg:radial-gradient(ellipse at 50% 25%,#2a140d,#170f0b 75%)}
-body.codex-ui .cx-ally{--pc:#2f8a6e;--pbg:linear-gradient(180deg,#0f1712,#0d130f)}
+body.codex-ui .cx-enemy{--pc:#a33a26;--pbg:linear-gradient(180deg,rgba(29,18,13,.55),rgba(23,15,11,.55))} /* v1469: translucent so the layer particles read through; cards stay opaque */
+body.codex-ui .cx-enemy.cx-boss{--pc:#c04a2a;--pbg:radial-gradient(ellipse at 50% 25%,rgba(42,20,13,.6),rgba(23,15,11,.55) 75%)}
+body.codex-ui .cx-ally{--pc:#2f8a6e;--pbg:linear-gradient(180deg,rgba(15,23,18,.55),rgba(13,19,15,.55))}
 body.codex-ui .cx-page>.row-lbl{position:absolute;top:-10px;left:14px;margin:0!important;padding:0 8px;background:#120d0a;font-size:0;line-height:1;z-index:6}
 body.codex-ui .cx-page>.row-lbl::after{content:attr(data-cx);font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--pc)}
 body.codex-ui .battle-head .round-banner{display:none}
@@ -2977,6 +2977,7 @@ Object.assign(T_EN,{
   'ui.evCard.awaits':'✦ An event awaits...',
   'ui.evCard.enter':'Enter Event',
   'ui.dt.unlocked':'Unlocked',
+  'ui.dt.dirGods':'GODS','ui.dt.dirAllies':'ALLIES','ui.dt.dirCombat':'COMBAT','ui.dt.dirEconomy':'ECONOMY', /* v1467: DT cardinal labels */
   'ui.dt.costHave':'★ {n} TEOTL | Have: {have}',
   'ui.dt.confirmBody':'Cost: {n} TEOTL\nYou have: {have} TEOTL',
   'ui.dt.unlockBtn':'Unlock ({n} TEOTL)',
@@ -3071,7 +3072,7 @@ Object.assign(T_EN,{
   'ui.tip.critup':'⬆ CRIT UP ×{n}',
   'ui.tip.critPct':'+{p}% crit',
   /* v1404: popup sweep */
-  'ui.unlock.title':'New Patron Unlocked!',
+  'ui.unlock.title':'New Patron Unlocked!','ui.unlock.titleF':'New Patron Unlocked!', /* v1481: F = goddess (ES is gendered) */
   'ui.unlock.heRecruit':'He can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs, and recruited via <strong style="color:#d4af37">Flowers summon</strong> mid-run.',
   'ui.unlock.sheRecruit':'She can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs, and recruited via <strong style="color:#d4af37">Flowers summon</strong> mid-run.',
   'ui.unlock.he':'He can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs.',
@@ -3079,6 +3080,7 @@ Object.assign(T_EN,{
   'ui.unlock.they':'They can now be selected as your <strong style="color:#d4af37">Patron God</strong> at the start of future runs.',
   'ui.unlock.heAnswer':'He will answer as your <strong style="color:#d4af37">Patron God</strong> in future runs.',
   'ui.unlock.banner':'<strong>New Patron Unlocked</strong> — {name}, {flavor} joins the pantheon!',
+  'ui.unlock.bannerF':'<strong>New Patron Unlocked</strong> — {name}, {flavor} joins the pantheon!',
   'ui.unlock.btn.drinkDeep':'Drink Deep',
   'ui.unlock.btn.mountain':'Feel the Mountain Shake',
   'ui.unlock.btn.butterfly':'The Butterfly Spreads Her Wings',
@@ -3394,7 +3396,7 @@ Object.assign(T_EN,{
   "ui.hud.miniboss":"Mini-boss",
   "ui.hud.layerBoss":"Layer Boss",
   "ui.end.reunited":"<strong>Reunited</strong> — Mayahuel joins Patecatl's party as a free vassal (Lv {lv}). The four hundred sing.",
-  "ui.end.unlockedPatron":"{name} has been unlocked as a patron!",
+  "ui.end.unlockedPatron":"{name} has been unlocked as a patron!","ui.end.unlockedPatronF":"{name} has been unlocked as a patron!",
   "ui.end.teotlEarned":"TEOTL EARNED",
   "ui.end.newRun":"New Run →",
   "ui.penance.willBe":"All enemies will be <strong>{p}% stronger</strong>."
@@ -4104,6 +4106,7 @@ Object.assign(T_ES,{
   'ui.evCard.awaits':'✦ Un evento te espera...',
   'ui.evCard.enter':'Entrar al evento',
   'ui.dt.unlocked':'Desbloqueado',
+  'ui.dt.dirGods':'DIOSES','ui.dt.dirAllies':'ALIADOS','ui.dt.dirCombat':'COMBATE','ui.dt.dirEconomy':'ECONOMÍA', /* v1467 */
   'ui.dt.costHave':'★ {n} TEOTL | Tienes: {have}',
   'ui.dt.confirmBody':'Costo: {n} TEOTL\nTienes: {have} TEOTL',
   'ui.dt.unlockBtn':'Desbloquear ({n} TEOTL)',
@@ -4198,14 +4201,15 @@ Object.assign(T_ES,{
   'ui.tip.critup':'⬆ AUMENTO CRIT ×{n}',
   'ui.tip.critPct':'+{p}% crit.',
   /* v1404 */
-  'ui.unlock.title':'¡Nuevo patrón desbloqueado!',
+  'ui.unlock.title':'¡Nuevo patrón desbloqueado!','ui.unlock.titleF':'¡Nueva patrona desbloqueada!', /* v1481 [Genaro]: goddesses get feminine forms */
   'ui.unlock.heRecruit':'Ya puede elegirse como tu <strong style="color:#d4af37">Dios patrón</strong> al inicio de futuras partidas, y reclutarse con <strong style="color:#d4af37">invocación de Flores</strong> durante la partida.',
-  'ui.unlock.sheRecruit':'Ya puede elegirse como tu <strong style="color:#d4af37">Dios patrón</strong> al inicio de futuras partidas, y reclutarse con <strong style="color:#d4af37">invocación de Flores</strong> durante la partida.',
+  'ui.unlock.sheRecruit':'Ya puede elegirse como tu <strong style="color:#d4af37">Diosa patrona</strong> al inicio de futuras partidas, y reclutarse con <strong style="color:#d4af37">invocación de Flores</strong> durante la partida.',
   'ui.unlock.he':'Ya puede elegirse como tu <strong style="color:#d4af37">Dios patrón</strong> al inicio de futuras partidas.',
-  'ui.unlock.she':'Ya puede elegirse como tu <strong style="color:#d4af37">Dios patrón</strong> al inicio de futuras partidas.',
+  'ui.unlock.she':'Ya puede elegirse como tu <strong style="color:#d4af37">Diosa patrona</strong> al inicio de futuras partidas.',
   'ui.unlock.they':'Ya puede elegirse como tu <strong style="color:#d4af37">Dios patrón</strong> al inicio de futuras partidas.',
   'ui.unlock.heAnswer':'Responderá como tu <strong style="color:#d4af37">Dios patrón</strong> en futuras partidas.',
   'ui.unlock.banner':'<strong>Nuevo patrón desbloqueado</strong> — ¡{name}, {flavor}, se une al panteón!',
+  'ui.unlock.bannerF':'<strong>Nueva patrona desbloqueada</strong> — ¡{name}, {flavor}, se une al panteón!',
   'ui.unlock.btn.drinkDeep':'Bebe a fondo',
   'ui.unlock.btn.mountain':'Siente temblar la montaña',
   'ui.unlock.btn.butterfly':'La mariposa extiende sus alas',
@@ -4521,7 +4525,7 @@ Object.assign(T_ES,{
   "ui.hud.miniboss":"Mini jefe",
   "ui.hud.layerBoss":"Jefe del nivel",
   "ui.end.reunited":"<strong>Reunidos</strong> — Mayahuel se une al grupo de Patecatl como vasalla gratuita (Nv. {lv}). Los cuatrocientos cantan.",
-  "ui.end.unlockedPatron":"¡Nuevo patrón desbloqueado: {name}!",
+  "ui.end.unlockedPatron":"¡Nuevo patrón desbloqueado: {name}!","ui.end.unlockedPatronF":"¡Nueva patrona desbloqueada: {name}!",
   "ui.end.teotlEarned":"TEOTL OBTENIDO",
   "ui.end.newRun":"Nueva partida →",
   "ui.penance.willBe":"Todos los enemigos serán <strong>{p}% más fuertes</strong>."
@@ -6732,7 +6736,7 @@ function doTlacuiloClone(k){
   var cu2=Object.assign({},cu,{_captureId:cloneCapId,baseId:baseId,_clone:true});
   delete cu2.currentHp;delete cu2.currentNP;delete cu2._tlacuiloRecord;
   G.captured.push(cu2);
-  G.levels[cloneCapId]=lv;
+  G.levels[cloneCapId]=lv;markJoin(cloneCapId,joinLvOf(k)); /* v1466: clone inherits source join level */
   if(G.surge&&G.surge[k]){try{G.surge[cloneCapId]=JSON.parse(JSON.stringify(G.surge[k]));}catch(e){if(typeof ensureSurge==='function')ensureSurge(cloneCapId);}}else if(typeof ensureSurge==='function'){ensureSurge(cloneCapId);}
   if(!G.deplSel.includes(cloneCapId)&&G.deplSel.length<getMaxAllies())G.deplSel.push(cloneCapId);
   notify(t('ui.msg.cloned',{icon:cu.icon,name:cu.name,lv:lv}),'#c0e060');
@@ -6983,11 +6987,11 @@ function renderDivTree(){
     return'H';
   };
   // Cardinal direction labels
-  [{t:'GODS',x:450,y:-58,col:CAT_COLORS.gods},{t:'ALLIES',x:450,y:828,col:CAT_COLORS.allies},{t:'COMBAT',x:878,y:363,col:CAT_COLORS.combat},{t:'ECONOMY',x:-205,y:363,col:CAT_COLORS.qol}].forEach(({t,x,y,col})=>{
+  [{t:'ui.dt.dirGods',x:450,y:-58,col:CAT_COLORS.gods},{t:'ui.dt.dirAllies',x:450,y:828,col:CAT_COLORS.allies},{t:'ui.dt.dirCombat',x:878,y:363,col:CAT_COLORS.combat},{t:'ui.dt.dirEconomy',x:-205,y:363,col:CAT_COLORS.qol}].forEach(({t:_k,x,y,col})=>{ /* v1467: were hardcoded English */
     const el=document.createElementNS('http://www.w3.org/2000/svg','text');
     el.setAttribute('x',x);el.setAttribute('y',y);el.setAttribute('text-anchor','middle');
     el.setAttribute('font-size','9');el.setAttribute('fill',col);el.setAttribute('opacity','0.55');
-    el.setAttribute('letter-spacing','1.5');el.setAttribute('font-weight','500');el.textContent=t;svg.appendChild(el);
+    el.setAttribute('letter-spacing','1.5');el.setAttribute('font-weight','500');el.textContent=t(_k);svg.appendChild(el);
   });
   // Connectors
   TREE_NODES.forEach(n=>{
@@ -7347,7 +7351,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1464'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1481'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -11299,6 +11303,7 @@ function layerTransition(){
   G.log=[];G.tutStep=0;
   // Reset event roll state for new layer
   G.pendingEvent=null;G._pendingEventRolled=false;
+  G._mfxBetween=true; /* v1476: MFX holds the patron's power on the between-layers Tianguis until the map */
 }
 initG();
 
@@ -11546,7 +11551,20 @@ function unitNPCost(u){
    against a surge-free, milestone-free base (see surgePick's v333 note) and must stay that way
    until the capstone build rules on it. Every site that builds or displays a real ally stat uses
    scR instead. If you are adding a new ally stat calculation, you almost certainly want scR. */
-function scA(base,lv){return Math.round(base*Math.pow(1.04,lv-1));}
+/* ═══ v1466: GROWTH TAPER (universal) ═══
+   One curve for allies, enemies, Soul Surge snapshots and TP pools. 4% per level, stepping down
+   0.5% every 25 levels: Lv2-25 4%, 26-50 3.5%, 51-75 3%, 76+ 2.5%. Enemies keep their x1.08
+   milestones in sc(), so the ally/enemy ratio is preserved; only the absolute numbers shrink
+   (about -45% at Lv92). Lv1-25 is bit-identical to the old 1.04^(lv-1).
+   Ruled by Genaro, Oct 17 -- see claude/teotlan_surge_growth_scope_v1464.md. Retune GROWTH_TAPER only. */
+const GROWTH_TAPER=[0.04,0.035,0.03,0.025];
+const _growthCache=[1,1];
+function growthCurve(lv){
+  const L=Math.max(1,Math.floor(lv||1));
+  for(let i=_growthCache.length;i<=L;i++)_growthCache[i]=_growthCache[i-1]*(1+GROWTH_TAPER[Math.min(GROWTH_TAPER.length-1,Math.floor((i-1)/25))]);
+  return _growthCache[L];
+}
+function scA(base,lv){return Math.round(base*growthCurve(lv));}
 /* ═══ v993: ROLE-AWARE ALLY GROWTH ═══
    Allies grew on a flat 1.04^(lv-1) while enemies (sc) carried an extra 1.08 per 10 levels. That
    milestone term is the whole late-game divergence: by Lv70 enemies were 58.7% ahead of allies on
@@ -11567,8 +11585,18 @@ function scA(base,lv){return Math.round(base*Math.pow(1.04,lv-1));}
       (was 5.7% / 11.9% at v993 rates; 58.7% before v993)
    ONE constant each -- retune here and nowhere else. */
 const ALLY_MILESTONE={god:1.03,vassal:1.02}; /* v1002: third step down. 1.07/1.06 -> 1.05/1.04 -> 1.04/1.03 -> 1.03/1.02 */
-function growthMult(lv,isGod){return Math.pow(isGod?ALLY_MILESTONE.god:ALLY_MILESTONE.vassal,Math.floor((Math.max(1,lv||1)-1)/10));}
-function scR(base,lv,isGod){return Math.round(base*Math.pow(1.04,Math.max(1,lv||1)-1)*growthMult(lv,isGod));}
+/* v1466: ally milestones count only the 10-level marks crossed AFTER the unit joined (any level
+   gained after joining counts, event levels included). A Lv80 recruit starts with none. joinLv
+   defaults to 1, which is the pre-v1466 behaviour -- old saves and any call site that does not
+   pass it are unchanged. Enemy milestones (sc) are untouched. */
+function growthMult(lv,isGod,joinLv){
+  const n=Math.floor((Math.max(1,lv||1)-1)/10)-Math.floor((Math.max(1,joinLv||1)-1)/10);
+  return Math.pow(isGod?ALLY_MILESTONE.god:ALLY_MILESTONE.vassal,Math.max(0,n));
+}
+function scR(base,lv,isGod,joinLv){return Math.round(base*growthCurve(lv)*growthMult(lv,isGod,joinLv));}
+/* v1466: join level per unit key, recorded at every acquisition site via markJoin. Missing = 1. */
+function markJoin(key,lv){if(!key)return;if(!G.joinLv)G.joinLv={};G.joinLv[key]=Math.max(1,lv||getLevel(key)||1);}
+function joinLvOf(key){return (G&&G.joinLv&&G.joinLv[key])||1;}
 /* Both of these take a surge KEY, and keys are 'god_<id>' for gods and a capture id otherwise --
    the same test baseNpCostFor already uses. Deriving the role in here keeps ~30 call sites
    correct without touching any of them. */
@@ -11666,7 +11694,7 @@ function sc(base,lv){
   // v317 BALANCE TEST: +4% per level, +8% milestone every 10 levels (was every 5) —
   // halves the compounding divergence vs the flat ally curve identified in the HP gap analysis.
   const milestones=Math.floor((lv-1)/10);
-  return Math.round(base*Math.pow(1.04,lv-1)*Math.pow(1.08,milestones)*penanceStatMult());
+  return Math.round(base*growthCurve(lv)*Math.pow(1.08,milestones)*penanceStatMult()); /* v1466: shared taper */
 }
 function cdm(id){return Math.pow(0.97,Math.floor(getLevel(id)/5));}
 function shCost(){return Math.round((4+G.battleNum+Math.floor(((G.layer||1)-1)/2)*2)*G.dte.flowerCostMult);} // v691: per-layer cost RESETS each layer (early-game friendly again), but the per-layer BASE climbs +2 every two layers — so L1-2 start cheap, L7-8 start dearer. Replaces v684's run-wide shieldsBought escalation, which made early Chimalli too costly.
@@ -12122,11 +12150,14 @@ function debugDrunkBattle(){ // v538: one-click misfire test — random Lv20 bat
    exactly what force level >=6 already pays -- so it buffs no bonus surge that matters.
    ══════════════════════════════════════════════════════════════════════════════════════════ */
 const SURGE_PCT={ // v333: indexed by FORCE level (not char band); additive snapshots · v1126: by PAID tier
-  ihiyotl:[.22,.20,.18,.16,.14,.12,.10],
-  teyoliaHp:[.14,.13,.12,.11,.10,.09,.08],
-  teyoliaDr:[.18,.16,.15,.14,.13,.12,.11],
-  tonalliTp:[.14,.13,.12,.11,.10,.09,.08],
-  tonalliCost:[.12,.11,.10,.09,.08,.08,.07,.07,.06]
+  /* v1466: FLAT -- no diminishing returns. Every pick pays the same; surgePct clamps to the one
+     entry, so tier/paid bookkeeping is now inert (kept for saves, refunds and bonus tracking).
+     Tonalli cost cut: 6% of the cost at pick time, minimum 1 (2 for picks taken at Lv10+). */
+  ihiyotl:[.20],
+  teyoliaHp:[.20],
+  teyoliaDr:[.20],
+  tonalliTp:[.20],
+  tonalliCost:[.06]
 };
 function surgePct(arr,lvl){return arr[Math.min(lvl,arr.length)-1];}
 /* v1126: which row of SURGE_PCT the NEXT pick reads. Driven by `paid` -- milestone surges only --
@@ -12230,7 +12261,19 @@ function unitBaseFor(key){
 // v334: +10% past Lv20 and past Lv40 to offset Tonalli cost-reduction.
 // v666: the (lv>=50?1.30:1) gate was removed — it fired on the same level as _lvCostMult's
 //       1.25->1.5 step, compounding to +58% in a single level. _lvCostMult now carries Lv50 alone.
+/* v1466: SMOOTHED player cost curve. The step multipliers below (x1.375 at Lv21, x1.20 at 36, x1.05
+   at 41 and 60) made Feather Embrace jump +11 at Lv21 and Lv36. The same multipliers are now
+   reached by linear ramps between anchors, so no single level adds more than ~3 TP. Lv1-14 and
+   Lv70+ are identical to the legacy curve. Enemies keep the legacy curve (npLevelCurveLegacy). */
+const NP_COST_ANCHORS=[[1,1.0],[14,1.0],[28,1.375],[38,1.65],[50,1.7325],[65,1.819],[70,1.819]];
 function npLevelCurve(bc,lv){
+  const base=bc+Math.floor(lv/2)+Math.floor(lv/20);
+  if(lv>=70)return base*1.819*Math.pow(1.01,lv-70);
+  const A=NP_COST_ANCHORS;let m=1;
+  for(let i=1;i<A.length;i++){const a=A[i-1],b=A[i];if(lv<=b[0]){m=a[1]+(b[1]-a[1])*(Math.max(lv,a[0])-a[0])/(b[0]-a[0]);break;}}
+  return base*m;
+}
+function npLevelCurveLegacy(bc,lv){
   /* v925: the multiplier stack stops at 60, so from there to 100 cost grew only on the near-linear
      (bc + lv/2 + lv/20) term while TP pools keep climbing -- specials got steadily cheaper in real
      terms across the whole endgame.
@@ -12300,12 +12343,16 @@ function baseNpCostFromObj(b,lv,isGod){
    Player costs are untouched — they run through baseNpCostFromObj/effectiveNpCost.
    Enemy round-end regen stays 5% (v696: nauaSurge penance now +5%/tier, was +10%/+20%). */
 const ENEMY_NP_GATE=48;
-function enemyNpGrowth(lv){return Math.pow(1.04,lv-1)*Math.pow(1.08,Math.floor((lv-1)/10));}
+function enemyNpGrowth(lv){return growthCurve(lv)*Math.pow(1.08,Math.floor((lv-1)/10));} /* v1466: shared taper */
+function _enemyNpGrowthLegacy(lv){return Math.pow(1.04,lv-1)*Math.pow(1.08,Math.floor((lv-1)/10));}
 function enemyNpCost(u){
   const bc=u.npCost||10,lv=u.enemyLevel||1;
-  const base=lv<=ENEMY_NP_GATE
-    ?npLevelCurve(bc,lv)
-    :npLevelCurve(bc,ENEMY_NP_GATE)*(enemyNpGrowth(lv)/enemyNpGrowth(ENEMY_NP_GATE));
+  /* v1466: enemy special cost is the LEGACY curve, scaled by exactly how much the growth taper
+     shrank the enemy TP pool -- so enemy regen/cost, i.e. how often enemies cast, is unchanged. */
+  const _tap=growthCurve(lv)/Math.pow(1.04,lv-1);
+  const base=(lv<=ENEMY_NP_GATE
+    ?npLevelCurveLegacy(bc,lv)
+    :npLevelCurveLegacy(bc,ENEMY_NP_GATE)*(_enemyNpGrowthLegacy(lv)/_enemyNpGrowthLegacy(ENEMY_NP_GATE)))*_tap;
   return Math.round(base*(1+0.30*(u.lethargyStacks||0))); /* no Tecpatl bane — player-side penance */
 }
 function baseNpCostFor(key){
@@ -12337,9 +12384,13 @@ function npRateProduct(lv){
   }
   _npRateCache.set(L,v);return v;
 }
-function npMaxFor(base,lv,isGod){return Math.round((base||0)*npRateProduct(lv)*growthMult(lv,isGod));}
-function maxNPFor(key,baseNp){return npMaxFor(baseNp,getLevel(key),isGodKey(key))+surgeBonus(key).tp;} /* v1004 */
-function allyMaxHpFor(key,baseHp,mult){return Math.round(scR(baseHp,getLevel(key),isGodKey(key))*(mult||1))+surgeBonus(key).hp;} /* v993 */
+/* v1466: TP pools ride the universal growth taper, which REPLACES the v1004 glide (npRateProduct is
+   kept but no longer called). TP_POOL_MULT x1.05 compensates the smaller late pools (Genaro's pick
+   over a special-cost increase). Player side only -- enemy pools are built with sc(). */
+const TP_POOL_MULT=1.05;
+function npMaxFor(base,lv,isGod,joinLv){return Math.round((base||0)*growthCurve(lv)*TP_POOL_MULT*growthMult(lv,isGod,joinLv));}
+function maxNPFor(key,baseNp){return npMaxFor(baseNp,getLevel(key),isGodKey(key),joinLvOf(key))+surgeBonus(key).tp;} /* v1004 */
+function allyMaxHpFor(key,baseHp,mult){return Math.round(scR(baseHp,getLevel(key),isGodKey(key),joinLvOf(key))*(mult||1))+surgeBonus(key).hp;} /* v993 */
 // v514: current roster HP for a unit between battles. Precedence: absolute override (event
 // penalties/heals — always pre-offering scale) → persisted RATIO from the last battle → full.
 // Ratios are scale-free, which fixes the v511–v513 bug where offering-multiplied battle HP was
@@ -12379,7 +12430,7 @@ function surgePreview(key,force){
   }else{
     const pt=surgePct(SURGE_PCT.tonalliTp,tier),pc=surgePct(SURGE_PCT.tonalliCost,tier);
     parts.push('+'+inc(scA(b.np||20,lv),pt,b.np||20)+' '+_sgW('TP'));
-    parts.push('−'+Math.max(1,Math.floor(baseNpCostFor(key)*pc))+' ✨'+_sgW('cost'));
+    parts.push('−'+Math.max(lv>=10?2:1,Math.floor(baseNpCostFor(key)*pc))+' ✨'+_sgW('cost')); /* v1466: min 2 from Lv10 */
   }
   const allZero=parts.every(x=>x.startsWith('+0 ')||x.startsWith('−0 '));
   return{lv:nl,txt:allZero?t('ui.lv.noGain'):parts.join(' ')};
@@ -12429,7 +12480,7 @@ function surgePick(key,force){
   }else{
     const pt=surgePct(SURGE_PCT.tonalliTp,tier),pc=surgePct(SURGE_PCT.tonalliCost,tier);
     f.tp=add(prev.tp,scA(b.np||20,lv),pt,b.np||20);
-    f.cost=prev.cost+Math.max(1,Math.floor(baseNpCostFor(key)*pc)); // additive reduction off surge-free base cost; consumer floors final cost at 1
+    f.cost=prev.cost+Math.max(lv>=10?2:1,Math.floor(baseNpCostFor(key)*pc)); /* v1466: min 2 from Lv10 -- mirrors surgePreview */ // additive reduction off surge-free base cost; consumer floors final cost at 1
   }
   if(s.pending){
     /* v990: claiming used to set claimedUpTo straight to the CURRENT level, swallowing every
@@ -14091,8 +14142,9 @@ function mkGod(gdId,b1){
   const lv=getLevel('god_'+gd.id);const isP=gd.id===G.god.id;
   const baseId='god_'+gd.id;
   const sb=surgeBonus(baseId); // v309: Soul Surge flat bonuses
-  const maxNP=npMaxFor(gd.np||30,lv,true)+sb.tp; /* v1004 */
-  const godMaxHp=Math.round(scR(gd.hp,lv,true)*(G.dte.godHpMult||1))+sb.hp; /* v993 */
+  const _jl=joinLvOf(baseId); /* v1466 */
+  const maxNP=npMaxFor(gd.np||30,lv,true,_jl)+sb.tp; /* v1004 */
+  const godMaxHp=Math.round(scR(gd.hp,lv,true,_jl)*(G.dte.godHpMult||1))+sb.hp; /* v993 */
   const overrideHpG=G.unitHpOverride?G.unitHpOverride[baseId]:undefined;
   const ratioHpG=G.unitHpRatio?G.unitHpRatio[baseId]:undefined;
   // v514: absolute override (event penalty, pre-offering scale) consumed once; else persisted ratio
@@ -14103,8 +14155,8 @@ function mkGod(gdId,b1){
   if(overrideHpG!==undefined)delete G.unitHpOverride[baseId];
   const _u={...gd,id:baseId,baseGodId:gd.id,level:lv,
     maxHp:godMaxHp,currentHp:godStartHp,
-    atk:scR(gd.atk||0,lv,true)+sb.atk,mag:scR(gd.mag||0,lv,true)+sb.mag, /* v993 */
-    def:scR(gd.def,lv,true)+sb.def,res:scR(gd.res||5,lv,true)+sb.res,
+    atk:scR(gd.atk||0,lv,true,_jl)+sb.atk,mag:scR(gd.mag||0,lv,true,_jl)+sb.mag, /* v993 */
+    def:scR(gd.def,lv,true,_jl)+sb.def,res:scR(gd.res||5,lv,true,_jl)+sb.res,
     maxNP,currentNP:getUnitNP(baseId,maxNP),
     npCost:Math.max(1,baseNpCostFor(baseId)-sb.cost-getOfferingEffects().tpCostFlat),
     _npBase:baseNpCostFor(baseId),_npReduce:(sb.cost+getOfferingEffects().tpCostFlat),
@@ -14133,9 +14185,10 @@ function mkCap(cu,slot,b1){
   const ck=capKey(cu); // unique key per captured instance
   const lv=getLevel(ck);
   const sb=surgeBonus(ck); // v309: Soul Surge flat bonuses
-  const maxNP=npMaxFor(cu.np||20,lv,false)+sb.tp; /* v1004 */
+  const _jl=joinLvOf(ck); /* v1466 */
+  const maxNP=npMaxFor(cu.np||20,lv,false,_jl)+sb.tp; /* v1004 */
   const hpPenalty=G.unitHpPenalty&&G.unitHpPenalty[ck]?G.unitHpPenalty[ck]:0;
-  const baseMaxHp=Math.round(scR(cu.hp,lv,false)*(G.dte.vassalHpMult||1))+sb.hp; /* v993 */
+  const baseMaxHp=Math.round(scR(cu.hp,lv,false,_jl)*(G.dte.vassalHpMult||1))+sb.hp; /* v993 */
   const overrideHp=G.unitHpOverride?G.unitHpOverride[ck]:undefined;
   const ratioHp=G.unitHpRatio?G.unitHpRatio[ck]:undefined;
   // v514: absolute override (event penalty, pre-offering scale) consumed once; else persisted ratio
@@ -14147,8 +14200,8 @@ function mkCap(cu,slot,b1){
   if(overrideHp!==undefined)delete G.unitHpOverride[ck]; // consume once
   return{...cu,id:'cap_'+(cu._captureId||cu.id)+'_'+slot,baseId:cu.baseId||cu.id,_captureId:cu._captureId,level:lv, /* v1048: was baseId:cu.id -- see note above */
     maxHp:baseMaxHp,currentHp:startHp,
-    atk:scR(cu.atk||0,lv,false)+sb.atk,mag:scR(cu.mag||0,lv,false)+sb.mag, /* v993 */
-    def:scR(cu.def,lv,false)+sb.def,res:scR(cu.res||4,lv,false)+sb.res,
+    atk:scR(cu.atk||0,lv,false,_jl)+sb.atk,mag:scR(cu.mag||0,lv,false,_jl)+sb.mag, /* v993 */
+    def:scR(cu.def,lv,false,_jl)+sb.def,res:scR(cu.res||4,lv,false,_jl)+sb.res,
     maxNP,currentNP:getUnitNP(ck,maxNP),
     npCost:Math.max(1,baseNpCostFor(ck)-sb.cost-getOfferingEffects().tpCostFlat),
     _npBase:baseNpCostFor(ck),_npReduce:(sb.cost+getOfferingEffects().tpCostFlat),
@@ -14495,7 +14548,7 @@ function evL6FishersNet(el){
       const pool=TEMIMINA_WATER_CAPS;const cu=pool[Math.floor(Math.random()*pool.length)];
       const pLv=getLevel('god_'+G.god.id);const lv=Math.max(1,pLv+(Math.floor(Math.random()*21)-10));
       const captureId='net_'+cu.id+'_'+Date.now();
-      G.captured.push({...cu,_captureId:captureId,baseId:cu.id,level:lv});G.levels[captureId]=lv;
+      G.captured.push({...cu,_captureId:captureId,baseId:cu.id,level:lv});G.levels[captureId]=lv;markJoin(captureId,lv);
       renderRes('rb-event');
       evResult(el2,'🕸',(isEs()?`La red sale pesada — ¡${cu.icon} <strong>${liveName(cu)}</strong> (${lvAb()}${lv}) se une a tu grupo!`:`The net comes up heavy — ${cu.icon} <strong>${cu.name}</strong> (${lvAb()}${lv}) joins your party!`),afterEvent);
     }else{
@@ -14653,7 +14706,7 @@ function grantElementVassals(n){
   for(let i=0;i<n;i++){
     const t=pool[Math.floor(Math.random()*pool.length)];
     const cid='tonal_'+t.id+'_'+Math.random().toString(36).slice(2,7);
-    G.captured.push({...t,_captureId:cid,baseId:t.id});G.levels[cid]=lv;
+    G.captured.push({...t,_captureId:cid,baseId:t.id});G.levels[cid]=lv;markJoin(cid,lv);
     out.push({icon:t.icon,name:t.name,lv});
   }
   return out;
@@ -15664,7 +15717,7 @@ function evUMidwifeShrine(el){ // v510: Cihuacoatl unlock — blessing / challen
         G.cihuaFreeSummon=true; // overflow: free recruit waits at the Tianguis altar
         joinLine=(isEs()?'Tu círculo de dioses está lleno — ella te esperará en el <strong style="color:#d4af37">Tianguis</strong> como recluta gratuita.':'Your circle of gods is full — she will wait at the <strong style="color:#d4af37">Tianguis</strong> as a free recruit.');
       }
-      if(wasLocked)setTimeout(()=>showMo('🤱',t('ui.unlock.title'),`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'cihuacoatl',icon:'🤱',name:'Cihuacoatl',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#ffd0a0;margin:.5rem 0 .25rem">Cihuacoatl</div><div style="font-size:12px;color:#d0a070;margin-bottom:.75rem">${flavorDisp({flavor:'Protector Goddess of Motherhood'})}</div><div style="font-size:12px;color:var(--td);line-height:1.6">${t('ui.unlock.sheRecruit')}</div></div>`,[{label:t('ui.unlock.btn.embraceHer'),fn:()=>{}}]),400);
+      if(wasLocked)setTimeout(()=>showMo('🤱',t('ui.unlock.titleF'),`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'cihuacoatl',icon:'🤱',name:'Cihuacoatl',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#ffd0a0;margin:.5rem 0 .25rem">Cihuacoatl</div><div style="font-size:12px;color:#d0a070;margin-bottom:.75rem">${flavorDisp({flavor:'Protector Goddess of Motherhood'})}</div><div style="font-size:12px;color:var(--td);line-height:1.6">${t('ui.unlock.sheRecruit')}</div></div>`,[{label:t('ui.unlock.btn.embraceHer'),fn:()=>{}}]),400);
       evResult(document.getElementById('event-content'),'🤱',(isEs()?`La Mujer Serpiente abraza a su hijo un largo momento. ${joinLine}`:`The Snake Woman holds her son a long moment. ${joinLine}`),afterEvent);
     }));
     return;
@@ -16143,7 +16196,7 @@ function memFinish(matched,pairs,container,vassalLv){
       }else{
         const cid='mem_'+p.id+'_'+Date.now();
         G.captured.push({...p.data,_captureId:cid,baseId:p.id});
-        G.levels[cid]=vassalLv||1;
+        G.levels[cid]=vassalLv||1;markJoin(cid,vassalLv||1);
         div.textContent=t('ui.evr.memf.added',{v0:(p.icon),v1:(p.name)});
       }
       container.appendChild(div);
@@ -19059,14 +19112,14 @@ function resolveCap(enemyId,doCapture){
       const balStats=MINIBOSS_CAP_STATS[base.id]||{hp:150,atk:base.atk||0,mag:base.mag||0,def:base.def||10,res:base.res||8,np:30,npCost:12,fv:5};
       const rosterEntry={...base,...balStats,id:captureId,_captureId:captureId,baseId:base.id,isMiniBoss:false,isBoss:false,isAlly:false};
       G.captured.push(rosterEntry);
-      G.levels[captureId]=dead.enemyLevel||1;
+      G.levels[captureId]=dead.enemyLevel||1;markJoin(captureId,dead.enemyLevel||1);
       ensureSurge(captureId); // v313: baseline at capture level so later event level-ups can't be swallowed
       if(G.deplSel.length<getMaxAllies())G.deplSel.push(captureId);
     }else{
       // Regular capture — Pokemon-style unique instance
       const newCap={...base,id:captureId,_captureId:captureId,baseId:base.id};
       G.captured.push(newCap);
-      G.levels[captureId]=dead.enemyLevel||1;
+      G.levels[captureId]=dead.enemyLevel||1;markJoin(captureId,dead.enemyLevel||1);
       ensureSurge(captureId); // v313: baseline at capture level so later event level-ups can't be swallowed
       if(G.deplSel.length<getMaxAllies())G.deplSel.push(captureId);
     }
@@ -19223,10 +19276,10 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
         if(pickT.isMiniBoss||(typeof MINIBOSS_CAP_STATS!=='undefined'&&MINIBOSS_CAP_STATS[base.id])){ /* v1436: species, see resolveCap */
           const balStats=MINIBOSS_CAP_STATS[base.id]||{hp:150,atk:base.atk||0,mag:base.mag||0,def:base.def||10,res:base.res||8,np:30,npCost:12,fv:5};
           G.captured.push({...base,...balStats,id:captureId3,_captureId:captureId3,baseId:base.id,level:pickT.enemyLevel||1,isMiniBoss:false,isBoss:false,isAlly:false});
-          G.levels[captureId3]=pickT.enemyLevel||1;
+          G.levels[captureId3]=pickT.enemyLevel||1;markJoin(captureId3,pickT.enemyLevel||1);
         }else{
           G.captured.push({...base,id:captureId3,_captureId:captureId3,baseId:base.id,level:pickT.enemyLevel||1});
-          G.levels[captureId3]=pickT.enemyLevel||1;
+          G.levels[captureId3]=pickT.enemyLevel||1;markJoin(captureId3,pickT.enemyLevel||1);
         }
         ensureSurge(captureId3); /* v1103: parity with the ordinary path (v313) -- baseline the
            surge store at capture level so a later event level-up cannot be swallowed. */
@@ -19383,7 +19436,7 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
         const statsMC=_isMbSpecies?(MINIBOSS_CAP_STATS[baseMC.id]||{hp:150,atk:baseMC.atk||0,mag:baseMC.mag||0,def:baseMC.def||10,res:baseMC.res||8,np:30,npCost:12,fv:5}):{};
         G.captured.push({...baseMC,...statsMC,id:cidMC,_captureId:cidMC,baseId:baseMC.id,
           level:tgt.enemyLevel||1,isMiniBoss:false,isBoss:false,isAlly:false,isUndead:true});
-        G.levels[cidMC]=tgt.enemyLevel||1;
+        G.levels[cidMC]=tgt.enemyLevel||1;markJoin(cidMC,tgt.enemyLevel||1);
         /* v814: pushed to spoils.KILLED, not captured. It reads as a kill in the log because it IS
            one -- the unit died and was raised, and it gets the red 'killed' pill with the
            Reanimated badge beside it rather than a green 'captured'.
@@ -20002,7 +20055,7 @@ function spawnTlaloque(enemyLv,fromId){
   const baseHp=45,baseMag=16,baseDef=3,baseRes=5,baseNP=15;
   /* v993: vassal curve — a Tlaloque joins G.captured, so mkCap rebuilds it on the vassal curve
      next battle. Spawning it flat made it weaker on the turn it appeared than ever after. */
-  const maxHp=scR(baseHp,lv,false),mag=scR(baseMag,lv,false),def=scR(baseDef,lv,false),res=scR(baseRes,lv,false),maxNP=scR(baseNP,lv,false);
+  const maxHp=scR(baseHp,lv,false,lv),mag=scR(baseMag,lv,false,lv),def=scR(baseDef,lv,false,lv),res=scR(baseRes,lv,false,lv),maxNP=scR(baseNP,lv,false,lv); /* v1466: joins at lv */
   const captureId='tlaloque_'+Date.now()+'_'+Math.random().toString(36).slice(2,5);
   // Use captureId as the entry's id so deplSel lookups match directly
   const rosterEntry={
@@ -20014,7 +20067,7 @@ function spawnTlaloque(enemyLv,fromId){
     ability:'Rain Drop',abilityEs:'Gota de Lluvia',ad:'1.3×MAG',adEs:'1.3×MAG',fv:2
   };
   G.captured.push(rosterEntry);
-  G.levels[captureId]=lv;
+  G.levels[captureId]=lv;markJoin(captureId,lv);
   if(G.deplSel.length<getMaxAllies())G.deplSel.push(captureId);
   // Spawn into active battle
   const tq={...rosterEntry,
@@ -20043,9 +20096,9 @@ function spawnTlaloqueAsSpoil(enemyLv){
     ability:'Rain Drop',abilityEs:'Gota de Lluvia',ad:'1.3×MAG',adEs:'1.3×MAG',fv:2
   };
   G.captured.push(rosterEntry);
-  G.levels[captureId]=lv;
+  G.levels[captureId]=lv;markJoin(captureId,lv);
   if(!G._spoilIdx)G._spoilIdx=0;
-  G.spoils.captured.push({unit:{...rosterEntry,maxHp:scR(45,lv,false),enemyLevel:lv,element:'water'},blood:0,cacao:0,tlaloqueJoin:true,_idx:++G._spoilIdx});
+  G.spoils.captured.push({unit:{...rosterEntry,maxHp:scR(45,lv,false,lv),enemyLevel:lv,element:'water'},blood:0,cacao:0,tlaloqueJoin:true,_idx:++G._spoilIdx});
   addLog(isEs()?`<span class="log-water">🌧 El grupo estaba lleno — ¡el Tlaloque (${lvAb()}${lv}) se unirá después de la batalla!</span>`:`<span class="log-water">🌧 Party was full — Tlaloque (${lvAb()}${lv}) will join after battle!</span>`);
 }
 
@@ -20278,7 +20331,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
       const lv=_elv||getLevel(u._captureId||u.id)||1;
       const summ=mkGodOrCap(pick,G.units.length,lv);
       summ._captureId='day_'+pick.id+'_sum_'+Date.now()+'_'+Math.floor(Math.random()*1000);
-      summ.isSummon=true;summ._summonLv=lv;G.levels[summ._captureId]=lv;
+      summ.isSummon=true;summ._summonLv=lv;G.levels[summ._captureId]=lv;markJoin(summ._captureId,lv);
       G.units.push(summ);G.captured.push({...pick,id:summ._captureId,_captureId:summ._captureId,baseId:pick.id});fxSummon(summ.id);
       if(typeof getMaxAllies==='function'&&G.deplSel.length<getMaxAllies()&&!G.deplSel.includes(summ._captureId))G.deplSel.push(summ._captureId);
       if(G.roundQueue&&G.qIdx!==undefined)G.roundQueue.splice(G.qIdx+1,0,{side:'player'});
@@ -20775,7 +20828,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     const lv=_elv||getLevel(u._captureId||u.id)||1;
     const summ=mkGodOrCap(pick,G.units.length,lv);
     summ._captureId='day_'+pick.id+'_sum_'+Date.now()+'_'+Math.floor(Math.random()*1000); // v420: unique capKey for display + persistence
-    summ.isSummon=true;summ._summonLv=lv;G.levels[summ._captureId]=lv; // v420: card shows correct level (was Lv1)
+    summ.isSummon=true;summ._summonLv=lv;G.levels[summ._captureId]=lv;markJoin(summ._captureId,lv); // v420: card shows correct level (was Lv1)
     if(G.units.filter(x=>x.currentHp>0).length>=((typeof getMaxAllies==='function')?getMaxAllies():5)){addLog(isEs()?`<span class="log-ab">☀️ El llamado del sol queda sin respuesta (grupo lleno).</span>`:`<span class="log-ab">☀️ The sun's call goes unanswered (party full).</span>`); // v551: party cap = DT slots
     }else{G.units.push(summ);G.captured.push({...pick,id:summ._captureId,_captureId:summ._captureId,baseId:pick.id});fxSummon(summ.id);if(typeof getMaxAllies==='function'&&G.deplSel.length<getMaxAllies()&&!G.deplSel.includes(summ._captureId))G.deplSel.push(summ._captureId); /* v422: keep summon in the deployed party for next battle */ /* v421: persist summon to roster immediately; dies->capturedDiedThisBattle cleans it */
       // v533 CRITICAL: give the summon its own action this round instead of stealing an existing
@@ -22096,6 +22149,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   }
   if(ab==='Patolli Gamble'&&aa.length){
     const roll=Math.floor(Math.random()*6)+1;
+    try{if(window.MFX)MFX.signature('roll',{res:roll,caster:u.id});}catch(_mfx){} /* v1468 */
     /* v1117 [Genaro]: near-mirror of the PLAYER table. v1111 had cut roll 6 alone (4.0 -> 3.2)
        and left 2-5 at a flat 1.50x the player's 1.1/1.3/1.6/1.8 -- so face 6 was already almost
        mirrored (1.07x) while the faces that actually killed parties were half again as strong.
@@ -22203,6 +22257,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     if(tgt.currentHp<=0)handleDeath(tgt);return;
   }
   if(ab==='Holy Harvest'&&ae.length){
+    try{if(window.MFX)MFX.signature('harvest',{uids:ae.map(a=>a.id),caster:u.id});}catch(_mfx){} /* v1468 */
     ae.forEach(a=>{
       const h=Math.round(a.maxHp*0.20);a.currentHp=healTo(a,h);
       cleanseUnit(a);
@@ -24293,7 +24348,7 @@ function handleDeath(dead){
     // L3 boss victory flag
     if(dead.id.startsWith('boss_itzpap')){const k='layer3_'+G.god.id;
       const wasL3Locked=!layer3Unlocked();V[k]=true;saveV();
-      if(wasL3Locked){setTimeout(()=>showMo('🦋',t('ui.unlock.title'),`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'itzpapalotl',icon:'🦋',name:'Itzpapalotl',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#b090ff;margin:.5rem 0 .25rem">Itzpapalotl</div><div style="font-size:12px;color:#9070d0;margin-bottom:.75rem">${flavorDisp({flavor:'Obsidian Butterfly'})}</div><div style="font-size:12px;color:var(--td);line-height:1.6">${t('ui.unlock.she')}</div></div>`,[{label:t('ui.unlock.btn.butterfly'),fn:()=>{}}]),400);}
+      if(wasL3Locked){setTimeout(()=>showMo('🦋',t('ui.unlock.titleF'),`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'itzpapalotl',icon:'🦋',name:'Itzpapalotl',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#b090ff;margin:.5rem 0 .25rem">Itzpapalotl</div><div style="font-size:12px;color:#9070d0;margin-bottom:.75rem">${flavorDisp({flavor:'Obsidian Butterfly'})}</div><div style="font-size:12px;color:var(--td);line-height:1.6">${t('ui.unlock.she')}</div></div>`,[{label:t('ui.unlock.btn.butterfly'),fn:()=>{}}]),400);}
       /* v990: the ceiling used to rise on the L3, L4 and L5 boss kills, so a run that died in
          Mictlan still handed out a higher penance next time. It now moves ONLY on a full Mictlan
          clear, and tracks the highest penance actually BEATEN [Genaro, v990]. */
@@ -24315,13 +24370,13 @@ function handleDeath(dead){
     if(dead.id.startsWith('boss_xochiquetzal')){ /* v1079: The Flower Offering */
       if(!xochiquetzalUnlocked()){
         V['xochiquetzal_unlocked']=true;saveV();
-        setTimeout(()=>showMo('\u{1F338}',t('ui.unlock.title'),`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'xochiquetzal',icon:'\u{1F338}',name:'Xochiquetzal',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#f090c0;margin:.5rem 0 .25rem">Xochiquetzal</div><div style="font-size:12px;color:#c07098;margin-bottom:.75rem">${flavorDisp({flavor:'Princess Goddess of Flowers and Beauty'})}</div><div style="font-size:12px;color:var(--td);line-height:1.6">${t('ui.unlock.sheRecruit')}</div></div>`,[{label:t('ui.unlock.btn.flower'),fn:()=>{}}]),400);
+        setTimeout(()=>showMo('\u{1F338}',t('ui.unlock.titleF'),`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'xochiquetzal',icon:'\u{1F338}',name:'Xochiquetzal',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#f090c0;margin:.5rem 0 .25rem">Xochiquetzal</div><div style="font-size:12px;color:#c07098;margin-bottom:.75rem">${flavorDisp({flavor:'Princess Goddess of Flowers and Beauty'})}</div><div style="font-size:12px;color:var(--td);line-height:1.6">${t('ui.unlock.sheRecruit')}</div></div>`,[{label:t('ui.unlock.btn.flower'),fn:()=>{}}]),400);
       }else{const _fp=eventBossFlowers(50);notify(t('ui.msg.godPleased',{icon:'🌸',god:'Xochiquetzal',n:_fp}),'#f090c0');}
     }
     if(dead.id.startsWith('boss_toci')){ /* v1074: The Grandmother's Temazcal */
       if(!tociUnlocked()){
         V['toci_unlocked']=true;saveV();
-        setTimeout(()=>showMo('\u2668\ufe0f',t('ui.unlock.title'),`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'toci',icon:'\u2668\ufe0f',name:'Toci',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#ffb060;margin:.5rem 0 .25rem">Toci</div><div style="font-size:12px;color:#d09050;margin-bottom:.75rem">${flavorDisp({flavor:'Grandmother Goddess of Steam'})}</div><div style="font-size:12px;color:var(--td);line-height:1.6">${t('ui.unlock.sheRecruit')}</div></div>`,[{label:t('ui.unlock.btn.steam'),fn:()=>{}}]),400);
+        setTimeout(()=>showMo('\u2668\ufe0f',t('ui.unlock.titleF'),`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'toci',icon:'\u2668\ufe0f',name:'Toci',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#ffb060;margin:.5rem 0 .25rem">Toci</div><div style="font-size:12px;color:#d09050;margin-bottom:.75rem">${flavorDisp({flavor:'Grandmother Goddess of Steam'})}</div><div style="font-size:12px;color:var(--td);line-height:1.6">${t('ui.unlock.sheRecruit')}</div></div>`,[{label:t('ui.unlock.btn.steam'),fn:()=>{}}]),400);
       }else{const _fp=eventBossFlowers(50);notify(t('ui.msg.godPleased',{icon:'♨️',god:'Toci',n:_fp}),'#ffb060');}
     }
     if(dead.id.startsWith('boss_huitzilopochtli')){ /* v1062: The War God's Notice */
@@ -24333,7 +24388,7 @@ function handleDeath(dead){
     if(dead.id.startsWith('boss_cihuacoatl')){ // v510: Midwife Shrine challenge win
       if(!cihuacoatlUnlocked()){
         V['cihuacoatl_unlocked']=true;saveV();
-        setTimeout(()=>showMo('🤱',t('ui.unlock.title'),`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'cihuacoatl',icon:'🤱',name:'Cihuacoatl',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#ffd0a0;margin:.5rem 0 .25rem">Cihuacoatl</div><div style="font-size:12px;color:#d0a070;margin-bottom:.75rem">${flavorDisp({flavor:'Protector Goddess of Motherhood'})}</div><div style="font-size:12px;color:var(--td);line-height:1.6">${t('ui.unlock.sheRecruit')}</div></div>`,[{label:t('ui.unlock.btn.embraceHer'),fn:()=>{}}]),400);
+        setTimeout(()=>showMo('🤱',t('ui.unlock.titleF'),`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'cihuacoatl',icon:'🤱',name:'Cihuacoatl',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#ffd0a0;margin:.5rem 0 .25rem">Cihuacoatl</div><div style="font-size:12px;color:#d0a070;margin-bottom:.75rem">${flavorDisp({flavor:'Protector Goddess of Motherhood'})}</div><div style="font-size:12px;color:var(--td);line-height:1.6">${t('ui.unlock.sheRecruit')}</div></div>`,[{label:t('ui.unlock.btn.embraceHer'),fn:()=>{}}]),400);
       }else{const _fp=eventBossFlowers(50);notify(t('ui.msg.godPleased',{icon:'🤱',god:'Cihuacoatl',n:_fp}),'#ffd0a0');}
     }
     // L5 boss victory flag
@@ -24360,7 +24415,7 @@ function handleDeath(dead){
       const bossName=isMal?'Malinalxochitl':'Xiuhtecuhtli';
       const bossFlavor=L(isMal?MALINALXOCHITL_BOSS_TPL:XIUHTECUHTLI_BOSS_TPL,'flavor'); /* v1422: ES */
       const bossColor=isMal?'#ff8040':'#40c0ff';
-      if(_bossWasLocked)setTimeout(()=>showMo(bossIcon,t('ui.unlock.title'),`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:bossGodId,icon:bossIcon,name:bossGodId,isGod:true},56)}<div style="font-size:16px;font-weight:600;color:${bossColor};margin:.5rem 0 .25rem">${bossName}</div><div style="font-size:12px;color:var(--td);margin-bottom:.75rem">${flavorDisp({flavor:bossFlavor})}</div><div style="font-size:12px;color:var(--td);line-height:1.6">${t('ui.unlock.they')}</div></div>`,[{label:t('ui.common.continue'),fn:()=>{}}]),400);
+      if(_bossWasLocked)setTimeout(()=>showMo(bossIcon,t(isMal?'ui.unlock.titleF':'ui.unlock.title'),`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:bossGodId,icon:bossIcon,name:bossGodId,isGod:true},56)}<div style="font-size:16px;font-weight:600;color:${bossColor};margin:.5rem 0 .25rem">${bossName}</div><div style="font-size:12px;color:var(--td);margin-bottom:.75rem">${flavorDisp({flavor:bossFlavor})}</div><div style="font-size:12px;color:var(--td);line-height:1.6">${t(isMal?'ui.unlock.she':'ui.unlock.he')}</div></div>`,[{label:t('ui.common.continue'),fn:()=>{}}]),400);
     }
     // L4 boss victory flag
     if(dead.id.startsWith('boss_ixqui')){const k='layer4_'+G.god.id;
@@ -24390,7 +24445,7 @@ function handleDeath(dead){
     if(dead.id.startsWith('boss_chicomecoatl')){
       if(!chicomecoatlUnlocked()){
         V['chicomecoatl_unlocked']=true;saveV();
-        setTimeout(()=>showMo('🌽',t('ui.unlock.title'),`<div style="text-align:center;padding:.5rem 0"><div style="${godIconHtml(GODS.find(g=>g.id==='chicomecoatl')||{id:'chicomecoatl',icon:'🌽',name:'chicomecoatl'},56)}<div style="font-size:16px;font-weight:600;color:#70e070;margin-bottom:.25rem">Chicomecoatl</div><div style="font-size:12px;color:#a0d080;margin-bottom:.75rem">${flavorDisp({flavor:'Goddess of Maize and Agriculture'})}</div><div style="font-size:12px;color:var(--td);line-height:1.6">${t('ui.unlock.sheRecruit')}</div></div>`,[{label:t('ui.unlock.btn.blessing'),fn:()=>{}}]),400);
+        setTimeout(()=>showMo('🌽',t('ui.unlock.titleF'),`<div style="text-align:center;padding:.5rem 0"><div style="${godIconHtml(GODS.find(g=>g.id==='chicomecoatl')||{id:'chicomecoatl',icon:'🌽',name:'chicomecoatl'},56)}<div style="font-size:16px;font-weight:600;color:#70e070;margin-bottom:.25rem">Chicomecoatl</div><div style="font-size:12px;color:#a0d080;margin-bottom:.75rem">${flavorDisp({flavor:'Goddess of Maize and Agriculture'})}</div><div style="font-size:12px;color:var(--td);line-height:1.6">${t('ui.unlock.sheRecruit')}</div></div>`,[{label:t('ui.unlock.btn.blessing'),fn:()=>{}}]),400);
       }else{
         const _fp=eventBossFlowers(50);notify(t('ui.msg.godPleased',{icon:'🌽',god:'Chicomecoatl',n:_fp}),'#d4af37');
       }
@@ -25497,6 +25552,7 @@ function endBattle(win){
   G._scaldingMiasmaActive=false;G._enemyMiasma=false;G._pulqueFeast=false;
   if(G.battlePhase==='done')return; // already ended — prevent double defeat screen and double TEOTL
   try{amoxBattleEnd(win);}catch(_amx){} /* v1440 */
+  try{if(win&&window.MFX)MFX.bossFall();}catch(_mfx){} /* v1468: particle burst when a boss falls */
   G._belicCascading=false; // stop any pending cascade polls immediately
   G.battlePhase='done';
   if(document.body)document.body.classList.remove('turn-you','turn-enemy'); /* v1390: drop the active-row glow */
@@ -25551,7 +25607,7 @@ function endBattle(win){
           G.capturedDiedThisBattle=G.capturedDiedThisBattle.filter(k=>k!==key);
           const cu=G.captured.find(c=>capKey(c)===key);
           if(cu){
-            G.levels[key]=1;cu.level=1;
+            G.levels[key]=1;cu.level=1;markJoin(key,1); /* v1466: reborn at Lv1 -- milestones from scratch */
             if(G.unitHpRatio)delete G.unitHpRatio[key];if(G.unitHpOverride)delete G.unitHpOverride[key]; // v514: reborn = whole
             delete G.surge[key];ensureSurge(key);grantBonusSurges(key,3);
             if(typeof getMaxAllies==='function'&&G.deplSel.length<getMaxAllies()&&!G.deplSel.includes(key))G.deplSel.push(key);
@@ -25569,7 +25625,7 @@ function endBattle(win){
             rosterEntry={...cl.base,id:captureId,_captureId:captureId,baseId:cl.base.id};
           }
           G.captured.push(rosterEntry);
-          G.levels[captureId]=1;
+          G.levels[captureId]=1;markJoin(captureId,1);
           ensureSurge(captureId);grantBonusSurges(captureId,3);
           if(typeof getMaxAllies==='function'&&G.deplSel.length<getMaxAllies())G.deplSel.push(captureId);
           G.spoils.captured.push({unit:{...rosterEntry,enemyLevel:1},blood:0,cacao:0,rebirthJoin:true,_idx:++G._spoilIdx}); // v523: show the rebirth on spoils
@@ -25876,7 +25932,7 @@ function afterSpoils(){
         const captureId=`${baseId}_rebirth_${Date.now()}_${Math.random().toString(36).slice(2,4)}`;
         const rebirthLv=Math.max(1,G.battleNum-2);
         G.captured.push({...base,id:captureId,_captureId:captureId,baseId:base.id,level:rebirthLv});
-        G.levels[captureId]=rebirthLv;
+        G.levels[captureId]=rebirthLv;markJoin(captureId,rebirthLv);
         notify(t('ui.msg.joinsRoster',{icon:base.icon,name:base.name}),'#50e090');
       }
     }
@@ -26061,13 +26117,13 @@ function showEnding(){
           // v554: L7 = run complete: grant TEOTL (also fixes the old 'Layer 5 Complete' header typo)
           const wasMayaPrev=unlockedBeforeRun('mayahuel'); /* v1104 */
           if(!wasMayaPrev&&gd.id!=='mayahuel'){
-            newUnlockBan+=`<div style="font-size:12px;color:#a0d060;margin-bottom:1rem;padding:.5rem;background:#0a1a08;border:0.5px solid #3a6a18;border-radius:8px">🌵 ${t('ui.unlock.banner',{name:'Mayahuel',flavor:flavorDisp({flavor:'Maguey Goddess of Pulque'})})}</div>`;
-            setTimeout(()=>showMo('🌵',t('ui.unlock.title'),`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'mayahuel',icon:'🌵',name:'Mayahuel',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#a0d060;margin:.5rem 0 .25rem">Mayahuel</div><div style="font-size:12px;color:#7ba840;margin-bottom:.75rem">${flavorDisp({flavor:'Maguey Goddess of Pulque'})}</div><div style="font-size:12px;color:var(--td);line-height:1.6">${t('ui.unlock.she')}</div></div>`,[{label:t('ui.unlock.btn.drinkDeep'),fn:()=>{}}]),900); // v564
+            newUnlockBan+=`<div style="font-size:12px;color:#a0d060;margin-bottom:1rem;padding:.5rem;background:#0a1a08;border:0.5px solid #3a6a18;border-radius:8px">🌵 ${t('ui.unlock.bannerF',{name:'Mayahuel',flavor:flavorDisp({flavor:'Maguey Goddess of Pulque'})})}</div>`;
+            setTimeout(()=>showMo('🌵',t('ui.unlock.titleF'),`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'mayahuel',icon:'🌵',name:'Mayahuel',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#a0d060;margin:.5rem 0 .25rem">Mayahuel</div><div style="font-size:12px;color:#7ba840;margin-bottom:.75rem">${flavorDisp({flavor:'Maguey Goddess of Pulque'})}</div><div style="font-size:12px;color:var(--td);line-height:1.6">${t('ui.unlock.she')}</div></div>`,[{label:t('ui.unlock.btn.drinkDeep'),fn:()=>{}}]),900); // v564
           }
           // v568 (Pass 6): Patecatl reunion — Mayahuel joins the RUN as a free god-vassal (locked §9)
           if(gd.id==='patecatl'&&!(G.party||[]).includes('mayahuel')){
             G.party.push('mayahuel');
-            G.levels['god_mayahuel']=Math.max(G.levels['god_mayahuel']||1,getLevel('god_patecatl')||1);
+            G.levels['god_mayahuel']=Math.max(G.levels['god_mayahuel']||1,getLevel('god_patecatl')||1);markJoin('god_mayahuel',getLevel('god_mayahuel'));
             newUnlockBan+=`<div style="font-size:12px;color:#c0e060;margin-bottom:1rem;padding:.5rem;background:#0c1406;border:0.5px solid #4a6a18;border-radius:8px">🍶🌵 ${t('ui.end.reunited',{lv:G.levels['god_mayahuel']})}</div>`;
           }
            actEl.innerHTML=`${newUnlockBan}<button class="btn" onclick="enterLayer8()" style="padding:10px 24px;background:#06141e;border-color:#2a5a8a;color:#60b8d8">${t('ui.spoils.enterLayer',{n:8})}</button>`;
@@ -26077,8 +26133,8 @@ function showEnding(){
               run-completion body moved down to the isL9 branch below. */
            const wasTlazPrev=unlockedBeforeRun('tlazolteotl'); /* v1104 */
            if(!wasTlazPrev&&gd.id!=='tlazolteotl'){
-             newUnlockBan+=`<div style="font-size:12px;color:#e070b0;margin-bottom:1rem;padding:.5rem;background:#1a0a14;border:0.5px solid #6a2a4a;border-radius:8px">🌺 ${t('ui.end.unlockedPatron',{name:'<strong>Tlazolteotl</strong>'})}</div>`;
-             setTimeout(()=>showMo('🌺',t('ui.unlock.title'),`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'tlazolteotl',icon:'🌺',name:'Tlazolteotl',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#e070b0;margin:.5rem 0 .25rem">Tlazolteotl</div><div style="font-size:12px;color:#b05a88;margin-bottom:.75rem">${flavorDisp({flavor:'Forgiving Goddess of Filth and Lust'})}</div><div style="font-size:12px;color:var(--td);line-height:1.6">${t('ui.unlock.she')}</div></div>`,[{label:t('ui.unlock.btn.giveIt'),fn:()=>{}}]),900); // v731: match the Xolotl/Mayahuel unlock layout
+             newUnlockBan+=`<div style="font-size:12px;color:#e070b0;margin-bottom:1rem;padding:.5rem;background:#1a0a14;border:0.5px solid #6a2a4a;border-radius:8px">🌺 ${t('ui.end.unlockedPatronF',{name:'<strong>Tlazolteotl</strong>'})}</div>`;
+             setTimeout(()=>showMo('🌺',t('ui.unlock.titleF'),`<div style="text-align:center;padding:.5rem 0">${unitIconHtml({id:'tlazolteotl',icon:'🌺',name:'Tlazolteotl',isGod:true},56)}<div style="font-size:16px;font-weight:600;color:#e070b0;margin:.5rem 0 .25rem">Tlazolteotl</div><div style="font-size:12px;color:#b05a88;margin-bottom:.75rem">${flavorDisp({flavor:'Forgiving Goddess of Filth and Lust'})}</div><div style="font-size:12px;color:var(--td);line-height:1.6">${t('ui.unlock.she')}</div></div>`,[{label:t('ui.unlock.btn.giveIt'),fn:()=>{}}]),900); // v731: match the Xolotl/Mayahuel unlock layout
            }
            /* v916: Xbalanque's unlock announcement. The block above only ever knew about
               Tlazolteotl, so beating the secret boss unlocked him silently and the player was
@@ -27253,8 +27309,9 @@ function showUnitTooltip(u){
      mkUnitCard but NOT in this scope -- referencing it here would have thrown. */
   const _sk=u.isGod?((u.id&&u.id.indexOf('god_')===0)?u.id:'god_'+(u.baseGodId||(G.god&&G.god.id)||'')):_tk;
   const sb=surgeBonus(_tk);
+  const _jl=joinLvOf(u.isGod?_sk:_tk); /* v1466 */
   const _uG=!!u.isGod; /* v993: mirror mkGod/mkCap -- a flat tooltip over a curved stat is the classic create-vs-patch lie */
-  let hp=scR(bo.hp||100,lv,_uG)+sb.hp,atk=scR(bo.atk||0,lv,_uG)+sb.atk,mag=scR(bo.mag||0,lv,_uG)+sb.mag,def=scR(bo.def||0,lv,_uG)+sb.def,res=scR(bo.res||0,lv,_uG)+sb.res,np=scR(bo.np||20,lv,_uG)+sb.tp;
+  let hp=scR(bo.hp||100,lv,_uG,_jl)+sb.hp,atk=scR(bo.atk||0,lv,_uG,_jl)+sb.atk,mag=scR(bo.mag||0,lv,_uG,_jl)+sb.mag,def=scR(bo.def||0,lv,_uG,_jl)+sb.def,res=scR(bo.res||0,lv,_uG,_jl)+sb.res,np=scR(bo.np||20,lv,_uG,_jl)+sb.tp;
   /* v1030: mirror mkGod's cross-type MIX flip, or the tooltip shows 0 MAG on a patron that
      fields a real one in battle. */
   const _ttX=(u.isPatron&&u.isGod)?oblationCrossStat(bo,lv):null;
@@ -27626,10 +27683,11 @@ function renderTraining(){
     const primStat=isPrim?u.mag:u.atk;const primEmoji=isPrim?'🪄':'🗡️';
     const sbPrim=isPrim?sbT.mag:sbT.atk;
     const _uG=!!u.isGod; /* v993: role for scR, used by every stat line and delta below */
-    const cr=scR(u.res||5,lv,_uG)+sbT.res,cr2=scR(u.res||5,lv+1,_uG)+sbT.res;
-    const cp=scR(primStat||0,lv,_uG)+sbPrim,ch=scR(u.hp,lv,_uG)+sbT.hp,cd2=scR(u.def,lv,_uG)+sbT.def;
-    const np=npMaxFor(u.np||20,lv,_uG)+sbT.tp,np2=npMaxFor(u.np||20,lv+1,_uG)+sbT.tp; /* v1004 */
-    const np_=scR(primStat||0,lv+1,_uG)+sbPrim,nh=scR(u.hp,lv+1,_uG)+sbT.hp,nd=scR(u.def,lv+1,_uG)+sbT.def;
+    const _jl=joinLvOf(uk); /* v1466: recruit-only milestones */
+    const cr=scR(u.res||5,lv,_uG,_jl)+sbT.res,cr2=scR(u.res||5,lv+1,_uG,_jl)+sbT.res;
+    const cp=scR(primStat||0,lv,_uG,_jl)+sbPrim,ch=scR(u.hp,lv,_uG,_jl)+sbT.hp,cd2=scR(u.def,lv,_uG,_jl)+sbT.def;
+    const np=npMaxFor(u.np||20,lv,_uG,_jl)+sbT.tp,np2=npMaxFor(u.np||20,lv+1,_uG,_jl)+sbT.tp; /* v1004 */
+    const np_=scR(primStat||0,lv+1,_uG,_jl)+sbPrim,nh=scR(u.hp,lv+1,_uG,_jl)+sbT.hp,nd=scR(u.def,lv+1,_uG,_jl)+sbT.def;
     const baseNpCost=u.isGod?(GODS.find(g=>'god_'+g.id===u.id||g.id===u.id.replace('god_',''))?.npCost||14):(u.npCost||9);
     const lv2=lv+1;
     const calcBattleNpCost=(level)=>{
@@ -27652,16 +27710,16 @@ function renderTraining(){
     // v605: level-up reveal — gains accumulated since the pre-burst baseline level flash briefly, then settle
     const _lvfRec=(G._lvFlash&&G._lvFlash[uk]&&(Date.now()-G._lvFlash[uk].t)<2600)?G._lvFlash[uk]:null;
     const lvf=(_lvfRec&&!fl)?(()=>{const L0=_lvfRec.fromLv,p0=primStat||0;return{
-      hp:ch-(scR(u.hp,L0,_uG)+sbT.hp),tp:np-(npMaxFor(u.np||20,L0,_uG)+sbT.tp), /* v1004 */
+      hp:ch-(scR(u.hp,L0,_uG,_jl)+sbT.hp),tp:np-(npMaxFor(u.np||20,L0,_uG,_jl)+sbT.tp), /* v1004 */
       /* v1031: branch on _trType, not u.type. A cross-oblated patron's TEMPLATE still says
          MAG/PHYS while the card renders MIX, so this fell into the single-stat branch with
          isPrim already false -- both deltas computed to 0 and the level-up arrows vanished. */
       /* v1031: include the GRANTED stat's own growth. It is 75% of the oblated god's base scaled
          to the patron's level, so it rises on level up too -- computing the delta from the
          patron's template alone (0 on the granted side) hid that entirely. */
-      atk:(_trType==='MIX'?(scR(u.atk||0,lv,_uG)-scR(u.atk||0,L0,_uG)):(isPrim?0:cp-(scR(p0,L0,_uG)+sbPrim)))+(_trX&&_trX.stat==='atk'?(_xAtk-((oblationCrossStat(u,L0)||{value:0}).value)):0),
-      mag:(_trType==='MIX'?(scR(u.mag||0,lv,_uG)-scR(u.mag||0,L0,_uG)):(isPrim?cp-(scR(p0,L0,_uG)+sbPrim):0))+(_trX&&_trX.stat==='mag'?(_xMag-((oblationCrossStat(u,L0)||{value:0}).value)):0),
-      def:cd2-(scR(u.def,L0,_uG)+sbT.def),res:cr-(scR(u.res||5,L0,_uG)+sbT.res),
+      atk:(_trType==='MIX'?(scR(u.atk||0,lv,_uG,_jl)-scR(u.atk||0,L0,_uG,_jl)):(isPrim?0:cp-(scR(p0,L0,_uG,_jl)+sbPrim)))+(_trX&&_trX.stat==='atk'?(_xAtk-((oblationCrossStat(u,L0)||{value:0}).value)):0),
+      mag:(_trType==='MIX'?(scR(u.mag||0,lv,_uG,_jl)-scR(u.mag||0,L0,_uG,_jl)):(isPrim?cp-(scR(p0,L0,_uG,_jl)+sbPrim):0))+(_trX&&_trX.stat==='mag'?(_xMag-((oblationCrossStat(u,L0)||{value:0}).value)):0),
+      def:cd2-(scR(u.def,L0,_uG,_jl)+sbT.def),res:cr-(scR(u.res||5,L0,_uG,_jl)+sbT.res),
       lv:lv-L0,cost:npCostNow-modelNpCost(_bcTR,L0,sbT.cost,u.element,u.isPatron)};})():null; // v956
     // v313: ▲ priority — (1) force-gain flash right after a pick, (2) hidden while a surge choice is
     // pending (leveling is blocked), (3) otherwise the classic next-level growth preview returns.
@@ -27718,7 +27776,7 @@ function renderTraining(){
       +'<div class="tc-desc'+_sfBd(G._oblationAd)+'">'+(G._oblationAd||'')+'</div>'):'';
     /* v1030: branch on _trType, and fold the granted stat into both rows. */
     const statMid=_trType==='MIX'
-      ?('<span data-stat="atk" '+statAttrs('atk')+'>🗡️ <b>'+statLbl('atk')+'</b> '+sg(scR(u.atk||0,lv,_uG)+sbT.atk+_xAtk,scR(u.atk||0,lv+1,_uG)+sbT.atk+_xAtk,'atk')+'</span><span data-stat="mag" '+statAttrs('mag')+'>🪄 <b>'+statLbl('mag')+'</b> '+sg(scR(u.mag||0,lv,_uG)+sbT.mag+_xMag,scR(u.mag||0,lv+1,_uG)+sbT.mag+_xMag,'mag')+'</span>')
+      ?('<span data-stat="atk" '+statAttrs('atk')+'>🗡️ <b>'+statLbl('atk')+'</b> '+sg(scR(u.atk||0,lv,_uG,_jl)+sbT.atk+_xAtk,scR(u.atk||0,lv+1,_uG,_jl)+sbT.atk+_xAtk,'atk')+'</span><span data-stat="mag" '+statAttrs('mag')+'>🪄 <b>'+statLbl('mag')+'</b> '+sg(scR(u.mag||0,lv,_uG,_jl)+sbT.mag+_xMag,scR(u.mag||0,lv+1,_uG,_jl)+sbT.mag+_xMag,'mag')+'</span>')
       :('<span data-stat="'+(isPrim?'mag':'atk')+'" '+statAttrs(isPrim?'mag':'atk')+'>'+primEmoji+' <b>'+statLbl(isPrim?'mag':'atk')+'</b> '+sg(cp,np_,isPrim?'mag':'atk')+'</span>');
     const d=document.createElement('div');d.className='train-card'+(isPatronRow?' tc-patron':'');d.dataset.uk=uk; // v313: hover targeting · v612: patron flair
     d.innerHTML='<div class="tc-head">'
@@ -27780,7 +27838,7 @@ function doHireMerc(baseId){
      Nothing about the unit is merc-specific here, so this affected EVERY hire of every species. */
   const mercEntry={...u,_captureId:captureId,baseId:u.baseId||u.id,_isHiredMerc:true};
   G.captured.push(mercEntry);
-  G.levels[captureId]=u._tier.lv; // always use hired level
+  G.levels[captureId]=u._tier.lv;markJoin(captureId,u._tier.lv); // always use hired level
   if(G.deplSel.length<getMaxAllies()&&!G.deplSel.includes(captureId))G.deplSel.push(captureId);
   notify(t('ui.msg.hired',{icon:u.icon,name:u.name,lv:u._tier.lv}),'#50c080');
   renderRes('rb-shop');renderPartyChips();renderTraining();renderAltar();renderMercs();renderTemazcal(); // v821: the Temazcal list was left stale, so a hire only appeared after switching tabs or restoring a unit
@@ -27821,8 +27879,8 @@ function renderMercs(){
     const lv=tier.lv;
     /* v993: was an inline hand-copy of the flat curve, so the hire card undersold every merc
        against what mkCap actually builds. Mercs are vassals. */
-    const hp=scR(u.hp||0,lv,false);
-    const tpMax=npMaxFor(u.np||20,lv,false); /* v1004 */
+    const hp=scR(u.hp||0,lv,false,lv);
+    const tpMax=npMaxFor(u.np||20,lv,false,lv); /* v1466: hired at lv -- no pre-join milestones */ /* v1004 */
     const primEmoji=u.type==='MAG'?'🪄':'🗡️';
     const card=document.createElement('div');
     // v632: training-card anatomy — HP/TP/type/element/special only (+ flowers when the altar exists)
@@ -27850,8 +27908,8 @@ function renderMercs(){
   requestAnimationFrame(function(){try{el.querySelectorAll('.merc-card .sf-r1').forEach(function(r){r.classList.toggle('sf-fit-wrap',r.scrollWidth>r.clientWidth+1);});}catch(e){}});
 }
 // v563: Teotecuilli Brazier — every 3 sacrifices, 1 random deployed FIRE unit (patron included)
-// gains a free Soul Surge (pending pick in Training). If no eligible fire unit is deployed (none in
-// party, or all already have a pending pick), the charge WAITS and fires on a later sacrifice.
+// gains a free Soul Surge (a BONUS surge since v1465). If no fire unit is deployed, the charge WAITS
+// and fires on a later sacrifice.
 function ehecatlTick(n){ // v580: mirror of brazierTick, but fed by SPARED units → WIND
   if(G.runStats)G.runStats.spared+=(n||1); // v829: tallied before the offering gate below, so the count is kept whether or not Ehecatl Mask is held
   if(!getOfferingEffects().ehecatlSpare)return;
@@ -27863,10 +27921,13 @@ function ehecatlTick(n){ // v580: mirror of brazierTick, but fed by SPARED units
     const wind=keys.filter(k=>{
       if(k===pkKey)return G.god.element==='wind';
       const cu=G.captured.find(c=>capKey(c)===k);return !!(cu&&cu.element==='wind');
-    }).filter(k=>!ensureSurge(k).pending);
+    }); /* v1465: no pending filter -- the grant is a bonus surge now, which stacks */
     if(!wind.length){G.ehecatlSpared+=4;break;} // charge waits for an eligible wind unit
     const pick=wind[Math.floor(Math.random()*wind.length)];
-    ensureSurge(pick).pending=true;
+    /* v1465 BUG FIX: was ensureSurge(pick).pending=true -- i.e. a fake LEVEL MILESTONE. That made the
+       pick paid: it stepped the force down the SURGE_PCT table, reset claimedUpTo, and counted toward
+       sacrifice/spare refunds (+50 Blood/+25 Cacao each). It is a free surge, so it is a bonus surge. */
+    grantBonusSurges(pick,1);
     const nm=pick===pkKey?G.god.name:((unitBaseFor(pick)||{}).name||'ally');
     notify(t('ui.msg.ehecatlSurge',{name:nm}),'#a0e8d8');
     if(typeof showSurgeModal==='function')setTimeout(()=>showSurgeModal(pick),350);
@@ -27886,10 +27947,13 @@ function brazierTick(n){
       // v637: deployed ally gods were invisible here (only G.captured was searched), so fire gods could never receive the surge
       if(k.startsWith('god_')){const g=GODS.find(x=>'god_'+x.id===k);return !!(g&&g.element==='fire');}
       const cu=G.captured.find(c=>capKey(c)===k);return !!(cu&&cu.element==='fire');
-    }).filter(k=>!ensureSurge(k).pending);
+    }); /* v1465: no pending filter -- the grant is a bonus surge now, which stacks */
     if(!fire.length){G.brazierSac+=4;break;} // charge waits for an eligible fire unit
     const pick=fire[Math.floor(Math.random()*fire.length)];
-    ensureSurge(pick).pending=true;
+    /* v1465 BUG FIX: was ensureSurge(pick).pending=true -- i.e. a fake LEVEL MILESTONE. That made the
+       pick paid: it stepped the force down the SURGE_PCT table, reset claimedUpTo, and counted toward
+       sacrifice/spare refunds (+50 Blood/+25 Cacao each). It is a free surge, so it is a bonus surge. */
+    grantBonusSurges(pick,1);
     const nm=pick===pkKey?G.god.name:((unitBaseFor(pick)||{}).name||'ally');
     notify(t('ui.msg.brazierSurge',{name:nm}),'#ff8040');
     if(typeof showSurgeModal==='function')setTimeout(()=>showSurgeModal(pick),350); // v564: make the grant unmissable
@@ -28761,3 +28825,811 @@ function restart(){G.dte=getDTEffects();initG();showScr('screen-intro');if(typeo
   window.ftState = function(){ return JSON.parse(JSON.stringify(st)); };
 })();
 </script>
+<script>
+/* ═══ v1468: MICTLAN PARTICLES (MFX) · v1469 title + story · v1470 god powers ═══════════════
+   Ambient pixel particles behind the UI. Presets and the LayerFx class are the "Mictlan Layer
+   Particles" preview page's code (tuned with Genaro Oct 18-19), unchanged except: cine moments draw
+   on a foreground canvas above the UI, earthquakes shake only the active .screen, reduced-motion
+   turns off shake/flash/cine and freezes the particles, and an overlay can share the canvas.
+     title: sparse embers                  story intro: that layer at its starting level
+     run screens: layer preset, build-up by G.battleNum (65% -> 100%); battle ~45% opacity
+     side-boss fight: that boss's preset   layer-boss fight (v1470): the boss GOD's power
+     god select (v1470): highlighted god's power, drifting to the detail panel
+     spoils (v1473): only the patron's power, from the end of the victory animation; it holds at
+       full strength after a LAYER boss ("power prevails"), slightly lighter after other wins
+     conquest: patron's power at full strength
+   Shapes are placeholder pixel grids in SPR for Ian's sprites. Kill switch: MFX.setEnabled(false). */
+(function(){
+const MFX_REDUCE=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const PIX=3;
+const LAYERS=[
+ {n:1,name:'Itzucuintlan',sub:'El Lugar Donde Vive el Perro',fx:'Cempasúchil petals',desc:'Orange and gold petals tumble down, now and then a whole tiny flower.',
+  count:34,mix:[['petal',.9],['flower',.1]],dir:'down',speed:[.18,.38],sway:.35,alpha:.9,
+  pal:{petal:['#f2a024','#e8871c','#f7c23a','#d9661a']}},
+ {n:2,name:'Tepeme Monamictlan',sub:'El Lugar Donde Chocan las Montañas',fx:'Dust, grit and earthquakes',desc:'Grit drifts on a slant. Earthquakes shake the screen and drop debris, more often and harder near Tepeyollotl.',
+  count:44,mix:[['dust',.88],['pebble',.12]],dir:'slant',speed:[.25,.5],sway:.05,alpha:.75,burstEvery:[3.5,6],
+  quake:{every:[9,3.5],amp:[1.5,6],dur:[.6,1.4]},
+  pal:{dust:['#8a7560','#a08a70','#6e5c4a','#b59d80']}},
+ {n:3,name:'Itztépetl',sub:'La Montaña de Obsidiana',fx:'Obsidian shards and butterflies',desc:'Black shards fall fast and flash violet when they catch the light. Obsidian butterflies flutter through.',
+  count:26,mix:[['shard',1]],dir:'down',speed:[.55,1.0],sway:.06,alpha:.95,butterfly:{max:[2,5],every:[2,4.5]},
+  approach:true,battleBoost:1.7, /* v1477 [Genaro]: lighter shards + more/brighter glints, ramps hard toward Itzpapalotl */
+  pal:{shard:['#3e3258','#54447a','#6a5894'],glint:'#e6d2ff'}},
+ {n:4,name:'Cehuélōyān',sub:'El Lugar del Frío que Muerde',fx:'Blizzard',desc:'Thick snow driven sideways. The blizzard gets heavier and the gusts harder as you near Ixquimilli.',
+  count:95,mix:[['flake',.8],['clump',.2]],dir:'down',speed:[.2,.42],sway:.25,alpha:.85,gust:{dir:1,base:.5,peak:2.6,period:6,scale:true},
+  pal:{flake:['#dfeaf2','#a9c4d8','#ffffff','#c8dbe8'],clump:['#ffffff','#dfeaf2']}},
+ {n:5,name:'Pancuetlacaloyán',sub:'Donde la Gente Ondea como Banderas',fx:'Embers, ash and amate strips',desc:'Embers and ash tumble in turbulent air. Every few seconds a hard blast of wind throws everything sideways.',
+  count:44,mix:[['ember',.6],['ash',.3],['strip',.1]],dir:'up',speed:[.2,.42],sway:.2,alpha:.9,gust:{dir:1,base:.2,peak:1.4,period:4.5},
+  blasts:{every:[4,8],dur:1.4,power:3.4},turb:.5,
+  pal:{ember:['#ff8a3a','#ffb050','#e0582a'],ash:['#7a6e66','#5e544e','#948880'],strip:['#cdb88c','#b59f70']}},
+ {n:6,name:'Temiminayólan',sub:'El Lugar Donde Llueven las Flechas',fx:'Rain and arrow volleys',desc:'Fast thin rain on a slant. Arrows cut through often, and near Opochtli they come in volleys.',
+  count:46,mix:[['rain',1]],dir:'rain',speed:[2.2,3.0],sway:0,alpha:.55,arrows:{every:[2.0,0.8]},
+  pal:{rain:['#7f9bb0','#9ab3c4','#6a8698']}},
+ {n:7,name:'Teyōllōcuālōyān',sub:'El Lugar Donde se Devoran los Corazones',fx:'Falling leaves and jungle mist',desc:'Leaves fall and settle on the ground. Jungle mist thickens as you near Mayahuel. A few red spores still pulse like a heartbeat.',
+  count:40,mix:[['leaf',.86],['spore',.14]],dir:'down',speed:[.14,.3],sway:.5,alpha:.9,heartbeat:1.6,
+  extra:{k:'mist',max:14,start:.1},
+  pal:{leaf:['#3f7a3a','#5c9a46','#2f5e2c','#8aa84a'],spore:['#c8283c','#e04a52','#9e1a2c'],mist:['#35503c']}},
+ {n:8,name:'Apanohualóyan',sub:'El Lugar del Cruce de las Aguas Negras',fx:'Black-water bubbles and mist',desc:'Bubbles rise and some pop into a ring. Mist rolls along the bottom.',
+  count:26,mix:[['bubble',.75],['mist',.25]],dir:'up',speed:[.12,.26],sway:.18,alpha:.85,
+  pal:{bubble:['#3d8a80','#2f6f6a','#5aa79b'],mist:['#2b4a47']}},
+ {n:9,name:'Chiconahualoyán',sub:'Reino del Dios Rey de los Muertos',fx:'Wandering souls and returning petals',desc:'Small pale figures of the dead drift upward, arms out, trailing light. The petals from the first layer come back.',
+  count:30,mix:[['soul',.5],['petal',.5]],dir:'mixed',speed:[.12,.24],sway:.3,alpha:.85,
+  pal:{soul:['#cfe9e4','#ffffff','#9cc9d6'],petal:['#f2a024','#e8871c','#f7c23a','#d9661a']}}
+];
+
+/* ═══ Side bosses — an ambient preset for each optional god fight. Xochipilli and Chicomecoatl
+   also get an entrance and a signature moment (full:true). Boss presets always run at full build-up. */
+const BOSSES=[
+ {id:'xochipilli',name:'Xochipilli',sub:'Prince God of Art and Games',full:true,fx:'Flowers and patolli beans',
+  desc:'Bright flowers, confetti and tumbling patolli beans. Entrance: a patolli board draws itself and the beans land. Signature: a big bean roll lands on the 1–6 result in a pop of confetti.',
+  count:38,mix:[['flowerc',.4],['bean',.25],['confetti',.35]],dir:'down',speed:[.15,.32],sway:.35,alpha:.9,entrance:'patolli',signature:'roll',
+  pal:{flowerc:[['#d94a7a','#f07aa0','#ffd36b','#5a1a2a'],['#e8b020','#f7d34a','#fff2a0','#6b4a12'],['#d6452e','#f07a4a','#ffd36b','#5a1a12'],['#9a5ad0','#c48af0','#ffe08a','#3a1a5a']],bean:['#f2ead8','#1a120c'],
+   confetti:[['#ff4f8b'],['#ffd23f'],['#3ee0c8'],['#4f8bff'],['#b46bff'],['#7be35a'],['#ff8a3a']]}},
+ {id:'chicomecoatl',name:'Chicomecoatl',sub:'Goddess of Maize and Agriculture',full:true,fx:'Maize kernels and corn silk',
+  desc:'Golden kernels and corn silk drift down. Entrance: maize stalks sprout along the bottom. Signature: sprouts burst up under the enemies she heals while kernels shower.',
+  count:34,mix:[['kernel',.65],['silk',.35]],dir:'down',speed:[.14,.3],sway:.3,alpha:.9,entrance:'stalks',signature:'harvest',crops:true,battleBoost:1.6,
+  pal:{kernel:['#f2c23a','#e8a020','#fff0a0'],silk:['#e8d8a0','#c8b070']}},
+ {id:'cihuacoatl',name:'Cihuacoatl',sub:'Protector Goddess of Motherhood',fx:'Cihuateteo spirits at dusk',
+  desc:'Pale spirit women drift up along the edges under a dusk-red tint.',
+  count:14,mix:[['spirit',.7],['ash',.3]],dir:'up',speed:[.08,.18],sway:.4,alpha:.85,tint:{col:'#5a1a1a',a:.2},
+  pal:{spirit:['#f2d8d8','#ffffff','#c89090'],ash:['#6a4a4a','#5a3a3a']}},
+ {id:'mixcoatl',name:'Mixcoatl',sub:'Hunter God of Thunderstorms',fx:'Storm clouds and stars',
+  desc:'A starfield behind slow storm clouds. Every few seconds a branching lightning bolt forks down from the clouds with a soft flash.',
+  count:15,mix:[['cloud',1]],dir:'none',speed:[.05,.1],sway:0,alpha:.9,stars:70,flicker:{every:[2.5,6]},bolts:true,
+  pal:{cloud:['#3a4558','#55627a'],star:['#ffffff','#cfd8ff','#ffe9b0']}},
+ {id:'tonatiuh',name:'Tonatiuh',sub:'Shining God of the Fifth Sun',fx:'Sun rays and gold motes',
+  desc:'Slow turning rays of the Fifth Sun from above, with gold motes rising.',
+  count:30,mix:[['mote',1]],dir:'up',speed:[.1,.24],sway:.25,alpha:.9,rays:{n:9,col:'#f2c23a'},
+  pal:{mote:['#ffd36b','#f2c23a','#fff0b0']}},
+ {id:'xochiquetzal',name:'Xochiquetzal',sub:'Princess Goddess of Flowers and Beauty',fx:'Quetzal feathers and petals',
+  desc:'Iridescent green feathers and pink petals float down.',
+  count:30,mix:[['feather',.4],['petal',.6]],dir:'down',speed:[.12,.26],sway:.45,alpha:.9,
+  pal:{feather:['#1f8a6a','#3fc49a','#2a5aa0'],petal:['#e86a9a','#f29ab8','#ffc8da','#c84a7a']}},
+ {id:'toci',name:'Toci',sub:'Grandmother Goddess of Steam',fx:'Temazcal steam',
+  desc:'Steam rises in slow columns, with a few warm sparks from the hot stones.',
+  count:22,mix:[['steam',.75],['ember',.25]],dir:'up',speed:[.1,.2],sway:.3,alpha:.85,
+  pal:{steam:['#d8d0c8'],ember:['#ff9a5a','#ffc070','#e0602a']}},
+ {id:'huitzilopochtli',name:'Huitzilopochtli',sub:'Hummingbird God of War',fx:'Hummingbirds and the war sun',
+  desc:'Hummingbirds dart and hover in front of a faint sun disc, leaving gold trails.',
+  count:16,mix:[['mote',1]],dir:'up',speed:[.1,.22],sway:.2,alpha:.9,disc:{col:'#e8a020'},hummers:{max:3},
+  pal:{mote:['#ffd36b','#f2c23a','#fff0b0']}},
+ {id:'ocetekuani',name:'Heart Jaguar',sub:'Ocetekuani',fx:'Jaguar eyes in the night jungle',
+  desc:'The jungle goes dark and pairs of jaguar eyes open and blink at the edges.',
+  count:14,mix:[['leaf',1]],dir:'down',speed:[.1,.2],sway:.4,alpha:.8,tint:{col:'#02060a',a:.4},eyes:{max:4},
+  pal:{leaf:['#1f3a22','#2c4e2c','#173018','#3a5a30']}},
+ {id:'patecatl',name:'Patecatl',sub:'God of Medicine',fx:'Medicinal herbs and powders',
+  desc:'Dried herb leaves and seeds drift down through a fine glinting powder, like an apothecary’s shelf.',
+  count:36,mix:[['herb',.45],['seed',.25],['powder',.3]],dir:'down',speed:[.1,.24],sway:.35,alpha:.9,
+  pal:{herb:['#7a8a4a','#9aa85a','#5e6a38','#b0a060'],seed:['#6a4a2a','#8a6a3a'],powder:['#d8e8b0','#f0e6c0','#b8d090']}}
+];
+
+/* v1479: every side boss gets an entrance */
+const SIDE_ENTR={cihuacoatl:['wail','dusk floods up from below and five Cihuateteo rise and wail'],mixcoatl:['storm','storm clouds roll in from both sides and three bolts strike'],
+  tonatiuh:['sunrise','the Fifth Sun rises from below and flares'],xochiquetzal:['bloom','a flower opens in the middle and throws petals and quetzal feathers outward'],
+  toci:['temazcal','the hot stones glow and steam columns roar up'],huitzilopochtli:['hummers','the war sun ignites and a V of hummingbirds streaks across'],
+  ocetekuani:['jaguar','night falls, jaguar eyes open all around, then the big eyes and a claw rake'],patecatl:['mortar','herbs fall into a molcajete and a cloud of medicine puffs out']};
+BOSSES.forEach(b=>{const e=SIDE_ENTR[b.id];if(e&&!b.entrance){b.entrance=e[0];b.desc+=' Entrance: '+e[1]+'.';}});
+
+/* ═══ God powers — the patron's effect on god select, victory spoils and layer clear.
+   Nine gods reuse their side-boss preset so a god looks the same everywhere. */
+const BOSS_REUSE=['chicomecoatl','mixcoatl','xochipilli','tonatiuh','xochiquetzal','huitzilopochtli','toci','patecatl','cihuacoatl'];
+const GOD_NEW=[
+ {id:'quetzalcoatl',name:'Quetzalcoatl',sub:'Merciful God of Wind',fx:'Holy feathers and wind curls',desc:'White and jade feathers drift down while small curls of wind turn through them.',
+  count:30,mix:[['feather',.7],['curl',.3]],dir:'down',speed:[.1,.22],sway:.5,alpha:.9,pal:{feather:['#e8f4ec','#7ad6b0','#ffffff'],curl:['#cfeee0','#9ad8c0']}},
+ {id:'tlaloc',name:'Tlaloc',sub:'Supreme God of Rain',fx:'Heavy rain and splashes',desc:'Heavy straight rain that splashes where it hits the bottom of the screen.',
+  count:60,mix:[['drop',1]],dir:'down',speed:[1.6,2.4],sway:0,alpha:.8,pal:{drop:['#6aa8e8','#8cc4f4','#4a88c8']}},
+ {id:'coatlicue',name:'Coatlicue',sub:'Mother Goddess of Earth',fx:'Growing vines and snakes',desc:'Vines climb up from the bottom corners and put out leaves. Small snakes slither along the ground.',
+  count:10,mix:[['leaf',1]],dir:'down',speed:[.1,.2],sway:.4,alpha:.85,vines:6,snakes:2,pal:{leaf:['#3f7a3a','#5c9a46','#2f5e2c','#8aa84a']}},
+ {id:'huehueteotl',name:'Huehueteotl',sub:'Old God of Fire',fx:'Rising embers',desc:'Warm embers and ash rise steadily, like the old fire never going out.',
+  count:44,mix:[['ember',.75],['ash',.25]],dir:'up',speed:[.18,.38],sway:.3,alpha:.95,pal:{ember:['#ff8a3a','#ffb050','#e0582a'],ash:['#7a6e66','#5e544e','#948880']}},
+ {id:'xolotl',name:'Xolotl',sub:'Dog God of Thunder and Disease',fx:'Jumping sparks and sickly haze',desc:'Blue sparks jump between points while a faint sickly green haze drifts through.',
+  count:40,mix:[['mote',1]],dir:'up',speed:[.06,.14],sway:.4,alpha:.95,zaps:{every:[.25,.8]},battleBoost:1.6,pal:{mote:['#9ad86a','#6ab84a','#c8f08a']}},
+ {id:'tepeyollotl',name:'Tepeyollotl',sub:'Jaguar God of Earthquakes',fx:'Rising grit and a low rumble',desc:'Stone grit lifts off the ground, and every few seconds a small rumble shakes the screen.',
+  count:46,mix:[['dust',.85],['pebble',.15]],dir:'up',speed:[.12,.3],sway:.15,alpha:.8,quake:{every:[6,4],amp:[1,2.5],dur:[.5,.9]},pal:{dust:['#8a7560','#a08a70','#6e5c4a','#b59d80']}},
+ {id:'itzpapalotl',name:'Itzpapalotl',sub:'Warrior Goddess of Obsidian',fx:'Obsidian butterfly swarm',desc:'A swarm of obsidian butterflies with knife-edge glints, thicker than Layer 3.',
+  count:14,mix:[['shard',1]],dir:'down',speed:[.5,.9],sway:.06,alpha:.95,butterfly:{max:[6,6],every:[.5,1.2]},pal:{shard:['#2a2235','#3c2f52','#463a5e'],glint:'#cdb0ff'}},
+ {id:'ixquimilli',name:'Ixquimilli',sub:'Punisher God of Ice',fx:'Ice pellets and creeping frost',desc:'Round ice pellets and small crystals fall while frost creeps in from the corners of the screen.',
+  count:52,mix:[['pellet',1]],dir:'down',speed:[.45,.95],sway:.3,alpha:.9,frost:true,pal:{needle:['#cfe8ff','#9cc8f0','#ffffff']}},
+ {id:'malinalxochitl',name:'Malinalxochitl',sub:'Sorcerer Goddess of the Desert',fx:'Sand whirl and sorcery sparks',desc:'Sand spirals slowly around the screen while violet sorcery sparks flicker inside it.',
+  count:60,mix:[['dust',.78],['mote',.22]],dir:'up',speed:[.05,.12],sway:.1,alpha:.85,vortex:1,pal:{dust:['#d8b878','#c8a060','#e8d0a0'],mote:['#c48af0','#9a5ad0','#e8c8ff']}},
+ {id:'xiuhtecuhtli',name:'Xiuhtecuhtli',sub:'Turquoise God of Heat Winds',fx:'Turquoise sparks on hot gusts',desc:'Turquoise sparks ride hard sideways gusts of hot wind.',
+  count:44,mix:[['ember',1]],dir:'up',speed:[.18,.34],sway:.25,alpha:.95,gust:{dir:1,base:.4,peak:2.2,period:4},turb:.25,pal:{ember:['#3ee0c8','#8af0e0','#20a8a0']}},
+ {id:'opochtli',name:'Opochtli',sub:'Swift God of Fishing',fx:'Fish hunted by Minacachalli harpoons',desc:'Small fish swim across the screen while Minacachalli harpoons strike up from below and drag the catch away.',
+  count:20,mix:[['drop',1]],dir:'down',speed:[.8,1.4],sway:0,alpha:.6,fish:{max:6,harpoons:true},pal:{drop:['#6aa8e8','#8cc4f4']}},
+ {id:'mayahuel',name:'Mayahuel',sub:'Maguey Goddess of Pulque',fx:'Pulque bubbles and maguey fibers',desc:'Milky pulque bubbles rise with pale green maguey fibers.',
+  count:32,mix:[['bubble',.7],['silk',.3]],dir:'up',speed:[.12,.26],sway:.25,alpha:.85,pal:{bubble:['#e8e0c8','#c8c0a8','#ffffff'],silk:['#a8c890','#c8d8a0']}},
+ {id:'tlazolteotl',name:'Tlazolteotl',sub:'Forgiving Goddess of Filth and Lust',fx:'Filth turned to light',desc:'Muddy specks drift inward and turn into white sparkles as she takes them in.',
+  count:44,mix:[['sin',1]],dir:'none',speed:[.1,.2],sway:.2,alpha:.9,inward:true,pal:{sin:['#6a5a3a','#5a4a2a','#7a6a48']}},
+ {id:'xbalanque',name:'Xbalanque',sub:'Twin Jaguar God Killer',fx:'Blowgun darts and jungle leaves',desc:'Godbane darts streak across the screen through falling jungle leaves.',
+  count:18,mix:[['leaf',1]],dir:'down',speed:[.14,.28],sway:.45,alpha:.85,darts:{every:[.7,1.8]},pal:{leaf:['#3f7a3a','#5c9a46','#2f5e2c','#8aa84a']}},
+ {id:'mictlantecuhtli',name:'Mictlantecuhtli',sub:'God King of the Dead',fx:'Bone dust, owl feathers and drawn-in souls',desc:'Bone dust and owl feathers fall while pale souls drift in toward the center.',
+  count:40,mix:[['dust',.5],['feather',.2],['soul',.3]],dir:'down',speed:[.1,.24],sway:.3,alpha:.85,inwardSouls:true,pal:{dust:['#e8e0d0','#c8c0b0','#a8a090'],feather:['#8a7a68','#b0a490','#5a4a3a'],soul:['#cfe9e4','#ffffff','#9cc9d6']}}
+];
+const GOD_ORDER=['quetzalcoatl','tlaloc','coatlicue','huehueteotl','xolotl','tepeyollotl','itzpapalotl','chicomecoatl','mixcoatl','xochipilli','ixquimilli','tonatiuh','malinalxochitl','xiuhtecuhtli','opochtli','mayahuel','tlazolteotl','xochiquetzal','huitzilopochtli','toci','patecatl','cihuacoatl','xbalanque','mictlantecuhtli'];
+const GODS_FX=GOD_ORDER.map(id=>{const n=GOD_NEW.find(g=>g.id===id);if(n)return n;
+  const b=BOSSES.find(x=>x.id===id);const c=Object.assign({},b);delete c.full;delete c.entrance;delete c.signature;
+  c.fx=b.fx+' (same as their side-boss fight)';c.desc=b.desc.split(' Entrance:')[0];return c;});
+/* v1479: layer bosses (the final fight of each layer) play an entrance; the fight runs their god power */
+const LB_ENTR={xolotl:'thunderdog',tepeyollotl:'clash',itzpapalotl:'swarm',ixquimilli:'freeze',malinalxochitl:'sandstorm',xiuhtecuhtli:'firewind',
+  opochtli:'net',mayahuel:'maguey',tlazolteotl:'cleanse',mictlantecuhtli:'deathgate'};
+/* v1479: Cipactli, the final boss (Layer 9, phase 2). Its own fight effect plus the biggest entrance in the game. */
+const CIPACTLI_FX={id:'cipactli',name:'Cipactli',sub:'Primordial Earth Monster',fx:'Final boss · primordial sea, heartbeat and snapping mouths',
+  desc:'Entrance: the world goes black and shakes, a jaw the size of the screen closes in from above and below, its eyes open, the mouths at its joints snap, then a roar shakes everything. The fight: a dark-red heartbeat pulses, bloody bubbles rise, red eyes open in the dark, mouths snap along the edges and the ground rumbles.',
+  count:40,mix:[['bubble',.45],['ash',.55]],dir:'up',speed:[.08,.2],sway:.3,alpha:.9,heartbeat:1.3,tint:{col:'#3a0606',a:.32,beat:true},
+  quake:{every:[7,4],amp:[1.5,3],dur:[.5,.9]},eyes:{max:3,col:'#ff3a2a'},maws:{every:[1.6,3.2]},battleBoost:1.5,entrance:'cipactli',
+  pal:{bubble:['#7a2a2a','#5a1a1a','#c86a5a'],ash:['#4a2a2a','#6a3a32'],dust:['#5a2a20','#7a3a2a']}};
+BOSSES.push(CIPACTLI_FX); /* after GODS_FX is built, so no god reuses it */
+
+/* Pixel sprites. Digits index into the colour list; '.' is empty. */
+const SPR={
+ petal:[["12","21","1."],["1..",".21","..1"],["121","21."],["..1",".12","1.."]],
+ flower:[[".121.","13331","23432","13331",".121."]],
+ shard:[["1","1","2","1"],["1.",".1",".2","..1"],["1","2","1"]],
+ bfly:[["11.11","12121","1...1"],[".1.1.",".121.","..1.."]],
+ strip:[["1","2","1","2"],["1.","21",".1","2."]],
+ leaf:[["12.","2123",".11"],[".1","121","21.","1.."],[".21","3212","12."],["..1",".12","121","1."]],
+ soul:[[".111.",".121.","..1..","11211",".121.",".111.","..1.."],[".111.",".121.","1.1.1",".121.",".121.",".111.","..1.."]],
+ bean:[["121","111"],["11","21","11"],["111","111"],["11","12","11"]],
+ feather:[[".1","112","121","21.","1.."],["1..",".21","..21","..12","...3"]],
+ hb:[["..1.","3221",".1.."],[".1..","3221","..1."]],
+ fishR:[["1.111.","111121","1.111."],[".1111.","111121",".1111."]],
+ fishL:[[".111.1","121111",".111.1"],[".1111.","121111",".1111."]]
+};
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const pick=a=>a[(Math.random()*a.length)|0];
+function pickKind(mix){let r=Math.random(),acc=0;for(const [k,w] of mix){acc+=w;if(r<=acc)return k;}return mix[0][0];}
+function drawSpr(ctx,frame,x,y,cols,alpha){
+  ctx.globalAlpha=alpha;
+  for(let j=0;j<frame.length;j++){const row=frame[j];for(let i=0;i<row.length;i++){const c=row[i];if(c==='.')continue;ctx.fillStyle=cols[(+c-1)%cols.length];ctx.fillRect(Math.round(x)+i,Math.round(y)+j,1,1);}}
+}
+
+/* ═══ v1479: boss entrances for every side boss and layer boss. Each is a short (2.3-2.8s)
+   pixel cinematic drawn over everything on the foreground canvas while the boss's greca plate shows.
+   CINE[k] = {dur, draw(ctx,C,W,H,u,fade,px)}; C is the cine state (C.t, C.dur) and holds any per-play
+   setup in C.d (built once on the first frame). */
+const MFX_SAFE_SHAKE=!MFX_REDUCE;
+const cl01=x=>Math.max(0,Math.min(1,x)),eo3=t=>1-Math.pow(1-cl01(t),3);
+const SKULL=["...11111...",".111111111.","11111111111","11222122211","11222122211","11221112211",".111131111.","..1113111..","..1111111..","..1.1.1.1..","..1111111..","...1.1.1..."];
+function jag(x0,y0,x1,y1,n,amp){const p=[[x0,y0]];for(let i=1;i<n;i++){const t=i/n;p.push([x0+(x1-x0)*t+rnd(-amp,amp),y0+(y1-y0)*t+rnd(-amp*.4,amp*.4)]);}p.push([x1,y1]);return p;}
+function poly(ctx,pts,col,a,w){ctx.globalAlpha=a;ctx.strokeStyle=col;ctx.lineWidth=w||1;ctx.beginPath();pts.forEach(([x,y],i)=>i?ctx.lineTo(Math.round(x)+.5,Math.round(y)+.5):ctx.moveTo(Math.round(x)+.5,Math.round(y)+.5));ctx.stroke();}
+function big(ctx,frame,x,y,cols,a,s){ctx.globalAlpha=a;for(let j=0;j<frame.length;j++)for(let i=0;i<frame[j].length;i++){const c=frame[j][i];if(c==='.')continue;ctx.fillStyle=cols[(+c-1)%cols.length];ctx.fillRect(Math.round(x+i*s),Math.round(y+j*s),s,s);}}
+const CINE={
+ /* ── side bosses ── */
+ wail:{dur:2.6,draw(ctx,C,W,H,u,f,px){ /* Cihuacoatl: dusk floods up, five Cihuateteo rise and wail */
+   for(let r=0;r<12;r++){const y=H-(r+1)*H/12;px(0,y,W,H/12+1,'#5a1a1a',f*.42*cl01(u*3-r*.12)*(1-r/16));}
+   for(let i=0;i<5;i++){const t=cl01((u-.08-i*.07)/.6),x=W*(.18+i*.16)+Math.sin(C.t*2+i)*3,y=H+10-eo3(t)*H*(.5+(i%2)*.12);if(t<=0)continue;
+     for(let k=1;k<5;k++)px(x+2+Math.sin(C.t*3+k)*1.5,y+14+k*3,2,2,'#c89090',f*t*(.5-k*.1));
+     big(ctx,SPR.soul[(C.t*3|0)&1],x,y,['#f2d8d8','#ffffff','#c89090'],f*t,2);}
+   if(u>.55){const v=(u-.55)/.45;for(let r=0;r<3;r++){const s=cl01(v-r*.15);if(s<=0)continue;ctx.globalAlpha=f*(1-s)*.6;ctx.strokeStyle='#f2d8d8';ctx.beginPath();ctx.ellipse(W/2,(C.fy||.66)*H,s*W*.45,s*H*.3,0,0,6.283);ctx.stroke();}}}},
+ storm:{dur:2.6,draw(ctx,C,W,H,u,f,px){ /* Mixcoatl: clouds roll in from both sides, a triple strike */
+   if(!C.d){C.d={cl:Array.from({length:14},(_,i)=>({x:i%2?W+rnd(0,40):-rnd(60,100),tx:rnd(-10,W-40),y:rnd(0,H*.22),w:rnd(36,70)|0,h:rnd(6,12)|0})),bolts:[.42,.52,.6].map(()=>{const x=rnd(W*.2,W*.8);return jag(x,H*.2,x+rnd(-20,20),H*.95,12,5);})};}
+   px(0,0,W,H,'#05070c',.5*f);
+   for(const c of C.d.cl){const x=c.x+(c.tx-c.x)*eo3(u/.4);px(x,c.y,c.w,c.h,'#3a4558',f);px(x+2,c.y,c.w-4,2,'#55627a',f);}
+   [.42,.52,.6].forEach((t0,i)=>{const v=(u-t0)/.12;if(v<0||v>1)return;px(0,0,W,H,'#cfd8ff',(1-v)*.22*f);poly(ctx,C.d.bolts[i],'#ffffff',f*(1-v),2);poly(ctx,C.d.bolts[i],'#9ab8ff',f*(1-v)*.5,4);});}},
+ sunrise:{dur:2.6,draw(ctx,C,W,H,u,f,px){ /* Tonatiuh: the Fifth Sun rises and flares */
+   const FY=(C.fy||.66)*H,cx=W/2,cy=H*1.1-eo3(u/.6)*(H*1.1-FY),r=H*.15;px(0,0,W,H,'#1a0c00',.3*f);
+   ctx.fillStyle='#f2c23a';for(let i=0;i<16;i++){const an=i*.3927+C.t*.4,L=r*(1.3+.9*eo3((u-.3)/.4)),s=.07;ctx.globalAlpha=f*.35;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(an-s)*L,cy+Math.sin(an-s)*L);ctx.lineTo(cx+Math.cos(an+s)*L,cy+Math.sin(an+s)*L);ctx.fill();}
+   ctx.globalAlpha=f;ctx.fillStyle='#e8a020';ctx.beginPath();ctx.arc(cx,cy,r,0,6.283);ctx.fill();ctx.fillStyle='#ffd36b';ctx.beginPath();ctx.arc(cx,cy,r*.7,0,6.283);ctx.fill();ctx.fillStyle='#fff0b0';ctx.beginPath();ctx.arc(cx,cy,r*.35,0,6.283);ctx.fill();
+   if(u>.6){const v=(u-.6)/.3;px(0,0,W,H,'#fff0b0',f*.3*cl01(1-v));ctx.globalAlpha=f*cl01(1-v);ctx.strokeStyle='#ffd36b';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,r+v*W*.5,0,6.283);ctx.stroke();ctx.lineWidth=1;}}},
+ bloom:{dur:2.4,draw(ctx,C,W,H,u,f,px){ /* Xochiquetzal: a flower opens and throws petals and quetzal feathers */
+   if(!C.d)C.d=Array.from({length:44},(_,i)=>({an:i*2.4,sp:rnd(.5,1.1),fea:i%4===0,c:pick(['#e86a9a','#f29ab8','#ffc8da','#c84a7a'])}));
+   const cx=W/2,cy=(C.fy||.66)*H,o=eo3(u/.45),R=H*.14*o;
+   for(let i=0;i<8;i++){const an=i*.785+u*.6;for(let s=0;s<R;s+=1){const w=Math.sin(s/R*Math.PI)*R*.32;px(cx+Math.cos(an)*s-w/2,cy+Math.sin(an)*s,Math.max(1,w),1,i%2?'#f29ab8':'#e86a9a',f);}}
+   px(cx-2,cy-2,4,4,'#ffd36b',f*o);
+   if(u>.35){const v=(u-.35)/.65;for(const p of C.d){const d=v*W*.6*p.sp,an=p.an+v*2;const x=cx+Math.cos(an)*d,y=cy+Math.sin(an)*d*.6+v*v*20;
+     if(p.fea)drawSpr(ctx,SPR.feather[0],x,y,['#1f8a6a','#3fc49a','#2a5aa0'],f*(1-v*.5));else drawSpr(ctx,SPR.petal[(an*2|0)&3],x,y,[p.c,'#ffc8da'],f*(1-v*.4));}}}},
+ temazcal:{dur:2.5,draw(ctx,C,W,H,u,f,px){ /* Toci: the stones glow and steam columns roar up */
+   const n=9;for(let i=0;i<n;i++){const x=(i+.5)*W/n;px(x-5,H-4,10,4,'#3a2a20',f);px(x-4,H-4,8,2,u>.1?'#ff9a5a':'#6a4a3a',f*(.6+.4*Math.sin(C.t*8+i)));
+     const t=cl01((u-.1-i*.025)/.6),hgt=eo3(t)*H*(.55+(i%3)*.12);
+     for(let s=0;s<hgt;s+=4){const r=3+s/hgt*6,x2=x+Math.sin(s*.15+C.t*3+i)*3;ctx.globalAlpha=f*.4*(1-s/hgt*.6)*cl01(1-(u-.8)/.2+.0);ctx.fillStyle='#d8d0c8';ctx.beginPath();ctx.arc(x2,H-6-s,r,0,6.283);ctx.fill();}
+     if(Math.random()<.3&&t>0)px(x+rnd(-3,3),H-6-rnd(0,hgt*.3),1,1,'#ffc070',f);}}},
+ hummers:{dur:2.4,draw(ctx,C,W,H,u,f,px){ /* Huitzilopochtli: the war sun ignites and a hummingbird host streaks through */
+   const FY=(C.fy||.66)*H,cx=W/2,cy=FY,r=H*.2*eo3(u/.3);ctx.globalAlpha=f*.18;ctx.fillStyle='#e8a020';ctx.beginPath();ctx.arc(cx,cy,r,0,6.283);ctx.fill();ctx.globalAlpha=f*.7;ctx.strokeStyle='#ffd36b';ctx.beginPath();ctx.arc(cx,cy,r,0,6.283);ctx.stroke();
+   for(let i=0;i<9;i++){const row=Math.abs(i-4),t=cl01((u-.15-row*.04)/.6),x=-20+t*(W+40)-row*10,y=FY+(i-4)*7+Math.sin(t*9+i)*3;if(t<=0||t>=1)continue;
+     for(let k=1;k<10;k++)px(x-k*3,y+1,2,1,'#f2c23a',f*(1-k/10)*.8);
+     drawSpr(ctx,SPR.hb[(C.t*16|0)&1],x,y,['#3fc49a','#1f8a6a','#e8471c'],f);}}},
+ jaguar:{dur:2.6,draw(ctx,C,W,H,u,f,px){ /* Heart Jaguar: night falls, eyes open all around, then the big eyes and a claw rake */
+   if(!C.d)C.d=Array.from({length:14},(_,i)=>({x:rnd(W*.05,W*.95),y:rnd(H*.1,H*.9),t0:rnd(.05,.45),bl:rnd(.3,.6)}));
+   px(0,0,W,H,'#000',f*.75*eo3(u/.15));
+   for(const e of C.d){const v=u-e.t0;if(v<0)continue;const op=Math.abs(Math.sin(v*12))<.2&&v>e.bl?0:1;px(e.x,e.y,2,1,'#f2c23a',f*op);px(e.x+5,e.y,2,1,'#f2c23a',f*op);}
+   if(u>.5){const v=cl01((u-.5)/.12),ey=(C.fy||.66)*H;const hh=Math.max(1,Math.round(4*v));px(W/2-16,ey,9,hh,'#ffd36b',f);px(W/2+7,ey,9,hh,'#ffd36b',f);px(W/2-13,ey,3,hh,'#1a0c00',f);px(W/2+10,ey,3,hh,'#1a0c00',f);}
+   if(u>.72){const v=cl01((u-.72)/.12);for(let k=0;k<3;k++){const x0=W*.25+k*14,y0=H*.15;poly(ctx,[[x0,y0],[x0+(W*.45)*v,y0+(H*.7)*v]],k===1?'#ffffff':'#d04040',f*(1-cl01((u-.86)/.14)),2);}}}},
+ mortar:{dur:2.4,draw(ctx,C,W,H,u,f,px){ /* Patecatl: herbs fall into the molcajete and a cloud of medicine puffs out */
+   if(!C.d)C.d={h:Array.from({length:16},()=>({x:rnd(-30,30),t0:rnd(0,.3),c:pick(['#7a8a4a','#9aa85a','#b0a060'])})),p:Array.from({length:60},()=>({an:rnd(Math.PI*1.05,Math.PI*1.95),v:rnd(.3,1),c:pick(['#d8e8b0','#f0e6c0','#b8d090'])}))};
+   const cx=W/2,cy=(C.fy||.66)*H+H*.06,r=H*.12;px(0,0,W,H,'#0a0c06',.3*f);
+   ctx.globalAlpha=f;ctx.fillStyle='#4a4038';ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI);ctx.fill();px(cx-r,cy-1,r*2,2,'#6a5e50',f);px(cx-r*.7,cy+r*.8,2,4,'#4a4038',f);px(cx+r*.7-2,cy+r*.8,2,4,'#4a4038',f);
+   for(const h of C.d.h){const t=cl01((u-h.t0)/.3);if(t<=0||t>=1)continue;drawSpr(ctx,SPR.leaf[(C.t*6|0)&3],cx+h.x*(1-t),-6+t*(cy+4),[h.c,'#5e6a38','#9aa85a'],f);}
+   if(u>.55){const v=(u-.55)/.45;for(const p of C.d.p){const d=v*H*.55*p.v;px(cx+Math.cos(p.an)*d*1.3,cy-2+Math.sin(p.an)*d+v*v*6,1,1,p.c,f*(1-v));}
+     ctx.globalAlpha=f*.25*(1-v);ctx.fillStyle='#b8d090';ctx.beginPath();ctx.arc(cx,cy-r*.5,r*(1+v*2),0,6.283);ctx.fill();}}},
+ /* ── layer bosses ── */
+ thunderdog:{dur:2.4,draw(ctx,C,W,H,u,f,px){ /* Xolotl: sickly haze, lightning converges on the center and bursts */
+   px(0,0,W,H,'#0e1a08',f*.45);const cx=W/2,cy=(C.fy||.66)*H;
+   if(u<.55&&Math.random()<.7){for(let i=0;i<3;i++){const an=rnd(0,6.283),d=W*.5*(1-u/.55)+20;poly(ctx,jag(cx+Math.cos(an)*d,cy+Math.sin(an)*d*.6,cx+rnd(-4,4),cy+rnd(-4,4),7,4),'#9ad8ff',f,1);}}
+   ctx.globalAlpha=f*.6;ctx.fillStyle='#9ad86a';ctx.beginPath();ctx.arc(cx,cy,3+6*cl01(u/.55),0,6.283);ctx.fill();
+   if(u>.55){const v=(u-.55)/.45;px(0,0,W,H,'#e0f0ff',f*.3*cl01(1-v*3));ctx.globalAlpha=f*(1-v);ctx.strokeStyle='#9ad8ff';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(cx,cy,v*W*.6,v*H*.5,0,0,6.283);ctx.stroke();ctx.lineWidth=1;
+     for(let i=0;i<10;i++){const an=i*.628;px(cx+Math.cos(an)*v*W*.4,cy+Math.sin(an)*v*H*.35,1,1,'#c8f08a',f*(1-v));}}}},
+ clash:{dur:2.6,draw(ctx,C,W,H,u,f,px){ /* Tepeyollotl: two mountains slide together and slam; rocks rain */
+   if(!C.d)C.d={rk:Array.from({length:30},()=>({x:rnd(0,W),t0:rnd(.5,.8),v:rnd(.8,1.4)})),dust:Array.from({length:40},()=>({an:rnd(Math.PI,2*Math.PI),v:rnd(.3,1.2)}))};
+   const m=eo3(u/.5),hit=u>.5?1-cl01((u-.5)/.5):0,sx=hit?rnd(-3,3)*hit:0,sy=hit?rnd(-2,2)*hit:0;
+   ctx.save();ctx.translate(Math.round(sx),Math.round(sy));px(0,0,W,H,'#0c0804',.35*f);
+   const mt=(x0,dir)=>{ctx.globalAlpha=f;ctx.fillStyle='#4a3a2c';ctx.beginPath();ctx.moveTo(x0-dir*W*.5,H);ctx.lineTo(x0-dir*W*.18,H*.28);ctx.lineTo(x0-dir*W*.1,H*.4);ctx.lineTo(x0,H*.2);ctx.lineTo(x0+dir*2,H);ctx.fill();
+     ctx.fillStyle='#6e5c4a';ctx.beginPath();ctx.moveTo(x0-dir*W*.18,H*.28);ctx.lineTo(x0-dir*W*.14,H*.36);ctx.lineTo(x0-dir*W*.22,H*.36);ctx.fill();};
+   mt(-W*.1+(W*.5+W*.1)*m,1);mt(W*1.1-(W*.6)*m,-1);
+   if(u>.5){const v=(u-.5)/.5;for(const d of C.d.dust)px(W/2+Math.cos(d.an)*v*W*.35*d.v,H*.55+Math.sin(d.an)*v*H*.25*d.v+v*v*20,2,2,'#a08a70',f*(1-v));
+     for(const r of C.d.rk){const t=(u-r.t0)/.3;if(t<0||t>1)continue;px(r.x,-4+t*H*r.v,2,2,'#6e5c4a',f);}}
+   ctx.restore();}},
+ swarm:{dur:2.4,draw(ctx,C,W,H,u,f,px){ /* Itzpapalotl: a black flash and an obsidian butterfly swarm bursts out, knives glint */
+   if(!C.d)C.d=Array.from({length:40},(_,i)=>({an:i*.157+rnd(-.1,.1),v:rnd(.5,1.2),ph:rnd(0,6)}));
+   px(0,0,W,H,'#08040e',f*.45);const cx=W/2,cy=(C.fy||.66)*H;
+   if(u<.2){ctx.globalAlpha=f*u/.2;ctx.fillStyle='#463a5e';ctx.beginPath();ctx.arc(cx,cy,u/.2*H*.12,0,6.283);ctx.fill();}
+   if(u>.18){const v=(u-.18)/.82;for(const b of C.d){const d=eo3(v)*W*.65*b.v,an=b.an+v*1.2;drawSpr(ctx,SPR.bfly[((C.t*10+b.ph)|0)&1],cx+Math.cos(an)*d,cy+Math.sin(an)*d*.6,['#3c2f52','#cdb0ff'],f*(1-v*.5));}}
+   [.3,.45,.6].forEach((t0,i)=>{const v=(u-t0)/.1;if(v<0||v>1)return;const y=H*(.5+i*.15);poly(ctx,[[W*.15,y-8],[W*.15+W*.7*v,y+8*(2*v-1)]],'#e6d2ff',f*(1-v*.5),1);});}},
+ freeze:{dur:2.5,draw(ctx,C,W,H,u,f,px){ /* Ixquimilli: frost races in from every edge, cracks, shatters */
+   if(!C.d){C.d={pts:[],cr:[]};for(let i=0;i<500;i++){const e=i%4,s=Math.random(),d=Math.pow(Math.random(),1.6)*.5;C.d.pts.push({x:e<2?s*W:(e===2?d*W:W-d*W),y:e<2?(e===0?d*H:H-d*H):s*H,d});}
+     for(let i=0;i<6;i++){const an=i*1.047+rnd(-.3,.3);C.d.cr.push(jag(W/2,(C.fy||.66)*H,W/2+Math.cos(an)*W*.45,(C.fy||.66)*H+Math.sin(an)*H*.45,8,3));}}
+   px(0,0,W,H,'#0a1420',f*.35);const g=eo3(u/.55)*.5;
+   for(const p of C.d.pts){if(p.d>g)continue;px(p.x,p.y,1,1,p.d<g*.5?'#ffffff':'#a9d2f0',f*(.9-p.d));}
+   if(u>.55){const v=cl01((u-.55)/.15);for(const c of C.d.cr)poly(ctx,c.slice(0,Math.ceil(c.length*v)),'#e8f6ff',f*(u>.85?1-(u-.85)/.15:1),1);}
+   if(u>.72){const v=(u-.72)/.28;px(0,0,W,H,'#ffffff',f*.25*cl01(1-v*4));for(let i=0;i<36;i++){const an=i*.1745,d=v*W*.5*(.5+(i%5)/8);px(W/2+Math.cos(an)*d,(C.fy||.66)*H+Math.sin(an)*d*.6,2,1,'#cfe8ff',f*(1-v));}}}},
+ sandstorm:{dur:2.6,draw(ctx,C,W,H,u,f,px){ /* Malinalxochitl: a sand whirl spins up around her with violet sorcery */
+   if(!C.d)C.d=Array.from({length:150},()=>({an:rnd(0,6.283),r:rnd(.05,1),c:pick(['#d8b878','#c8a060','#e8d0a0']),s:Math.random()<.12}));
+   px(0,0,W,H,'#2a1e0c',f*.3*eo3(u/.3));const cx=W/2,cy=(C.fy||.66)*H,R=Math.min(W,H)*.55*(u<.6?eo3(u/.6):1+((u-.6)/.4)*.6);
+   for(const p of C.d){const an=p.an+C.t*(3.2-p.r*1.8),r=R*p.r;px(cx+Math.cos(an)*r*1.4,cy+Math.sin(an)*r*.55,p.s?1:2,1,p.s?(Math.random()<.5?'#e8c8ff':'#c48af0'):p.c,f*(u>.8?1-(u-.8)/.2:1));}}},
+ firewind:{dur:2.3,draw(ctx,C,W,H,u,f,px){ /* Xiuhtecuhtli: turquoise fire rides a hot gust across the screen */
+   if(!C.d)C.d=Array.from({length:26},()=>({y:rnd(H*.1,H*.9),t0:rnd(0,.45),L:rnd(20,60),c:pick(['#3ee0c8','#8af0e0','#20a8a0'])}));
+   px(0,0,W,H,'#041210',f*.35);for(const b of C.d){const t=(u-b.t0)/.45;if(t<0||t>1)continue;const x=-b.L+t*(W+b.L*2),y=b.y+Math.sin(t*8+b.L)*4;
+     for(let k=0;k<b.L;k+=2)px(x-k,y+Math.sin((x-k)*.2)*1.5,2,1,b.c,f*(1-k/b.L));px(x,y-1,2,3,'#e8fff8',f);}
+   if(u>.45&&u<.6)px(0,0,W,H,'#8af0e0',f*.18*(1-(u-.45)/.15));}},
+ net:{dur:2.5,draw(ctx,C,W,H,u,f,px){ /* Opochtli: a fishing net drops, fish leap, harpoons strike up */
+   px(0,0,W,H,'#04121e',f*.35);const ny=-H*.4+eo3(u/.4)*H*.55,sp=10;
+   ctx.globalAlpha=f*.8;ctx.strokeStyle='#c8b080';for(let x=-H;x<W+H;x+=sp){ctx.beginPath();ctx.moveTo(x,ny-H*.4);ctx.lineTo(x+H*.4,ny);ctx.stroke();ctx.beginPath();ctx.moveTo(x+H*.4,ny-H*.4);ctx.lineTo(x,ny);ctx.stroke();}
+   for(let x=0;x<W;x+=18)px(x,ny,2,2,'#8a6a3a',f);
+   for(let i=0;i<7;i++){const t=cl01((u-.3-i*.05)/.4);if(t<=0||t>=1)continue;const x=W*(.1+i*.13),y=H-Math.sin(t*Math.PI)*H*.45;drawSpr(ctx,SPR.fishR[(C.t*8|0)&1],x+t*20,y,['#e8a040','#f8d080'],f);if(t<.12||t>.88)px(x+t*20+2,H-3,3,1,'#8cc4f4',f);}
+   [.62,.7,.78].forEach((t0,i)=>{const v=cl01((u-t0)/.12);if(v<=0)return;const x=W*(.3+i*.2);px(x,H-v*H*.6,1,v*H*.6,'#8a6a3a',f);px(x-1,H-v*H*.6-3,3,3,'#e8e0d0',f);});}},
+ maguey:{dur:2.6,draw(ctx,C,W,H,u,f,px){ /* Mayahuel: a maguey rosette unfurls, its quiote shoots up and blooms; pulque bubbles rise */
+   const cx=W/2,by=H-2,g=eo3(u/.5);px(0,0,W,H,'#0a1208',f*.3);
+   for(let i=0;i<11;i++){const an=Math.PI*(1.08+i*.084),L=H*.42*g*(.6+.4*Math.sin(i/10*Math.PI));ctx.globalAlpha=f;ctx.fillStyle=i%2?'#5a8a6a':'#7aa88a';ctx.beginPath();
+     ctx.moveTo(cx-4,by);ctx.lineTo(cx+Math.cos(an)*L,by+Math.sin(an)*L);ctx.lineTo(cx+4,by);ctx.fill();px(cx+Math.cos(an)*L,by+Math.sin(an)*L,1,1,'#c8a060',f);}
+   if(u>.45){const v=eo3((u-.45)/.35),top=by-H*.2-v*H*.55;px(cx,top,1,by-top,'#6a8a4a',f);if(v>.9)for(let k=0;k<5;k++)px(cx-6+k*3,top-2+(k%2)*2,3,2,'#f2d34a',f);}
+   for(let i=0;i<14;i++){const t=cl01((u-.2-i*.04)/.6);if(t<=0||t>=1)continue;const x=cx+(i-7)*W*.05,y=by-t*H*.8;ctx.globalAlpha=f*(1-t);ctx.strokeStyle='#e8e0c8';ctx.beginPath();ctx.arc(x+Math.sin(t*8+i)*3,y,2,0,6.283);ctx.stroke();}}},
+ cleanse:{dur:2.5,draw(ctx,C,W,H,u,f,px){ /* Tlazolteotl: filth swirls into her and bursts out as light */
+   if(!C.d)C.d=Array.from({length:80},()=>({an:rnd(0,6.283),r:rnd(.6,1.1),c:pick(['#6a5a3a','#5a4a2a','#7a6a48'])}));
+   px(0,0,W,H,'#0c0a04',f*.35);const cx=W/2,cy=(C.fy||.66)*H;
+   if(u<.55){const v=eo3(u/.55);for(const p of C.d){const an=p.an+v*4,r=(1-v)*p.r*W*.55+2;px(cx+Math.cos(an)*r,cy+Math.sin(an)*r*.6,2,2,p.c,f);}
+     ctx.globalAlpha=f*v*.5;ctx.fillStyle='#fff8e0';ctx.beginPath();ctx.arc(cx,cy,2+v*5,0,6.283);ctx.fill();}
+   else{const v=(u-.55)/.45;px(0,0,W,H,'#fff8e0',f*.25*cl01(1-v*4));for(const p of C.d){const d=eo3(v)*p.r*W*.6;px(cx+Math.cos(p.an)*d,cy+Math.sin(p.an)*d*.6,1,1,Math.random()<.3?'#fff8e0':'#ffffff',f*(1-v));}}}},
+ deathgate:{dur:2.8,draw(ctx,C,W,H,u,f,px){ /* Mictlantecuhtli: darkness; bone dust gathers into his skull; the sockets light; souls are pulled in */
+   const s=Math.max(3,Math.round(H/40)),FY=(C.fy||.66)*H,ox=W/2-5.5*s,oy=FY-6*s;
+   if(!C.d){C.d={pts:[],souls:Array.from({length:12},()=>({an:rnd(0,6.283),r:rnd(.7,1.1)}))};SKULL.forEach((row,j)=>[...row].forEach((c,i)=>{if(c==='1')for(let k=0;k<3;k++)C.d.pts.push({tx:ox+i*s+rnd(0,s),ty:oy+j*s+rnd(0,s),x:rnd(0,W),y:rnd(0,H),c:pick(['#e8e0d0','#c8c0b0','#a8a090'])});}));}
+   px(0,0,W,H,'#000',f*.65*eo3(u/.2));const v=eo3((u-.1)/.5);
+   for(const p of C.d.pts){px(p.x+(p.tx-p.x)*v,p.y+(p.ty-p.y)*v,v>.95?2:1,v>.95?2:1,p.c,f);}
+   if(u>.6){SKULL.forEach((row,j)=>[...row].forEach((c,i)=>{if(c==='2')px(ox+i*s,oy+j*s,s,s,(u*10|0)%2&&u<.7?'#cfe9e4':'#9cc9d6',f*cl01((u-.6)/.1)*.9);}));
+     const w=cl01((u-.65)/.35);for(const sl of C.d.souls){const d=(1-w)*sl.r*W*.6;drawSpr(ctx,SPR.soul[(C.t*4|0)&1],W/2+Math.cos(sl.an)*d,FY+Math.sin(sl.an)*d*.6,['#cfe9e4','#ffffff','#9cc9d6'],f*(1-w*.7));}}
+   if(u>.82){const r=(u-.82)/.18;ctx.globalAlpha=f*(1-r);ctx.strokeStyle='#9cc9d6';ctx.beginPath();ctx.arc(W/2,FY,r*W*.5,0,6.283);ctx.stroke();}}},
+ /* ── final boss ── */
+ cipactli:{dur:3.6,draw(ctx,C,W,H,u,f,px){ /* Cipactli: the world goes black and shakes, a jaw the size of the screen closes in from
+     above and below, its eyes open, every joint-mouth snaps, then a roar that shakes everything */
+   if(!C.d){const T=(n,L)=>Array.from({length:n},(_,i)=>({x:(i+.5)*W/n+rnd(-2,2),h:rnd(L*.6,L),w:rnd(6,10)}));
+     C.d={up:T(Math.round(W/16),H*.16),lo:T(Math.round(W/16),H*.16),sp:Array.from({length:60},()=>({an:rnd(0,6.283),v:rnd(.4,1.3)})),mw:[[.06,.5],[.94,.5],[.25,.95],[.75,.95]]};}
+   const roar=u>.58&&u<.82?1-Math.abs((u-.7)/.12):0,rum=Math.min(1,u/.3)*.6+roar*1.6,shk=MFX_SAFE_SHAKE?(rum*3):0;
+   ctx.save();ctx.translate(Math.round(rnd(-shk,shk)),Math.round(rnd(-shk*.6,shk*.6)));
+   px(-6,-6,W+12,H+12,'#000',f*.88*eo3(u/.15));
+   const FY=(C.fy||.66)*H,o=u<.45?eo3((u-.08)/.37):u<.58?1:u<.82?1+.25*Math.sin(Math.PI*(u-.58)/.24):1-eo3((u-.82)/.18)*.35;
+   const upY=-H*.25+o*H*.52,loY=H*1.25-o*H*.45;
+   /* gums */
+   px(-6,-6,W+12,upY+6,'#3a0808',f);px(-6,upY-3,W+12,3,'#6a1414',f);px(-6,loY,W+12,H-loY+6,'#3a0808',f);px(-6,loY,W+12,3,'#6a1414',f);
+   /* teeth: bone, darker at the root */
+   const tooth=(x,y,w,h,dir)=>{ctx.globalAlpha=f;ctx.fillStyle='#e8dcc0';ctx.beginPath();ctx.moveTo(x-w/2,y);ctx.lineTo(x,y+dir*h);ctx.lineTo(x+w/2,y);ctx.fill();
+     ctx.fillStyle='#a8987a';ctx.beginPath();ctx.moveTo(x-w/2,y);ctx.lineTo(x-w*.15,y+dir*h*.5);ctx.lineTo(x-w*.1,y);ctx.fill();};
+   for(const t of C.d.up)tooth(t.x,upY,t.w,t.h*o,1);for(const t of C.d.lo)tooth(t.x,loY,t.w,t.h*o,-1);
+   /* eyes on the upper jaw: amber with a slit that narrows on the roar */
+   if(u>.38){const e=eo3((u-.38)/.12),ey=Math.max(6,upY*.45),eh=Math.max(1,Math.round(7*e));
+     for(const ex of [W*.3,W*.7]){ctx.globalAlpha=f*.35;ctx.fillStyle='#ff3a10';ctx.beginPath();ctx.ellipse(ex,ey,16,eh+4,0,0,6.283);ctx.fill();
+       ctx.globalAlpha=f;ctx.fillStyle='#ffb020';ctx.beginPath();ctx.ellipse(ex,ey,12,eh,0,0,6.283);ctx.fill();px(ex-(roar?1:2),ey-eh,roar?2:4,eh*2,'#120400',f);}}
+   /* the mouths at every joint snap open and shut */
+   if(u>.45)for(const [mx,my] of C.d.mw){const m=Math.abs(Math.sin((u-.45)*28+mx*9)),x=W*mx,y=H*my,g=4+m*6;
+     px(x-9,y-g-3,18,3,'#6a1414',f);px(x-9,y+g,18,3,'#6a1414',f);for(let k=0;k<4;k++){px(x-8+k*5,y-g,2,3,'#e8dcc0',f);px(x-6+k*5,y+g-3,2,3,'#e8dcc0',f);}}
+   /* the roar: dark-red flash, shockwave rings, spray */
+   if(roar>0){px(-6,-6,W+12,H+12,'#8a0a0a',f*.28*roar);const v=(u-.58)/.24;
+     for(let r=0;r<3;r++){const s2=cl01(v*1.3-r*.18);if(s2<=0)continue;ctx.globalAlpha=f*(1-s2);ctx.strokeStyle=r?'#c83020':'#ffb090';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(W/2,FY,s2*W*.7,s2*H*.5,0,0,6.283);ctx.stroke();}
+     ctx.lineWidth=1;for(const p of C.d.sp){const d=v*W*.6*p.v;px(W/2+Math.cos(p.an)*d,FY+Math.sin(p.an)*d*.55,2,1,'#c86a5a',f*(1-v));}}
+   ctx.restore();}}
+};
+
+class LayerFx{
+  constructor(canvas,preset,host){this.c=canvas;this.ctx=canvas.getContext('2d');this.p=preset;this.host=host||canvas;this.parts=[];this.events=[];this.t=0;
+    this.mode='map';this.intensity=0;this.burstT=0;this.nextBurst=preset.burstEvery?rnd(...preset.burstEvery):0;this.nextArrow=rnd(.8,2);this.nextFly=rnd(1,3);
+    this.nextQuake=rnd(2,4);this.quakeT=0;this.quakeDur=1;this.nextBlast=rnd(2,5);this.blastT=0;this.resize();}
+  lerp(a){return a[0]+(a[1]-a[0])*this.intensity;}
+  resize(){const r=this.c.getBoundingClientRect();const px=r.width>700?4:PIX;const w=Math.max(40,Math.round(r.width/px)),h=Math.max(24,Math.round(r.height/px));
+    if(w!==this.w||h!==this.h){if(!this.noClear){this.c.width=w;this.c.height=h;}this.w=w;this.h=h;if(this.fg){this.fg.width=w;this.fg.height=h;}this.parts=[];this.crops=null;this.fill();
+      this.frostPts=this.p.frost?(()=>{const a=[],R=Math.min(w,h)*.38;for(const [cx,cy] of [[0,0],[w,0],[0,h],[w,h]])for(let i=0;i<110;i++){const r=R*Math.pow(Math.random(),1.8),an=Math.random()*1.5708;
+        a.push({x:(cx?cx-Math.cos(an)*r:Math.cos(an)*r)|0,y:(cy?cy-Math.sin(an)*r:Math.sin(an)*r)|0,r:r/R,ph:rnd(0,6)});}return a;})():null;
+      this.starList=this.p.stars?Array.from({length:this.p.stars},()=>({x:rnd(0,w)|0,y:rnd(0,h*.7)|0,ph:rnd(0,6),c:pick(this.p.pal.star)})):null;}}
+  /* a jagged bolt from the cloud band down, with one or two short branches */
+  makeBolt(){const w=this.w,h=this.h;let x=rnd(w*.12,w*.88),y=rnd(h*.08,h*.22);
+    const cl=this.parts.filter(p=>p.k==='cloud'&&p.x>0&&p.x+p.wid<w);if(cl.length){const c=pick(cl);x=c.x+rnd(4,c.wid-4);y=c.y+c.hgt;} /* bolts fork from a visible cloud */
+    const end=Math.min(h*.95,y+rnd(h*.3,h*.6)),pts=[[x,y]],br=[];
+    while(y<end){x+=rnd(-3,3);y+=rnd(3,6);pts.push([x,y]);if(br.length<2&&Math.random()<.18){let bx=x,by=y;const dir=Math.random()<.5?-1:1,b=[[bx,by]];for(let j=0;j<(rnd(3,7)|0);j++){bx+=dir*rnd(1,4);by+=rnd(2,5);b.push([bx,by]);}br.push(b);}}
+    return {k:'bolt',pts,br,age:0,life:.55};}
+  play(k,opts){const D={patolli:2.8,roll:2.3,stalks:2.6,harvest:1.9};this.cine=Object.assign({k,t:0,dur:D[k]||(CINE[k]&&CINE[k].dur)||2,res:1+(Math.random()*6|0)},opts||{});
+    if(k==='harvest'){for(let i=0;i<40;i++)this.events.push({k:'kern',x:rnd(0,this.w),y:rnd(-30,-2),vx:rnd(-.1,.1),vy:rnd(1,2),age:0,life:3,col:pick(['#f2c23a','#e8a020','#fff0a0'])});}}
+  target(){const f=this.p.approach?0.5+1.0*this.intensity:0.65+0.35*this.intensity, m=this.mode==='battle'?0.6*(this.p.battleBoost?1.3:1):1, area=(this.w*this.h)/(320*180);
+    return Math.round(this.p.count*1.25*f*m*Math.max(.6,Math.min(1.6,area))*(this.burstT>0?1.8:1)*(this.rampDur?Math.min(1,this.rampT/this.rampDur):1));} /* v1474: build-up */
+  fill(){const n=this.target();for(let i=0;i<n;i++)this.parts.push(this.spawn(true));}
+  spawn(anywhere,kindOverride){
+    const P=this.p,k=kindOverride||pickKind(P.mix),w=this.w,h=this.h;
+    let dir=P.dir; if(dir==='mixed')dir=(k==='wisp'||k==='soul')?'up':'down';
+    const sp=rnd(...P.speed)*(this.mode==='battle'?.8:1)*(this.burstT>0?1.6:1);
+    const p={k,x:rnd(-4,w+4),y:0,vx:0,vy:0,ph:Math.random()*6.28,spin:rnd(-.08,.08),life:0,cols:P.pal[k]||P.pal[Object.keys(P.pal)[0]],trail:[]};
+    if(dir==='down'){p.y=anywhere?rnd(-6,h):rnd(-12,-3);p.vy=sp;p.vx=rnd(-.08,.08);}
+    else if(dir==='up'){p.y=anywhere?rnd(0,h+6):rnd(h+2,h+10);p.vy=-sp;p.vx=rnd(-.06,.06);}
+    else if(dir==='slant'){p.y=anywhere?rnd(-4,h):rnd(-8,h*.6);if(!anywhere)p.x=rnd(-10,-2);p.vx=sp;p.vy=sp*.35;}
+    else if(dir==='rain'){p.y=anywhere?rnd(-10,h):rnd(-14,-4);p.x=rnd(-h*.4,w);p.vy=sp;p.vx=sp*.32;p.len=(rnd(4,8))|0;}
+    if(k==='mist'){const jungle=P.extra&&P.extra.k==='mist';p.y=jungle?rnd(h*.45,h-2):rnd(h*.7,h-2);p.x=anywhere?rnd(-30,w):-30;p.vx=rnd(.04,.1);p.vy=jungle?rnd(-.02,0):0;p.wid=(jungle?rnd(18,34):rnd(8,16))|0;p.hgt=jungle?(rnd(2,5)|0):2;}
+    if(k==='leaf'&&!P.eyes){p.groundY=rnd(h-5,h-1);}
+    if(Array.isArray(p.cols&&p.cols[0]))p.cols=pick(p.cols); /* flower colour sets */
+    if(k==='spirit'){p.x=Math.random()<.5?rnd(0,w*.2):w-rnd(4,w*.2);}
+    if(k==='cloud'){p.y=rnd(h*.02,h*.8); /* v1471: spread down the screen -- the top band hides behind god select's detail panel */p.x=anywhere?rnd(-40,w):-60;p.vx=rnd(...P.speed);p.vy=0;p.wid=(rnd(30,60))|0;p.hgt=(rnd(5,9))|0;}
+    if(k==='steam'){p.wid=(rnd(3,7))|0;p.hgt=(rnd(10,18))|0;}
+    if(k==='sin'||(k==='soul'&&P.inwardSouls)){if(anywhere){p.x=rnd(0,w);p.y=rnd(0,h);}else{const e=(Math.random()*4)|0;p.x=e===0?-3:e===1?w+3:rnd(0,w);p.y=e===2?-3:e===3?h+3:rnd(0,h);}p.vx=0;p.vy=0;}
+    if(k==='drop'||k==='needle'){p.len=(rnd(3,5))|0;}
+    if(P.gust&&!anywhere&&k!=='mist'&&Math.random()<.6){p.x=rnd(-12,-2);p.y=rnd(-4,h);} /* windy layers refill from the upwind edge */
+    if(k==='clump'){p.vy*=1.2;}
+    if(k==='bubble'){p.popAt=rnd(h*.15,h*.75);}
+    if(k==='flower'){p.vy*=.8;}
+    if(k==='pebble'){p.vy=sp*.9;p.vx=sp*.5;}
+    return p;
+  }
+  burst(){this.burstT=3;const n=Math.round(this.p.count*.9);for(let i=0;i<n;i++){const p=this.spawn(true);p.y=this.p.dir==='up'?rnd(this.h*.5,this.h):rnd(0,this.h*.5);this.parts.push(p);}}
+  wind(){const g=this.p.gust;if(!g)return 0;const s=Math.max(0,Math.sin(this.t*6.283/g.period));
+    let w=g.dir*(g.base+(g.peak-g.base)*s*s*s);if(g.scale)w*=(.6+.9*this.intensity);
+    const B=this.p.blasts;if(B&&this.blastT>0){const u=1-this.blastT/B.dur;w+=g.dir*B.power*Math.sin(Math.PI*u)*(.7+.5*this.intensity);}
+    return w*(this.mode==='battle'?.8:1);}
+  /* screen offset for earthquakes, in CSS px */
+  shake(){const Q=this.p.quake;if(!Q||this.quakeT<=0)return null;const u=1-this.quakeT/this.quakeDur,env=Math.sin(Math.PI*u);
+    const amp=this.lerp(Q.amp)*env*(this.mode==='battle'?.5:1);return [Math.round(rnd(-amp,amp)),Math.round(rnd(-amp*.6,amp*.6))];}
+  beat(){const hb=this.p.heartbeat;if(!hb)return 1;const ph=(this.t%hb)/hb;const pulse=x=>Math.exp(-Math.pow((ph-x)/0.045,2));return .55+.45*Math.max(pulse(.08),.8*pulse(.26));}
+  step(dt){
+    this.t+=dt;if(this.burstT>0)this.burstT-=dt;this.resize();
+    const P=this.p,w=this.w,h=this.h,wind=this.wind();
+    // dust bursts (L2)
+    if(P.burstEvery){this.nextBurst-=dt;if(this.nextBurst<=0){this.nextBurst=rnd(...P.burstEvery);const bx=rnd(w*.15,w*.85),by=rnd(h*.55,h*.9);
+      for(let i=0;i<(this.mode==='battle'?14:24);i++){const a=rnd(Math.PI*1.05,Math.PI*1.95),v=rnd(.4,1.4);this.events.push({k:'puff',x:bx,y:by,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:rnd(1.2,2.2),age:0,col:pick(P.pal.dust)});}}}
+    // earthquakes (L2): more often and harder as the layer advances; debris rains during the shake
+    if(P.quake){if(this.quakeT>0){this.quakeT-=dt;if(Math.random()<.5+.4*this.intensity)this.events.push({k:'puff',x:rnd(0,w),y:-2,vx:rnd(-.1,.1),vy:rnd(.6,1.4),life:rnd(1,2),age:0,col:pick(P.pal.dust)});}
+      else{this.nextQuake-=dt;if(this.nextQuake<=0){this.quakeDur=this.quakeT=this.lerp(P.quake.dur);this.nextQuake=this.lerp(P.quake.every)*rnd(.7,1.3);}}}
+    // wind blasts (L5)
+    if(P.blasts){if(this.blastT>0)this.blastT-=dt;else{this.nextBlast-=dt;if(this.nextBlast<=0){this.blastT=P.blasts.dur;this.nextBlast=rnd(...P.blasts.every)*(1-.35*this.intensity);}}}
+    // arrows (L6): more often toward the boss, and volleys late in the layer
+    if(P.arrows){this.nextArrow-=dt;if(this.nextArrow<=0){this.nextArrow=this.lerp(P.arrows.every)*rnd(.6,1.4);
+      const n=Math.random()<this.intensity*.7?((rnd(3,6))|0):1,sp=1+.5*this.intensity,x0=rnd(-30,w*.55);
+      for(let j=0;j<n;j++)this.events.push({k:'arrow',x:x0+j*rnd(5,10),y:-8-j*rnd(3,8),vx:1.7*sp,vy:3.4*sp,age:0,life:9});}}
+    // butterflies (L3)
+    if(P.butterfly){const nb=this.events.filter(e=>e.k==='bfly').length;if(nb<Math.round(this.lerp(P.butterfly.max))*(this.mode==='battle'?.5:1)){this.nextFly-=dt;if(this.nextFly<=0){this.nextFly=rnd(...P.butterfly.every)/(P.approach?1+1.5*this.intensity:1);const L=Math.random()<.5;this.events.push({k:'bfly',x:L?-6:w+6,y:rnd(h*.1,h*.7),vx:(L?1:-1)*rnd(.25,.45),ph:Math.random()*6,age:0,life:40,wob:rnd(1.6,2.8)});}}}
+    // side-boss extras: distant lightning, hummingbirds, jaguar eyes, entrance/signature timeline
+    if(P.flicker){this.nextFlick=(this.nextFlick??rnd(1,3))-dt;if(this.nextFlick<=0){this.nextFlick=rnd(...P.flicker.every);this.flickT=.35;
+      if(P.bolts&&Math.random()<.8)this.events.push(this.makeBolt());}}
+    if(this.cine&&this.cine.k==='roll'&&!this.cine.popped&&this.cine.t>=this.cine.dur*.5){this.cine.popped=true;const cx=w/2,cy=h*.42,cols=P.pal.confetti||[['#ffd23f']];
+      for(let i=0;i<46;i++){const an=rnd(Math.PI*1.1,Math.PI*1.9),v=rnd(.8,2.4);this.events.push({k:'conf',x:cx,y:cy,vx:Math.cos(an)*v,vy:Math.sin(an)*v,age:0,life:rnd(1.6,2.6),col:pick(cols)[0],ph:rnd(0,6)});}}
+    if(this.flickT>0)this.flickT-=dt;
+    if(P.hummers&&this.events.filter(e=>e.k==='hb').length<P.hummers.max*(this.mode==='battle'?.67:1)&&Math.random()<.01){
+      this.events.push({k:'hb',x:Math.random()<.5?-4:w+4,y:rnd(h*.1,h*.7),tx:rnd(w*.1,w*.9),ty:rnd(h*.1,h*.7),hold:0,age:0,life:25,trail:[]});}
+    if(P.eyes&&this.events.filter(e=>e.k==='eyes').length<P.eyes.max&&Math.random()<.012){
+      const L=Math.random()<.5;this.events.push({k:'eyes',x:L?rnd(2,w*.2):w-rnd(6,w*.2),y:rnd(h*.15,h*.85),age:0,life:rnd(2.5,4.5),blink:rnd(.8,1.6)});}
+    if(this.cine){this.cine.t+=dt;if(this.cine.t>=this.cine.dur)this.cine=null;}
+    /* Cipactli: the mouths at its joints open and snap shut along the edges */
+    if(P.maws){this.nextMaw=(this.nextMaw??1)-dt;if(this.nextMaw<=0){this.nextMaw=rnd(...P.maws.every);const e=(Math.random()*3)|0;
+      this.events.push({k:'maw',x:e===0?6:e===1?w-6:rnd(w*.15,w*.85),y:e===2?h-6:rnd(h*.25,h*.8),age:0,life:1.2});}}
+    // god extras: Xolotl sparks, Opochtli fish, Xbalanque darts, Coatlicue snakes + vines
+    if(P.zaps){this.nextZap=(this.nextZap??.5)-dt;if(this.nextZap<=0){this.nextZap=rnd(...P.zaps.every);const x=rnd(w*.1,w*.9),y=rnd(h*.1,h*.85),an=rnd(0,6.28),L=rnd(10,24),pts=[[x,y]];
+      for(let j=1;j<=5;j++)pts.push([x+Math.cos(an)*L*j/5+rnd(-1.5,1.5),y+Math.sin(an)*L*j/5+rnd(-1.5,1.5)]);this.events.push({k:'zap',pts,age:0,life:.28});}}
+    if(P.fish&&this.events.filter(e=>e.k==='fish').length<P.fish.max&&Math.random()<.02){const R=Math.random()<.5;this.events.push({k:'fish',x:R?-7:w+7,y:rnd(h*.15,h*.85),vx:(R?1:-1)*rnd(.3,.7),ph:rnd(0,6),age:0,life:60,col:pick([['#e8a040','#f8d080'],['#8ab0c8','#d0e8f8'],['#d86a4a','#f8b080']])});}
+    /* Opochtli: Minacachalli fishers' harpoons hunt the fish from below and drag the catch down */
+    if(P.fish&&P.fish.harpoons){this.nextHarp=(this.nextHarp??1.5)-dt;if(this.nextHarp<=0){this.nextHarp=rnd(1.2,2.8);
+      const free=this.events.filter(e=>e.k==='fish'&&!e.hooked&&e.x>w*.1&&e.x<w*.9);if(free.length){const f=pick(free);this.events.push({k:'harp',x:f.x+rnd(-w*.2,w*.2),y:h+6,ux:0,uy:-1,tgt:f,age:0,life:8});}}}
+    if(P.darts){this.nextDart=(this.nextDart??1)-dt;if(this.nextDart<=0){this.nextDart=rnd(...P.darts.every);const R=Math.random()<.5;this.events.push({k:'dart',x:R?-8:w+8,y:rnd(h*.1,h*.85),vx:R?4.2:-4.2,age:0,life:4});}}
+    if(P.snakes&&this.events.filter(e=>e.k==='snake').length<P.snakes&&Math.random()<.008){const R=Math.random()<.5;this.events.push({k:'snake',x:R?-14:w+14,y:h-rnd(3,7),vx:(R?1:-1)*rnd(.25,.45),age:0,life:60});}
+    if(P.vines){if(!this.vines)this.vines=[];if(this.vines.length<P.vines&&Math.random()<.02){const L=Math.random()<.5;this.vines.push({pts:[[L?rnd(0,w*.25):w-rnd(1,w*.25),h]],dir:L?1:-1,max:(rnd(h*.25,h*.55))|0,hold:0,fade:1});}
+      for(let i=this.vines.length-1;i>=0;i--){const v=this.vines[i];if(v.pts.length<v.max){if(Math.random()<.6){const [x,y]=v.pts[v.pts.length-1];v.pts.push([x+rnd(-.6,.6)+v.dir*.15,y-1]);}}
+        else{v.hold+=dt;if(v.hold>3){v.fade-=dt*.5;if(v.fade<=0)this.vines.splice(i,1);}}}}
+    /* v1479: Chicomecoatl's crops -- each stalk grows over ~15-25s, then an ear swells, ripens (glows) and
+       bursts into kernels, and a new ear starts. Stalks stay grown for the rest of the fight. */
+    if(P.crops){if(!this.crops){const n=Math.max(5,Math.round(w/24));this.crops=Array.from({length:n},(_,k)=>({x:((k+.5)*w/n+rnd(-4,4))|0,g:0,rate:1/rnd(15,25),maxH:h*rnd(.16,.27),ear:0,earRate:1/rnd(5,9),ripe:0,side:k%2?1:-1}));}
+      for(const c of this.crops){if(c.g<1){c.g=Math.min(1,c.g+dt*c.rate);continue;}
+        if(c.ear<1)c.ear=Math.min(1,c.ear+dt*c.earRate);else{c.ripe+=dt;if(c.ripe>1.4){c.ripe=0;c.ear=0;c.earRate=1/rnd(5,9);
+          const ey=h-c.maxH*.72;for(let i=0;i<7;i++)this.events.push({k:'kern',x:c.x+c.side*2,y:ey,vx:rnd(-.5,.5),vy:rnd(-1.1,-.5),age:0,life:3,col:pick(['#f2c23a','#e8a020','#fff0a0'])});}}}}
+    // keep population near target
+    const T=this.target();for(let r=0;r<3&&this.parts.length<T;r++)if(Math.random()<.6)this.parts.push(this.spawn(false));
+    // extra kind that grows with layer progress (L7 jungle mist)
+    if(P.extra){const X=P.extra,want=Math.round(X.max*Math.max(0,(this.intensity-X.start)/(1-X.start)+.15)*(this.mode==='battle'?.6:1));
+      const have=this.parts.filter(p=>p.k===X.k).length;if(have<want&&Math.random()<.1)this.parts.push(this.spawn(false,X.k));}
+    for(let i=this.parts.length-1;i>=0;i--){const p=this.parts[i];p.life+=dt;p.ph+=dt*2;
+      if(p.landed){p.land+=dt;if(p.land>3){this.parts[i]=this.spawn(false);}continue;}
+      const sw=Math.sin(p.ph)*P.sway*(p.k==='petal'||p.k==='flower'||p.k==='leaf'?1:.6);
+      p.x+=p.vx+sw*.25+wind*(p.k==='rain'?.2:p.k==='mist'?.3:p.k==='clump'?.8:1);p.y+=p.vy;
+      if(P.turb&&p.k!=='mist'){p.x+=Math.sin(p.ph*3.1+p.y*.15)*P.turb;p.y+=Math.cos(p.ph*2.3+p.x*.12)*P.turb*.6;}
+      if(p.k==='leaf'&&p.y>=p.groundY){p.landed=true;p.land=0;p.y=p.groundY;continue;}
+      if(p.k==='drop'&&p.y>=h-2){for(let s=0;s<3;s++)this.events.push({k:'splash',x:p.x,y:h-2,vx:rnd(-.6,.6),vy:rnd(-1.1,-.5),age:0,life:.4,col:p.cols[1]});this.parts[i]=this.spawn(false);continue;}
+      if(P.vortex){const dx=p.x-w/2,dy=(p.y-h/2)*1.6,d=Math.hypot(dx,dy)||1,sp=.35*P.vortex*Math.min(1,d/(h*.3));p.x+=-dy/d*sp;p.y+=dx/d*sp*.6;} /* wide slow orbit, no pull to the middle */
+      if(p.k==='sin'||(p.k==='soul'&&P.inwardSouls)){const at=this.attract||[.5,.45],dx=w*at[0]-p.x,dy=h*at[1]-p.y,d=Math.hypot(dx,dy)||1;p.x+=dx/d*.22;p.y+=dy/d*.22-p.vy;
+        if(p.k==='sin'&&d<h*.2){p.k='clean';p.life=0;p.vy=-rnd(.15,.3);p.vx=rnd(-.1,.1);}
+        if(p.k==='soul'&&d<h*.12){this.parts[i]=this.spawn(false);continue;}}
+      if(p.k==='clean'){p.y+=p.vy-0;p.x+=p.vx;if(p.life>1.6){this.parts[i]=this.spawn(false);continue;}}
+      if(p.k==='wisp'||p.k==='soul'){p.trail.unshift([p.x,p.y]);if(p.trail.length>(p.k==='soul'?4:5))p.trail.pop();}
+      if(p.k==='bubble'&&p.y<p.popAt&&Math.random()<.02){this.events.push({k:'pop',x:p.x+1,y:p.y+1,age:0,life:.45,col:p.cols[2]});this.parts.splice(i,1);continue;}
+      const out=p.y>h+10||p.y<-22||p.x>w+18||p.x<-24-(p.wid||0); /* wide mist/clouds enter from far left */
+      if(out){if(this.parts.length>T)this.parts.splice(i,1);else this.parts[i]=this.spawn(false);}
+    }
+    for(let i=this.events.length-1;i>=0;i--){const e=this.events[i];e.age+=dt;
+      if(e.k==='puff'){e.x+=e.vx;e.y+=e.vy;e.vx*=.95;e.vy=e.vy*.95+.01;}
+      else if(e.k==='arrow'){e.x+=e.vx;e.y+=e.vy;if(e.y>h+10)e.age=e.life;}
+      else if(e.k==='bfly'){e.ph+=dt*9;e.x+=e.vx;e.y+=Math.sin(e.age*e.wob)*.35;if(e.x<-10||e.x>w+10)e.age=e.life;}
+      else if(e.k==='kern'){e.x+=e.vx;e.y+=e.vy;e.vy+=.03;if(e.y>h+4)e.age=e.life;}
+      else if(e.k==='splash'){e.x+=e.vx;e.y+=e.vy;e.vy+=.12;}
+      else if(e.k==='fish'){e.ph+=dt*(e.hooked?18:6);if(!e.hooked){e.x+=e.vx;e.y+=Math.sin(e.ph*.5)*.15;}if(e.x<-10||e.x>w+10)e.age=e.life;}
+      else if(e.k==='harp'){const f=e.tgt;
+        if(!e.hit){const tx=f&&f.age<f.life?f.x+3:e.x+e.ux*9,ty=f&&f.age<f.life?f.y+1:e.y+e.uy*9,dx=tx-e.x,dy=ty-e.y,d=Math.hypot(dx,dy)||1;e.ux=dx/d;e.uy=dy/d;e.x+=e.ux*3.4;e.y+=e.uy*3.4;
+          if(f&&!f.hooked&&d<3){e.hit=true;f.hooked=true;for(let s=0;s<6;s++)this.events.push({k:'splash',x:e.x,y:e.y,vx:rnd(-.8,.8),vy:rnd(-1.2,-.3),age:0,life:.5,col:'#8cc4f4'});}
+          if(e.y<-12||e.x<-12||e.x>w+12)e.age=e.life;}
+        else{e.uy=1;e.ux=0;e.y+=1.5;if(f){f.x=e.x-3;f.y=e.y-1;}if(e.y>h+10){e.age=e.life;if(f)f.age=f.life;}}}
+      else if(e.k==='dart'){e.x+=e.vx;if(e.x<-12||e.x>w+12)e.age=e.life;}
+      else if(e.k==='snake'){e.x+=e.vx;if(e.x<-20||e.x>w+20)e.age=e.life;}
+      else if(e.k==='conf'){e.ph+=dt*10;e.x+=e.vx+Math.sin(e.ph*.6)*.2;e.y+=e.vy;e.vx*=.97;e.vy=e.vy*.97+.035;if(e.y>h+4)e.age=e.life;}
+      else if(e.k==='hb'){e.trail.unshift([e.x,e.y]);if(e.trail.length>6)e.trail.pop();
+        const d=Math.hypot(e.tx-e.x,e.ty-e.y);if(d>1.5){e.x+=(e.tx-e.x)*.12;e.y+=(e.ty-e.y)*.12;}
+        else{e.hold+=dt;e.x+=rnd(-.3,.3);e.y+=rnd(-.3,.3);if(e.hold>rnd(.5,1.4)){e.hold=0;if(e.age>e.life-3){e.tx=Math.random()<.5?-10:w+10;}else{e.tx=rnd(w*.08,w*.92);e.ty=rnd(h*.08,h*.75);}}}
+        if(e.x<-9||e.x>w+9)e.age=e.life;}
+      if(e.age>=e.life)this.events.splice(i,1);}
+  }
+  draw(){
+    const ctx=this.ctx,P=this.p,A=P.alpha*(this.mode==='battle'?.45*(P.battleBoost||1):1)*(.85+.15*this.intensity)*(this.fade==null?1:this.fade),beat=this.beat(),wnd=Math.abs(this.wind());
+    if(P.quake&&this.host&&!MFX_REDUCE){const sh=this.shake();this.host.style.transform=sh?'translate('+sh[0]+'px,'+sh[1]+'px)':'';}
+    if(!this.noClear)ctx.clearRect(0,0,this.w,this.h);
+    const W=this.w,H=this.h,bm=this.mode==='battle'?.6:1;
+    if(P.tint){ctx.globalAlpha=P.tint.a*bm*(P.tint.beat?.5+.7*beat:1);ctx.fillStyle=P.tint.col;ctx.fillRect(0,0,W,H);}
+    if(this.frostPts){const grow=Math.min(1,this.t/6);for(const f of this.frostPts){if(f.r>grow)continue;ctx.globalAlpha=A*(.75-f.r*.6)*(.7+.3*Math.sin(this.t*1.3+f.ph));ctx.fillStyle=f.r<.35?'#ffffff':'#a9d2f0';ctx.fillRect(f.x,f.y,1,1);}}
+    if(this.vines)for(const v of this.vines){for(let j=0;j<v.pts.length;j++){const [x,y]=v.pts[j];ctx.globalAlpha=A*v.fade;ctx.fillStyle='#3e7a2e';ctx.fillRect(x|0,y|0,1,1);
+      if(j%7===3){const s=(j%14===3)?1:-1;ctx.fillStyle='#6aa84a';ctx.fillRect((x|0)+s,(y|0),1,1);ctx.fillRect((x|0)+2*s,(y|0)-1,1,1);}}}
+    if(this.crops)for(const c of this.crops){const hgt=c.maxH*(1-Math.pow(1-c.g,3)),x=c.x;if(hgt<1)continue;
+      ctx.globalAlpha=A;ctx.fillStyle='#4e8a3a';ctx.fillRect(x,(H-hgt)|0,1,Math.ceil(hgt));
+      for(let j=5;j<hgt-3;j+=5){const L=(j/5)%2?1:-1;ctx.fillStyle='#6aa84a';ctx.fillRect(x+L,(H-j)|0,1,1);ctx.fillRect(x+2*L,(H-j-1)|0,1,1);}
+      if(c.g>=1){ctx.fillStyle='#e8d8a0';ctx.fillRect(x,(H-hgt-2)|0,1,2);
+        if(c.ear>0){const eh=Math.max(1,Math.round(5*c.ear)),ey=(H-c.maxH*.72-eh/2)|0,ex=x+(c.side>0?1:-2);
+          ctx.fillStyle=c.ear<.6?'#7ab84a':'#f2c23a';ctx.fillRect(ex,ey,2,eh);ctx.fillStyle='#6aa84a';ctx.fillRect(c.side>0?ex+2:ex-1,ey+1,1,Math.max(1,eh-1));
+          if(c.ripe>0){ctx.globalAlpha=A*(.5+.5*Math.sin(c.ripe*14));ctx.fillStyle='#fff0a0';ctx.fillRect(ex-1,ey-1,4,eh+2);ctx.globalAlpha=A;}}}}
+    if(this.starList)for(const s of this.starList){ctx.globalAlpha=A*(.35+.35*Math.sin(this.t*1.7+s.ph));ctx.fillStyle=s.c;ctx.fillRect(s.x,s.y,1,1);}
+    if(P.disc){const cx=W*.5,cy=H*.24,r=H*.17;ctx.globalAlpha=.07*bm;ctx.fillStyle=P.disc.col;ctx.beginPath();ctx.arc(cx,cy,r,0,6.283);ctx.fill();
+      ctx.globalAlpha=.16*bm;ctx.strokeStyle=P.disc.col;ctx.lineWidth=1;ctx.beginPath();ctx.arc(cx,cy,r,0,6.283);ctx.stroke();}
+    if(P.rays){const cx=W*.5,cy=-H*.18,L=H*1.5;ctx.fillStyle=P.rays.col;
+      for(let i=0;i<P.rays.n;i++){const an=Math.PI*.5+(i-(P.rays.n-1)/2)*.2+Math.sin(this.t*.12)*.12;const s=.035;
+        ctx.globalAlpha=(.05+.03*Math.sin(this.t*.8+i))*bm;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(an-s)*L,cy+Math.sin(an-s)*L);ctx.lineTo(cx+Math.cos(an+s)*L,cy+Math.sin(an+s)*L);ctx.fill();}}
+    if(this.flickT>0&&!MFX_REDUCE){const u=this.flickT/.35;ctx.globalAlpha=.09*bm*(u>.6?1:u<.3?.7:0);ctx.fillStyle='#cfd8ff';ctx.fillRect(0,0,W,H);}
+    for(const p of this.parts){const c=p.cols;let a=A;
+      switch(p.k){
+        case 'petal':{const fr=SPR.petal[((Math.floor(p.ph*1.2+p.spin*40)%4)+4)%4];drawSpr(ctx,fr,p.x,p.y,c,a);break;}
+        case 'flower':drawSpr(ctx,SPR.flower[0],p.x,p.y,['#d9661a','#e8871c','#f7c23a','#6b2a12'],a);break;
+        case 'dust':ctx.globalAlpha=a*.8;ctx.fillStyle=c[(p.ph*10|0)%c.length];ctx.fillRect(p.x|0,p.y|0,1,1);break;
+        case 'pebble':ctx.globalAlpha=a;ctx.fillStyle='#6e5c4a';ctx.fillRect(p.x|0,p.y|0,2,2);ctx.fillStyle='#a08a70';ctx.fillRect(p.x|0,p.y|0,1,1);break;
+        case 'shard':{const fr=SPR.shard[(Math.abs(p.spin*100)|0)%3];drawSpr(ctx,fr,p.x,p.y,c,a);
+          if(Math.sin(p.ph*1.7+p.spin*50)>(P.approach?.9-.18*this.intensity:.93)){ctx.globalAlpha=a;ctx.fillStyle=P.pal.glint;ctx.fillRect(p.x|0,(p.y|0)+1,1,1);ctx.globalAlpha=a*.35;ctx.fillRect((p.x|0)-1,(p.y|0)+1,3,1);ctx.fillRect(p.x|0,p.y|0,1,3);}break;}
+        case 'flake':{ctx.globalAlpha=a;ctx.fillStyle=c[0];const big=(p.spin>0.03);
+          if(wnd>1.1){const L=1+Math.min(4,(wnd-1)*2)|0;ctx.globalAlpha=a*.8;ctx.fillRect((p.x|0)-L,p.y|0,L+1,1);break;} /* streaks in strong wind */
+          ctx.fillRect(p.x|0,p.y|0,1,1);if(big){ctx.globalAlpha=a*.55;ctx.fillRect((p.x|0)-1,p.y|0,3,1);ctx.fillRect(p.x|0,(p.y|0)-1,1,3);}break;}
+        case 'flowerc':drawSpr(ctx,SPR.flower[0],p.x,p.y,c,a);break;
+        case 'curl':{ctx.fillStyle=c[0];for(let j=0;j<4;j++){const an=p.ph*2+j*.55;ctx.globalAlpha=a*(.75-j*.15);ctx.fillRect(Math.round(p.x+Math.cos(an)*2.5),Math.round(p.y+Math.sin(an)*2.5),1,1);}break;}
+        case 'pellet':{const x=p.x|0,y=p.y|0;ctx.globalAlpha=a;ctx.fillStyle=c[0]; /* v1471: round ice pellets and small crystals instead of rain-like needles */
+          if(p.spin>.03){ctx.fillRect(x,y-1,1,3);ctx.fillRect(x-1,y,3,1);ctx.fillStyle=c[2];ctx.fillRect(x,y,1,1);}
+          else{ctx.fillRect(x,y,2,2);ctx.globalAlpha=a*.5;ctx.fillRect(x-1,y,1,2);ctx.fillRect(x+2,y,1,2);ctx.fillRect(x,y-1,2,1);ctx.fillRect(x,y+2,2,1);ctx.globalAlpha=a;ctx.fillStyle=c[2];ctx.fillRect(x,y,1,1);}break;}
+        case 'drop':case 'needle':{ctx.globalAlpha=a;ctx.fillStyle=c[0];ctx.fillRect(p.x|0,(p.y|0)-p.len,1,p.len);ctx.fillStyle=c[1];ctx.fillRect(p.x|0,p.y|0,1,1);break;}
+        case 'sin':ctx.globalAlpha=a*.85;ctx.fillStyle=c[0];ctx.fillRect(p.x|0,p.y|0,2,1);ctx.fillStyle=c[1];ctx.fillRect(p.x|0,(p.y|0)+1,1,1);break;
+        case 'clean':{const f=Math.max(0,1-p.life/1.6),tw=.6+.4*Math.sin(p.life*14);ctx.globalAlpha=a*f*tw;ctx.fillStyle='#ffffff';ctx.fillRect(p.x|0,p.y|0,1,1);
+          ctx.globalAlpha=a*f*.45;ctx.fillRect((p.x|0)-1,p.y|0,3,1);ctx.fillRect(p.x|0,(p.y|0)-1,1,3);break;}
+        case 'confetti':{const fl=Math.floor(p.ph*2.2+p.spin*50)%3;ctx.globalAlpha=a*(fl===2?.55:1);ctx.fillStyle=c[0];ctx.fillRect(p.x|0,p.y|0,fl===0?2:1,fl===1?2:1);break;}
+        case 'bean':drawSpr(ctx,SPR.bean[((Math.floor(p.ph*1.4+p.spin*40)%4)+4)%4],p.x,p.y,c,a);break;
+        case 'kernel':ctx.globalAlpha=a;ctx.fillStyle=c[1];ctx.fillRect(p.x|0,p.y|0,1,2);ctx.fillStyle=c[2];ctx.fillRect(p.x|0,p.y|0,1,1);break;
+        case 'silk':{ctx.globalAlpha=a*.75;ctx.fillStyle=c[(p.spin>0)?0:1];for(let j=0;j<4;j++)ctx.fillRect(Math.round(p.x+Math.sin(p.ph*1.5+j*.9)*1),(p.y|0)+j,1,1);break;}
+        case 'spirit':{const fr=SPR.soul[Math.floor(p.ph*.7)&1],fl=.6+.3*Math.sin(p.ph*2);drawSpr(ctx,fr,p.x,p.y,[c[2],c[0]],a*fl*.8);break;}
+        case 'cloud':{ctx.globalAlpha=a*.32;ctx.fillStyle=c[0];ctx.fillRect(p.x|0,p.y|0,p.wid,p.hgt);ctx.fillRect((p.x|0)+4,(p.y|0)-2,p.wid-10,2);
+          ctx.globalAlpha=a*.18;ctx.fillStyle=c[1];ctx.fillRect((p.x|0)+6,(p.y|0)-3,p.wid-16,2);break;}
+        case 'mote':{const fl=.6+.4*Math.sin(p.ph*3+p.spin*60);ctx.globalAlpha=a*.25*fl;ctx.fillStyle=c[1];ctx.fillRect((p.x|0)-1,(p.y|0)-1,3,3);ctx.globalAlpha=a*fl;ctx.fillStyle=c[(p.spin>0)?0:2];ctx.fillRect(p.x|0,p.y|0,1,1);break;}
+        case 'feather':drawSpr(ctx,SPR.feather[Math.floor(p.ph*.8)&1],p.x,p.y,c,a);break;
+        case 'steam':{const g=Math.min(1,p.life/3);ctx.fillStyle=c[0];for(let j=0;j<p.hgt;j+=2){ctx.globalAlpha=a*.15*g*(1-j/p.hgt);ctx.fillRect(Math.round(p.x+Math.sin(p.ph+j*.3)*1.5),(p.y|0)+j,p.wid,2);}break;}
+        case 'herb':drawSpr(ctx,SPR.leaf[((Math.floor(p.ph*1.1+p.spin*40)%4)+4)%4],p.x,p.y,c,a*.9);break;
+        case 'seed':ctx.globalAlpha=a;ctx.fillStyle=c[0];ctx.fillRect(p.x|0,p.y|0,1,1);break;
+        case 'powder':{const tw=Math.max(0,Math.sin(p.ph*2.4+p.spin*70));ctx.globalAlpha=a*(.2+.6*tw*tw);ctx.fillStyle=c[(p.spin>0)?0:1];ctx.fillRect(p.x|0,p.y|0,1,1);break;}
+        case 'clump':ctx.globalAlpha=a*.9;ctx.fillStyle=c[0];ctx.fillRect(p.x|0,p.y|0,2,2);ctx.globalAlpha=a*.4;ctx.fillRect((p.x|0)-1,p.y|0,1,1);break;
+        case 'leaf':{const fr=p.landed?SPR.leaf[0]:SPR.leaf[((Math.floor(p.ph*1.1+p.spin*40)%4)+4)%4];drawSpr(ctx,fr,p.x,p.y,c,a*(p.landed?Math.max(0,1-p.land/3):1));break;}
+        case 'soul':{const fr=SPR.soul[Math.floor(p.ph*.9)&1],fl=.75+.25*Math.sin(p.ph*2.5);
+          for(let s=p.trail.length-1;s>=1;s--){ctx.globalAlpha=a*(.22-s*.05);ctx.fillStyle=c[2];ctx.fillRect((p.trail[s][0]|0)+2,(p.trail[s][1]|0)+5,1,2);}
+          for(const [ox,oy] of [[-1,0],[1,0],[0,-1],[0,1]])drawSpr(ctx,fr,p.x+ox,p.y+oy,[c[2],c[2]],a*.12*fl); /* soft halo */
+          drawSpr(ctx,fr,p.x,p.y,[c[0],c[1]],a*fl);break;}
+        case 'ember':{const fl=.6+.4*Math.sin(p.ph*5+p.spin*90);ctx.globalAlpha=a*.25*fl;ctx.fillStyle=c[2];ctx.fillRect((p.x|0)-1,(p.y|0)-1,3,3);ctx.globalAlpha=a*fl;ctx.fillStyle=c[(p.spin>0)?1:0];ctx.fillRect(p.x|0,p.y|0,1,1);break;}
+        case 'ash':ctx.globalAlpha=a*.6;ctx.fillStyle=c[0];ctx.fillRect(p.x|0,p.y|0,1,1);break;
+        case 'strip':drawSpr(ctx,SPR.strip[(Math.floor(p.ph*2.5))%2],p.x,p.y,c,a*.85);break;
+        case 'rain':{ctx.globalAlpha=a;ctx.fillStyle=c[0];const dx=p.vx/p.vy;for(let s=0;s<p.len;s++)ctx.fillRect(Math.round(p.x-dx*s),Math.round(p.y-s),1,1);break;}
+        case 'spore':{const g=beat;ctx.globalAlpha=a*.3*g;ctx.fillStyle=c[1];ctx.fillRect((p.x|0)-1,(p.y|0)-1,4,4);ctx.globalAlpha=a*(.5+.5*g);ctx.fillStyle=c[0];ctx.fillRect(p.x|0,p.y|0,2,2);break;}
+        case 'pollen':ctx.globalAlpha=a*(.4+.4*beat);ctx.fillStyle=c[0];ctx.fillRect(p.x|0,p.y|0,1,1);break;
+        case 'bubble':{ctx.globalAlpha=a;ctx.fillStyle=c[0];const x=p.x|0,y=p.y|0;ctx.fillRect(x+1,y,1,1);ctx.fillRect(x,y+1,1,1);ctx.fillRect(x+2,y+1,1,1);ctx.fillRect(x+1,y+2,1,1);ctx.fillStyle=c[2];ctx.fillRect(x+2,y,1,1);break;}
+        case 'mist':ctx.globalAlpha=a*.16;ctx.fillStyle=c[0];ctx.fillRect(p.x|0,p.y|0,p.wid,p.hgt||2);ctx.globalAlpha=a*.09;ctx.fillRect((p.x|0)+2,(p.y|0)-1,p.wid-4,1);ctx.fillRect((p.x|0)+3,(p.y|0)+(p.hgt||2),p.wid-6,1);break;
+        case 'wisp':{for(let s=p.trail.length-1;s>=0;s--){ctx.globalAlpha=a*(.35-s*.06);ctx.fillStyle=c[0];ctx.fillRect(p.trail[s][0]|0,p.trail[s][1]|0,1,1);}
+          const fl=.7+.3*Math.sin(p.ph*3);ctx.globalAlpha=a*.25*fl;ctx.fillStyle=c[1];ctx.fillRect((p.x|0)-1,(p.y|0)-1,4,4);ctx.globalAlpha=a*fl;ctx.fillStyle=c[2];ctx.fillRect(p.x|0,p.y|0,2,2);break;}
+      }}
+    for(const e of this.events){const t=e.age/e.life;
+      if(e.k==='puff'){ctx.globalAlpha=A*.8*(1-t);ctx.fillStyle=e.col;ctx.fillRect(e.x|0,e.y|0,t<.4?2:1,t<.4?2:1);}
+      else if(e.k==='pop'){const r=1+t*3;ctx.globalAlpha=A*(1-t);ctx.fillStyle=e.col;for(let k=0;k<8;k++){const an=k*Math.PI/4;ctx.fillRect(Math.round(e.x+Math.cos(an)*r),Math.round(e.y+Math.sin(an)*r),1,1);}}
+      else if(e.k==='arrow'){ctx.globalAlpha=Math.min(1,A*1.6);const ux=e.vx/Math.hypot(e.vx,e.vy),uy=e.vy/Math.hypot(e.vx,e.vy);
+        for(let s=0;s<9;s++){ctx.fillStyle=s===0?'#e2ddd2':s>6?'#b03a2e':'#6b5340';ctx.fillRect(Math.round(e.x-ux*s),Math.round(e.y-uy*s),1,1);}
+        ctx.fillStyle='#b03a2e';ctx.fillRect(Math.round(e.x-ux*8)-1,Math.round(e.y-uy*8),1,1);}
+      else if(e.k==='bfly'){drawSpr(ctx,SPR.bfly[(Math.floor(e.ph)%2)],e.x,e.y,['#4b3d6b','#cdb0ff'],Math.min(1,A*1.1));}
+      else if(e.k==='splash'){ctx.globalAlpha=A*(1-t);ctx.fillStyle=e.col;ctx.fillRect(e.x|0,e.y|0,1,1);}
+      else if(e.k==='zap'){const on=t<.4||(t>.55&&t<.85);if(!on)continue;ctx.fillStyle='#bfe0ff';
+        for(let q=1;q<e.pts.length;q++){const [x0,y0]=e.pts[q-1],[x1,y1]=e.pts[q],n=Math.max(1,Math.ceil(Math.hypot(x1-x0,y1-y0)));for(let r=0;r<=n;r++){ctx.globalAlpha=A;ctx.fillRect(Math.round(x0+(x1-x0)*r/n),Math.round(y0+(y1-y0)*r/n),1,1);}}
+        ctx.globalAlpha=A*.4;ctx.fillStyle='#6a9cff';ctx.fillRect((e.pts[0][0]|0)-1,(e.pts[0][1]|0)-1,3,3);}
+      else if(e.k==='fish'){drawSpr(ctx,(e.vx>0?SPR.fishR:SPR.fishL)[Math.floor(e.ph)&1],e.x,e.y,e.col,Math.min(1,A*1.05));}
+      else if(e.k==='harp'){ctx.globalAlpha=Math.min(1,A*1.3);const bx=-e.ux,by=-e.uy;for(let s=1;s<10;s++){ctx.fillStyle='#8a6a40';ctx.fillRect(Math.round(e.x+bx*s),Math.round(e.y+by*s),1,1);}
+        ctx.fillStyle='#e2ddd2';ctx.fillRect(Math.round(e.x),Math.round(e.y),1,1);const px=Math.round(-by),py=Math.round(bx);
+        ctx.fillRect(Math.round(e.x+bx+px),Math.round(e.y+by+py),1,1);ctx.fillRect(Math.round(e.x+bx-px),Math.round(e.y+by-py),1,1);}
+      else if(e.k==='dart'){const d=e.vx>0?-1:1;ctx.globalAlpha=Math.min(1,A*1.4);for(let s=0;s<6;s++){ctx.fillStyle=s===0?'#e8e0c0':s>3?'#4ab84a':'#8a6a40';ctx.fillRect(Math.round(e.x+d*s),e.y|0,1,1);}
+        ctx.globalAlpha=A*.3;ctx.fillStyle='#e8e0c0';for(let s=6;s<12;s++)ctx.fillRect(Math.round(e.x+d*s),e.y|0,1,1);}
+      else if(e.k==='snake'){const d=e.vx>0?1:-1;for(let s=0;s<10;s++){const sx=Math.round(e.x-d*s),sy=Math.round(e.y+Math.sin(e.age*5-s*.8)*1.2);ctx.globalAlpha=Math.min(1,A*1.1);ctx.fillStyle=s===0?'#2f5e2c':(s%3===0?'#c8a040':'#4e8a3a');ctx.fillRect(sx,sy,1,1);}
+        if((e.age*3%2)<.4){ctx.fillStyle='#d8403a';ctx.fillRect(Math.round(e.x+d),Math.round(e.y+Math.sin(e.age*5)*1.2),1,1);}}
+      else if(e.k==='kern'){ctx.globalAlpha=Math.min(1,A*1.2);ctx.fillStyle=e.col;ctx.fillRect(e.x|0,e.y|0,1,2);}
+      else if(e.k==='conf'){ctx.globalAlpha=Math.min(1,(1-t)*1.6);ctx.fillStyle=e.col;const fl=Math.floor(e.ph)%3;ctx.fillRect(e.x|0,e.y|0,fl===0?2:1,fl===1?2:1);}
+      else if(e.k==='bolt'){/* on, brief gap, on again, fade: two strikes, never a strobe */
+        const s=e.age;const on=s<.1?1:s<.16?0:s<.3?.9:Math.max(0,.9*(1-(s-.3)/.25));if(on<=0)continue;const bm2=this.mode==='battle'?.6:1;
+        const line=(pts,col,a,wid)=>{ctx.globalAlpha=a;ctx.fillStyle=col;for(let q=1;q<pts.length;q++){const [x0,y0]=pts[q-1],[x1,y1]=pts[q],n=Math.max(1,Math.ceil(Math.max(Math.abs(x1-x0),Math.abs(y1-y0))));
+          for(let r=0;r<=n;r++){const xx=Math.round(x0+(x1-x0)*r/n),yy=Math.round(y0+(y1-y0)*r/n);ctx.fillRect(xx-(wid>1?1:0),yy,wid,1);}}};
+        line(e.pts,'#7f9cff',.28*on*bm2,3);e.br.forEach(b=>line(b,'#7f9cff',.18*on*bm2,3));
+        line(e.pts,'#f4f6ff',on*bm2,1);e.br.forEach(b=>line(b,'#cfd8ff',.75*on*bm2,1));}
+      else if(e.k==='hb'){for(let s=1;s<e.trail.length;s++){ctx.globalAlpha=A*(.4-s*.06);ctx.fillStyle='#f2c23a';ctx.fillRect(e.trail[s][0]|0,(e.trail[s][1]|0)+1,1,1);}
+        drawSpr(ctx,SPR.hb[(Math.floor(e.age*14))%2],e.x,e.y,['#3fc49a','#1f8a6a','#e8e0c0'],Math.min(1,A*1.1));}
+      else if(e.k==='maw'){const v=e.age/e.life,m=v<.55?Math.sin(v/.55*Math.PI/2):Math.max(0,1-(v-.55)/.08),g=1+m*4,x=e.x|0,y=e.y|0,fa=A*Math.min(1,(e.life-e.age)/.3);
+        ctx.globalAlpha=fa*.8;ctx.fillStyle='#200404';ctx.fillRect(x-6,y-g,12,g*2);ctx.globalAlpha=fa;ctx.fillStyle='#6a1414';ctx.fillRect(x-7,(y-g-2)|0,14,2);ctx.fillRect(x-7,(y+g)|0,14,2);
+        ctx.fillStyle='#e8dcc0';for(let k=0;k<4;k++){ctx.fillRect(x-6+k*3,(y-g)|0,1,2);ctx.fillRect(x-5+k*3,(y+g-2)|0,1,2);}}
+      else if(e.k==='eyes'){const f=Math.min(1,e.age/.4,(e.life-e.age)/.4),shut=(e.age%e.blink)<.12;if(shut)continue;
+        ctx.globalAlpha=f*.3;ctx.fillStyle=(P.eyes&&P.eyes.col)||'#ffcf3a';ctx.fillRect((e.x|0)-1,(e.y|0)-1,8,3);
+        ctx.globalAlpha=f;ctx.fillStyle=(P.eyes&&P.eyes.col)||'#ffd84a';ctx.fillRect(e.x|0,e.y|0,2,1);ctx.fillRect((e.x|0)+4,e.y|0,2,1);ctx.fillStyle='#1a1000';ctx.fillRect((e.x|0)+1,e.y|0,1,1);ctx.fillRect((e.x|0)+5,e.y|0,1,1);}
+    }
+    {const fc=this.fgCtx||ctx;if(this.fgCtx)this.fgCtx.clearRect(0,0,this.w,this.h);if(this.cine){this.drawCine(fc);const b=this.clearBand;if(this.fgCtx&&b)fc.clearRect(0,b[0],this.w,b[1]-b[0]);}} /* v1479: the boss's greca plate band stays clear */
+    ctx.globalAlpha=1;
+  }
+  /* Entrances and signatures. Full strength in every mode: these are the one-second moments. */
+  drawCine(ctx){
+    const C=this.cine,W=this.w,H=this.h,u=C.t/C.dur,fade=Math.min(1,(1-u)/.18,C.t/.15);
+    const px=(x,y,w,h,col,a)=>{ctx.globalAlpha=a;ctx.fillStyle=col;ctx.fillRect(Math.round(x),Math.round(y),w,h);};
+    if(C.k==='patolli'){
+      const s=Math.max(3,(H*.05)|0),cx=W/2,cy=H/2,cells=[];
+      for(let i=1;i<=5;i++)for(const off of [-1,0]){const e=i===5;cells.push([off,-i-1,e],[off,i,e],[-i-1,off,e],[i,off,e]);}
+      cells.sort((a,b)=>Math.abs(a[0])+Math.abs(a[1])-Math.abs(b[0])-Math.abs(b[1]));
+      px(0,0,W,H,'#000',.35*fade);
+      const shown=Math.floor(Math.min(1,u/.5)*cells.length);
+      for(let i=0;i<shown;i++){const [gx,gy]=cells[i],x=cx+gx*s,y=cy+gy*s;ctx.globalAlpha=fade;ctx.strokeStyle='#d9a43a';ctx.lineWidth=1;ctx.strokeRect(Math.round(x)+.5,Math.round(y)+.5,s-1,s-1);
+        if(cells[i][2])px(x+1,y+1,s-2,s-2,'#8c2f22',.6*fade);}
+      px(cx-s,cy-s,s*2,s*2,'#d9a43a',.25*fade);
+      for(let b=0;b<5;b++){const t0=.5+b*.05,v=Math.max(0,Math.min(1,(u-t0)/.18));if(v<=0)continue;
+        const bx=cx-s+((b*7)%(s*2-3)),by=cy-s+((b*5)%(s*2-2)),drop=(1-v)*H*.5,bounce=Math.abs(Math.sin(v*Math.PI*2))*(1-v)*4;
+        drawSpr(ctx,SPR.bean[b%2],bx,by-drop-bounce,['#f2ead8','#1a120c'],fade);}
+    }else if(C.k==='roll'){
+      const cx=W/2,cy=H*.48,land=.5,v=Math.min(1,u/land),x=-10+(cx+10)*(1-Math.pow(1-v,2)),y=cy-Math.abs(Math.sin(v*Math.PI*3))*(1-v)*H*.15;
+      px(0,0,W,H,'#000',.25*fade);
+      const fr=SPR.bean[u<land?(Math.floor(C.t*12)%4):0];
+      for(let j=0;j<fr.length;j++)for(let i=0;i<fr[j].length;i++){const c=fr[j][i];if(c==='.')continue;px(x-4+i*3,y+j*3,3,3,c==='1'?'#f2ead8':'#1a120c',fade);}
+      const n=u<land?(1+(Math.floor(C.t*14)%6)):C.res,pop=u<land?1:1+.4*Math.max(0,1-(u-land)/.12);
+      const fs=Math.round(H*.16*pop);ctx.font='bold '+fs+'px monospace';ctx.textAlign='center';ctx.textBaseline='bottom';
+      ctx.globalAlpha=fade;ctx.fillStyle='#1a120c';ctx.fillText(String(n),cx+1,y-3+1);ctx.fillStyle=u<land?'#a8937a':'#ffd36b';ctx.fillText(String(n),cx,y-3);
+    }else if(C.k==='stalks'){
+      const n=Math.max(5,Math.round(W/22));
+      for(let k=0;k<n;k++){const x=((k+.5)*W/n+((k*37)%9)-4)|0,maxH=H*(.28+((k*53)%17)/17*.22),g=Math.min(1,Math.max(0,(u-k*.02)/.55)),hgt=maxH*(1-Math.pow(1-g,3));
+        px(x,H-hgt,1,hgt,'#4e8a3a',fade);
+        for(let j=6;j<hgt-4;j+=6){const L=(j/6)%2?1:-1;px(x+L,H-j,1,1,'#6aa84a',fade);px(x+2*L,H-j-1,1,1,'#6aa84a',fade);px(x+3*L,H-j-1,1,1,'#3e7a2e',fade*.8);}
+        if(g>.75){px(x-1,H-hgt-4,2,4,'#f2c23a',fade);px(x+1,H-hgt-3,1,3,'#6aa84a',fade);px(x,H-hgt-6,1,2,'#e8d8a0',fade);}}
+    }else if(C.k==='harvest'){
+      const spots=C.spots||[[W*.33,H*.47],[W*.5,H*.47],[W*.67,H*.47]];
+      for(const sp of spots){const x=sp[0]|0,y=sp[1]|0,g=Math.min(1,u/.3),hgt=(H*.12*(1-Math.pow(1-g,3)))|0;
+        px(x,y-hgt,1,hgt,'#5cb85c',fade);for(let j=3;j<hgt;j+=4){px(x-1-(j%8?0:1),y-j,1,1,'#8ad06a',fade);px(x+1+(j%8?1:0),y-j-1,1,1,'#8ad06a',fade);}
+        if(u<.35){for(let r=0;r<6;r++){const an=r*1.047+u*4;px(x+Math.cos(an)*u*30,y-2+Math.sin(an)*u*16,1,1,'#b8f08a',(1-u/.35)*fade);}}}
+    }else if(CINE[C.k])CINE[C.k].draw(ctx,C,W,H,u,fade,px);
+    ctx.globalAlpha=1;
+  }
+}
+
+
+const RUN_SCREENS=new Set(['screen-mictlan-map','screen-deploy','screen-battle','screen-event','screen-spoils','screen-shop']);
+const BOSS_IDS=[['boss_xochi_ev','xochipilli'],['boss_chicomecoatl_ev','chicomecoatl'],['boss_cihuacoatl_ev','cihuacoatl'],['boss_mixcoatl_ev','mixcoatl'],
+  ['boss_tonatiuh_ev','tonatiuh'],['boss_xochiquetzal_ev','xochiquetzal'],['boss_toci_ev','toci'],['boss_huitzilopochtli_ev','huitzilopochtli'],['jag_ocetekuani','ocetekuani'],['boss_patecatl_ev','patecatl']];
+const TITLE_FX={n:0,name:'Title',count:24,mix:[['ember',.8],['ash',.2]],dir:'up',speed:[.1,.26],sway:.3,alpha:.8,
+  pal:{ember:['#ff8a3a','#ffb050','#e0582a'],ash:['#7a6e66','#5e544e','#948880']}};
+function sideBossFor(enemies){
+  for(const e of (enemies||[])){if(!e||!e.id)continue;const id=String(e.id);
+    for(const [pre,key] of BOSS_IDS){if(pre==='jag_ocetekuani'?id===pre:(id===pre||id.indexOf(pre+'_')===0))return {key,uid:id};}}
+  return null;}
+/* v1470: a layer boss is a god -- match the boss unit to a GODS_FX id (Malinalxochitl or Xiuhtecuhtli on L5) */
+function layerBossGodFor(enemies){
+  for(const e of (enemies||[])){if(!e||!e.isBoss||e.isMiniBoss)continue;const s=(String(e.id)+' '+String(e.baseId||'')+' '+String(e.name||'')).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); /* ids are short ('boss_tepy_8'), names are not */
+    const g=GODS_FX.find(x=>s.indexOf(x.id)>=0);if(g)return {key:g.id,uid:String(e.id)};}
+  return null;}
+const S={on:true,fx:null,key:null,host:null,enemiesRef:null,boss:null,bossKind:null,bossUid:null,entPending:false,entScr:null,entT:null,warm:false,
+  lastSid:null,lastFight:null,ov:null,ovT:0};
+try{if(localStorage.getItem('teotlan_mfx')==='off')S.on=false;}catch(e){}
+let bg=null,fg=null;
+function ensureCanvases(){
+  if(bg)return;
+  const wrap=document.body&&document.body.querySelector(':scope > div[style*="position:relative"]');
+  bg=document.createElement('canvas');bg.id='mfx-bg';fg=document.createElement('canvas');fg.id='mfx-fg';
+  const css='position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;image-rendering:pixelated;';
+  bg.style.cssText=css+'z-index:0';fg.style.cssText=css+'z-index:90';
+  if(wrap)document.body.insertBefore(bg,wrap);else document.body.prepend(bg);
+  document.body.appendChild(fg);}
+function clearAll(){if(bg)bg.getContext('2d').clearRect(0,0,bg.width,bg.height);if(fg)fg.getContext('2d').clearRect(0,0,fg.width,fg.height);
+  if(S.host)S.host.style.transform='';endEntrance();S.ov=null;S.old=null;}
+/* v1478 [Genaro]: the entrance used to dim the WHOLE battle screen to 15%, which also greyed out the
+   boss's greca title plate (it lives inside the screen). Now everything is dimmed EXCEPT the plate:
+   every sibling along the path from the plate up to the screen is dimmed, the path itself is not.
+   If the plate isn't there yet it keeps polling briefly; with no plate the whole screen dims as before. */
+function dimExceptPlate(scr){
+  const dim=el=>{S.entDim.push([el,el.style.transition]);el.style.transition='filter .25s';el.style.filter='brightness(.2)';}; /* filter, not opacity: the intro's kaUnroll animates opacity on the codex pages and would override it */
+  S.entDim=[];const pl=scr.querySelector('.cx-plate');
+  if(!pl){dim(scr);S.entPoll=(S.entPoll||0)+1;
+    /* v1480: wait up to ~0.4s for the codex intro's plate; a boss whose fight has none (Tonatiuh, Cipactli)
+       gets an MFX-made greca plate with its name instead */
+    setTimeout(()=>{if(S.entScr!==scr)return;if(!scr.querySelector('.cx-plate')&&S.entPoll>=8)makePlate(scr);undim();dimExceptPlate(scr);},50);return;}
+  S.entPoll=0;let n=pl;while(n&&n!==scr){const p=n.parentElement;if(!p)break;for(const c of p.children)if(c!==n)dim(c);n=p;}}
+function makePlate(scr){const ep=scr.querySelector('#cx-enemy');if(!ep)return;
+  let nm,sub;if(S.boss==='cipactli'){nm='Cipactli';sub=isEs()?'Monstruo Primordial de la Tierra':'Primordial Earth Monster';}
+  else{const e=(G.enemies||[]).find(x=>x&&String(x.id)===S.bossUid)||(G.enemies||[]).find(x=>x&&x.isBoss);if(!e)return;nm=e.name;try{sub=flavorDisp(e);}catch(_){sub=e.flavor||'';}}
+  const pl=document.createElement('div');pl.className='cx-plate mfx-plate';pl.innerHTML='<b>'+nm+'</b>'+(sub?'<span>'+sub+'</span>':'');
+  const dur=S.fx&&S.fx.cine?S.fx.cine.dur:2;pl.style.setProperty('--cxpd','0s');pl.style.setProperty('--kaK',String(Math.max(1,(dur-.3)/1.8)));
+  ep.appendChild(pl);S.entPlate=pl;}
+function undim(){(S.entDim||[]).forEach(([el,tr])=>{el.style.filter='';setTimeout(()=>{if(!el.style.filter)el.style.transition=tr;},300);});S.entDim=[];}
+function endEntrance(kill){if(S.entT){clearTimeout(S.entT);S.entT=null;}if(S.entPlate){S.entPlate.remove();S.entPlate=null;}if(S.entScr){undim();S.entScr.style.opacity='';S.entScr=null;S.entPoll=0;}
+  if(kill!==false&&S.fx&&S.fx.cine&&S.fx.cine.k===S.entK)S.fx.cine=null;if(S.fx&&kill!==false)S.fx.clearBand=null;} /* the timer only undims; a click skips the cinematic */ /* v1479: any entrance, not just the first two */
+document.addEventListener('pointerdown',()=>{if(S.entScr)endEntrance();},true);
+function presetFor(key){const k=key.slice(2);
+  if(key==='T')return TITLE_FX;
+  if(key.charAt(0)==='B')return BOSSES.find(b=>b.id===k);
+  if(key.charAt(0)==='G')return GODS_FX.find(g=>g.id===k);
+  return LAYERS.find(l=>l.n===+k);}
+function godKeyOf(id){return GODS_FX.some(g=>g.id===id)?'G:'+id:null;}
+/* v1472: Amoxtli Logs -- an open entry plays its own effect. Gods: their god power (as on god select).
+   Vassals: their layer's effect, except the EVENT vassals, which play their patron side boss's effect:
+   Humanity xe1-xe5 -> Xochipilli, xe6-xe8 -> Patecatl (xe4 escorts both; it is Xochipilli's), Nature ->
+   Chicomecoatl, Tonatiuh's Day pool -> Tonatiuh. Heart Jaguar plays its fight; Tlaloque play Tlaloc;
+   minibosses and Cipactli's parts play their layer. Unseen entries play nothing. */
+function amoxFxKey(){
+  try{
+    if(typeof AMX==='undefined'||AMX.view!=='entry'||!AMX.key)return null;
+    const k=String(AMX.key);
+    if(typeof amoxTier==='function'&&amoxTier(k)<1)return null;
+    if(k.indexOf('G:')===0)return godKeyOf(k.slice(2));
+    const e=amoxRegistry().byId[k];if(!e)return null;
+    if(e.id==='ocetekuani')return 'B:ocetekuani';
+    if(e.id==='mq_tlaloque')return godKeyOf('tlaloc');
+    if(e.cat==='vassal'){const has=(arr)=>Array.isArray(arr)&&arr.some(t=>t&&t.id===e.id);
+      if(typeof HUMANITY_CAPS!=='undefined'&&has(HUMANITY_CAPS))return /^xe[678]$/.test(e.id)?'B:patecatl':'B:xochipilli';
+      if(typeof NATURE_CAPS!=='undefined'&&has(NATURE_CAPS))return 'B:chicomecoatl';
+      if(typeof TONATIUH_DAY_CAPS!=='undefined'&&has(TONATIUH_DAY_CAPS))return 'B:tonatiuh';}
+    return 'L:'+Math.min(9,Math.max(1,e.layer|0||1));
+  }catch(err){return null;}}
+/* where inward presets (Tlazolteotl, Mictlantecuhtli) drift to: the god's own card */
+function attractFor(sid){
+  let el=null;
+  if(sid==='screen-battle'&&S.bossUid)el=document.querySelector('#screen-battle .uc[data-uid="'+S.bossUid.replace(/"/g,'')+'"]');
+  else if(sid==='screen-god')el=document.getElementById('god-detail-panel');
+  if(!el||!bg)return null;const r=el.getBoundingClientRect();if(!r.width)return null;
+  return [(r.left+r.width/2)/(bg.clientWidth||1),(r.top+r.height/2)/(bg.clientHeight||1)];}
+let last=performance.now();
+function frame(now){
+  const dt=Math.min(.05,(now-last)/1000);last=now;
+  try{tick(dt);}catch(e){if(!S._warned){S._warned=true;console.warn('MFX',e);}}
+  requestAnimationFrame(frame);}
+function tick(dt){
+  if(document.hidden)return;
+  const scr=document.querySelector('.screen.active'),sid=scr&&scr.id;
+  const g=(typeof G!=='undefined')?G:null;
+  const patron=g&&g.god&&g.god.id;
+  const lay=Math.min(9,Math.max(1,(g&&g.layer)|0||1));
+  const amoxK=sid==='screen-amox'?amoxFxKey():null;
+  const ctx0=amoxK?'amox':sid==='screen-intro'?'title':sid==='screen-story'?'story':(sid==='screen-god'&&patron)?'godsel':(sid==='screen-conquest'&&patron)?'conquest'
+    :(sid==='screen-ending'&&patron)?'ending'
+    :(patron&&(g.layer||0)>=1&&RUN_SCREENS.has(sid))?'run':null;
+  const entered=sid!==S.lastSid;S.lastSid=sid;
+  /* v1476 [Genaro]: layer-clear screen + the Tianguis before 'Enter Layer N' keep the patron's power;
+     the next layer's effect only starts once the player actually leaves for the map. */
+  if(g&&g._mfxBetween&&RUN_SCREENS.has(sid)&&sid!=='screen-shop')g._mfxBetween=false;
+  const between=ctx0==='ending'||(sid==='screen-shop'&&!!(g&&g._mfxBetween));
+  if(!(S.on&&ctx0)){if(S.fx){clearAll();S.fx=null;S.key=null;S.host=null;}return;}
+  ensureCanvases();
+  const battle=sid==='screen-battle';
+  if(battle&&g.enemies!==S.enemiesRef){S.enemiesRef=g.enemies;const sb=sideBossFor(g.enemies),lb=sb?null:layerBossGodFor(g.enemies);
+    S.boss=sb?sb.key:lb?lb.key:null;S.bossKind=sb?'side':lb?'layer':null;S.bossUid=sb?sb.uid:lb?lb.uid:null;
+    /* v1479: Cipactli (L9 phase 2) overrides whatever else is on the field -- Mictlantecuhtli stays in that wave */
+    const cip=(g.enemies||[]).find(e=>e&&String(e.id).indexOf('boss_cipactli_')===0);
+    if(cip){S.boss='cipactli';S.bossKind='side';S.bossUid='cipactli';}
+    const B=S.bossKind==='side'&&BOSSES.find(b=>b.id===S.boss);
+    S.entK=S.bossKind==='side'?(B&&B.entrance)||null:S.bossKind==='layer'?LB_ENTR[S.boss]||null:null;
+    /* once per boss: a later enemies-array swap mid-fight (summons, phases) must not replay it */
+    S.entPending=!!(S.entK&&!MFX_REDUCE&&S.bossUid!==S.entDoneUid);}
+  if(battle)S.lastFight=S.boss==='cipactli'?'layer':S.bossKind||'normal'; /* v1479: Cipactli's fall is the L9 clear */
+  if(!battle){S.boss=null;S.bossKind=null;S.bossUid=null;S.entDoneUid=null;S.entPending=false;}
+  /* spoils: a layer-boss win holds the patron's power for the whole screen; any other win layers a
+     short burst of it over the layer effect */
+  const layerClear=sid==='screen-spoils'&&S.lastFight==='layer';
+  /* v1473 [Genaro]: spoils show ONLY the patron's power -- no layer effect underneath. It starts when
+     the spoils screen opens, i.e. right after the battle's victory animation (cxVictoryThen) ends. */
+  const spoils=sid==='screen-spoils';S.ov=null;
+  /* v1474 [Genaro]: the switch to the patron's power starts DURING the yellow victory greca
+     (cxVictoryThen sets window._cxVictoryFinish for as long as it plays), not when spoils open. */
+  const victory=battle&&!!window._cxVictoryFinish;
+  let key;
+  if(ctx0==='amox')key=amoxK;
+  else if(ctx0==='title')key='T';
+  else if(ctx0==='godsel'||ctx0==='conquest'||spoils||victory||between)key=godKeyOf(patron)||'L:'+lay;
+  else if(S.bossKind==='side')key='B:'+S.boss;
+  else if(S.bossKind==='layer')key=godKeyOf(S.boss)||'L:'+lay;
+  else key='L:'+lay;
+  if(key!==S.key){const P=presetFor(key);if(!P)return;if(S.host)S.host.style.transform='';
+    const prev=S.fx;
+    S.fx=new LayerFx(bg,P,scr);S.fx.fg=fg;S.fx.fgCtx=fg.getContext('2d');fg.width=S.fx.w;fg.height=S.fx.h;S.key=key;S.warm=false;
+    /* v1474: every switch is a crossfade -- the new effect starts EMPTY and builds up over ~2.6s while
+       fading in, and the old one fades out over ~0.9s underneath. No more instant full screens. */
+    if(!MFX_REDUCE){S.fx.parts=[];S.fx.rampT=0;S.fx.rampDur=2.6;S.fx.fade=0;
+      if(prev){prev.noClear=true;prev.fgCtx=null;prev.cine=null;prev.host=null;S.old=prev;S.oldT=0;}}}
+  const fx=S.fx;
+  if(fx.host!==scr){if(fx.host)fx.host.style.transform='';fx.host=scr;}S.host=scr;
+  fx.mode=(battle&&!victory)?'battle':'map';
+  fx.intensity=(ctx0==='title'||ctx0==='story')?0:(ctx0==='godsel'||ctx0==='amox')?.4:(S.boss||layerClear||ctx0==='conquest'||between)?1:(spoils||victory)?.75:Math.min(1,Math.max(0,((g.battleNum||1)-1)/7));
+  if(fx.p.inward||fx.p.inwardSouls){const at=attractFor(sid);fx.attract=at||[.5,.45];}
+  /* v1479: wait while a modal is open or Cipactli's parts are still being revealed */
+  const _moOpen=(()=>{const m=document.getElementById('mo');return !!(m&&m.classList.contains('open'));})();
+  if(battle&&S.entPending&&!_moOpen&&!g._cipactliRevealing&&!g._cipactliReveal){S.entPending=false;S.entDoneUid=S.bossUid;fx.play(S.entK);
+    S.entScr=scr;dimExceptPlate(scr);S.entT=setTimeout(()=>endEntrance(false),fx.cine.dur*1000-250);}
+  /* v1479: during an entrance, aim the focal point below the boss's greca plate and keep its band clear */
+  if(fx.cine&&S.entScr){const pl=S.entScr.querySelector('.cx-plate'),op=pl?+getComputedStyle(pl).opacity:0;
+    if(pl&&op>.05){const r=pl.getBoundingClientRect(),H=bg.clientHeight||innerHeight,k=fx.h/H;fx.clearBand=[Math.floor(r.top*k),Math.ceil(r.bottom*k)];
+      if(!fx.cine.fySet){fx.cine.fySet=true;const pb=r.bottom/H;fx.cine.fy=Math.min(.82,Math.max(.55,pb+(1-pb)*.45));}}else fx.clearBand=null;}
+  else if(fx.clearBand)fx.clearBand=null;
+  if(MFX_REDUCE){if(!S.warm){for(let i=0;i<150;i++)fx.step(1/60);fx.draw();S.warm=true;}return;}
+  if(fx.rampDur){fx.rampT+=dt;fx.fade=Math.min(1,fx.rampT/1.2);if(fx.rampT>=fx.rampDur){fx.rampDur=0;fx.fade=null;}}
+  fx.step(dt);fx.draw();
+  if(S.old){S.oldT+=dt;S.old.fade=Math.max(0,1-S.oldT/.9);S.old.step(dt);S.old.draw();if(S.oldT>=.9)S.old=null;}
+}
+window.MFX={
+  signature(kind,opts){
+    if(!S.fx||MFX_REDUCE||!S.on)return;opts=opts||{};
+    if(kind==='roll'&&!(S.boss==='xochipilli'&&/xochi/.test(opts.caster||'')))return;
+    if(kind==='harvest'&&!(S.boss==='chicomecoatl'&&/chicomecoatl/.test(opts.caster||'')))return;
+    if(kind==='harvest'&&opts.uids&&bg){const sx=S.fx.w/(bg.clientWidth||1),sy=S.fx.h/(bg.clientHeight||1),spots=[];
+      opts.uids.forEach(u=>{const el=document.querySelector('#screen-battle .uc[data-uid="'+String(u).replace(/"/g,'')+'"]');if(!el)return;const r=el.getBoundingClientRect();
+        if(r.width)spots.push([(r.left+r.width/2)*sx,(r.bottom-4)*sy]);});
+      S.fx.play('harvest',spots.length?{spots}:{});return;}
+    S.fx.play(kind,kind==='roll'?{res:opts.res}:{});},
+  bossFall(){if(!S.fx||MFX_REDUCE)return;const g=(typeof G!=='undefined')?G:null;
+    if(g&&(g.enemies||[]).some(e=>e&&e.isBoss&&!e.isMiniBoss))S.fx.burst();},
+  setEnabled(v){S.on=!!v;try{localStorage.setItem('teotlan_mfx',v?'on':'off');}catch(e){}if(!v){clearAll();S.fx=null;S.key=null;}},
+  state(){return {on:S.on,key:S.key,boss:S.boss,bossKind:S.bossKind,lastFight:S.lastFight,overlay:!!S.ov,mode:S.fx&&S.fx.mode,intensity:S.fx&&S.fx.intensity,parts:S.fx&&S.fx.parts.length,cine:S.fx&&S.fx.cine&&S.fx.cine.k,attract:S.fx&&S.fx.attract,reduce:MFX_REDUCE};},
+  _fx(){return S.fx;}
+};
+requestAnimationFrame(frame);
+})();
+</script>
+
