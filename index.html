@@ -801,6 +801,13 @@ body.fx-min .amx-pend{animation:none}
    afflicts several targets at once. */
 @keyframes stCallout{0%{opacity:0;transform:translateY(6px) scale(.6)}15%{opacity:1;transform:translateY(-2px) scale(1.18)}25%{transform:translateY(-4px) scale(1)}55%{opacity:1;transform:translateY(-9px) scale(1)}100%{opacity:0;transform:translateY(-30px) scale(.95)}}
 .st-callout{position:fixed;font-size:13px;font-weight:800;letter-spacing:.4px;pointer-events:none;z-index:9999;animation:stCallout 1.26s ease-out forwards;text-shadow:0 1px 3px #000c,0 0 8px currentColor;white-space:nowrap}
+.dmg-pop.dmg-num{font-size:23px;font-weight:900;letter-spacing:.02em;-webkit-text-stroke:4px #140a06;paint-order:stroke fill;
+  text-shadow:0 2px 0 #140a06,0 0 10px rgba(0,0,0,.85);animation:dmgNumFloat 1.15s cubic-bezier(.2,.8,.3,1) forwards;z-index:10000}
+.dmg-pop.dmg-num.crit{font-size:28px}
+/* v1497 [Genaro]: bigger, outlined numbers -- they were getting lost under the special animations */
+@keyframes dmgNumFloat{0%{opacity:0;transform:translate(-50%,6px) scale(.6)}12%{opacity:1;transform:translate(-50%,-4px) scale(1.25)}24%{transform:translate(-50%,-6px) scale(1)}
+  75%{opacity:1;transform:translate(-50%,-26px) scale(1)}100%{opacity:0;transform:translate(-50%,-40px) scale(.92)}}
+@media (prefers-reduced-motion:reduce){.dmg-pop.dmg-num{animation:dmgNumFade 1.1s linear forwards}@keyframes dmgNumFade{0%,70%{opacity:1;transform:translate(-50%,-8px)}100%{opacity:0;transform:translate(-50%,-8px)}}}
 .dmg-pop{position:fixed;font-size:15px;font-weight:700;pointer-events:none;z-index:9999;animation:dmgFloat .9s ease-out forwards;text-shadow:0 1px 3px #000a;white-space:nowrap}
 @keyframes reviveBurst{0%{transform:scale(.9);box-shadow:0 0 0 0 rgba(255,215,120,0)}25%{transform:scale(1.07);box-shadow:0 0 18px 6px rgba(255,215,120,.6)}60%{box-shadow:0 0 12px 3px rgba(120,220,140,.5)}100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,215,120,0)}}
 .revive-burst{animation:reviveBurst 1.1s ease-out}
@@ -3192,14 +3199,14 @@ Object.assign(T_EN,{
   'ui.evr.xochi.final':`<div style="font-size:14px;color:#e0a0d0;margin-bottom:.75rem;text-align:center"><div style="font-size:32px;margin-bottom:.5rem">🎭</div><em>"You've played all my games. Now face me directly."</em><br><span style="font-size:12px;color:var(--td)">— Xochipilli prepares for battle</span></div>`,
   'ui.evr.xochi.lead':`<div style="font-size:13px;color:var(--td);margin-bottom:.75rem;text-align:center;font-style:italic">"You enter a small shrine full of toys, paintings, and undead dancers. Xochipilli grins and challenges you." <span style="font-size:10px;color:#e0a0d0">(Game {v0}/3)</span></div>`,
   'ui.evr.mem.out':`<div style="text-align:center;color:#e07070;font-size:13px;margin-top:.5rem">Out of flips! Keeping what you matched.</div>`,
-  'ui.evr.ball.cpuHit':`CPU scored! {v0} {v1} -{v2} HP next battle`,
+  'ui.evr.ball.cpuHit':`Xochipilli scores! {v0} {v1} -{v2} HP next battle`,
   'ui.evr.ball.score':`You: {v0} — Xochipilli: {v1} (First to {v2})`,
   'ui.evr.ball.wonSub':'Xochipilli showers you with riches!',
   'ui.evr.ball.lostSub':'Xochipilli: "Wow, you suck at ball games!"',
   'ui.evr.ball.rules':`<em>"First to {v0} points wins! Move your mouse/finger to control the paddle."</em>`,
   'ui.evr.ball.score0':`You: 0 — Xochipilli: 0 (First to {v0})`,
   'ui.evr.ball.youScored':`You scored! +{v0}`,
-  'ui.evr.ball.cpu':'CPU scored!',
+  'ui.evr.ball.cpu':'Xochipilli scores!',
   'ui.evr.ball.victory':'Victory!',
   'ui.evr.ball.xochiWins':'Xochipilli wins!',
   'ui.evr.ball.start':'Start Game!',
@@ -4321,14 +4328,14 @@ Object.assign(T_ES,{
   'ui.evr.xochi.final':'<div style="font-size:14px;color:#e0a0d0;margin-bottom:.75rem;text-align:center"><div style="font-size:32px;margin-bottom:.5rem">🎭</div><em>"Ya jugaste todos mis juegos. Ahora enfréntame directamente."</em><br><span style="font-size:12px;color:var(--td)">— Xochipilli se prepara para la batalla</span></div>',
   'ui.evr.xochi.lead':'<div style="font-size:13px;color:var(--td);margin-bottom:.75rem;text-align:center;font-style:italic">"Entras a un pequeño santuario lleno de juguetes, pinturas y danzantes no muertos. Xochipilli sonríe y te reta." <span style="font-size:10px;color:#e0a0d0">(Juego {v0}/3)</span></div>',
   'ui.evr.mem.out':'<div style="text-align:center;color:#e07070;font-size:13px;margin-top:.5rem">¡Se acabaron los volteos! Te quedas con lo que emparejaste.</div>',
-  'ui.evr.ball.cpuHit':'¡Anotó la CPU! {v0} {v1} -{v2} PV la siguiente batalla',
+  'ui.evr.ball.cpuHit':'¡Xochipilli anota! {v0} {v1} -{v2} PV la siguiente batalla',
   'ui.evr.ball.score':'Tú: {v0} — Xochipilli: {v1} (Gana el primero en llegar a {v2})',
   'ui.evr.ball.wonSub':'¡Xochipilli te colma de riquezas!',
   'ui.evr.ball.lostSub':'Xochipilli: "¡Vaya, el juego de pelota no es lo tuyo!"',
   'ui.evr.ball.rules':'<em>"¡Gana el primero en llegar a {v0} puntos! Mueve el ratón o el dedo para controlar la paleta."</em>',
   'ui.evr.ball.score0':'Tú: 0 — Xochipilli: 0 (Gana el primero en llegar a {v0})',
   'ui.evr.ball.youScored':'¡Anotaste! +{v0}',
-  'ui.evr.ball.cpu':'¡Anotó la CPU!',
+  'ui.evr.ball.cpu':'¡Xochipilli anota!',
   'ui.evr.ball.victory':'¡Victoria!',
   'ui.evr.ball.xochiWins':'¡Gana Xochipilli!',
   'ui.evr.ball.start':'¡Empezar el juego!',
@@ -7351,7 +7358,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1481'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1498'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -8005,22 +8012,25 @@ function buildMixcoatlFight(){
   return[boss,...escorts];
 }
 // ── NATURE CAPS: Chicomecoatl escorts — spawn cross-layer after unlock ──
+/* v1486 [Genaro]: Nature HP raised ~22% (85/72/80/120 -> 105/90/100/140) -- they were ~20% under the L2-L3 natives
+   they guest beside, and weak even after the first run. Also buffs captured Nature vassals (same template). */
 const NATURE_CAPS=[
-  {id:'ce1',name:'Thorn Dancer',nameEs:'Danzante de Espinas',icon:'🌿',element:'nature',type:'PHYS',hp:85,atk:16,mag:0,def:8,res:5,np:22,npCost:10,ability:'Thorn Lash',abilityEs:'Latigazo de Espinas',ad:'1.5×ATK + {{st:poison}} ×1',adEs:'1.5×ATQ a 1 enemigo + {{st:poison}} ×1',ak:'thornLash',acd:10,fv:4},
-  {id:'ce2',name:'Pollen Sprite',nameEs:'Duende de Polen',icon:'🌸',element:'nature',type:'MAG',hp:72,atk:0,mag:14,def:5,res:8,np:24,npCost:16,ability:'Pollen Burst',abilityEs:'Estallido de Polen',ad:'1.1×MAG, 2 targets + {{st:atkup}} ×1 all allies',adEs:'1.1×MAG a 2 enemigos + {{st:atkup}} ×1 a todos los aliados',ak:'pollenBurst',acd:10,fv:3},
-  {id:'ce3',name:'Harvest Wraith',nameEs:'Espectro de la Cosecha',icon:'🌾',element:'nature',type:'MIX',hp:80,atk:11,mag:8,def:6,res:6,np:22,npCost:14,ability:'Withering Touch',abilityEs:'Toque Marchitador',ad:'1.25×ATK, 4 targets + {{st:slow}} ×1',adEs:'1.25×ATQ a 4 enemigos + {{st:slow}} ×1',ak:'witheringTouch',acd:11,fv:3},
-  {id:'ce4',name:'Stalker Vine',nameEs:'Liana Acechante',icon:'🪴',element:'nature',type:'PHYS',hp:120,atk:14,mag:0,def:14,res:6,np:25,npCost:13,ability:'Vine Grasp',abilityEs:'Agarre de Liana',ad:'1.3×ATK + heals self for damage dealt',adEs:'1.3×ATQ a 1 enemigo + se cura por el daño infligido',ak:'vineGrasp',acd:12,fv:4},
+  {id:'ce1',name:'Thorn Dancer',nameEs:'Danzante de Espinas',icon:'🌿',element:'nature',type:'PHYS',hp:105,atk:16,mag:0,def:8,res:5,np:22,npCost:10,ability:'Thorn Lash',abilityEs:'Latigazo de Espinas',ad:'1.5×ATK + {{st:poison}} ×1',adEs:'1.5×ATQ a 1 enemigo + {{st:poison}} ×1',ak:'thornLash',acd:10,fv:4},
+  {id:'ce2',name:'Pollen Sprite',nameEs:'Duende de Polen',icon:'🌸',element:'nature',type:'MAG',hp:90,atk:0,mag:14,def:5,res:8,np:24,npCost:16,ability:'Pollen Burst',abilityEs:'Estallido de Polen',ad:'1.1×MAG, 2 targets + {{st:atkup}} ×1 all allies',adEs:'1.1×MAG a 2 enemigos + {{st:atkup}} ×1 a todos los aliados',ak:'pollenBurst',acd:10,fv:3},
+  {id:'ce3',name:'Harvest Wraith',nameEs:'Espectro de la Cosecha',icon:'🌾',element:'nature',type:'MIX',hp:100,atk:11,mag:8,def:6,res:6,np:22,npCost:14,ability:'Withering Touch',abilityEs:'Toque Marchitador',ad:'1.25×ATK, 4 targets + {{st:slow}} ×1',adEs:'1.25×ATQ a 4 enemigos + {{st:slow}} ×1',ak:'witheringTouch',acd:11,fv:3},
+  {id:'ce4',name:'Stalker Vine',nameEs:'Liana Acechante',icon:'🪴',element:'nature',type:'PHYS',hp:140,atk:14,mag:0,def:14,res:6,np:25,npCost:13,ability:'Vine Grasp',abilityEs:'Agarre de Liana',ad:'1.3×ATK + heals self for damage dealt',adEs:'1.3×ATQ a 1 enemigo + se cura por el daño infligido',ak:'vineGrasp',acd:12,fv:4},
 ];
 // ── HUMANITY CAPS: Xochipilli escorts ────────────────────────────────────────
+/* v1487 [Genaro]: Humanity HP raised ~22% to match the v1486 Nature buff (avg 87 -> 107). Captured Humanity vassals get it too. */
 const HUMANITY_CAPS=[
-  {id:'xe1',name:'Tlachtli Champion',nameEs:'Campeón de Tlachtli',icon:'🏐',element:'humanity',type:'PHYS',hp:88,atk:17,mag:0,def:7,res:4,np:22,npCost:10,ability:'Ball Strike',abilityEs:'Golpe de Pelota',ad:'0.55×ATK, 5 hits to random enemies + {{st:slow}} ×1 per hit',adEs:'0.55×ATQ, 5 golpes a enemigos al azar + {{st:slow}} ×1 por golpe',ak:'ballStrike',acd:10,fv:4},
-  {id:'xe2',name:'Obsidian Sculptor',nameEs:'Escultor de Obsidiana',icon:'🗿',element:'humanity',type:'MAG',hp:75,atk:0,mag:15,def:5,res:6,np:26,npCost:15,ability:'Craft Shard',abilityEs:'Esquirla Labrada',ad:'1.1×MAG, 4 targets + {{st:burn}} ×1',adEs:'1.1×MAG a 4 enemigos + {{st:burn}} ×1',ak:'craftShard',acd:10,fv:4},
-  {id:'xe3',name:'War Drummer',nameEs:'Tamborilero de Guerra',icon:'🥁',element:'humanity',type:'MIX',hp:80,atk:11,mag:9,def:7,res:6,np:24,npCost:11,ability:'War Rhythm',abilityEs:'Ritmo de Guerra',ad:'1.2×ATK to 1 enemy + {{st:atkup}} ×1 to all allies',adEs:'1.2×ATQ a 1 enemigo + {{st:atkup}} ×1 a todos los aliados',ak:'warRhythm',acd:11,fv:3},
-  {id:'xe4',name:'Macuahuitl Bearer',nameEs:'Portador de Macuahuitl',icon:'⚔️',element:'humanity',type:'PHYS',hp:115,atk:14,mag:0,def:12,res:5,np:22,npCost:10,ability:'Heavy Cleave',abilityEs:'Tajo Pesado',ad:'1.3×ATK + {{st:wound}} ×1',adEs:'1.3×ATQ a 1 enemigo + {{st:wound}} ×1',ak:'heavyCleave',acd:12,fv:4},
-  {id:'xe5',name:'War Priest',nameEs:'Sacerdote de Guerra',icon:'🙏',element:'humanity',type:'PHYS',hp:90,atk:10,mag:0,def:8,res:8,np:30,npCost:20,ability:'Uapantotli',abilityEs:'Uapantotli',ad:'Heal all allies 20% HP + cleanse',adEs:'Cura 20% de PV a todos los aliados + Limpieza',ak:'uapantotli',acd:12,fv:4},
-  {id:'xe6',name:'Curandera',nameEs:'Curandera',icon:'🌿',element:'humanity',type:'MAG',hp:80,atk:0,mag:14,def:6,res:8,np:28,npCost:14,ability:'Folk Remedy',abilityEs:'Remedio Casero',ad:'Heal all allies 18% HP + cleanse',adEs:'Cura 18% de PV a todos los aliados + Limpieza',ak:'folkRemedy',acd:11,fv:4},
-  {id:'xe7',name:'Toloache Poisoner',nameEs:'Envenenador de Toloache',icon:'🍵',element:'humanity',type:'MAG',hp:76,atk:0,mag:15,def:5,res:6,np:24,npCost:11,ability:'Tainted Draught',abilityEs:'Brebaje Contaminado',ad:'1.2×MAG to 1 + {{st:poison}} ×2',adEs:'1.2×MAG a 1 enemigo + {{st:poison}} ×2',ak:'taintedDraught',acd:10,fv:4},
-  {id:'xe8',name:'Picietl Brave',nameEs:'Valiente de Picietl',icon:'🍃',element:'humanity',type:'PHYS',hp:95,atk:16,mag:0,def:8,res:4,np:22,npCost:10,ability:'Battle Tonic',abilityEs:'Tónico de Batalla',ad:'{{st:atkup}} ×1 to self, then 1.3×ATK to 1 target',adEs:'{{st:atkup}} ×1 a sí mismo, luego 1.3×ATQ a 1 enemigo',ak:'battleTonic',acd:11,fv:4},
+  {id:'xe1',name:'Tlachtli Champion',nameEs:'Campeón de Tlachtli',icon:'🏐',element:'humanity',type:'PHYS',hp:108,atk:17,mag:0,def:7,res:4,np:22,npCost:10,ability:'Ball Strike',abilityEs:'Golpe de Pelota',ad:'0.55×ATK, 5 hits to random enemies + {{st:slow}} ×1 per hit',adEs:'0.55×ATQ, 5 golpes a enemigos al azar + {{st:slow}} ×1 por golpe',ak:'ballStrike',acd:10,fv:4},
+  {id:'xe2',name:'Obsidian Sculptor',nameEs:'Escultor de Obsidiana',icon:'🗿',element:'humanity',type:'MAG',hp:92,atk:0,mag:15,def:5,res:6,np:26,npCost:15,ability:'Craft Shard',abilityEs:'Esquirla Labrada',ad:'1.1×MAG, 4 targets + {{st:burn}} ×1',adEs:'1.1×MAG a 4 enemigos + {{st:burn}} ×1',ak:'craftShard',acd:10,fv:4},
+  {id:'xe3',name:'War Drummer',nameEs:'Tamborilero de Guerra',icon:'🥁',element:'humanity',type:'MIX',hp:98,atk:11,mag:9,def:7,res:6,np:24,npCost:11,ability:'War Rhythm',abilityEs:'Ritmo de Guerra',ad:'1.2×ATK to 1 enemy + {{st:atkup}} ×1 to all allies',adEs:'1.2×ATQ a 1 enemigo + {{st:atkup}} ×1 a todos los aliados',ak:'warRhythm',acd:11,fv:3},
+  {id:'xe4',name:'Macuahuitl Bearer',nameEs:'Portador de Macuahuitl',icon:'⚔️',element:'humanity',type:'PHYS',hp:140,atk:14,mag:0,def:12,res:5,np:22,npCost:10,ability:'Heavy Cleave',abilityEs:'Tajo Pesado',ad:'1.3×ATK + {{st:wound}} ×1',adEs:'1.3×ATQ a 1 enemigo + {{st:wound}} ×1',ak:'heavyCleave',acd:12,fv:4},
+  {id:'xe5',name:'War Priest',nameEs:'Sacerdote de Guerra',icon:'🙏',element:'humanity',type:'PHYS',hp:110,atk:10,mag:0,def:8,res:8,np:30,npCost:20,ability:'Uapantotli',abilityEs:'Uapantotli',ad:'Heal all allies 20% HP + cleanse',adEs:'Cura 20% de PV a todos los aliados + Limpieza',ak:'uapantotli',acd:12,fv:4},
+  {id:'xe6',name:'Curandera',nameEs:'Curandera',icon:'🌿',element:'humanity',type:'MAG',hp:98,atk:0,mag:14,def:6,res:8,np:28,npCost:14,ability:'Folk Remedy',abilityEs:'Remedio Casero',ad:'Heal all allies 18% HP + cleanse',adEs:'Cura 18% de PV a todos los aliados + Limpieza',ak:'folkRemedy',acd:11,fv:4},
+  {id:'xe7',name:'Toloache Poisoner',nameEs:'Envenenador de Toloache',icon:'🍵',element:'humanity',type:'MAG',hp:93,atk:0,mag:15,def:5,res:6,np:24,npCost:11,ability:'Tainted Draught',abilityEs:'Brebaje Contaminado',ad:'1.2×MAG to 1 + {{st:poison}} ×2',adEs:'1.2×MAG a 1 enemigo + {{st:poison}} ×2',ak:'taintedDraught',acd:10,fv:4},
+  {id:'xe8',name:'Picietl Brave',nameEs:'Valiente de Picietl',icon:'🍃',element:'humanity',type:'PHYS',hp:116,atk:16,mag:0,def:8,res:4,np:22,npCost:10,ability:'Battle Tonic',abilityEs:'Tónico de Batalla',ad:'{{st:atkup}} ×1 to self, then 1.3×ATK to 1 target',adEs:'{{st:atkup}} ×1 a sí mismo, luego 1.3×ATQ a 1 enemigo',ak:'battleTonic',acd:11,fv:4},
 ];
 function getNatureCaps(){return chicomecoatlUnlocked()?NATURE_CAPS:[];}
 function getHumanityCaps(){
@@ -12154,8 +12164,8 @@ const SURGE_PCT={ // v333: indexed by FORCE level (not char band); additive snap
      entry, so tier/paid bookkeeping is now inert (kept for saves, refunds and bonus tracking).
      Tonalli cost cut: 6% of the cost at pick time, minimum 1 (2 for picks taken at Lv10+). */
   ihiyotl:[.20],
-  teyoliaHp:[.20],
-  teyoliaDr:[.20],
+  teyoliaHp:[.15], /* v1484 [Genaro]: Teyolia felt strongest -- it pays on three stats. 20% -> 15% on HP, DEF and RES */
+  teyoliaDr:[.15],
   tonalliTp:[.20],
   tonalliCost:[.06]
 };
@@ -13649,6 +13659,15 @@ function eLvL9(bn){var T={1:81,2:82,3:83,4:84,5:87,6:88,7:90,8:92};return (T[bn]
    put both at 102. Phase 1 is a single unit and sits below the layer's regular curve; phase 2
    is six units at once and sits just under it. Tecpatl's enemyLvBonus and hard-mode still
    apply on top of both. */
+/* v1485 [Genaro]: regular-battle HP bonus per layer. L2-L3 up so L4 no longer spikes as hard; L5, L7 and L8 up
+   (L7 the most) so the climb after L4 does not dip. Regular battles only -- bosses and minibosses are untouched,
+   including the L8 minibosses. Scope: claude/teotlan_enemy_hp_layers_scope_v1484.md */
+const LAYER_HP_BONUS={1:1,2:1.10,3:1.20,4:1.25,5:1.40,6:1.25,7:1.50,8:1.30,9:1};
+/* v1485: L9 finale tuning -- phase 1 was a lone Mictlantecuhtli with less HP than the L8 boss fight */
+const L9_P1_HP=1.60,L9_P1_MAG=1.15,L9_P2_HP=1.25,L9_P2_DMG=1.10;
+/* v1485: L9 B5 fake-out -- summoned gods at full HP (was x0.85); the L1-L3 bosses were built for early levels
+   and fell far behind at Lv87, so they get an echo boost in this fight only */
+const L9_TAUNT_HP=1.00,L9_TAUNT_EARLY={boss_xolotl:1,boss_tepy:1,boss_itzpap:1},L9_TAUNT_EARLY_DMG=1.35,L9_TAUNT_EARLY_HP=1.20;
 const L9_PHASE1_LV=92, L9_PHASE2_LV=95; /* v792: phase 1 now matches the B8 curve and phase 2 sits above everything, so the finale is the high point instead of dipping below the trash preceding it */
 function l9BossLv(base){return base+(getTecpatlEffects().enemyLvBonus||0)+hardLvBonus();}
 function eCntL9(bn){return eCntL8(bn)+1;}
@@ -13815,10 +13834,10 @@ function buildEnemySet(bn,diff){
          defeating him here currently just ends the battle. */
       const lv9=l9BossLv(L9_PHASE1_LV); // v777: phase 1 at Lv95 (was the B8 table's 102)
       const tp9=getTecpatlEffects();const bHpM9=tp9.bossHpMult||1.0;
-      const bh9=Math.round(sc(MICTLANTECUHTLI_BOSS_TPL.hp||0,lv9)*diffHpMult(diff)*bHpM9);
+      const bh9=Math.round(sc(MICTLANTECUHTLI_BOSS_TPL.hp||0,lv9)*diffHpMult(diff)*bHpM9*L9_P1_HP); /* v1485 */
       const bnp9=Math.round(sc(MICTLANTECUHTLI_BOSS_TPL.np||60,lv9));
       const boss9={...MICTLANTECUHTLI_BOSS_TPL,id:'boss_mictlantecuhtli_8',maxHp:bh9,currentHp:bh9,
-        atk:0,mag:Math.round(sc(MICTLANTECUHTLI_BOSS_TPL.mag||0,lv9)*(diff==='hard'?1.1:1)),
+        atk:0,mag:Math.round(sc(MICTLANTECUHTLI_BOSS_TPL.mag||0,lv9)*(diff==='hard'?1.1:1)*L9_P1_MAG), /* v1485 */
         def:Math.round(sc(MICTLANTECUHTLI_BOSS_TPL.def||0,lv9)),res:Math.round(sc(MICTLANTECUHTLI_BOSS_TPL.res||0,lv9)),
         maxNP:bnp9,currentNP:bnp9,enemyLevel:lv9,isAlly:false};
       return[boss9];
@@ -13991,7 +14010,7 @@ function buildEnemySet(bn,diff){
   // v658: easy gains +1 enemy (was bc-1, now bc) — the old single-enemy L1 opener taught nothing
   // and paid nothing. Hard's bespoke HP curve is replaced by easy's curve x the per-layer ratio,
   // so HARD_HP_BY_LAYER is the single source of truth for the difficulty gap.
-  const _ehs=(0.5+bn*.065)*((isL4||isL5||isL6)?1.25:1);
+  const _ehs=(0.5+bn*.065)*(LAYER_HP_BONUS[G.layer]||1); /* v1485: per-layer table (was x1.25 on L4-L6 only) */
   if(diff==='easy'){count=Math.max(1,bc-1);lv=Math.max(1,bl-1);hs=_ehs;
     /* v1390: Gamepalooza -- L1 easy openers (B1-B4) rolled bc-1 = 1 lone enemy, no variety.
        Floor at 2 on L1, and split the old single enemy's HP across the pair (x0.5 each) so
@@ -16229,10 +16248,12 @@ function evXochiBallGame(el){
   const addPReward=()=>{const r=REWARDS[Math.floor(Math.random()*3)];pRewards.push(r);if(r==='blood')G.res.blood+=100;else if(r==='cacao')G.res.cacao+=50;else G.res.flower+=10;renderRes('rb-battle');try{saveRun();}catch(e){}}; /* v1101: banked per point */
 
   const canvas=document.createElement('canvas');
-  canvas.width=W;canvas.height=H;canvas.style.cssText='display:block;margin:0 auto;border:1px solid #5a4020;border-radius:6px;background:#1a0a00;cursor:none';
-  const ctx=canvas.getContext('2d');
-  let scoreDiv=document.createElement('div');scoreDiv.style.cssText='text-align:center;font-size:12px;color:#d4af37;margin:.25rem 0';
-  let rewardLog=document.createElement('div');rewardLog.style.cssText='font-size:11px;color:var(--td);text-align:center;min-height:16px';
+  /* v1482 [Genaro]: bigger court on screen. Same 320x220 game space, so speeds and paddles play the
+     same; it renders at 2x for crisp edges and scales to the panel (up to 640px wide). */
+  const SC=2;canvas.width=W*SC;canvas.height=H*SC;canvas.style.cssText='display:block;margin:0 auto;width:100%;max-width:640px;height:auto;aspect-ratio:'+W+'/'+H+';border:1px solid #5a4020;border-radius:6px;background:#1a0a00;cursor:none;touch-action:none';
+  const ctx=canvas.getContext('2d');ctx.setTransform(SC,0,0,SC,0,0);
+  let scoreDiv=document.createElement('div');scoreDiv.style.cssText='text-align:center;font-size:14px;color:#d4af37;margin:.35rem 0';
+  let rewardLog=document.createElement('div');rewardLog.style.cssText='font-size:13px;color:var(--td);text-align:center;min-height:20px;margin-top:.3rem';
 
   canvas.addEventListener('mousemove',e=>{const r=canvas.getBoundingClientRect();pPad=Math.max(0,Math.min(H-PAD_H,(e.clientY-r.top)/r.height*H-PAD_H/2));});
   canvas.addEventListener('touchmove',e=>{e.preventDefault();const r=canvas.getBoundingClientRect();pPad=Math.max(0,Math.min(H-PAD_H,(e.touches[0].clientY-r.top)/r.height*H-PAD_H/2));},{passive:false});
@@ -16536,11 +16557,12 @@ function buildL9TauntGods(lv,diff){
               typeof XOLOTL_BOSS_TPL!=='undefined'?XOLOTL_BOSS_TPL:null].filter(Boolean);
   const hs=diffHpMult(diff||'boss'),bHpM=(getTecpatlEffects().bossHpMult)||1.0;
   return [...pool].sort(()=>Math.random()-0.5).slice(0,5).map((tpl,idx)=>{
-    const mh=Math.round(sc(tpl.hp||0,lv)*hs*bHpM*0.85);
+    const early=!!L9_TAUNT_EARLY[tpl.id],eH=early?L9_TAUNT_EARLY_HP:1,eD=early?L9_TAUNT_EARLY_DMG:1; /* v1485 */
+    const mh=Math.round(sc(tpl.hp||0,lv)*hs*bHpM*L9_TAUNT_HP*eH);
     const mn=Math.round(sc(tpl.np||50,lv));
     const u={...tpl,id:tpl.id+'_5_'+idx,baseId:tpl.id,maxHp:mh,currentHp:mh,
-      atk:Math.round(sc(tpl.atk||0,lv)*(diff==='hard'?1.1:1)),
-      mag:Math.round(sc(tpl.mag||0,lv)*(diff==='hard'?1.1:1)),
+      atk:Math.round(sc(tpl.atk||0,lv)*(diff==='hard'?1.1:1)*eD),
+      mag:Math.round(sc(tpl.mag||0,lv)*(diff==='hard'?1.1:1)*eD),
       def:Math.round(sc(tpl.def||0,lv)),res:Math.round(sc(tpl.res||0,lv)),
       maxNP:mn,currentNP:mn,enemyLevel:lv,isAlly:false,_summonedGod:true};
     delete u.pk;
@@ -17502,7 +17524,9 @@ function processCurrentSlot(){
           G._actingEnemy=null;
           if(G.captureQueue.length&&!G.capActive){setTimeout(()=>processNextCap(),400);return;}
           // Phase 4: pause so player can read the damage (600ms)
-          setTimeout(advanceTurn,paceMs(600));
+          /* v1489 [Genaro]: a boss signature (Patolli roll, Holy Harvest) holds the next actor until it finishes */
+          const _hold=Math.min(2500,Math.max(0,(window._mfxHoldUntil||0)-performance.now()));
+          setTimeout(advanceTurn,paceMs(600)+_hold);
         };
         if(G._enemyHitsPending){G._enemyHitsDone=_afterEnemy;epochTimeout(()=>{if(!_done){G._enemyHitsPending=false;_afterEnemy();}},3000);}
         else _afterEnemy();
@@ -18415,6 +18439,10 @@ function fxImpact(uid){
 function fxKickoff(attacker,target,isAoe){ // specials: choose lunge/stomp/pulse + arm contact delay + wave origin
   if(!fxOn()||!attacker)return;
   const phys=(attacker.type||'PHYS')==='PHYS';
+  /* v1496 [Genaro]: when the special has its own animation, skip the generic kick-off entirely -- no lunge (it lunged,
+     then the fissure came), no stomp/pulse, and no distance cascade on the numbers: the animation times each number
+     to its own impact (MFX._numDelay). */
+  if(window.MFX&&MFX.willSpecial&&MFX.willSpecial(attacker)){if(G._fxCtx)G._fxCtx=null;return;}
   if(phys&&!isAoe&&target){
     fxSetCtx(attacker,target.id,target.id,170); // v557: wave radiates from the struck target, after contact
     fxLunge(attacker.id,target.id);
@@ -18505,12 +18533,12 @@ function animateHit(uid,dmg,isHeal,isCrit,_pastFx){
     if(el){
       const rect=el.getBoundingClientRect();
       const num=document.createElement('div');
-      num.className='dmg-pop';
+      num.className='dmg-pop dmg-num'+(isCrit?' crit':''); /* v1497: bigger, outlined, centred on the card */
       num.textContent=(isHeal?'+':'-')+dmg;
-      num.style.cssText=`color:${col};left:${rect.left+rect.width/2-16}px;top:${rect.top+6}px;${isCrit?'font-size:16px;font-weight:900;':''}`;
+      num.style.cssText=`color:${isCrit?'#ffd700':isHeal?'#6ef0a0':'#ff6a5a'};left:${rect.left+rect.width/2}px;top:${rect.top+rect.height*.18}px;`;
       if(isCrit){el.classList.add('crit-flash');setTimeout(()=>el.classList.remove('crit-flash'),400);}
       document.body.appendChild(num);
-      setTimeout(()=>num.remove(),950);
+      setTimeout(()=>num.remove(),1200);
       el.classList.remove('hit-flash','heal-flash');
       void el.offsetWidth;
       el.classList.add(isHeal?'heal-flash':'hit-flash');
@@ -18845,7 +18873,7 @@ function doPlayerSpecial(useOblation){
     if(G._b1HintState&&!G._b1SpecHintSeen){G._b1SpecHintSeen=true;setB1Hint(t('ui.b1.specTp'));}
     renderBattle();
     // Delay advanceTurn past any async multi-hit animations
-    const delay=G._multiHitPending?4*160+500:450;
+    const delay=(G._multiHitPending?4*160+500:450)+(window._mfxHoldMs?_mfxHoldMs():0); /* v1493 */
     setTimeout(()=>advanceTurn(actorId),paceMs(delay));
   }else{
     // Single-target: check if it targets an ally or enemy
@@ -18930,7 +18958,7 @@ function doPlayerAoeTarget(enemyId){
   else fireUnitSpecial(actor,targets,aa,null);
   resolveStatusAfterAction(actor);
   renderBattle();
-  const delay=G._multiHitPending?4*160+500:450;
+  const delay=(G._multiHitPending?4*160+500:450)+(window._mfxHoldMs?_mfxHoldMs():0); /* v1493 */
   setTimeout(()=>advanceTurn(actorId),paceMs(delay));
 }
 function doPlayerTarget(enemyId){
@@ -18986,7 +19014,7 @@ function doPlayerTarget(enemyId){
     }
     G.battlePhase='player_acting'; // block UI clicks during animation window
     renderBattle();
-    const mhDelay=G._multiHitPending?4*160+500:450;
+    const mhDelay=(G._multiHitPending?4*160+500:450)+(window._mfxHoldMs?_mfxHoldMs():0); /* v1493 */
     setTimeout(()=>{G.battlePhase='idle';advanceTurn(actorId);},mhDelay);
   }
 }
@@ -19833,7 +19861,7 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
     }else _belicNow(); /* v885: single-arrow path */
   }
   else if(gd.ak==='patolliGamble'){
-    const roll=rollPatolli();
+    const roll=rollPatolli();G._mfxRoll=roll; /* v1493 */
     const mults=[0,0,1.1,1.3,1.6,1.8,3.0];const hits=[0,0,1,2,3,0,0];
     addLog(isEs()?`<span class="log-ab">🎭 Apuesta de Patolli — ¡sacó <strong>${roll}</strong>!</span>`:`<span class="log-ab">🎭 Patolli Gamble — rolled <strong>${roll}</strong>!</span>`);
     if(roll===1){
@@ -22149,7 +22177,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   }
   if(ab==='Patolli Gamble'&&aa.length){
     const roll=Math.floor(Math.random()*6)+1;
-    try{if(window.MFX)MFX.signature('roll',{res:roll,caster:u.id});}catch(_mfx){} /* v1468 */
+    G._mfxRoll=roll; /* v1493: MFX reads the face (both sides) */
     /* v1117 [Genaro]: near-mirror of the PLAYER table. v1111 had cut roll 6 alone (4.0 -> 3.2)
        and left 2-5 at a flat 1.50x the player's 1.1/1.3/1.6/1.8 -- so face 6 was already almost
        mirrored (1.07x) while the faces that actually killed parties were half again as strong.
@@ -22171,21 +22199,22 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
        critify -- so these multipliers are hard ceilings, not averages. */
     const mults=[0,0,1.2,1.4,1.75,2.0,3.1];const hits=[0,0,1,2,3,0,0];
     addLog(isEs()?`<span class="log-ab">🎭 Apuesta de Patolli — ¡sacó <strong>${roll}</strong>!</span>`:`<span class="log-ab">🎭 Patolli Gamble — rolled <strong>${roll}</strong>!</span>`);
+    const _pgHits=[]; /* v1491: one entry per hit, in order, for the confetti bursts */
     if(roll===1){
-      aa.forEach(a=>{const h=applyArmorDamage(a,1,true);if(h>0){a.currentHp=Math.max(0,a.currentHp-h);G._animQueue.push({uid:a.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,a);if(a.currentHp<=0)handleDeath(a);}});
+      aa.forEach(a=>{const h=applyArmorDamage(a,1,true);_pgHits.push(a.id);if(h>0){a.currentHp=Math.max(0,a.currentHp-h);G._animQueue.push({uid:a.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,a);if(a.currentHp<=0)handleDeath(a);}});
     }else if(roll<=4){
       const n=hits[roll];
       for(let i=0;i<n;i++){
         const live=aa.filter(a=>a.currentHp>0);if(!live.length)break;
         const t=live[Math.floor(Math.random()*live.length)];
         const d=Math.max(1,Math.round(bpn(u)*(((u.mag||0)*mults[roll]-(t.res||0)*0.4))));
-        const h=applyArmorDamage(t,d,true);
+        const h=applyArmorDamage(t,d,true);_pgHits.push(t.id);
         /* v968: this branch logged nothing per hit, so three hits read as one line. */
         addLog(isEs()?`<span class="log-dmg">\u{1F3AD} Golpe de Patolli ${i+1}/${n} \u2192 ${t.icon} ${liveName(t)}: ${h>0?h:'absorbido por el Chimalli'}</span>`:`<span class="log-dmg">\u{1F3AD} Patolli hit ${i+1}/${n} \u2192 ${t.icon} ${t.name}: ${h>0?h:'absorbed by Chimalli'}</span>`);
         if(h>0){t.currentHp=Math.max(0,t.currentHp-h);G._animQueue.push({uid:t.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,t);if(t.currentHp<=0)handleDeath(t);}
       }
     }else{
-      aa.forEach(a=>{const d=Math.max(1,Math.round(bpn(u)*(((u.mag||0)*mults[roll]-(a.res||0)*0.4))));const h=applyArmorDamage(a,d,true);if(h>0){a.currentHp=Math.max(0,a.currentHp-h);G._animQueue.push({uid:a.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,a);if(a.currentHp<=0)handleDeath(a);}});
+      aa.forEach(a=>{const d=Math.max(1,Math.round(bpn(u)*(((u.mag||0)*mults[roll]-(a.res||0)*0.4))));const h=applyArmorDamage(a,d,true);_pgHits.push(a.id);if(h>0){a.currentHp=Math.max(0,a.currentHp-h);G._animQueue.push({uid:a.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});onHitContact(u,a);if(a.currentHp<=0)handleDeath(a);}});
     }
     addLog(isEs()?`<span class="log-ab">🎭 Tirada de Patolli ${roll}${roll===6?' — ¡IRA DIVINA!':''}</span>`:`<span class="log-ab">🎭 Patolli roll ${roll}${roll===6?' — DIVINE WRATH!':''}</span>`);return;
   }
@@ -22257,7 +22286,6 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     if(tgt.currentHp<=0)handleDeath(tgt);return;
   }
   if(ab==='Holy Harvest'&&ae.length){
-    try{if(window.MFX)MFX.signature('harvest',{uids:ae.map(a=>a.id),caster:u.id});}catch(_mfx){} /* v1468 */
     ae.forEach(a=>{
       const h=Math.round(a.maxHp*0.20);a.currentHp=healTo(a,h);
       cleanseUnit(a);
@@ -24090,12 +24118,12 @@ function startCipactliPhase(){
      Mictlantecuhtli resolved to 'mictlantecuhtli_p2' and fell back to his emoji while the
      phase-1 id ('_8') resolved fine. */
   const build=(t,idSuffix,extra)=>{
-    const h=Math.round(sc(t.hp||0,lv9)*hm*bHpM);
+    const h=Math.round(sc(t.hp||0,lv9)*hm*bHpM*L9_P2_HP); /* v1485 */
     const n=Math.round(sc(t.np||50,lv9));
     return Object.assign({...t,
       id:t.id+idSuffix,maxHp:h,currentHp:h,
-      atk:Math.round(sc(t.atk||0,lv9)*dm),
-      mag:Math.round(sc(t.mag||0,lv9)*dm),
+      atk:Math.round(sc(t.atk||0,lv9)*dm*L9_P2_DMG),
+      mag:Math.round(sc(t.mag||0,lv9)*dm*L9_P2_DMG),
       def:Math.round(sc(t.def||0,lv9)),
       res:Math.round(sc(t.res||0,lv9)),
       maxNP:n,currentNP:n,enemyLevel:lv9,isAlly:false},extra||{});
@@ -27519,7 +27547,9 @@ function buildEditPartyRows(){
   const ma=getMaxAllies();const pg=G.god;
   /* v1159: patron gets the same element badge the ally rows carry. */
   const _pgElem=(pg&&ELEM_META[pg.element])?('<span class="elem-badge '+ELEM_META[pg.element].cls+'" style="font-size:9px;white-space:nowrap">'+ELEM_META[pg.element].icon+' '+elemLbl(pg.element)+'</span>'):'';
-  const patronRow=pg?`<div data-punit="god_${pg.id}" style="display:flex;align-items:center;gap:8px;padding:5px 4px;border-bottom:0.5px solid var(--br);background:#1e1604;border-radius:4px;margin-bottom:2px"><span style="display:inline-flex;align-items:center">${godIconHtml(pg,GOD_PORTRAITS[pg.id]?48:28)}</span><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;color:#d4af37;display:flex;align-items:baseline;gap:6px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${pg.name}</span><span style="font-size:10px;color:var(--td);white-space:nowrap">${lvAb()}${getLevel('god_'+pg.id)} · ${unitTypeLbl(pg.type)}</span></div><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px">${_pgElem}${calcSynergy().count>0?'<span '+SYN_ATTRS.replace('style="','style="font-size:9px;color:#d4af37;background:#1e1604;border:0.5px solid #5a4a10;border-radius:8px;padding:1px 5px;white-space:nowrap;')+'>\u{1F517} +'+Math.round(calcSynergy().pct*100)+'%</span>':''}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;padding:3px 8px;white-space:nowrap;flex:0 0 auto"><span style="font-size:9px;color:#806030">${t('ui.party.patronTag')}</span><span style="font-size:10px;color:#504030">${t('ui.party.alwaysIn')}</span></div></div>`:'';
+  /* v1498 [Genaro]: the patron's portrait goes through unitIconHtml like the ally gods below it, so it gets the same
+     god-card scale (it was drawn at 48px next to 70px allies) */
+  const patronRow=pg?`<div data-punit="god_${pg.id}" style="display:flex;align-items:center;gap:8px;padding:5px 4px;border-bottom:0.5px solid var(--br);background:#1e1604;border-radius:4px;margin-bottom:2px"><span style="display:inline-flex;align-items:center">${GOD_PORTRAITS[pg.id]?unitIconHtml({id:'god_'+pg.id,name:pg.name,icon:pg.icon,isGod:true},48):godIconHtml(pg,28)}</span><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;color:#d4af37;display:flex;align-items:baseline;gap:6px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${pg.name}</span><span style="font-size:10px;color:var(--td);white-space:nowrap">${lvAb()}${getLevel('god_'+pg.id)} · ${unitTypeLbl(pg.type)}</span></div><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px">${_pgElem}${calcSynergy().count>0?'<span '+SYN_ATTRS.replace('style="','style="font-size:9px;color:#d4af37;background:#1e1604;border:0.5px solid #5a4a10;border-radius:8px;padding:1px 5px;white-space:nowrap;')+'>\u{1F517} +'+Math.round(calcSynergy().pct*100)+'%</span>':''}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;padding:3px 8px;white-space:nowrap;flex:0 0 auto"><span style="font-size:9px;color:#806030">${t('ui.party.patronTag')}</span><span style="font-size:10px;color:#504030">${t('ui.party.alwaysIn')}</span></div></div>`:'';
   const allyRows=getAllyPool().map(u=>{
     const uid=u._captureId||u.id;
     const inParty=G.deplSel.includes(uid);
@@ -29155,6 +29185,337 @@ const CINE={
    ctx.restore();}}
 };
 
+/* ═══ God specials, batch 1 (v1493). One cinematic per god's special move, drawn on the foreground canvas.
+   C.spec = {caster:rect, foes:[rect], friends:[rect], hits:[foeIndex,...], kill:bool, stacks:n, low:friendIndex}
+   rects are {x,y,w,h} in canvas pixels. Works for either side: "foes" are whoever the move hits. */
+const SPC=r=>[r.x+r.w/2,r.y+r.h/2];
+const SPE=t=>1-Math.pow(1-Math.max(0,Math.min(1,t)),3);
+const SPP=(t,a,b)=>Math.max(0,Math.min(1,(t-a)/(b-a)));
+function spRing(ctx,x,y,r,col,a,w){ctx.globalAlpha=a;ctx.strokeStyle=col;ctx.lineWidth=w||1;ctx.beginPath();ctx.arc(x,y,Math.max(.5,r),0,6.283);ctx.stroke();ctx.lineWidth=1;}
+function spShake(C,i,amt){C._sh=C._sh||{};C._sh[i]=Math.max(C._sh[i]||0,amt);}
+function spApplyShake(C){const S=C.spec;if(!S)return;(S.foes||[]).forEach((r,i)=>{const el=r&&r.el;if(!el)return;const a=(C._sh&&C._sh[i])||0;
+  el.style.transform=a>0?'translate('+Math.round(rnd(-a,a)*2.2)+'px,'+Math.round(rnd(-a*.5,a*.5)*2.2)+'px)':''; /* amt is in canvas px; ~2.2 CSS px each */});C._sh={};}
+function spClearShake(C){const S=C&&C.spec;if(S)(S.foes||[]).forEach(r=>{if(r&&r.el)r.el.style.transform='';});}
+/* The game's Teotl glyph (64x64 pixel art, #tl-teotl), rasterised once: an image for the spin and a pixel list for the dissolve */
+const TEOTL_D='M4 0h60v1h-60zM5 1h58v1h-58zM0 2h1v1h-1zM5 2h18v1h-18zM26 2h12v1h-12zM42 2h20v1h-20zM0 3h2v1h-2zM6 3h16v1h-16zM27 3h10v1h-10zM43 3h18v1h-18zM63 3h1v1h-1zM0 4h3v1h-3zM7 4h14v1h-14zM28 4h8v1h-8zM43 4h17v1h-17zM62 4h2v1h-2zM0 5h4v1h-4zM8 5h12v1h-12zM23 5h3v1h-3zM29 5h6v1h-6zM38 5h3v1h-3zM44 5h15v1h-15zM61 5h3v1h-3zM0 6h5v1h-5zM9 6h11v1h-11zM23 6h3v1h-3zM29 6h6v1h-6zM38 6h4v1h-4zM45 6h13v1h-13zM60 6h3v1h-3zM0 7h6v1h-6zM10 7h16v1h-16zM29 7h6v1h-6zM38 7h19v1h-19zM59 7h3v1h-3zM0 8h7v1h-7zM11 8h15v1h-15zM29 8h6v1h-6zM38 8h18v1h-18zM58 8h3v1h-3zM0 9h8v1h-8zM13 9h13v1h-13zM29 9h6v1h-6zM38 9h17v1h-17zM57 9h3v1h-3zM0 10h9v1h-9zM14 10h12v1h-12zM29 10h6v1h-6zM38 10h16v1h-16zM56 10h3v1h-3zM0 11h10v1h-10zM15 11h11v1h-11zM29 11h6v1h-6zM38 11h15v1h-15zM55 11h3v1h-3zM0 12h11v1h-11zM16 12h10v1h-10zM29 12h6v1h-6zM38 12h14v1h-14zM54 12h3v1h-3zM0 13h13v1h-13zM17 13h9v1h-9zM29 13h6v1h-6zM38 13h13v1h-13zM53 13h3v1h-3zM0 14h13v1h-13zM17 14h9v1h-9zM29 14h6v1h-6zM38 14h12v1h-12zM52 14h3v1h-3zM0 15h15v1h-15zM19 15h7v1h-7zM38 15h11v1h-11zM51 15h3v1h-3zM0 16h15v1h-15zM19 16h7v1h-7zM39 16h9v1h-9zM50 16h4v1h-4zM0 17h16v1h-16zM20 17h4v1h-4zM40 17h7v1h-7zM49 17h4v1h-4zM0 18h17v1h-17zM21 18h1v1h-1zM43 18h3v1h-3zM48 18h4v1h-4zM0 19h18v1h-18zM44 19h1v1h-1zM47 19h3v1h-3zM0 20h5v1h-5zM7 20h12v1h-12zM27 20h13v1h-13zM46 20h3v1h-3zM57 20h2v1h-2zM0 21h4v1h-4zM7 21h13v1h-13zM25 21h16v1h-16zM45 21h3v1h-3zM57 21h3v1h-3zM0 22h3v1h-3zM7 22h13v1h-13zM24 22h18v1h-18zM44 22h3v1h-3zM57 22h4v1h-4zM0 23h2v1h-2zM5 23h14v1h-14zM23 23h23v1h-23zM59 23h3v1h-3zM0 24h2v1h-2zM5 24h14v1h-14zM22 24h9v1h-9zM35 24h9v1h-9zM45 24h1v1h-1zM59 24h3v1h-3zM0 25h2v1h-2zM5 25h13v1h-13zM21 25h7v1h-7zM37 25h8v1h-8zM59 25h3v1h-3zM0 26h4v1h-4zM21 26h6v1h-6zM38 26h23v1h-23zM0 27h5v1h-5zM20 27h6v1h-6zM39 27h21v1h-21zM0 28h5v1h-5zM20 28h5v1h-5zM40 28h6v1h-6zM0 29h18v1h-18zM20 29h5v1h-5zM42 29h4v1h-4zM0 30h18v1h-18zM20 30h5v1h-5zM31 30h5v1h-5zM42 30h4v1h-4zM0 31h18v1h-18zM20 31h5v1h-5zM30 31h1v1h-1zM33 31h4v1h-4zM42 31h4v1h-4zM0 32h18v1h-18zM20 32h5v1h-5zM33 32h5v1h-5zM42 32h4v1h-4zM0 33h18v1h-18zM20 33h5v1h-5zM33 33h5v1h-5zM42 33h4v1h-4zM0 34h18v1h-18zM20 34h6v1h-6zM33 34h5v1h-5zM42 34h4v1h-4zM0 35h5v1h-5zM20 35h7v1h-7zM32 35h6v1h-6zM42 35h4v1h-4zM0 36h5v1h-5zM20 36h8v1h-8zM32 36h6v1h-6zM42 36h17v1h-17zM0 37h4v1h-4zM21 37h17v1h-17zM42 37h18v1h-18zM0 38h2v1h-2zM5 38h14v1h-14zM22 38h15v1h-15zM42 38h3v1h-3zM59 38h2v1h-2zM0 39h2v1h-2zM5 39h15v1h-15zM22 39h14v1h-14zM40 39h4v1h-4zM59 39h2v1h-2zM0 40h2v1h-2zM5 40h16v1h-16zM23 40h12v1h-12zM40 40h3v1h-3zM59 40h2v1h-2zM0 41h3v1h-3zM7 41h14v1h-14zM24 41h11v1h-11zM38 41h5v1h-5zM57 41h4v1h-4zM0 42h4v1h-4zM7 42h14v1h-14zM24 42h5v1h-5zM38 42h6v1h-6zM57 42h3v1h-3zM0 43h5v1h-5zM7 43h13v1h-13zM23 43h1v1h-1zM25 43h4v1h-4zM37 43h3v1h-3zM41 43h4v1h-4zM57 43h2v1h-2zM0 44h19v1h-19zM22 44h3v1h-3zM26 44h3v1h-3zM36 44h4v1h-4zM42 44h4v1h-4zM0 45h18v1h-18zM21 45h3v1h-3zM26 45h3v1h-3zM35 45h4v1h-4zM43 45h4v1h-4zM0 46h17v1h-17zM20 46h3v1h-3zM26 46h3v1h-3zM35 46h3v1h-3zM44 46h4v1h-4zM0 47h16v1h-16zM19 47h3v1h-3zM26 47h3v1h-3zM35 47h3v1h-3zM45 47h4v1h-4zM0 48h15v1h-15zM18 48h3v1h-3zM26 48h3v1h-3zM35 48h3v1h-3zM46 48h4v1h-4zM0 49h14v1h-14zM17 49h3v1h-3zM26 49h3v1h-3zM35 49h3v1h-3zM47 49h4v1h-4zM0 50h14v1h-14zM17 50h2v1h-2zM26 50h3v1h-3zM35 50h3v1h-3zM48 50h4v1h-4zM0 51h13v1h-13zM16 51h3v1h-3zM26 51h3v1h-3zM35 51h3v1h-3zM49 51h4v1h-4zM0 52h11v1h-11zM15 52h3v1h-3zM26 52h3v1h-3zM35 52h3v1h-3zM50 52h4v1h-4zM0 53h10v1h-10zM14 53h3v1h-3zM26 53h3v1h-3zM35 53h3v1h-3zM51 53h4v1h-4zM0 54h9v1h-9zM13 54h3v1h-3zM26 54h3v1h-3zM35 54h3v1h-3zM52 54h4v1h-4zM0 55h8v1h-8zM11 55h4v1h-4zM26 55h3v1h-3zM35 55h3v1h-3zM53 55h4v1h-4zM0 56h7v1h-7zM10 56h4v1h-4zM26 56h3v1h-3zM35 56h3v1h-3zM54 56h4v1h-4zM0 57h6v1h-6zM9 57h4v1h-4zM20 57h3v1h-3zM26 57h3v1h-3zM35 57h3v1h-3zM42 57h3v1h-3zM55 57h4v1h-4zM0 58h5v1h-5zM8 58h3v1h-3zM20 58h3v1h-3zM26 58h3v1h-3zM35 58h3v1h-3zM41 58h3v1h-3zM56 58h4v1h-4zM0 59h4v1h-4zM7 59h3v1h-3zM21 59h7v1h-7zM36 59h7v1h-7zM57 59h4v1h-4zM0 60h3v1h-3zM6 60h3v1h-3zM22 60h5v1h-5zM37 60h6v1h-6zM58 60h4v1h-4zM0 61h2v1h-2zM5 61h3v1h-3zM23 61h3v1h-3zM38 61h4v1h-4zM59 61h4v1h-4zM0 62h1v1h-1zM5 62h2v1h-2zM60 62h4v1h-4zM4 63h2v1h-2zM61 63h3v1h-3z';
+let _teotl=null;function teotlGlyph(){if(_teotl)return _teotl;const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');x.fillStyle='#7ec2ff';x.fill(new Path2D(TEOTL_D));
+  const data=x.getImageData(0,0,64,64).data,pts=[];for(let y=0;y<64;y+=2)for(let i=0;i<64;i+=2)if(data[(y*64+i)*4+3]>128)pts.push([i,y]);_teotl={c,pts};return _teotl;}
+/* spin the glyph over a card, then dissolve it into drifting pixels. a: 0..1 progress of the beat */
+function teotlSwirl(ctx,px,x,y,size,a,f){const G=teotlGlyph(),sc=size/64;
+  if(a<.45){const v=a/.45,rot=v*v*9,s2=sc*(.55+.45*SPE(v*1.6));ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.globalAlpha=f*Math.min(1,v*4);ctx.imageSmoothingEnabled=false;
+    ctx.drawImage(G.c,-32*s2,-32*s2,64*s2,64*s2);ctx.restore();spRing(ctx,x,y,size*.5*(.6+.4*v),'#7ec2ff',f*v*.6,1);}
+  else{const v=(a-.45)/.55;for(let k=0;k<G.pts.length;k++){const [gx,gy]=G.pts[k],dx=(gx-32)*sc,dy=(gy-32)*sc,an=Math.atan2(dy,dx)+v*2.5,r=Math.hypot(dx,dy)*(1+v*1.6)+((k*7)%5)*v*3;
+    px(x+Math.cos(an)*r,y+Math.sin(an)*r-v*v*10,1,1,k%4?'#7ec2ff':'#e0f2ff',f*(1-v)*(1-(k%3)*.15));}}}
+function spPlus(px,x,y,col,a){px(x,y-1,1,3,col,a);px(x-1,y,3,1,col,a);}
+const SPECIALS={
+ /* Quetzalcoatl — Feather Embrace: feathers spiral to the target and wrap it; on a kill they close into a cocoon */
+ feather:{dur:1.4,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,[cx,cy]=SPC(S.caster),T=S.foes[0];if(!T)return;const [tx,ty]=SPC(T);
+   if(!C.d)C.d=Array.from({length:18},(_,i)=>({o:i/18*6.283,d:rnd(0,.18),c:pick(['#ffffff','#e8f4ec','#7ad6b0'])}));
+   for(const p of C.d){const v=SPP(t,p.d,p.d+.5),an=p.o+t*7;if(v<=0)continue;
+     const r=(1-SPE(v))*Math.hypot(tx-cx,ty-cy)*.15+6+(t>.6?4:0)-(S.kill?SPE(SPP(t,.7,.95))*10:0);if(S.kill&&t>.95)continue; /* on a kill the feathers collapse into the orb */
+     const x=cx+(tx-cx)*SPE(v)+Math.cos(an)*r,y=cy+(ty-cy)*SPE(v)+Math.sin(an)*r*.7;
+     drawSpr(ctx,SPR.feather[(an*2|0)&1],x,y,[p.c,'#7ad6b0','#cfeee0'],f*(t>1.1?1-(t-1.1)/.3:1));}
+   for(let i=0;i<3;i++){const v=SPP(t,.45+i*.08,.9+i*.08);if(v>0&&v<1)spRing(ctx,tx,ty,6+v*14,'#cfeee0',f*(1-v)*.8);}
+   /* v1493 [Genaro]: on a kill the feathers fold into a golden orb, which then plays the game's regular capture
+      binding (gold glow, two contracting ring glyphs, motes drawn inward, ✦ CAPTURED) */
+   if(S.kill&&t>.8){const ov=SPE(SPP(t,.8,1.0)),out=SPP(t,1.15,1.35),R=(3+ov*5)*(1+.15*Math.sin(t*30)*(t<1.15?1:0))*(1-out);
+     if(R>.3){ctx.globalAlpha=f*.35*(1-out);ctx.fillStyle='#f0c850';ctx.beginPath();ctx.arc(tx,ty,R*2.2,0,6.283);ctx.fill();
+       ctx.globalAlpha=f*(1-out);ctx.fillStyle='#a8791a';ctx.beginPath();ctx.arc(tx,ty,R,0,6.283);ctx.fill();ctx.fillStyle='#f0c850';ctx.beginPath();ctx.arc(tx,ty,R*.75,0,6.283);ctx.fill();
+       ctx.fillStyle='#fff2c0';ctx.beginPath();ctx.arc(tx-R*.25,ty-R*.25,R*.35,0,6.283);ctx.fill();}
+     const b=SPP(t,1.1,1.9);if(b>0&&b<1){
+       ctx.globalAlpha=f*Math.sin(Math.PI*Math.min(1,b/.9))*.55;ctx.fillStyle='#ffe696';ctx.beginPath();ctx.ellipse(tx,ty,T.w*.45*(.7+.5*b),T.h*.4*(.7+.5*b),0,0,6.283);ctx.fill();
+       for(const [sc0,dl] of [[1,0],[.62,.14]]){const rv=SPP(b,dl,dl+.85);if(rv<=0||rv>=1)continue;const rr=T.w*.55*sc0*(1.7-1.2*rv),rot=rv*2.6;
+         ctx.globalAlpha=f*(rv<.25?rv/.25:1-rv)*.95;ctx.strokeStyle='#f0cd64';ctx.lineWidth=2;ctx.beginPath();ctx.arc(tx,ty,rr,0,6.283);ctx.stroke();ctx.lineWidth=1;
+         for(let k=0;k<8;k++){const an=rot+k*.785;px(tx+Math.cos(an)*rr-1,ty+Math.sin(an)*rr-1,3,3,'#fff2c0',f*(1-rv));}}
+       for(let k=0;k<16;k++){const an=k*.3927+k*.13,mv=SPP(b,(k%5)*.03,.6+(k%5)*.03),mag=T.w*(.6+(k%3)*.18)*(1-SPE(mv));if(mv<=0||mv>=1)continue;
+         const mx=tx+Math.cos(an)*mag,my=ty+Math.sin(an)*mag;ctx.globalAlpha=f*(mv<.2?mv/.2:1-mv);ctx.fillStyle='#f0c850';ctx.beginPath();ctx.arc(mx,my,1.6*(1-.6*mv),0,6.283);ctx.fill();}
+       /* (no CAPTURED text here -- the game's own capture label shows it) */}}}},
+ /* Tlaloc — Tlalocan Deluge: a storm cloud gathers over the targets and a downpour hits each; the first kill rises as a Tlaloque */
+ deluge:{dur:1.5,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t;if(!S.foes.length)return;
+   const xs=S.foes.map(r=>r.x),xe=S.foes.map(r=>r.x+r.w),x0=Math.min(...xs)-6,x1=Math.max(...xe)+6,top=Math.min(...S.foes.map(r=>r.y)),cyl=Math.max(4,top-14);
+   /* one cloud per target, so only the cards actually hit sit under the storm */
+   const g=SPE(SPP(t,0,.3));S.foes.forEach((T,ti)=>{const cx2=T.x+T.w/2,hw=T.w*.62;ctx.globalAlpha=f*.92*g;ctx.fillStyle='#2a3448';
+     for(let i=0;i<3;i++){ctx.beginPath();ctx.ellipse(cx2+(i-1)*hw*.6,cyl+Math.sin(i*1.7+ti)*2,hw*.5,7,0,0,6.283);ctx.fill();}
+     ctx.fillStyle='#3e4c66';for(let i=0;i<2;i++){ctx.beginPath();ctx.ellipse(cx2+(i-.5)*hw*.6,cyl-3,hw*.38,4,0,0,6.283);ctx.fill();}});
+   if(!C.d)C.d=Array.from({length:70},()=>({x:rnd(0,1),o:rnd(0,1),L:rnd(4,8)}));
+   const rain=SPP(t,.25,.4)*(1-SPP(t,1.1,1.4));if(rain>0)for(const d of C.d){const T=S.foes[(d.x*S.foes.length)|0],X=T.x+((d.x*S.foes.length)%1)*T.w,sp=(t*3+d.o)%1,Y=cyl+6+sp*(T.y+T.h-cyl-6);
+     px(X+sp*3,Y,1,d.L,'#8cc4f4',f*rain*.85);if(sp>.92)px(X+2,T.y+T.h-2,3,1,'#cfe8ff',f*rain);}
+   S.foes.forEach((T,i)=>{const [x,y]=SPC(T),v=SPP(t,.45+i*.05,.75+i*.05);if(v>0&&v<1)spRing(ctx,x,y,4+v*12,'#6aa8e8',f*(1-v));});
+   if(S.kill&&t>.9){const T=S.foes[S.killIdx!=null?S.killIdx:0]||S.foes[0], /* v1495: the unit that actually died first */[x]=SPC(T),v=SPE(SPP(t,.9,1.3)),y=T.y+T.h-v*T.h*.7;
+     ctx.globalAlpha=f*v;ctx.fillStyle='#4a88c8';ctx.fillRect(x-3,y-8,6,8);ctx.fillStyle='#8cc4f4';ctx.fillRect(x-2,y-12,4,4);ctx.fillStyle='#ffffff';ctx.fillRect(x-1,y-11,1,1);ctx.fillRect(x+1,y-11,1,1);
+     spRing(ctx,x,y-6,6+v*8,'#8cc4f4',f*(1-v)*.8);}}},
+ /* Coatlicue — Ophidian Mother: a serpent coils up each ally, dark flecks fly off (cleanse), green + rise; the weakest gets a scale shield */
+ ophidian:{dur:1.5,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t;
+   if(!C.d)C.d=S.friends.map(()=>Array.from({length:8},()=>({an:rnd(0,6.283),v:rnd(.5,1.2)})));
+   S.friends.forEach((R,i)=>{const [x]=SPC(R),bot=R.y+R.h,hgt=R.h*.85*SPE(SPP(t,.05+i*.04,.6+i*.04));
+     for(let j=0;j<hgt;j+=1){const sx=x+Math.sin(j*.22+t*6)*R.w*.32;px(sx,bot-j,2,1,j%6<3?'#3f7a3a':'#5c9a46',f);}
+     if(hgt>4){const hx=x+Math.sin(hgt*.22+t*6)*R.w*.32;px(hx-1,bot-hgt-2,4,3,'#2f5e2c',f);px(hx,bot-hgt-1,1,1,'#ffd36b',f);px(hx+3,bot-hgt,2,1,'#d04a3a',f*(Math.sin(t*20)>0?1:0));}
+     const cv=SPP(t,.45,.85);if(cv>0&&cv<1)for(const p of C.d[i]){px(x+Math.cos(p.an)*cv*16*p.v,R.y+R.h*.5+Math.sin(p.an)*cv*12*p.v,1,1,'#3a2a2a',f*(1-cv));}
+     const hv=SPP(t,.7,1.5);if(hv>0)for(let k=0;k<3;k++){const v=(hv+k*.33)%1;spPlus(px,x-6+k*6,R.y+R.h*.5-v*R.h*.5,'#b8f08a',f*(1-v));}});
+   if(S.low!=null&&S.friends[S.low]&&t>.8){const R=S.friends[S.low],[x,y]=SPC(R),v=SPE(SPP(t,.8,1.1));ctx.globalAlpha=f*v*.9;ctx.strokeStyle='#9ad86a';ctx.lineWidth=2;ctx.beginPath();
+     for(let k=0;k<=6;k++){const an=k*1.047+.52,rr=R.w*.42*v+2;k?ctx.lineTo(x+Math.cos(an)*rr,y+Math.sin(an)*rr):ctx.moveTo(x+Math.cos(an)*rr,y+Math.sin(an)*rr);}ctx.stroke();ctx.lineWidth=1;}}},
+ /* Huehueteotl — Old Fire: an ember climbs from the caster and drops on the target; the blast grows with each Burn already on it */
+ oldfire:{dur:1.4,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,[cx,cy]=SPC(S.caster),T=S.foes[0];if(!T)return;const [tx,ty]=SPC(T),st=S.stacks||0;
+   const v=SPP(t,0,.55);if(v<1){const x=cx+(tx-cx)*v,y=cy+(ty-cy)*v-Math.sin(v*Math.PI)*H*.25,r=2+v*3;
+     for(let k=1;k<7;k++){const kv=Math.max(0,v-k*.03);px(cx+(tx-cx)*kv,cy+(ty-cy)*kv-Math.sin(kv*Math.PI)*H*.25,2,2,'#e0582a',f*(1-k/7)*.8);}
+     ctx.globalAlpha=f;ctx.fillStyle='#ff8a3a';ctx.beginPath();ctx.arc(x,y,r,0,6.283);ctx.fill();ctx.fillStyle='#ffd36b';ctx.beginPath();ctx.arc(x,y,r*.5,0,6.283);ctx.fill();}
+   const b=SPP(t,.55,.9);if(b>0&&b<1){const R=(8+st*6)*SPE(b);ctx.globalAlpha=f*(1-b)*.85;ctx.fillStyle='#ff8a3a';ctx.beginPath();ctx.arc(tx,ty,R,0,6.283);ctx.fill();
+     ctx.fillStyle='#ffd36b';ctx.beginPath();ctx.arc(tx,ty,R*.55,0,6.283);ctx.fill();spRing(ctx,tx,ty,R+3,'#ffb050',f*(1-b),2);if(b<.2)px(0,0,W,H,'#ff8a3a',f*.12*(1-b/.2)*(1+st*.3));}
+   if(t>.7){for(let k=0;k<6+st*3;k++){const ph=(t*2.2+k*.37)%1,x=T.x+((k*13)%T.w),y=T.y+T.h-ph*T.h*.6;px(x,y,1,2,ph<.5?'#ffd36b':'#e0582a',f*(1-ph)*(1-SPP(t,1.15,1.4)));}}}},
+ /* Xolotl — Crippling Shock: four bolts, one per hit, each leaving a sickly poison puff */
+ shock:{dur:1.6,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,[cx,cy]=SPC(S.caster);
+   if(!C.d)C.d=S.hits.map((fi,i)=>{const T=S.foes[fi],[tx,ty]=SPC(T);return {fi,t0:.15+i*.2,pts:jag(cx,cy,tx,ty,9,6),tx,ty,puff:Array.from({length:10},()=>({an:rnd(0,6.283),v:rnd(.4,1)}))};});
+   for(const h of C.d){const a=t-h.t0;if(a<0)continue;
+     spShake(C,h.fi,a<.15?1.3:0);if(a<.18){poly(ctx,h.pts,'#ffffff',f,2);poly(ctx,h.pts,'#6ab8ff',f*.6,4);spRing(ctx,h.tx,h.ty,3+a*60,'#cfe8ff',f*(1-a/.18));}
+     const pv=SPP(a,.08,.6);if(pv>0&&pv<1)for(const p of h.puff)px(h.tx+Math.cos(p.an)*pv*12*p.v,h.ty+Math.sin(p.an)*pv*9*p.v-pv*4,2,2,pv<.5?'#9ad86a':'#6ab84a',f*(1-pv));}
+   if(t<.25){ctx.globalAlpha=f*.5;ctx.fillStyle='#9ad8ff';ctx.beginPath();ctx.arc(cx,cy,3+t*20,0,6.283);ctx.fill();}}},
+ /* Tepeyollotl — Epicenter Roar: a crack races to the target, the ground jolts, rocks splash the others and everyone slows */
+ roar:{dur:1.5,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,[cx]=SPC(S.caster),T=S.foes[0];if(!T)return;const [tx,ty]=SPC(T),gy=S.caster.y>T.y?T.y+T.h+3:T.y-3;
+   if(!C.d)C.d={crack:jag(cx,S.caster.y>T.y?S.caster.y-2:S.caster.y+S.caster.h+2,tx,gy,12,4),rocks:Array.from({length:14},()=>({an:rnd(Math.PI*1.1,Math.PI*1.9),v:rnd(.6,1.4)}))};
+   const hit=t>.42&&t<.75?1-Math.abs((t-.55)/.2):0;ctx.save();if(hit>0&&MFX_SAFE_SHAKE)ctx.translate(Math.round(rnd(-3,3)*hit),Math.round(rnd(-2,2)*hit));
+   const cv=SPP(t,0,.42);poly(ctx,C.d.crack.slice(0,Math.max(2,Math.ceil(C.d.crack.length*cv))),'#2a1a10',f,3);poly(ctx,C.d.crack.slice(0,Math.max(2,Math.ceil(C.d.crack.length*cv))),'#b59d80',f*.7,1);
+   const b=SPP(t,.42,.9);spShake(C,0,b>0&&b<.35?2.2:0);if(b>0&&b<1){for(const r of C.d.rocks){const d=b*26*r.v;px(tx+Math.cos(r.an)*d,ty+Math.sin(r.an)*d*.7+b*b*16,2,2,'#8a7560',f*(1-b));}spRing(ctx,tx,ty,4+b*20,'#a08a70',f*(1-b),2);}
+   S.foes.forEach((R,i)=>{if(i===0)return;const [x,y]=SPC(R),v=SPP(t,.5,.8);if(v>0&&v<1){const sx=tx+(x-tx)*v,sy=ty+(y-ty)*v-Math.sin(v*Math.PI)*12;px(sx,sy,2,2,'#6e5c4a',f);}
+     if(t>.78&&t<.95)spRing(ctx,x,y,5,'#a08a70',f*(1-SPP(t,.78,.95)));spShake(C,i,t>.78&&t<.9?1.2:0);});
+   if(t>.85)S.foes.forEach(R=>{const [x]=SPC(R),v=SPP(t,.85,1.15),y=R.y-4+v*3;ctx.globalAlpha=f*(1-SPP(t,1.2,1.5));ctx.fillStyle='#6ab0e8';
+     for(let k=0;k<2;k++){ctx.fillRect(x-3,y+k*3,7,1);ctx.fillRect(x-2,y+k*3+1,5,1);ctx.fillRect(x-1,y+k*3+2,3,1);}});
+   ctx.restore();}},
+ /* ── batch 2 ── */
+ /* Itzpapalotl — Obsidian Storm: a slanting shower of obsidian flints rains onto every target; each strike sparks, the last leaves a bleeding Wound */
+ obsidian:{dur:1.6,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t;
+   if(!C.d){C.d=[];S.foes.forEach((T,i)=>{for(let k=0;k<9;k++){const t0=.05+i*.06+k*.07+rnd(0,.05);C.d.push({i,t0,tx:T.x+T.w*rnd(.2,.8),ty:T.y+T.h*rnd(.25,.75),dx:rnd(28,46),dy:rnd(70,100),L:rnd(5,8)|0});}});}
+   const dark=SPP(t,0,.2)*(1-SPP(t,1.2,1.5));px(0,0,W,H,'#0a0612',f*.3*dark);
+   for(const s of C.d){const v=SPP(t,s.t0,s.t0+.22);if(v<=0)continue;
+     if(v<1){const x=s.tx-s.dx*(1-v),y=s.ty-s.dy*(1-v),ux=s.dx/Math.hypot(s.dx,s.dy),uy=s.dy/Math.hypot(s.dx,s.dy);
+       for(let k=0;k<s.L;k++)px(x-ux*k,y-uy*k,k<2?2:1,1,k<2?'#2a2235':k<4?'#463a5e':'#6a5894',f*(1-k/s.L*.6));px(x,y,1,1,'#e6d2ff',f);}
+     else{const a=SPP(t,s.t0+.22,s.t0+.45);if(a<1){px(s.tx-1,s.ty-1,3,3,'#e6d2ff',f*(1-a));for(let k=0;k<4;k++){const an=k*1.57+.78;px(s.tx+Math.cos(an)*a*6,s.ty+Math.sin(an)*a*6,1,1,'#cdb0ff',f*(1-a));}}
+       px(s.tx-1,s.ty,3,1,'#2a2235',f*(1-SPP(t,1.3,1.6)));}}
+   S.foes.forEach((T,i)=>{const [tx,ty]=SPC(T),w=SPP(t,.55+i*.06,.65+i*.06);if(w<=0)return;const fo=1-SPP(t,1.3,1.6);
+     px(tx-5,ty+3,10,1,'#d0303a',f*w*fo);px(tx-4,ty+5,8,1,'#d0303a',f*w*fo);for(let k=0;k<3;k++){const dv=((t-.6)*1.5+k*.33)%1;px(tx-3+k*3,ty+6+dv*7,1,1,'#a01a24',f*w*fo*(1-dv));}
+     spShake(C,i,t>.3&&t<.9?1.2:0);});}},
+ /* Mixcoatl — Tlipotl Arrows: a lightning-trailed arrow flies to the target and pins it with a Paralyze crackle; a second one if he acted first */
+ arrows:{dur:1.35,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,[cx,cy]=SPC(S.caster),T=S.foes[0];if(!T)return;const [tx,ty]=SPC(T);
+   const shots=S.first?[0,.38]:[0];
+   shots.forEach((t0,si)=>{const v=SPP(t,t0+.08,t0+.38),ox=si?3:-2,an=Math.atan2(ty-cy,tx-cx),ca=Math.cos(an),sa=Math.sin(an);
+     if(t>t0&&v<1){const x=cx+(tx-cx)*v+ox,y=cy+(ty-cy)*v-Math.sin(v*Math.PI)*6;
+       const tr=jag(x-ca*30,y-sa*30,x,y,6,2.5);poly(ctx,tr,'#9ab8ff',f*.8,1);
+       for(let k=0;k<10;k++)px(x-ca*k,y-sa*k,1,1,k<2?'#2a2235':'#8a6a3a',f);px(x-ca*10-1,y-sa*10-1,2,2,'#e8e0d0',f);}
+     const hv=SPP(t,t0+.38,t0+.8);if(hv>0){const fo=1-SPP(t,1.1,1.35);for(let k=0;k<8;k++)px(tx+ox-ca*k*.8,ty-sa*k*.8,1,1,k<2?'#2a2235':'#8a6a3a',f*fo);
+       if(hv<1){spRing(ctx,tx,ty,3+hv*12,'#ffd84a',f*(1-hv));for(let z=0;z<3;z++){const a=z*2.09+t*9,r=T.w*.35;poly(ctx,jag(tx+Math.cos(a)*r,ty+Math.sin(a)*r*.8,tx+Math.cos(a+.9)*r,ty+Math.sin(a+.9)*r*.8,3,2),'#ffe85a',f*(1-hv),1);}}}
+     spShake(C,0,(t>t0+.38&&t<t0+.55)?1.5:0);});}},
+ /* Ixquimilli — Frost Macuahuitl: an icy blade sweeps across the target with a white flash; the card shudders hard, ice shards burst off, frost creeps over it,
+    two snowflakes freeze in place (Lethargy x2) and a red Wound cut appears */
+ frost:{dur:1.55,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,T=S.foes[0];if(!T)return;const [tx,ty]=SPC(T);
+   if(!C.d)C.d={fr:Array.from({length:80},()=>{const e=(Math.random()*4)|0,s=Math.random(),d=Math.pow(Math.random(),1.7)*.5;return {x:e<2?T.x+s*T.w:(e===2?T.x+d*T.w:T.x+T.w-d*T.w),y:e<2?(e===0?T.y+d*T.h:T.y+T.h-d*T.h):T.y+s*T.h,d};}),
+     sh:Array.from({length:16},()=>({an:rnd(0,6.283),v:rnd(.6,1.4)}))};
+   const sv=SPP(t,.05,.3);if(sv>0&&sv<1){const R=T.w*.8,a0=-2.5,a1=a0+2.4*SPE(sv);ctx.globalAlpha=f*(1-SPP(sv,.7,1));ctx.strokeStyle='#cfe8ff';ctx.lineWidth=4;ctx.beginPath();ctx.arc(tx-R*.3,ty+R*.5,R,a0,a1);ctx.stroke();
+     ctx.strokeStyle='#ffffff';ctx.lineWidth=1;ctx.beginPath();ctx.arc(tx-R*.3,ty+R*.5,R-2,a0,a1);ctx.stroke();}
+   const hit=SPP(t,.28,.4);if(hit>0&&hit<1){ctx.globalAlpha=f*(1-hit)*.85;ctx.fillStyle='#e8f6ff';ctx.fillRect(T.x,T.y,T.w,T.h);px(0,0,W,H,'#cfe8ff',f*.12*(1-hit));}
+   const bv=SPP(t,.28,.75);if(bv>0&&bv<1)for(const p of C.d.sh){const d=SPE(bv)*T.w*.9*p.v;px(tx+Math.cos(p.an)*d,ty+Math.sin(p.an)*d*.8+bv*bv*8,2,1,bv<.5?'#ffffff':'#a9d2f0',f*(1-bv));}
+   const shake=t>.28&&t<.75?(1-SPP(t,.28,.75))*3.5:0;spShake(C,0,shake);
+   const g=SPE(SPP(t,.3,.8))*.5,fo=1-SPP(t,1.25,1.55);for(const p of C.d.fr){if(p.d>g)continue;px(p.x,p.y,1,1,p.d<g*.5?'#ffffff':'#a9d2f0',f*fo*(.9-p.d));}
+   [[-.22,0],[.22,.08]].forEach(([dx,dl])=>{const v=SPP(t,.6+dl,.85+dl);if(v<=0)return;const x=tx+dx*T.w,y=T.y+T.h*.3,c='#e8f6ff',a=f*fo;
+     px(x-3*v,y,6*v+1,1,c,a);px(x,y-3*v,1,6*v+1,c,a);px(x-2*v,y-2*v,1,1,c,a);px(x+2*v,y+2*v,1,1,c,a);px(x+2*v,y-2*v,1,1,c,a);px(x-2*v,y+2*v,1,1,c,a);});
+   const w=SPP(t,.3,.4);if(w>0){px(tx-5,ty+2,10,1,'#d0303a',f*w*fo);px(tx-4,ty+4,8,1,'#d0303a',f*w*fo);}}},
+ /* Tonatiuh — Aurum Break: a sun flares over Tonatiuh, a golden strike drops on the target, then its light streams to the weakest ally as healing */
+ aurum:{dur:1.7,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,[cx,cy]=SPC(S.caster),T=S.foes[0];if(!T)return;const [tx,ty]=SPC(T),Lw=S.friends[S.low!=null?S.low:0]||S.caster,[lx,ly]=SPC(Lw);
+   const sv=SPP(t,0,.3);if(sv<1){const r=3+sv*6;ctx.globalAlpha=f*(1-SPP(t,.25,.4));ctx.fillStyle='#e8a020';ctx.beginPath();ctx.arc(cx,cy-S.caster.h*.6,r,0,6.283);ctx.fill();ctx.fillStyle='#fff0b0';ctx.beginPath();ctx.arc(cx,cy-S.caster.h*.6,r*.5,0,6.283);ctx.fill();
+     for(let k=0;k<8;k++){const a=k*.785+t*3;px(cx+Math.cos(a)*(r+3)-1,cy-S.caster.h*.6+Math.sin(a)*(r+3),2,1,'#ffd36b',f*(1-sv));}}
+   const bv=SPP(t,.28,.55);if(bv>0&&bv<1){const top=Math.max(0,T.y-H*.3),yb=top+(ty-top)*SPE(bv);ctx.globalAlpha=f*.9;ctx.fillStyle='#ffd36b';ctx.fillRect(tx-2,top,4,yb-top);ctx.fillStyle='#fff8e0';ctx.fillRect(tx-1,top,2,yb-top);}
+   const xv=SPP(t,.5,.8);if(xv>0&&xv<1){ctx.globalAlpha=f*(1-xv)*.8;ctx.fillStyle='#ffd36b';ctx.beginPath();ctx.arc(tx,ty,4+xv*12,0,6.283);ctx.fill();spRing(ctx,tx,ty,6+xv*16,'#fff0b0',f*(1-xv),2);
+     for(let k=0;k<10;k++){const a=k*.628;px(tx+Math.cos(a)*xv*18,ty+Math.sin(a)*xv*14,2,2,'#ffd36b',f*(1-xv));}}
+   spShake(C,0,t>.5&&t<.68?1.5:0);
+   if(t>.75){for(let k=0;k<14;k++){const v=SPP(t,.75+k*.025,1.2+k*.025);if(v<=0||v>=1)continue;const x=tx+(lx-tx)*SPE(v),y=ty+(ly-ty)*SPE(v)-Math.sin(v*Math.PI)*14;px(x,y,2,2,k%3?'#ffd36b':'#fff0b0',f*(1-v*.3));}
+     const hv=SPP(t,1.15,1.7);if(hv>0){ctx.globalAlpha=f*.3*(1-hv);ctx.fillStyle='#ffd36b';ctx.beginPath();ctx.ellipse(lx,ly,Lw.w*.5,Lw.h*.45,0,0,6.283);ctx.fill();
+       for(let k=0;k<3;k++){const v=(hv+k*.33)%1;spPlus(px,lx-6+k*6,ly-v*Lw.h*.5,'#fff0b0',f*(1-v));}}}}},
+ /* Malinalxochitl — Fiery Stinger: a burning scorpion tail rises from Malinalxochitl, fires a beam of violet fire into the main target,
+    and the blast recoils outward through the rest of the enemies; Burn flames take hold */
+ stinger:{dur:1.7,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,[cx,cy]=SPC(S.caster),T=S.foes[0];if(!T)return;const [tx,ty]=SPC(T);
+   const up=S.caster.y>T.y?-1:1,rise=SPE(SPP(t,0,.3)),fall=SPP(t,.75,.95),n=10;let tipx=cx,tipy=cy;
+   if(fall<1)for(let i=0;i<n;i++){const s=i/(n-1),a=Math.PI*.5*up*-1+s*Math.PI*1.1*rise*(cx<W/2?1:-1),R=S.caster.w*(.35+.55*s)*rise,x=cx+Math.sin(s*Math.PI*1.1*rise)*R*(cx<W/2?1:-1)*.6,y=cy+up*s*S.caster.h*1.1*rise;
+     const sz=Math.max(2,Math.round(4-s*2));px(x-sz/2,y-sz/2,sz,sz,i%2?'#9a5ad0':'#c48af0',f*(1-fall));if(i===n-1){tipx=x;tipy=y;px(x-1,y-1,3,3,'#ff8040',f*(1-fall));}}
+   const ch=SPP(t,.25,.4);if(ch>0&&ch<1){spRing(ctx,tipx,tipy,2+ch*6,'#ffb050',f*(1-ch));}
+   const bv=SPP(t,.38,.62);if(bv>0){const L=SPE(Math.min(1,bv*1.6)),ex=tipx+(tx-tipx)*L,ey=tipy+(ty-tipy)*L,fo=1-SPP(t,.6,.8);
+     ctx.globalAlpha=f*fo*.55;ctx.strokeStyle='#9a5ad0';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(tipx,tipy);ctx.lineTo(ex,ey);ctx.stroke();
+     ctx.globalAlpha=f*fo;ctx.strokeStyle='#ff8040';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(tipx,tipy);ctx.lineTo(ex,ey);ctx.stroke();ctx.strokeStyle='#ffe0b0';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(tipx,tipy);ctx.lineTo(ex,ey);ctx.stroke();ctx.lineWidth=1;
+     for(let k=0;k<6;k++){const s=rnd(0,1);px(tipx+(ex-tipx)*s+rnd(-3,3),tipy+(ey-tipy)*s+rnd(-3,3),1,1,'#ffb050',f*fo);}}
+   const hv=SPP(t,.55,.85);if(hv>0&&hv<1){ctx.globalAlpha=f*(1-hv)*.85;ctx.fillStyle='#9a5ad0';ctx.beginPath();ctx.arc(tx,ty,5+hv*14,0,6.283);ctx.fill();ctx.fillStyle='#ff8040';ctx.beginPath();ctx.arc(tx,ty,3+hv*7,0,6.283);ctx.fill();}
+   spShake(C,0,t>.55&&t<.85?2.5*(1-SPP(t,.55,.85)):0);
+   /* recoil: a shockwave runs out from the main target and knocks through the others */
+   const rv=SPP(t,.7,1.15);if(rv>0&&rv<1){const far=Math.max(...S.foes.map(R=>Math.abs(SPC(R)[0]-tx)))+10;spRing(ctx,tx,ty,6+rv*far,'#c48af0',f*(1-rv),2);spRing(ctx,tx,ty,rv*far*.8,'#ff8040',f*(1-rv)*.6,1);}
+   S.foes.forEach((R,i)=>{if(!i)return;const [x,y]=SPC(R),at=.7+Math.abs(x-tx)/(W*.9)*.45,v=SPP(t,at,at+.3);if(v>0&&v<1){ctx.globalAlpha=f*(1-v)*.8;ctx.fillStyle='#c48af0';ctx.beginPath();ctx.arc(x,y,3+v*8,0,6.283);ctx.fill();}
+     spShake(C,i,t>at&&t<at+.2?1.5:0);});
+   if(t>.8){const fo=1-SPP(t,1.4,1.7);S.foes.forEach((R,i)=>{const n2=i?3:7;for(let k=0;k<n2;k++){const ph=(t*2.4+k*.29)%1,x=R.x+R.w*(.15+.7*((k*.37)%1)),y=R.y+R.h-ph*R.h*.55;px(x,y,1,2,ph<.45?'#ffb050':'#c48af0',f*(1-ph)*fo);}});}}},
+ /* Xiuhtecuhtli — Torrid Tornado: a turquoise fire tornado hops from target to target, flinging flames off its spin; each hop slows and burns */
+ tornado:{dur:1.8,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t;if(!S.hits||!S.hits.length)return;
+   if(!C.d)C.d=Array.from({length:30},()=>({ph:rnd(0,1),an:rnd(0,6.283),lv:rnd(.15,1),sp:rnd(.7,1.3)}));
+   const hop=.3,i=Math.min(S.hits.length-1,Math.floor(Math.max(0,t-.1)/hop)),v=SPP((t-.1)-i*hop,0,hop);
+   const A=S.foes[S.hits[i]],B=S.foes[S.hits[Math.min(S.hits.length-1,i+1)]];if(!A)return;const [ax]=SPC(A),[bx]=SPC(B),
+     move=SPE(SPP(v,.55,1)),x=t<.1?ax:ax+(bx-ax)*(i<S.hits.length-1?move:0),base=A.y+A.h,hgt=A.h*1.1,fo=1-SPP(t,1.5,1.8);
+   for(let k=0;k<14;k++){const s=k/13,w=3+s*12,y=base-s*hgt,rot=t*14+k*.6;const c=k%3===0?'#e8fff8':k%2?'#3ee0c8':'#20a8a0';
+     px(x+Math.cos(rot)*w-1,y,3,2,c,f*fo*(.6+.4*s));px(x-Math.cos(rot)*w-1,y,2,1,'#8af0e0',f*fo*.6);}
+   /* flames thrown off the spin: they leave the funnel tangentially, rise and burn out */
+   for(const p of C.d){const a=((t*1.6*p.sp)+p.ph)%1,y0=base-p.lv*hgt,w0=3+p.lv*12,an=p.an+t*14,dir=Math.sin(an)>0?1:-1,d=a*(18+p.lv*16);
+     const fx=x+Math.cos(an)*w0+dir*d,fy=y0-a*a*14-a*6;px(fx,fy,a<.35?2:1,a<.35?2:1,a<.3?'#ffffff':a<.6?'#8af0e0':'#20a8a0',f*fo*(1-a));}
+   S.hits.forEach((fi,j)=>{const T=S.foes[fi],[tx]=SPC(T),at=.1+j*hop+hop*.3;if(t<at)return;const a=1-SPP(t,at+.4,at+.8);if(a<=0)return;
+     spShake(C,fi,t<at+.15?1.3:0);
+     ctx.globalAlpha=f*a;ctx.fillStyle='#6ab0e8';const yy=T.y-4;for(let k=0;k<2;k++){ctx.fillRect(tx-3,yy+k*3,7,1);ctx.fillRect(tx-2,yy+k*3+1,5,1);ctx.fillRect(tx-1,yy+k*3+2,3,1);}
+     for(let k=0;k<3;k++){const ph=(t*2.6+k*.33)%1;px(tx-3+k*3,T.y+T.h-ph*T.h*.4,1,2,ph<.5?'#8af0e0':'#3ee0c8',f*a*(1-ph));}});}},
+ /* ── batch 3 ── */
+ /* Opochtli — Sinistral Minacachalli: barbed harpoons on ropes shoot at up to 3 targets in turn; each hit splashes and shudders the card;
+    a crit flashes gold and sends ATK/MAG UP arrows through every ally */
+ harpoon:{dur:1.6,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,[cx,cy]=SPC(S.caster);let anyCrit=-1;
+   S.foes.forEach((T,i)=>{const [tx,ty]=SPC(T),t0=i*.17,v=SPP(t,t0,t0+.26),back=SPP(t,t0+.45,t0+.7),an=Math.atan2(ty-cy,tx-cx),ca=Math.cos(an),sa=Math.sin(an),crit=S.crits&&S.crits[i];
+     if(v>0&&back<1){const L=SPE(v)*(1-back),hx=cx+(tx-cx)*L,hy=cy+(ty-cy)*L;
+       ctx.globalAlpha=f*.8;ctx.strokeStyle='#c8b080';ctx.beginPath();ctx.moveTo(cx,cy);ctx.quadraticCurveTo((cx+hx)/2+sa*8,(cy+hy)/2-ca*8,hx,hy);ctx.stroke();
+       for(let k=2;k<14;k++)px(hx-ca*k,hy-sa*k,1,1,'#8a6a3a',f); /* shaft */
+       const M='#e8d48a',D='#a8873a';for(let q=-3;q<=3;q++)px(hx-ca*2+(-sa)*q,hy-sa*2+ca*q,1,1,D,f); /* crossbar */
+       for(const q of [-3,0,3]){const L2=q?4:6;for(let k=0;k<L2;k++)px(hx-ca*2+(-sa)*q+ca*k,hy-sa*2+ca*q+sa*k,1,1,k===L2-1?'#fff4c0':M,f);} /* three prongs */}
+     const hv=SPP(t,t0+.26,t0+.6);if(hv>0&&hv<1){for(let k=0;k<8;k++){const a2=k*.785;px(tx+Math.cos(a2)*hv*12,ty+Math.sin(a2)*hv*9-hv*hv*6,1,2,'#8cc4f4',f*(1-hv));}
+       spShake(C,i,hv<.4?1.6:0);if(crit){ctx.globalAlpha=f*(1-hv)*.7;ctx.fillStyle='#ffd36b';ctx.fillRect(T.x,T.y,T.w,T.h);spRing(ctx,tx,ty,4+hv*16,'#fff0b0',f*(1-hv),2);anyCrit=Math.max(anyCrit,t0);}}
+     if(crit&&t>t0+.26)anyCrit=Math.max(anyCrit,t0);});
+   if(anyCrit>=0)S.friends.forEach((R,j)=>{const [x]=SPC(R),v=SPP(t,anyCrit+.4+j*.04,anyCrit+.9+j*.04);if(v<=0||v>=1)return;for(let k=0;k<2;k++){const yy=R.y+R.h*.7-v*R.h*.5-k*5,xx=x-4+k*8;
+     px(xx,yy,1,4,'#e05050',f*(1-v));px(xx-1,yy+1,3,1,'#e05050',f*(1-v));px(xx-2,yy+2,5,1,'#e05050',f*(1-v)*.7);}});}},
+ /* Mayahuel — Octli Drench: a big lob of milky pulque arcs onto the main target and splashes over the rest; everyone it touches goes Drunk (bubbles and dizzy stars);
+    as Patron her own side gets tipsy too */
+ drench:{dur:1.6,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,[cx,cy]=SPC(S.caster),T=S.foes[0];if(!T)return;const [tx,ty]=SPC(T);
+   const v=SPP(t,0,.45);if(v<1){const x=cx+(tx-cx)*v,y=cy+(ty-cy)*v-Math.sin(v*Math.PI)*H*.22;for(let k=1;k<6;k++){const kv=Math.max(0,v-k*.03);px(cx+(tx-cx)*kv,cy+(ty-cy)*kv-Math.sin(kv*Math.PI)*H*.22,2,2,'#e8e0c8',f*(1-k/6)*.7);}
+     ctx.globalAlpha=f;ctx.fillStyle='#e8e0c8';ctx.beginPath();ctx.ellipse(x,y,5,4,0,0,6.283);ctx.fill();ctx.fillStyle='#ffffff';ctx.fillRect(x-2,y-2,2,1);}
+   const sv=SPP(t,.45,.85);if(sv>0&&sv<1){for(let k=0;k<16;k++){const a=Math.PI*(1.05+k/15*.9),d=sv*(14+(k%3)*5);px(tx+Math.cos(a)*d,ty+Math.sin(a)*d+sv*sv*16,2,2,k%2?'#e8e0c8':'#c8c0a8',f*(1-sv));}
+     ctx.globalAlpha=f*(1-sv)*.6;ctx.fillStyle='#e8e0c8';ctx.beginPath();ctx.ellipse(tx,ty+T.h*.2,T.w*.45,T.h*.25,0,0,6.283);ctx.fill();spShake(C,0,sv<.35?1.4:0);}
+   S.foes.forEach((R,i)=>{if(!i)return;const [x,y]=SPC(R),w=SPP(t,.55,.85);if(w>0&&w<1){const sx=tx+(x-tx)*w,sy=ty+(y-ty)*w-Math.sin(w*Math.PI)*10;px(sx-1,sy-1,3,2,'#e8e0c8',f);}});
+   const drunk=[...S.foes.map(r=>[r,0]),...(S.patron?S.friends.map(r=>[r,.15]):[])];
+   if(t>.8)drunk.forEach(([R,dl],i)=>{const a=SPP(t,.8+dl,.95+dl)*(1-SPP(t,1.35,1.6));if(a<=0)return;const [x]=SPC(R),y=R.y-2;
+     for(let k=0;k<3;k++){const an=t*5+k*2.09;px(x+Math.cos(an)*6,y+Math.sin(an)*2,1,1,'#ffd36b',f*a);}
+     for(let k=0;k<3;k++){const ph=(t*1.5+k*.33+i*.1)%1;ctx.globalAlpha=f*a*(1-ph);ctx.strokeStyle='#e8e0c8';ctx.beginPath();ctx.arc(R.x+R.w*(.25+.25*k),R.y+R.h*.8-ph*R.h*.5,1.5,0,6.283);ctx.stroke();}});}},
+ /* Tlazolteotl — She Who Eats Filth: dark filth lifts off every ally, swirls into her and comes back as white light (heal + cleanse);
+    then poison drips onto every enemy — and onto her own side too when she is the Patron */
+ filth:{dur:1.7,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,[cx,cy]=SPC(S.caster);
+   if(!C.d)C.d=S.friends.map(R=>Array.from({length:7},()=>({x:R.x+rnd(.15,.85)*R.w,y:R.y+rnd(.2,.8)*R.h,d:rnd(0,.15)})));
+   C.d.forEach(arr=>arr.forEach(p=>{const v=SPP(t,p.d,p.d+.55);if(v<=0||v>=1)return;const x=p.x+(cx-p.x)*SPE(v)+Math.sin(v*9)*4,y=p.y+(cy-p.y)*SPE(v)-Math.sin(v*Math.PI)*10;const pz=Math.sin(t*16+p.x*.7)>0?3:2;px(x-.5,y-.5,pz+1,pz+1,'#0e0a04',f*.45);px(x,y,pz,pz,'#2a1e10',f);px(x+1,y+1,1,1,'#4a3a20',f*.6);}));
+   const gv=SPP(t,.45,.75);if(gv>0&&gv<1){ctx.globalAlpha=f*Math.sin(gv*Math.PI)*.6;ctx.fillStyle='#fff8e0';ctx.beginPath();ctx.arc(cx,cy,4+gv*6,0,6.283);ctx.fill();}
+   S.friends.forEach((R,i)=>{const [x,y]=SPC(R),v=SPP(t,.65+i*.03,1.05+i*.03);if(v>0&&v<1){const lx=cx+(x-cx)*SPE(v),ly=cy+(y-cy)*SPE(v);px(lx-1,ly-1,3,3,'#ffffff',f*(1-v*.5));}
+     const hv=SPP(t,1.0,1.6);if(hv>0){for(let k=0;k<3;k++){const v2=(hv+k*.33)%1;spPlus(px,x-6+k*6,y+R.h*.1-v2*R.h*.45,'#b8f08a',f*(1-v2));}for(let k=0;k<4;k++){const an=k*1.57+t*4;px(x+Math.cos(an)*R.w*.35,y+Math.sin(an)*R.h*.3,1,1,'#ffffff',f*(1-hv));}}});
+   const tox=[...S.foes.map(r=>[r,0]),...(S.patron?S.friends.map(r=>[r,.12]):[])];
+   tox.forEach(([R,dl],i)=>{const a=SPP(t,.95+dl,1.1+dl)*(1-SPP(t,1.45,1.7));if(a<=0)return;for(let k=0;k<4;k++){const ph=(t*1.8+k*.25+i*.13)%1,x=R.x+R.w*(.2+.2*k),y=R.y+ph*R.h*.8;
+     px(x,y,1,2,'#7ac04a',f*a*(1-ph));if(ph>.8)px(x-1,R.y+R.h*.82,3,1,'#5a8a2a',f*a);}
+     ctx.globalAlpha=f*a*.25;ctx.fillStyle='#7ac04a';ctx.beginPath();ctx.ellipse(R.x+R.w/2,R.y+R.h*.85,R.w*.4,3,0,0,6.283);ctx.fill();});}},
+ /* Xochiquetzal — Ixiptlatli Bloom: a ribbon of petals streams to up to 5 targets in turn and bursts on each;
+    her Nature allies bloom a flower shield (Chimalli) */
+ bloom2:{dur:1.6,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,[cx,cy]=SPC(S.caster),cols=['#e86a9a','#f29ab8','#ffc8da','#c84a7a'];
+   S.foes.forEach((T,i)=>{const [tx,ty]=SPC(T),t0=i*.12;for(let k=0;k<7;k++){const v=SPP(t,t0+k*.025,t0+.35+k*.025);if(v<=0||v>=1)continue;
+       const x=cx+(tx-cx)*SPE(v)+Math.sin(v*10+k)*5,y=cy+(ty-cy)*SPE(v)+Math.cos(v*8+k)*4;drawSpr(ctx,SPR.petal[(k+((t*8)|0))&3],x,y,[cols[k%4],'#ffc8da'],f);}
+     const bv=SPP(t,t0+.38,t0+.75);if(bv>0&&bv<1){for(let k=0;k<10;k++){const a=k*.628+i;drawSpr(ctx,SPR.petal[k&3],tx+Math.cos(a)*bv*14,ty+Math.sin(a)*bv*11+bv*bv*6,[cols[k%4],'#ffc8da'],f*(1-bv));}spShake(C,i,bv<.3?1:0);}});
+   S.friends.forEach((R,i)=>{if(!(S.nature&&S.nature[i]))return;const [x,y]=SPC(R),v=SPE(SPP(t,.8+i*.05,1.1+i*.05)),fo=1-SPP(t,1.35,1.6);if(v<=0)return;
+     for(let k=0;k<6;k++){const a=k*1.047+t*.8,rr=R.w*.42*v;ctx.globalAlpha=f*fo*.85;ctx.fillStyle=k%2?'#f29ab8':'#e86a9a';ctx.beginPath();ctx.ellipse(x+Math.cos(a)*rr,y+Math.sin(a)*rr*.9,3,2,a,0,6.283);ctx.fill();}
+     spRing(ctx,x,y,R.w*.42*v,'#3fc49a',f*fo*.8,1);px(x-1,y-1,3,3,'#ffd36b',f*fo*v);});}},
+ /* Huitzilopochtli — Xiuhcoatl Might: the fire serpent strikes three times, arcing from him to each target; every strike flares and shudders the card;
+    a kill spits gold sparks back to his side with ATK/MAG UP */
+ xiuhcoatl:{dur:1.7,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,[cx,cy]=SPC(S.caster);
+   S.hits.slice(0,3).forEach((fi,j)=>{const T=S.foes[fi],[tx,ty]=SPC(T),t0=j*.32,v=SPP(t,t0,t0+.28);
+     if(v>0&&v<1){const N=12;for(let k=N-1;k>=0;k--){const s=Math.max(0,v-k*.025),x=cx+(tx-cx)*SPE(s),y=cy+(ty-cy)*SPE(s)-Math.sin(s*Math.PI)*H*.18+Math.sin(s*20)*3;
+         if(k===0){const dir=tx>=cx?1:-1;/* Xiuhcoatl head: 8x6 with a fire crest, eye and open jaw */
+           px(x-4,y-3,8,6,'#ffd36b',f);px(x-4,y-3,8,1,'#fff0b0',f);px(x-4+(dir>0?5:0),y+1,3,2,'#1a0c00',f);px(x-4+(dir>0?6:0),y+2,2,1,'#e8471c',f);
+           px(x+(dir>0?1:-2),y-2,1,1,'#1a0c00',f);for(let c2=0;c2<4;c2++)px(x-3+c2*2,y-5-(c2%2),1,2,c2%2?'#e8471c':'#ff8a3a',f);}
+         else{const sz=Math.max(2,4-k*.2);px(x-sz/2,y-sz/2,sz,sz,k%2?'#e8471c':'#ff8a3a',f*(1-k/N*.6));}}}
+     const hv=SPP(t,t0+.28,t0+.55);if(hv>0&&hv<1){ctx.globalAlpha=f*(1-hv)*.85;ctx.fillStyle='#ff8a3a';ctx.beginPath();ctx.arc(tx,ty,3+hv*11,0,6.283);ctx.fill();ctx.fillStyle='#ffd36b';ctx.beginPath();ctx.arc(tx,ty,2+hv*5,0,6.283);ctx.fill();spShake(C,fi,hv<.4?1.8:0);}
+     if(S.kills&&S.kills[j]){const kv=SPP(t,t0+.45,t0+1.0);if(kv>0&&kv<1)S.friends.forEach((R,q)=>{const [x,y]=SPC(R);for(let k=0;k<3;k++){const s=Math.max(0,kv-k*.06);px(tx+(x-tx)*SPE(s)+k,ty+(y-ty)*SPE(s)-Math.sin(s*Math.PI)*16,2,2,'#ffd36b',f*(1-kv*.5));}
+       if(kv>.7){const yy=R.y+R.h*.6-(kv-.7)*R.h;px(x,yy,1,4,'#e05050',f);px(x-1,yy+1,3,1,'#e05050',f);px(x-2,yy+2,5,1,'#e05050',f*.7);}});}});}},
+ /* Toci — Tlalli Steam: temazcal steam billows up over every ally (heal + cleanse, green + rise) while hot stones drop on every enemy and set them burning */
+ steam:{dur:1.7,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t;
+   S.friends.forEach((R,i)=>{const x=R.x+R.w/2,bot=R.y+R.h,g=SPE(SPP(t,.05+i*.04,.7+i*.04)),fo=1-SPP(t,1.3,1.7);px(x-6,bot-2,12,2,'#ff9a5a',f*fo*(.6+.4*Math.sin(t*14+i)));
+     for(let s=0;s<R.h*1.1*g;s+=3){const r=2+s/(R.h*1.1)*R.w*.3,xx=x+Math.sin(s*.12+t*3+i)*3;ctx.globalAlpha=f*fo*.35*(1-s/(R.h*1.3));ctx.fillStyle='#e8e0d8';ctx.beginPath();ctx.arc(xx,bot-4-s,r,0,6.283);ctx.fill();}
+     const hv=SPP(t,.7,1.6);if(hv>0)for(let k=0;k<3;k++){const v=(hv+k*.33)%1;spPlus(px,x-6+k*6,R.y+R.h*.5-v*R.h*.5,'#b8f08a',f*(1-v));}});
+   S.foes.forEach((R,i)=>{const [x]=SPC(R),t0=.3+i*.06,v=SPP(t,t0,t0+.3);if(v>0&&v<1){const y=R.y-H*.2+(R.y+R.h*.45-(R.y-H*.2))*v*v;px(x-2,y-2,4,4,'#4a3a2c',f);px(x-1,y-2,2,2,'#ff9a5a',f);for(let k=1;k<4;k++)px(x,y-k*3,1,2,'#ffb050',f*(1-k/4));}
+     const hv=SPP(t,t0+.3,t0+.55);if(hv>0&&hv<1){spRing(ctx,x,R.y+R.h*.45,3+hv*10,'#ffb050',f*(1-hv));spShake(C,i,hv<.4?1:0);}
+     if(t>t0+.35){const fo=1-SPP(t,1.35,1.7);for(let k=0;k<4;k++){const ph=(t*2.4+k*.27)%1;px(R.x+R.w*(.2+.2*k),R.y+R.h-ph*R.h*.5,1,2,ph<.45?'#ffd36b':'#e0582a',f*(1-ph)*fo);}}});}},
+ /* ── batch 4 ── */
+ /* Cihuacoatl — Cihuateteo Fury: pale warrior spirits swoop in, one per hit (1 + each damaged ally); then a blue DEF/RES UP shimmer rises over her side */
+ fury:{dur:1.8,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,n=S.furyHits||2;
+   for(let j=0;j<n;j++){const fi=S.hits[j%S.hits.length],T=S.foes[fi],[tx,ty]=SPC(T),t0=j*.2,v=SPP(t,t0,t0+.35);
+     if(v>0&&v<1){const sx=tx+(j%2?-1:1)*W*.25,sy=-10,x=sx+(tx-sx)*SPE(v),y=sy+(ty-sy)*v*v;for(let k=1;k<5;k++){const kv=Math.max(0,v-k*.05);px(sx+(tx-sx)*SPE(kv),sy+(ty-sy)*kv*kv,2,2,'#c89090',f*(1-k/5)*.6);}
+       big(ctx,SPR.soul[((t*8)|0)&1],x-5,y-7,['#f2d8d8','#ffffff','#c89090'],f,2);}
+     const hv=SPP(t,t0+.35,t0+.6);if(hv>0&&hv<1){ctx.globalAlpha=f*(1-hv)*.6;ctx.fillStyle='#f2d8d8';ctx.fillRect(T.x,T.y,T.w,T.h);spRing(ctx,tx,ty,4+hv*12,'#ffffff',f*(1-hv));spShake(C,fi,hv<.4?1.6:0);}}
+   const end=.2*(n-1)+.6;S.friends.forEach((R,i)=>{const [x]=SPC(R),v=SPP(t,end+i*.04,end+.6+i*.04);if(v<=0||v>=1)return;ctx.globalAlpha=f*Math.sin(v*Math.PI)*.35;ctx.fillStyle='#6ab0e8';ctx.fillRect(R.x,R.y,R.w,R.h);
+     for(let k=0;k<2;k++){const yy=R.y+R.h*.75-v*R.h*.5-k*5,xx=x-4+k*8;px(xx,yy,1,4,'#8ac8ff',f*(1-v));px(xx-1,yy+1,3,1,'#8ac8ff',f*(1-v));px(xx-2,yy+2,5,1,'#8ac8ff',f*(1-v)*.7);}});}},
+ /* Xbalanque — Godbane Blowgun: five quick darts, one per random hit; a dart that lands on a god flashes a big red X and hits much harder */
+ blowgun:{dur:1.6,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,[cx,cy]=SPC(S.caster);
+   S.hits.slice(0,5).forEach((fi,j)=>{const T=S.foes[fi],[tx,ty]=SPC(T),god=S.gods&&S.gods[fi],t0=.05+j*.12,v=SPP(t,t0,t0+.14),ox=((j*5)%9)-4,oy=((j*7)%7)-3,an=Math.atan2(ty+oy-cy,tx+ox-cx),ca=Math.cos(an),sa=Math.sin(an);
+     if(v>0&&v<1){const x=cx+(tx+ox-cx)*v,y=cy+(ty+oy-cy)*v;for(let k=0;k<6;k++)px(x-ca*k,y-sa*k,1,1,k<1?'#e8e0d0':k<4?'#3a2a1a':'#c83a3a',f);for(let k=6;k<14;k++)px(x-ca*k,y-sa*k,1,1,'#e8e0d0',f*.25*(1-(k-6)/8));}
+     const hv=SPP(t,t0+.14,t0+.45);if(hv>0){const fo=1-SPP(t,1.1,1.4);for(let k=0;k<4;k++)px(tx+ox-ca*k,ty+oy-sa*k,1,1,k<1?'#e8e0d0':'#3a2a1a',f*fo);
+       if(hv<1){spRing(ctx,tx+ox,ty+oy,2+hv*6,'#e8e0d0',f*(1-hv));spShake(C,fi,hv<.35?(god?2.4:1):0);
+}}
+     /* v1493 [Genaro]: on a god, its Teotl glyph swirls up and dissolves (Godbane) instead of the red X */
+     if(god){const gv=SPP(t,t0+.14,t0+.75);if(gv>0&&gv<1)teotlSwirl(ctx,px,tx,ty,T.w*.8,gv,f);}});}},
+ /* Mictlantecuhtli — Mictlan Clasp: bony hands burst up and grip each of up to 6 targets; survivors are left chilled (Lethargy);
+    a kill gives up a pale soul that drifts across to his side (it joins as undead) */
+ clasp:{dur:1.8,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,[cx,cy]=SPC(S.caster);
+   S.foes.forEach((T,i)=>{const [tx,ty]=SPC(T),bot=T.y+T.h,t0=i*.07,rise=SPE(SPP(t,t0,t0+.3)),grip=SPP(t,t0+.3,t0+.45),sink=SPP(t,t0+.8,t0+1.05),h=T.h*.55*rise*(1-sink);
+     /* one skeletal hand per target: forearm bones, a small palm, four splayed finger bones that curl in on the grip */
+     if(h>2){const hx=tx,pt=bot-h;px(hx-2,pt+4,1,h-4,'#e8e0d0',f);px(hx+1,pt+4,1,h-4,'#d8d0c0',f);px(hx-2,pt+h*.45,4,1,'#a8a090',f);
+       px(hx-3,pt,7,4,'#e8e0d0',f);px(hx-2,pt+1,1,1,'#a8a090',f);px(hx+1,pt+1,1,1,'#a8a090',f);
+       for(let k=0;k<4;k++){const base=hx-3+k*2,spread=(k-1.5)*1.6*(1-grip),L=6;for(let q=0;q<L;q++){const bend=q>L*.5?(q-L*.5)*grip*.9*((k<2)?1:-1):0;
+         px(base+spread*q/L+bend,pt-1-q+(q>L*.5?grip*(q-L*.5)*.6:0),1,1,q%3===2?'#a8a090':'#e8e0d0',f);}}
+       px(hx+4,pt+1,3,1,'#e8e0d0',f);px(hx+6,pt,1,1,'#e8e0d0',f); /* thumb */}
+     const g=SPP(t,t0+.3,t0+.5);if(g>0&&g<1){ctx.globalAlpha=f*(1-g)*.5;ctx.fillStyle='#1a1a2a';ctx.fillRect(T.x,T.y,T.w,T.h);spShake(C,i,g<.5?1.4:0);}
+     const kill=S.kills&&S.kills[i%3]&&i<3;
+     if(!kill&&t>t0+.55){const a=1-SPP(t,1.45,1.8);for(let k=0;k<2;k++){const x=T.x+T.w*(.3+.4*k),y=T.y+T.h*.25+Math.sin(t*3+k)*1.5;px(x-2,y,5,1,'#9cc9d6',f*a);px(x,y-2,1,5,'#9cc9d6',f*a);}}
+     if(kill){const sv=SPP(t,t0+.6,t0+1.3);if(sv>0&&sv<1){const d=S.friends[i%S.friends.length]||S.caster,[dx,dy]=SPC(d),x=tx+(dx-tx)*SPE(sv),y=ty+(dy-ty)*SPE(sv)-Math.sin(sv*Math.PI)*18;
+       big(ctx,SPR.soul[((t*5)|0)&1],x-5,y-7,['#cfe9e4','#ffffff','#9cc9d6'],f*(1-sv*.4),2);}}});}},
+ /* ── Cipactli's parts (enemy only) ── */
+ /* Head — Primordial Hunger: a jaw the width of the field snaps shut over the whole row; every card is cut (Wound x4) and red life streams back to the head */
+ hunger:{dur:1.7,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,[cx,cy]=SPC(S.caster);if(!S.foes.length)return;
+   const x0=Math.min(...S.foes.map(r=>r.x))-6,x1=Math.max(...S.foes.map(r=>r.x+r.w))+6,y0=Math.min(...S.foes.map(r=>r.y)),y1=Math.max(...S.foes.map(r=>r.y+r.h)),mid=(y0+y1)/2;
+   const open=SPE(SPP(t,0,.35)),shut=SPE(SPP(t,.35,.5)),back=SPP(t,.9,1.2),gap=(y1-y0)*.75*open*(1-shut*.92)*(1-back*0)+2,up=mid-gap-(1-open)*H*.3,lo=mid+gap+(1-open)*H*.3,fo=1-back;
+   if(fo>0){px(x0,up-10,x1-x0,10,'#3a0808',f*fo);px(x0,lo,x1-x0,10,'#3a0808',f*fo);
+     for(let x=x0+4;x<x1-2;x+=9){ctx.globalAlpha=f*fo;ctx.fillStyle='#e8dcc0';ctx.beginPath();ctx.moveTo(x-3,up);ctx.lineTo(x,up+9);ctx.lineTo(x+3,up);ctx.fill();ctx.beginPath();ctx.moveTo(x+1,lo);ctx.lineTo(x+4,lo-9);ctx.lineTo(x+7,lo);ctx.fill();}}
+   const hit=SPP(t,.48,.6);if(hit>0&&hit<1)px(0,0,W,H,'#8a0a0a',f*.25*(1-hit));
+   S.foes.forEach((R,i)=>{const [x,y]=SPC(R);spShake(C,i,t>.48&&t<.75?2:0);const w=SPP(t,.5,.6),fo2=1-SPP(t,1.4,1.7);if(w>0)for(let k=0;k<4;k++)px(x-5+k%2*2,y-4+k*3,9-k%2*2,1,'#d0303a',f*w*fo2);
+     const sv=SPP(t,.8+i*.04,1.35+i*.04);if(sv>0&&sv<1)for(let k=0;k<3;k++){const s=Math.max(0,sv-k*.05);px(x+(cx-x)*SPE(s),y+(cy-y)*SPE(s),2,2,'#e05050',f*(1-sv*.3));}});
+   const hv=SPP(t,1.3,1.7);if(hv>0){ctx.globalAlpha=f*.3*(1-hv);ctx.fillStyle='#e05050';ctx.beginPath();ctx.ellipse(cx,cy,S.caster.w*.5,S.caster.h*.45,0,0,6.283);ctx.fill();}}},
+ /* Left arm — Mouth of Sustenance: the mouth at the joint opens and breathes green healing mist over his side (heal + cleanse); his foes get Slowed */
+ sustenance:{dur:1.6,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,[cx,cy]=SPC(S.caster);
+   const m=Math.sin(Math.PI*SPP(t,0,.5))*5;px(cx-7,cy-m-3,14,3,'#6a1414',f*(1-SPP(t,1.2,1.5)));px(cx-7,cy+m,14,3,'#6a1414',f*(1-SPP(t,1.2,1.5)));for(let k=0;k<4;k++){px(cx-6+k*4,cy-m,1,2,'#e8dcc0',f);px(cx-4+k*4,cy+m-2,1,2,'#e8dcc0',f);}
+   S.friends.forEach((R,i)=>{const [x,y]=SPC(R);for(let k=0;k<6;k++){const v=SPP(t,.2+k*.05,.7+k*.05);if(v<=0||v>=1)continue;ctx.globalAlpha=f*(1-v)*.45;ctx.fillStyle='#8ad06a';ctx.beginPath();ctx.arc(cx+(x-cx)*v,cy+(y-cy)*v-Math.sin(v*Math.PI)*8,3+v*4,0,6.283);ctx.fill();}
+     const hv=SPP(t,.7,1.5);if(hv>0)for(let k=0;k<3;k++){const v=(hv+k*.33)%1;spPlus(px,x-6+k*6,y+R.h*.1-v*R.h*.45,'#b8f08a',f*(1-v));}});
+   S.foes.forEach(R=>{const [x]=SPC(R),v=SPP(t,.9,1.2),a=1-SPP(t,1.35,1.6);if(v<=0||a<=0)return;ctx.globalAlpha=f*a;ctx.fillStyle='#6ab0e8';const yy=R.y-4+v*3;for(let k=0;k<2;k++){ctx.fillRect(x-3,yy+k*3,7,1);ctx.fillRect(x-2,yy+k*3+1,5,1);ctx.fillRect(x-1,yy+k*3+2,3,1);}});}},
+ /* Right arm — Zipacna Rage: a huge clawed fist drives down onto one target; if it was already hurt, the blow erupts in a red flare */
+ zipacna:{dur:1.4,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,T=S.foes[0];if(!T)return;const [tx,ty]=SPC(T);
+   const v=SPP(t,.1,.42),y=-30+(ty-T.h*.3+30)*v*v,fo=1-SPP(t,.6,.8);if(t>.1&&fo>0){const x=tx-10;px(x,y,20,14,'#4a2a20',f*fo);px(x+2,y+2,16,3,'#6a3a2a',f*fo);for(let k=0;k<4;k++){px(x+1+k*5,y+14,3,4,'#e8dcc0',f*fo);px(x+2+k*5,y+17,1,2,'#ffffff',f*fo);}
+     for(let k=1;k<5;k++)px(x+4,y-k*6,12,2,'#3a2018',f*fo*(1-k/5)*.6);}
+   const hv=SPP(t,.42,.75);if(hv>0&&hv<1){ctx.globalAlpha=f*(1-hv)*.7;ctx.fillStyle=S.hurt?'#e03020':'#c8b090';ctx.beginPath();ctx.arc(tx,ty,4+hv*(S.hurt?22:14),0,6.283);ctx.fill();spRing(ctx,tx,ty,6+hv*20,S.hurt?'#ff8060':'#e8dcc0',f*(1-hv),2);
+     for(let k=0;k<12;k++){const a=k*.524;px(tx+Math.cos(a)*hv*20,ty+Math.sin(a)*hv*14+hv*hv*8,2,2,S.hurt?'#e05050':'#a08a70',f*(1-hv));}}
+   spShake(C,0,t>.42&&t<.75?3*(1-SPP(t,.42,.75)):0);if(hv>0&&hv<.15)px(0,0,W,H,S.hurt?'#ff3020':'#ffffff',f*.15);}},
+ /* Left leg — Teocipactli Punishment: one orb per element on the enemy side orbits the leg, then they fire one after another into a single target; a little splash */
+ punishment:{dur:1.7,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,[cx,cy]=SPC(S.caster),T=S.foes[0];if(!T)return;const [tx,ty]=SPC(T);
+   const EL=['#ff8a3a','#6aa8e8','#5c9a46','#ffe85a','#cfeee0','#8a7560','#ffd36b','#6a5894','#e8e0c8'],n=S.elements||4;
+   for(let k=0;k<n;k++){const t0=.45+k*.12,v=SPP(t,t0,t0+.25),a=k/n*6.283+t*5,ox=cx+Math.cos(a)*14,oy=cy+Math.sin(a)*9,c=EL[k%EL.length];
+     if(v<=0){if(t<t0){ctx.globalAlpha=f*SPP(t,k*.05,.2+k*.05);ctx.fillStyle=c;ctx.beginPath();ctx.arc(ox,oy,3,0,6.283);ctx.fill();}continue;}
+     if(v<1){const x=ox+(tx-ox)*SPE(v),y=oy+(ty-oy)*SPE(v);for(let q=1;q<4;q++){const qv=Math.max(0,v-q*.06);px(ox+(tx-ox)*SPE(qv),oy+(ty-oy)*SPE(qv),2,2,c,f*(1-q/4)*.6);}ctx.globalAlpha=f;ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,3,0,6.283);ctx.fill();}
+     const hv=SPP(t,t0+.25,t0+.5);if(hv>0&&hv<1){spRing(ctx,tx,ty,3+hv*10,c,f*(1-hv),2);spShake(C,0,hv<.3?1.2:0);}}
+   S.foes.forEach((R,i)=>{if(!i)return;const [x,y]=SPC(R),v=SPP(t,.45+n*.12+.2,.45+n*.12+.45);if(v>0&&v<1)spRing(ctx,x,y,3+v*6,'#cdb0ff',f*(1-v));});}},
+ /* Right leg — Mouth of the Undoing: the leg's mouth retches a wave of poison and fire that rolls along the whole row; everyone is poisoned and set burning */
+ undoing:{dur:1.8,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,[cx,cy]=SPC(S.caster);if(!S.foes.length)return;
+   const x0=Math.min(...S.foes.map(r=>r.x))-8,x1=Math.max(...S.foes.map(r=>r.x+r.w))+8,yb=Math.max(...S.foes.map(r=>r.y+r.h)),hh=Math.max(...S.foes.map(r=>r.h));
+   const m=Math.sin(Math.PI*SPP(t,0,.6))*5;px(cx-7,cy-m-3,14,3,'#6a1414',f);px(cx-7,cy+m,14,3,'#6a1414',f);
+   const wv=SPP(t,.25,.95),front=x0+(x1-x0)*SPE(wv),fo=1-SPP(t,1.1,1.4);
+   /* a rolling, frothing wave: a dark green body, an orange fire crest, bubbles popping on top */
+   if(wv>0){ctx.globalAlpha=f*fo*.7;ctx.fillStyle='#3e5a1a';ctx.beginPath();ctx.moveTo(x0,yb);for(let x=x0;x<=front;x+=3){const hgt=hh*.42*(.65+.35*Math.sin(x*.18+t*9))*Math.min(1,(front-x)/24+.35);ctx.lineTo(x,yb-hgt);}ctx.lineTo(front,yb);ctx.closePath();ctx.fill();
+     for(let x=x0;x<front;x+=4){const hgt=hh*.42*(.65+.35*Math.sin(x*.18+t*9))*Math.min(1,(front-x)/24+.35);ctx.globalAlpha=f*fo*.85;ctx.fillStyle=((x/4)|0)%2?'#7ac04a':'#ff8a3a';ctx.beginPath();ctx.arc(x,yb-hgt,2.2,0,6.283);ctx.fill();
+       if(((x*7+((t*20)|0))%11)===0){ctx.strokeStyle='#b8f08a';ctx.globalAlpha=f*fo*.7;ctx.beginPath();ctx.arc(x,yb-hgt-4,1.5,0,6.283);ctx.stroke();}}}
+   S.foes.forEach((R,i)=>{const [x]=SPC(R),at=.25+((x-x0)/(x1-x0||1))*.7*.8;spShake(C,i,t>at&&t<at+.25?1.6:0);if(t<at+.1)return;const a=1-SPP(t,1.45,1.8);
+     for(let k=0;k<4;k++){const ph=(t*2.2+k*.25+i*.1)%1;px(R.x+R.w*(.2+.2*k),R.y+R.h-ph*R.h*.55,1,2,k%2?'#ffb050':'#7ac04a',f*a*(1-ph));}});}},
+ /* Patecatl — Peyote Concoction: a pinch of medicine powder bursts over every ally (heal + cleanse), green + rise, then red ATK/MAG UP arrows */
+ peyote:{dur:1.6,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t;
+   if(!C.d)C.d=S.friends.map(()=>Array.from({length:14},()=>({an:rnd(0,6.283),v:rnd(.4,1.1),c:pick(['#d8e8b0','#f0e6c0','#b8d090','#9aa85a'])})));
+   S.friends.forEach((R,i)=>{const [x,y]=SPC(R),t0=i*.06,dv=SPP(t,t0,t0+.25);if(dv>0&&dv<1){const yy=R.y-H*.12+(y-R.y+H*.12)*dv;drawSpr(ctx,SPR.leaf[(i+((t*8)|0))&3],x-2,yy,['#7a8a4a','#9aa85a','#5e6a38'],f);}
+     const bv=SPP(t,t0+.25,t0+.75);if(bv>0&&bv<1){ctx.globalAlpha=f*(1-bv)*.35;ctx.fillStyle='#d8e8b0';ctx.beginPath();ctx.arc(x,y,R.w*.2+bv*R.w*.35,0,6.283);ctx.fill();
+       for(const p of C.d[i]){const d=SPE(bv)*R.w*.6*p.v;px(x+Math.cos(p.an)*d,y+Math.sin(p.an)*d*.8+bv*6,1,1,p.c,f*(1-bv));}
+       for(let k=0;k<4;k++){const an=k*1.57+.4;px(x+Math.cos(an)*bv*R.w*.5,y+Math.sin(an)*bv*R.h*.35,1,1,'#2a1e10',f*(1-bv));}}
+     const hv=SPP(t,t0+.55,t0+1.2);if(hv>0&&hv<1)for(let k=0;k<3;k++){const v=(hv+k*.33)%1;spPlus(px,x-6+k*6,y+R.h*.1-v*R.h*.45,'#b8f08a',f*(1-v));}
+     const av=SPP(t,t0+.95,t0+1.5);if(av>0&&av<1)for(let k=0;k<2;k++){const yy=R.y+R.h*.75-av*R.h*.5-k*5,xx=x-4+k*8;px(xx,yy,1,4,'#e05050',f*(1-av));px(xx-1,yy+1,3,1,'#e05050',f*(1-av));px(xx-2,yy+2,5,1,'#e05050',f*(1-av)*.7);}});}}
+};
+
 class LayerFx{
   constructor(canvas,preset,host){this.c=canvas;this.ctx=canvas.getContext('2d');this.p=preset;this.host=host||canvas;this.parts=[];this.events=[];this.t=0;
     this.mode='map';this.intensity=0;this.burstT=0;this.nextBurst=preset.burstEvery?rnd(...preset.burstEvery):0;this.nextArrow=rnd(.8,2);this.nextFly=rnd(1,3);
@@ -29171,7 +29532,12 @@ class LayerFx{
     const end=Math.min(h*.95,y+rnd(h*.3,h*.6)),pts=[[x,y]],br=[];
     while(y<end){x+=rnd(-3,3);y+=rnd(3,6);pts.push([x,y]);if(br.length<2&&Math.random()<.18){let bx=x,by=y;const dir=Math.random()<.5?-1:1,b=[[bx,by]];for(let j=0;j<(rnd(3,7)|0);j++){bx+=dir*rnd(1,4);by+=rnd(2,5);b.push([bx,by]);}br.push(b);}}
     return {k:'bolt',pts,br,age:0,life:.55};}
-  play(k,opts){const D={patolli:2.8,roll:2.3,stalks:2.6,harvest:1.9};this.cine=Object.assign({k,t:0,dur:D[k]||(CINE[k]&&CINE[k].dur)||2,res:1+(Math.random()*6|0)},opts||{});
+  /* v1490/v1491: Patolli hits -- one burst PER HIT. spots are [x,y,delay] in canvas pixels / seconds after the bean lands;
+     a unit hit twice pops twice. */
+  addRollHits(spots,res){const C=this.cine;if(!C||C.k!=='roll'||!spots.length)return;const AMT=[0,4,9,13,18,28,44],cols=(this.p.pal&&this.p.pal.confetti)||[['#ff4f8b'],['#ffd23f'],['#3ee0c8'],['#4f8bff'],['#b46bff'],['#7be35a'],['#ff8a3a']]; /* v1493: player-side rolls play on any layer */
+    C.landT=C.landT||C.dur*.5;let md=0;C.bursts=spots.map(([x,y,d])=>{md=Math.max(md,d||0);return {x:x+rnd(-2,2),y:y+rnd(-2,2),d:d||0,k:.6+res*.15,p:Array.from({length:AMT[res||1]},()=>{const an=rnd(Math.PI*1.05,Math.PI*1.95),v=rnd(.4,1.4)*(.7+res*.1);
+      return {vx:Math.cos(an)*v,vy:Math.sin(an)*v,c:pick(cols)[0],s:Math.random()<.35?2:1};})};});C.dur=Math.max(C.dur,C.landT+md+.75+res*.05);}
+  play(k,opts){const D={patolli:2.8,roll:1.15,stalks:2.6,harvest:2.3} /* v1489: roll 2.3 -> 1.15s [Genaro: other enemies acted while it played] */;this.cine=Object.assign({k,t:0,dur:D[k]||(CINE[k]&&CINE[k].dur)||(SPECIALS[k]&&SPECIALS[k].dur)||2,res:1+(Math.random()*6|0)},opts||{});
     if(k==='harvest'){for(let i=0;i<40;i++)this.events.push({k:'kern',x:rnd(0,this.w),y:rnd(-30,-2),vx:rnd(-.1,.1),vy:rnd(1,2),age:0,life:3,col:pick(['#f2c23a','#e8a020','#fff0a0'])});}}
   target(){const f=this.p.approach?0.5+1.0*this.intensity:0.65+0.35*this.intensity, m=this.mode==='battle'?0.6*(this.p.battleBoost?1.3:1):1, area=(this.w*this.h)/(320*180);
     return Math.round(this.p.count*1.25*f*m*Math.max(.6,Math.min(1.6,area))*(this.burstT>0?1.8:1)*(this.rampDur?Math.min(1,this.rampT/this.rampDur):1));} /* v1474: build-up */
@@ -29229,14 +29595,14 @@ class LayerFx{
     // side-boss extras: distant lightning, hummingbirds, jaguar eyes, entrance/signature timeline
     if(P.flicker){this.nextFlick=(this.nextFlick??rnd(1,3))-dt;if(this.nextFlick<=0){this.nextFlick=rnd(...P.flicker.every);this.flickT=.35;
       if(P.bolts&&Math.random()<.8)this.events.push(this.makeBolt());}}
-    if(this.cine&&this.cine.k==='roll'&&!this.cine.popped&&this.cine.t>=this.cine.dur*.5){this.cine.popped=true;const cx=w/2,cy=h*.42,cols=P.pal.confetti||[['#ffd23f']];
+    if(this.cine&&this.cine.k==='roll'&&!this.cine.popped&&this.cine.t>=(this.cine.landT||this.cine.dur*.5)){this.cine.popped=true;const cx=w/2,cy=h*.42,cols=P.pal.confetti||[['#ffd23f']];
       for(let i=0;i<46;i++){const an=rnd(Math.PI*1.1,Math.PI*1.9),v=rnd(.8,2.4);this.events.push({k:'conf',x:cx,y:cy,vx:Math.cos(an)*v,vy:Math.sin(an)*v,age:0,life:rnd(1.6,2.6),col:pick(cols)[0],ph:rnd(0,6)});}}
     if(this.flickT>0)this.flickT-=dt;
     if(P.hummers&&this.events.filter(e=>e.k==='hb').length<P.hummers.max*(this.mode==='battle'?.67:1)&&Math.random()<.01){
       this.events.push({k:'hb',x:Math.random()<.5?-4:w+4,y:rnd(h*.1,h*.7),tx:rnd(w*.1,w*.9),ty:rnd(h*.1,h*.7),hold:0,age:0,life:25,trail:[]});}
     if(P.eyes&&this.events.filter(e=>e.k==='eyes').length<P.eyes.max&&Math.random()<.012){
       const L=Math.random()<.5;this.events.push({k:'eyes',x:L?rnd(2,w*.2):w-rnd(6,w*.2),y:rnd(h*.15,h*.85),age:0,life:rnd(2.5,4.5),blink:rnd(.8,1.6)});}
-    if(this.cine){this.cine.t+=dt;if(this.cine.t>=this.cine.dur)this.cine=null;}
+    if(this.cine){this.cine.t+=dt;if(this.cine.t>=this.cine.dur){spClearShake(this.cine);this.cine=null;}}
     /* Cipactli: the mouths at its joints open and snap shut along the edges */
     if(P.maws){this.nextMaw=(this.nextMaw??1)-dt;if(this.nextMaw<=0){this.nextMaw=rnd(...P.maws.every);const e=(Math.random()*3)|0;
       this.events.push({k:'maw',x:e===0?6:e===1?w-6:rnd(w*.15,w*.85),y:e===2?h-6:rnd(h*.25,h*.8),age:0,life:1.2});}}
@@ -29254,8 +29620,8 @@ class LayerFx{
         else{v.hold+=dt;if(v.hold>3){v.fade-=dt*.5;if(v.fade<=0)this.vines.splice(i,1);}}}}
     /* v1479: Chicomecoatl's crops -- each stalk grows over ~15-25s, then an ear swells, ripens (glows) and
        bursts into kernels, and a new ear starts. Stalks stay grown for the rest of the fight. */
-    if(P.crops){if(!this.crops){const n=Math.max(5,Math.round(w/24));this.crops=Array.from({length:n},(_,k)=>({x:((k+.5)*w/n+rnd(-4,4))|0,g:0,rate:1/rnd(15,25),maxH:h*rnd(.16,.27),ear:0,earRate:1/rnd(5,9),ripe:0,side:k%2?1:-1}));}
-      for(const c of this.crops){if(c.g<1){c.g=Math.min(1,c.g+dt*c.rate);continue;}
+    if(P.crops){if(!this.crops){const n=Math.max(5,Math.round(w/24));this.crops=Array.from({length:n},(_,k)=>({x:((k+.5)*w/n+rnd(-4,4))|0,g:0,rate:1/rnd(15,25),maxH:h*rnd(.16,.27),ear:0,earRate:1/rnd(5,9),ripe:0,side:k%2?1:-1,wait:rnd(0,12)}));}
+      for(const c of this.crops){if(c.wait>0){c.wait-=dt;continue;} /* v1488 [Ian]: staggered starts */if(c.g<1){c.g=Math.min(1,c.g+dt*c.rate);continue;}
         if(c.ear<1)c.ear=Math.min(1,c.ear+dt*c.earRate);else{c.ripe+=dt;if(c.ripe>1.4){c.ripe=0;c.ear=0;c.earRate=1/rnd(5,9);
           const ey=h-c.maxH*.72;for(let i=0;i<7;i++)this.events.push({k:'kern',x:c.x+c.side*2,y:ey,vx:rnd(-.5,.5),vy:rnd(-1.1,-.5),age:0,life:3,col:pick(['#f2c23a','#e8a020','#fff0a0'])});}}}}
     // keep population near target
@@ -29365,7 +29731,7 @@ class LayerFx{
           drawSpr(ctx,fr,p.x,p.y,[c[0],c[1]],a*fl);break;}
         case 'ember':{const fl=.6+.4*Math.sin(p.ph*5+p.spin*90);ctx.globalAlpha=a*.25*fl;ctx.fillStyle=c[2];ctx.fillRect((p.x|0)-1,(p.y|0)-1,3,3);ctx.globalAlpha=a*fl;ctx.fillStyle=c[(p.spin>0)?1:0];ctx.fillRect(p.x|0,p.y|0,1,1);break;}
         case 'ash':ctx.globalAlpha=a*.6;ctx.fillStyle=c[0];ctx.fillRect(p.x|0,p.y|0,1,1);break;
-        case 'strip':drawSpr(ctx,SPR.strip[(Math.floor(p.ph*2.5))%2],p.x,p.y,c,a*.85);break;
+        case 'strip':drawSpr(ctx,SPR.strip[(Math.floor(p.ph*2.5))&1],p.x,p.y,c,a*.85);break;
         case 'rain':{ctx.globalAlpha=a;ctx.fillStyle=c[0];const dx=p.vx/p.vy;for(let s=0;s<p.len;s++)ctx.fillRect(Math.round(p.x-dx*s),Math.round(p.y-s),1,1);break;}
         case 'spore':{const g=beat;ctx.globalAlpha=a*.3*g;ctx.fillStyle=c[1];ctx.fillRect((p.x|0)-1,(p.y|0)-1,4,4);ctx.globalAlpha=a*(.5+.5*g);ctx.fillStyle=c[0];ctx.fillRect(p.x|0,p.y|0,2,2);break;}
         case 'pollen':ctx.globalAlpha=a*(.4+.4*beat);ctx.fillStyle=c[0];ctx.fillRect(p.x|0,p.y|0,1,1);break;
@@ -29402,7 +29768,7 @@ class LayerFx{
         line(e.pts,'#7f9cff',.28*on*bm2,3);e.br.forEach(b=>line(b,'#7f9cff',.18*on*bm2,3));
         line(e.pts,'#f4f6ff',on*bm2,1);e.br.forEach(b=>line(b,'#cfd8ff',.75*on*bm2,1));}
       else if(e.k==='hb'){for(let s=1;s<e.trail.length;s++){ctx.globalAlpha=A*(.4-s*.06);ctx.fillStyle='#f2c23a';ctx.fillRect(e.trail[s][0]|0,(e.trail[s][1]|0)+1,1,1);}
-        drawSpr(ctx,SPR.hb[(Math.floor(e.age*14))%2],e.x,e.y,['#3fc49a','#1f8a6a','#e8e0c0'],Math.min(1,A*1.1));}
+        drawSpr(ctx,SPR.hb[(Math.floor(e.age*14))&1] /* v1492: was %2 -- could index a missing frame and throw */,e.x,e.y,['#3fc49a','#1f8a6a','#e8e0c0'],Math.min(1,A*1.1));}
       else if(e.k==='maw'){const v=e.age/e.life,m=v<.55?Math.sin(v/.55*Math.PI/2):Math.max(0,1-(v-.55)/.08),g=1+m*4,x=e.x|0,y=e.y|0,fa=A*Math.min(1,(e.life-e.age)/.3);
         ctx.globalAlpha=fa*.8;ctx.fillStyle='#200404';ctx.fillRect(x-6,y-g,12,g*2);ctx.globalAlpha=fa;ctx.fillStyle='#6a1414';ctx.fillRect(x-7,(y-g-2)|0,14,2);ctx.fillRect(x-7,(y+g)|0,14,2);
         ctx.fillStyle='#e8dcc0';for(let k=0;k<4;k++){ctx.fillRect(x-6+k*3,(y-g)|0,1,2);ctx.fillRect(x-5+k*3,(y+g-2)|0,1,2);}}
@@ -29430,25 +29796,53 @@ class LayerFx{
         const bx=cx-s+((b*7)%(s*2-3)),by=cy-s+((b*5)%(s*2-2)),drop=(1-v)*H*.5,bounce=Math.abs(Math.sin(v*Math.PI*2))*(1-v)*4;
         drawSpr(ctx,SPR.bean[b%2],bx,by-drop-bounce,['#f2ead8','#1a120c'],fade);}
     }else if(C.k==='roll'){
-      const cx=W/2,cy=H*.48,land=.5,v=Math.min(1,u/land),x=-10+(cx+10)*(1-Math.pow(1-v,2)),y=cy-Math.abs(Math.sin(v*Math.PI*3))*(1-v)*H*.15;
+      const cx=W/2,cy=H*.48,land=(C.landT||C.dur*.5)/C.dur,v=Math.min(1,u/land),x=-10+(cx+10)*(1-Math.pow(1-v,2)),y=cy-Math.abs(Math.sin(v*Math.PI*3))*(1-v)*H*.15;
       px(0,0,W,H,'#000',.25*fade);
       const fr=SPR.bean[u<land?(Math.floor(C.t*12)%4):0];
       for(let j=0;j<fr.length;j++)for(let i=0;i<fr[j].length;i++){const c=fr[j][i];if(c==='.')continue;px(x-4+i*3,y+j*3,3,3,c==='1'?'#f2ead8':'#1a120c',fade);}
       const n=u<land?(1+(Math.floor(C.t*14)%6)):C.res,pop=u<land?1:1+.4*Math.max(0,1-(u-land)/.12);
       const fs=Math.round(H*.16*pop);ctx.font='bold '+fs+'px monospace';ctx.textAlign='center';ctx.textBaseline='bottom';
       ctx.globalAlpha=fade;ctx.fillStyle='#1a120c';ctx.fillText(String(n),cx+1,y-3+1);ctx.fillStyle=u<land?'#a8937a':'#ffd36b';ctx.fillText(String(n),cx,y-3);
+      /* v1490 [Genaro]: confetti bursts on every unit the roll hit, so the move reads as damage. More confetti
+         the stronger the face; repeat hits on one unit add more. */
+      if(C.bursts){const LT=C.landT||C.dur*.5;for(const b of C.bursts){const age=C.t-LT-b.d,life=Math.max(.3,C.dur-LT-b.d);if(age<=0)continue;
+        const ra=Math.max(0,1-age/.35);ctx.globalAlpha=fade*ra*.8;ctx.strokeStyle='#ffd36b';ctx.lineWidth=1;ctx.beginPath();ctx.arc(b.x,b.y,2+age*28*b.k,0,6.283);ctx.stroke();
+        for(const p of b.p){const px2=b.x+p.vx*age*16,py2=b.y+p.vy*age*16+age*age*26;ctx.globalAlpha=fade*Math.max(0,1-age/life*.85);ctx.fillStyle=p.c;ctx.fillRect(Math.round(px2),Math.round(py2),p.s,p.s===2?1:2);}}}
     }else if(C.k==='stalks'){
       const n=Math.max(5,Math.round(W/22));
-      for(let k=0;k<n;k++){const x=((k+.5)*W/n+((k*37)%9)-4)|0,maxH=H*(.28+((k*53)%17)/17*.22),g=Math.min(1,Math.max(0,(u-k*.02)/.55)),hgt=maxH*(1-Math.pow(1-g,3));
+      for(let k=0;k<n;k++){const x=((k+.5)*W/n+((k*37)%9)-4)|0,maxH=H*(.28+((k*53)%17)/17*.22),g=Math.min(1,Math.max(0,(u-((k*37+11)%n)/n*.38)/.45)) /* v1488 [Ian]: scattered sprouting -- they all rose at once */,hgt=maxH*(1-Math.pow(1-g,3));
         px(x,H-hgt,1,hgt,'#4e8a3a',fade);
         for(let j=6;j<hgt-4;j+=6){const L=(j/6)%2?1:-1;px(x+L,H-j,1,1,'#6aa84a',fade);px(x+2*L,H-j-1,1,1,'#6aa84a',fade);px(x+3*L,H-j-1,1,1,'#3e7a2e',fade*.8);}
         if(g>.75){px(x-1,H-hgt-4,2,4,'#f2c23a',fade);px(x+1,H-hgt-3,1,3,'#6aa84a',fade);px(x,H-hgt-6,1,2,'#e8d8a0',fade);}}
     }else if(C.k==='harvest'){
+      /* v1489 [Genaro]: Holy Harvest reads as a HEAL -- under each healed unit a little milpa grows and bears:
+         maize (husk opens on a gold ear), a bean vine (flowers, then pods), squash (yellow blossom), tomato and chili,
+         then green + motes rise off it. */
       const spots=C.spots||[[W*.33,H*.47],[W*.5,H*.47],[W*.67,H*.47]];
-      for(const sp of spots){const x=sp[0]|0,y=sp[1]|0,g=Math.min(1,u/.3),hgt=(H*.12*(1-Math.pow(1-g,3)))|0;
-        px(x,y-hgt,1,hgt,'#5cb85c',fade);for(let j=3;j<hgt;j+=4){px(x-1-(j%8?0:1),y-j,1,1,'#8ad06a',fade);px(x+1+(j%8?1:0),y-j-1,1,1,'#8ad06a',fade);}
-        if(u<.35){for(let r=0;r<6;r++){const an=r*1.047+u*4;px(x+Math.cos(an)*u*30,y-2+Math.sin(an)*u*16,1,1,'#b8f08a',(1-u/.35)*fade);}}}
+      const e3=t=>1-Math.pow(1-Math.max(0,Math.min(1,t)),3),ph=(a,b)=>Math.max(0,Math.min(1,(u-a)/(b-a)));
+      const SC=2; /* drawn at 2x so the crops read at a glance */
+      spots.forEach((sp,si)=>{ctx.save();ctx.translate(sp[0]|0,sp[1]|0);ctx.scale(SC,SC);const x=0,y=0,hM=Math.max(8,H*.085)*e3(u/.35),f=fade;
+        /* soft heal glow */
+        ctx.globalAlpha=f*.22*ph(.25,.45);ctx.fillStyle='#8ad06a';ctx.beginPath();ctx.ellipse(x,y-hM*.45,10,hM*.6+2,0,0,6.283);ctx.fill();
+        /* maize: stalk, leaves, ear that opens from green husk to gold, tassel */
+        px(x,y-hM,1,hM,'#4e8a3a',f);for(let j=4;j<hM-3;j+=4){const L=(j/4)%2?1:-1;px(x+L,y-j,1,1,'#6aa84a',f);px(x+2*L,y-j-1,1,1,'#6aa84a',f);}
+        if(hM>6){px(x,y-hM-2,1,2,'#e8d8a0',f);px(x-1,y-hM-1,1,1,'#e8d8a0',f);px(x+1,y-hM-1,1,1,'#e8d8a0',f);
+          const eo=ph(.38,.62),ey=(y-hM*.62)|0;px(x+1,ey,2,5,'#6aa84a',f*ph(.3,.4));
+          if(eo>0){px(x+1,ey+1,2,4,'#f2c23a',f*eo);px(x+2,ey,1,1,'#fff0a0',f*eo);px(x+3,ey+1,1,3,'#7ab84a',f*eo);px(x+1,ey-2,1,2,'#e8d8a0',f*eo);}}
+        /* bean vine twining on the left, red flowers then green pods */
+        const hB=hM*.75*e3(ph(.08,.45));for(let j=0;j<hB;j++)px(x-3+Math.round(Math.sin(j*.7+si)*1.4),y-j,1,1,'#5c9a46',f);
+        if(hB>6)for(let j=4;j<hB;j+=6){const bx=x-3+Math.round(Math.sin(j*.7+si)*1.4)-1,by=y-j;
+          if(u<.6)px(bx,by,1,1,'#d04a3a',f*ph(.3,.42));else{px(bx-1,by,1,3,'#7ab84a',f);}}
+        /* squash on the ground to the right: leaf and a yellow blossom */
+        const sq=e3(ph(.15,.5));px(x+3,y-2,4*sq,2,'#3f7a3a',f);if(sq>.6){const b=ph(.35,.55);px(x+5,y-4,2,2,'#f2d34a',f*b);px(x+4,y-3,1,1,'#f2d34a',f*b);px(x+7,y-3,1,1,'#f2d34a',f*b);px(x+5,y-3,1,1,'#e8871c',f*b);}
+        /* tomato and chili on a short plant further right */
+        const tp=e3(ph(.2,.5));px(x+8,y-5*tp,1,5*tp,'#4e8a3a',f);if(tp>.8){const r=ph(.42,.6);px(x+7,y-4,2,2,'#d6452e',f*r);px(x+9,y-6,1,3,'#e8471c',f*r);px(x+7,y-5,1,1,'#ff8a6a',f*r);}
+        /* heal: green + motes rise */
+        if(u>.45)for(let r=0;r<5;r++){const v=((u-.45)/.55+r*.2)%1,mx=x-6+((r*7+si*3)%13),my=y-hM*.4-v*H*.09,a=f*(1-v)*ph(.45,.55);
+          px(mx,my-1,1,3,'#b8f08a',a);px(mx-1,my,3,1,'#b8f08a',a);}
+        ctx.restore();});
     }else if(CINE[C.k])CINE[C.k].draw(ctx,C,W,H,u,fade,px);
+    else if(SPECIALS[C.k]){SPECIALS[C.k].draw(ctx,C,W,H,u,fade,px);spApplyShake(C);}
     ctx.globalAlpha=1;
   }
 }
@@ -29509,6 +29903,10 @@ function presetFor(key){const k=key.slice(2);
   if(key.charAt(0)==='B')return BOSSES.find(b=>b.id===k);
   if(key.charAt(0)==='G')return GODS_FX.find(g=>g.id===k);
   return LAYERS.find(l=>l.n===+k);}
+/* v1483 [Genaro]: every god's shrine / encounter event plays that god's side-boss effect */
+const EVENT_FX={u_xochipilli:'xochipilli',u_tonatiuh:'tonatiuh',u_patecatl:'patecatl',u_huitzilopochtli:'huitzilopochtli',u_toci:'toci',
+  u_xochiquetzal:'xochiquetzal',u_midwife_shrine:'cihuacoatl',l1_cornfield:'chicomecoatl',l1_cornfield_boss:'chicomecoatl',
+  l2_mixcoatl:'mixcoatl',l2_mixcoatl_boss:'mixcoatl',l7_heart_jaguar:'ocetekuani',l7_heart_jaguar_fight:'ocetekuani'};
 function godKeyOf(id){return GODS_FX.some(g=>g.id===id)?'G:'+id:null;}
 /* v1472: Amoxtli Logs -- an open entry plays its own effect. Gods: their god power (as on god select).
    Vassals: their layer's effect, except the EVENT vassals, which play their patron side boss's effect:
@@ -29580,10 +29978,13 @@ function tick(dt){
   /* v1474 [Genaro]: the switch to the patron's power starts DURING the yellow victory greca
      (cxVictoryThen sets window._cxVictoryFinish for as long as it plays), not when spoils open. */
   const victory=battle&&!!window._cxVictoryFinish;
+  /* v1482 [Genaro]: a god's shrine event (Xochipilli's games) plays that god's side-boss effect */
+  const evB=sid==='screen-event'&&g&&g.currentEvent&&EVENT_FX[g.currentEvent]||null;
   let key;
   if(ctx0==='amox')key=amoxK;
   else if(ctx0==='title')key='T';
   else if(ctx0==='godsel'||ctx0==='conquest'||spoils||victory||between)key=godKeyOf(patron)||'L:'+lay;
+  else if(evB)key='B:'+evB;
   else if(S.bossKind==='side')key='B:'+S.boss;
   else if(S.bossKind==='layer')key=godKeyOf(S.boss)||'L:'+lay;
   else key='L:'+lay;
@@ -29597,7 +29998,7 @@ function tick(dt){
   const fx=S.fx;
   if(fx.host!==scr){if(fx.host)fx.host.style.transform='';fx.host=scr;}S.host=scr;
   fx.mode=(battle&&!victory)?'battle':'map';
-  fx.intensity=(ctx0==='title'||ctx0==='story')?0:(ctx0==='godsel'||ctx0==='amox')?.4:(S.boss||layerClear||ctx0==='conquest'||between)?1:(spoils||victory)?.75:Math.min(1,Math.max(0,((g.battleNum||1)-1)/7));
+  fx.intensity=(ctx0==='title'||ctx0==='story')?0:(ctx0==='godsel'||ctx0==='amox')?.4:(S.boss||evB||layerClear||ctx0==='conquest'||between)?1:(spoils||victory)?.75:Math.min(1,Math.max(0,((g.battleNum||1)-1)/7));
   if(fx.p.inward||fx.p.inwardSouls){const at=attractFor(sid);fx.attract=at||[.5,.45];}
   /* v1479: wait while a modal is open or Cipactli's parts are still being revealed */
   const _moOpen=(()=>{const m=document.getElementById('mo');return !!(m&&m.classList.contains('open'));})();
@@ -29613,7 +30014,97 @@ function tick(dt){
   fx.step(dt);fx.draw();
   if(S.old){S.oldT+=dt;S.old.fade=Math.max(0,1-S.oldT/.9);S.old.step(dt);S.old.draw();if(S.oldT>=.9)S.old=null;}
 }
+/* v1493: god-special helpers (battle side) */
+const SPECIAL_BY_ABILITY={'Feather Embrace':'feather','Tlalocan Deluge':'deluge','Ophidian Mother':'ophidian','Old Fire':'oldfire','Crippling Shock':'shock',
+  'Epicenter Roar':'roar','Obsidian Storm':'obsidian','Tlipotl Arrows':'arrows','Frost Macuahuitl':'frost','Aurum Break':'aurum','Fiery Stinger':'stinger',
+  'Torrid Tornado':'tornado','Sinistral Minacachalli':'harpoon','Octli Drench':'drench','She Who Eats Filth':'filth','Ixiptlatli Bloom':'bloom2',
+  'Xiuhcoatl Might':'xiuhcoatl','Tlalli Steam':'steam','Cihuateteo Fury':'fury','Godbane Blowgun':'blowgun','Mictlan Clasp':'clasp',
+  'Primordial Hunger':'hunger','Mouth of Sustenance':'sustenance','Zipacna Rage':'zipacna','Teocipactli Punishment':'punishment','Mouth of the Undoing':'undoing',
+  'Patolli Gamble':'roll','Holy Harvest':'harvest','Peyote Concoction':'peyote'};
+/* v1494: look specials up by ability KEY first -- display names are translated in place (Spanish runs showed
+   'Diluvio del Tlalocan' and matched nothing, so no special played on ES). */
+const SPECIAL_BY_AK={featherEmbrace:'feather',deluge:'deluge',ophidianMother:'ophidian',oldFire:'oldfire',cripplingShock:'shock',shock:'shock',
+  seismicRoar:'roar',obsidianStorm:'obsidian',holyHarvest:'harvest',zappingStrike:'arrows',patolliGamble:'roll',frostMacuahuitl:'frost',aurumBreak:'aurum',
+  fieryStinger:'stinger',torridTornado:'tornado',torridTornadoBoss:'tornado',sinistralMinacachalli:'harpoon',octliDrench:'drench',sheWhoEatsFilth:'filth',
+  ixiptlatliBloom:'bloom2',xiuhcoatlMight:'xiuhcoatl',tlalliSteam:'steam',peyoteConcoction:'peyote',cihuateteoFury:'fury',godbaneBlowgun:'blowgun',
+  mictlanClaspPlayer:'clasp',mictlanClasp:'clasp',primordialHunger:'hunger',mouthOfSustenance:'sustenance',zipacnaRage:'zipacna',
+  teocipactliPunishment:'punishment',mouthOfUndoing:'undoing'};
+function specialKey(ak,name,obj){return (ak&&SPECIAL_BY_AK[ak])||SPECIAL_BY_ABILITY[name]||(obj&&typeof i18nRaw==='function'&&SPECIAL_BY_ABILITY[i18nRaw(obj,'ability')])||null;}
+function cardEl(uid){return document.querySelector('#screen-battle .uc[data-uid="'+String(uid).replace(/"/g,'')+'"]');}
+function unitOf(uid){const g=(typeof G!=='undefined')?G:null;return g&&([...(g.units||[]),...(g.enemies||[])].find(u=>u&&u.id===uid));}
+function rectOf(uid){const el=cardEl(uid);if(!el||!S.fx||!bg)return null;const r=el.getBoundingClientRect();if(!r.width)return null;
+  const sx=S.fx.w/(bg.clientWidth||1),sy=S.fx.h/(bg.clientHeight||1);return {x:r.left*sx,y:r.top*sy,w:r.width*sx,h:r.height*sy,el,uid};}
+function buildSpec(rec,my,their){const live=a=>(a||[]).filter(u=>u&&u.currentHp>0||rec.hits.some(h=>h.uid===(u&&u.id)));
+  const caster=rectOf(rec.caster.id)||{x:0,y:0,w:10,h:10};
+  const foeIds=[];rec.hits.forEach(h=>{if(!foeIds.includes(h.uid))foeIds.push(h.uid);});
+  if(!foeIds.length)live(their).forEach(u=>foeIds.push(u.id));
+  const foes=foeIds.map(rectOf).filter(Boolean),fu=foes.map(r=>unitOf(r.uid));
+  const friendsU=(my||[]).filter(u=>u&&u.currentHp>0),friends=friendsU.map(u=>rectOf(u.id)).filter(Boolean);
+  const hits=rec.hits.map(h=>foes.findIndex(r=>r.uid===h.uid)).filter(i=>i>=0);
+  const healFirst=rec.heals.length?friends.findIndex(r=>r.uid===rec.heals[0].uid):-1;
+  let low=healFirst;if(low<0&&friendsU.length){let m=1e9;friendsU.forEach((u,i)=>{const p=u.currentHp/(u.maxHp||1);if(p<m){m=p;low=i;}});}
+  const t0=fu[0],last=rec.hits.find(h=>h.uid===(t0&&t0.id));
+  const els=new Set(live(their).map(u=>u.element));
+  const g=(typeof G!=='undefined')?G:null,patron=rec.side==='p'&&g&&g.god&&rec.caster.id==='god_'+g.god.id;
+  /* v1495 [Genaro]: the move's MAIN target goes first. Splash and spread hits can be recorded before it, which aimed
+     Epicenter Roar (and other main-target specials) at a splashed unit. Main = the unit that took the most damage. */
+  const PRIMARY=new Set(['roar','stinger','drench','punishment','zipacna','feather','oldfire','frost','aurum','arrows']);
+  /* the target the player picked (or the game handed in) is the main target, even when its own hit is still deferred
+     behind the lunge cascade and only the splash hits have been recorded so far */
+  if(rec.primary){let pi=foes.findIndex(r=>r.uid===rec.primary);
+    if(pi<0){const R=rectOf(rec.primary);if(R){foes.unshift(R);fu.unshift(unitOf(rec.primary));for(let q=0;q<hits.length;q++)hits[q]++;pi=0;}}
+    if(pi>0){const m=foes.splice(pi,1)[0];foes.unshift(m);const mu=fu.splice(pi,1)[0];fu.unshift(mu);for(let q=0;q<hits.length;q++)hits[q]=hits[q]===pi?0:hits[q]<pi?hits[q]+1:hits[q];}}
+  else if(PRIMARY.has(rec.k)&&foes.length>1){const dmg=r=>rec.hits.filter(h=>h.uid===r.uid).reduce((a,h)=>a+(h.dmg||0),0);let mi=0;foes.forEach((r,i)=>{if(dmg(r)>dmg(foes[mi]))mi=i;});
+    if(mi>0){const m=foes.splice(mi,1)[0];foes.unshift(m);const mu=fu.splice(mi,1)[0];fu.unshift(mu);for(let q=0;q<hits.length;q++)hits[q]=hits[q]===mi?0:hits[q]<mi?hits[q]+1:hits[q];}}
+  const killHit=rec.hits.find(h=>{const u=unitOf(h.uid);return u&&u.currentHp<=0;}),killIdx=killHit?foes.findIndex(r=>r.uid===killHit.uid):-1;
+  return {caster,foes,friends,hits:hits.length?hits:[0],killIdx:killIdx>=0?killIdx:null,kill:fu.some(u=>u&&u.currentHp<=0),kills:hits.map(i=>!!(fu[i]&&fu[i].currentHp<=0)),
+    crits:foes.map(r=>rec.hits.some(h=>h.uid===r.uid&&h.crit)),gods:fu.map(u=>!!(u&&(u.isGod||(u.isBoss&&!u.isMiniBoss)))),
+    stacks:Math.max(0,((t0&&t0.burnStacks)||0)-2),hurt:!!(t0&&last&&t0.currentHp+last.dmg<(t0.maxHp||1)*.999),elements:Math.max(1,Math.min(9,els.size)),
+    first:hits.length>=2,furyHits:Math.max(1,hits.length),patron:!!patron,nature:friendsU.map(u=>u.element==='nature'),low:Math.max(0,low)};}
 window.MFX={
+  /* ═══ v1493: god specials in battle (both sides). The special fn is wrapped: we open a recorder, the game's own
+     animateHit calls tell us who was hit / healed (in order, including timed multi-hits), and the matching cinematic
+     plays on the foreground canvas with cards shaking on impact. The next actor waits until it finishes. */
+  _special(caster,k,side,ft){
+    if(!k||!S.fx||MFX_REDUCE||!S.on||!bg)return;
+    if(S.entScr)return; /* never over a boss entrance */
+    const D=(SPECIALS[k]&&SPECIALS[k].dur)||(k==='roll'?1.6:k==='harvest'?2.3:1.5);
+    window._mfxHoldUntil=performance.now()+D*1000+150;
+    const rec={k,caster,side,hits:[],heals:[],t0:performance.now(),started:false,primary:ft&&ft.id};
+    /* a physical single-target special lunges first: the game delays the main target's hit (_fxDelayMap) while splash
+       hits land at once -- that pending entry IS the main target */
+    if(!rec.primary&&G._fxDelayMap){const pk=Object.keys(G._fxDelayMap).find(id=>G._fxDelayMap[id]>0);if(pk)rec.primary=pk;}S.rec=rec;
+    const g=G,my=side==='p'?g.units:g.enemies,their=side==='p'?g.enemies:g.units;
+    const go=()=>{if(rec.started||S.rec!==rec)return;rec.started=true;if(!S.fx)return;
+      if(k==='roll'){S.fx.play('roll',{res:g._mfxRoll||1});setTimeout(()=>{if(S.fx&&S.fx.cine&&S.fx.cine.k==='roll')MFX.rollHits(rec.hits.map(h=>h.uid),g._mfxRoll||1);},560);return;}
+      if(k==='harvest'){const sx=S.fx.w/(bg.clientWidth||1),sy=S.fx.h/(bg.clientHeight||1),spots=[];
+        (rec.heals.length?rec.heals.map(h=>h.uid):my.filter(u=>u.currentHp>0).map(u=>u.id)).forEach(u=>{const el=cardEl(u);if(!el)return;const r=el.getBoundingClientRect();if(r.width)spots.push([(r.left+r.width/2)*sx,(r.bottom-4)*sy]);});
+        S.fx.play('harvest',{spots});return;}
+      S.fx.play(k);const C=S.fx.cine;if(!C)return;C.spec=buildSpec(rec,my,their);rec.cine=C;};
+    const HEALISH=new Set(['ophidian','filth','steam','sustenance','harvest','peyote']);
+    if(HEALISH.has(k)||k==='roll')setTimeout(go,0);
+    else{let n=0;const poll=()=>{if(rec.started)return;if(rec.hits.length||n++>=10)go();else setTimeout(poll,50);};setTimeout(poll,0);}},
+  willSpecial(u){if(!u||!S.fx||MFX_REDUCE||!S.on||S.entScr)return false;
+    if(u.isGod&&(G.units||[]).includes(u)){const gd=(typeof GODS!=='undefined'&&GODS.find(g=>g.id===u.baseGodId))||G.god,ob=G._useOblationSpecial;
+      return !!specialKey(ob?G._oblationAk:(gd&&gd.ak),ob?G._oblationAbility:(gd&&gd.ability),ob?null:gd);}
+    return !!specialKey(u.ak,u.ability,u);},
+  /* v1496 [Genaro]: how long a number waits so it pops on the animation's impact, not before it.
+     Seconds from the special's start; i = this hit's order, f = the target's order (main target first). */
+  _numDelay(uid,isHeal){const rec=S.rec;if(!rec||rec.k==null||performance.now()-rec.t0>1200)return 0;
+    const k=rec.k,hits=rec.hits,heals=rec.heals;
+    const i=isHeal?heals.length:hits.length,seen=[];if(rec.primary)seen.push(rec.primary);hits.forEach(h=>{if(!seen.includes(h.uid))seen.push(h.uid);});
+    let fi=seen.indexOf(uid);if(fi<0)fi=seen.length;const main=fi===0;
+    const T={feather:.5,deluge:.5+fi*.05,ophidian:.75,oldfire:.56,shock:.17+i*.2,roar:main?.45:.62,obsidian:.32+fi*.06,arrows:.4+i*.38,frost:.3,
+      aurum:isHeal?1.2:.52,stinger:main?.58:.8,tornado:.2+i*.3,harpoon:.27+fi*.17,drench:main?.47:.72,filth:isHeal?1.05:1.0,bloom2:.4+fi*.12,
+      xiuhcoatl:.3+i*.32,steam:isHeal?.75:.6+fi*.06,peyote:.55+fi*.06,fury:.37+i*.2,blowgun:.2+i*.12,clasp:.32+fi*.07,hunger:.5,sustenance:isHeal?.75:1.0,
+      zipacna:.44,punishment:.72,undoing:.4+fi*.12,roll:.58+((G._mfxRoll>=2&&G._mfxRoll<=4)?i*.15:0),harvest:.65}[k];
+    if(T==null)return 0;return Math.max(0,rec.t0+T*1000-200-performance.now());}, /* the game's own pop lands ~200ms after animateHit */
+  _hit(uid,dmg,isHeal,isCrit){const rec=S.rec;if(!rec||performance.now()-rec.t0>2500)return;
+    (isHeal?rec.heals:rec.hits).push({uid,dmg,crit:!!isCrit});
+    if(!isHeal&&rec.cine&&S.fx&&S.fx.cine===rec.cine){const S2=rec.cine.spec;let i=S2.foes.findIndex(r=>r.uid===uid);
+      if(i<0){const R=rectOf(uid);if(!R)return;S2.foes.push(R);i=S2.foes.length-1;}
+      S2.hits.push(i);S2.furyHits=S2.hits.length;S2.first=S2.hits.length>=2;S2.crits[i]=S2.crits[i]||!!isCrit;
+      const u=unitOf(uid);S2.kills.push(!!(u&&u.currentHp<=0));if(u&&u.currentHp<=0){S2.kill=true;if(S2.killIdx==null)S2.killIdx=i;}if(i===S2.foes.length-1&&S2.hits.filter(x=>x===i).length===1||rec.k==='shock')rec.cine.d=null;}},
   signature(kind,opts){
     if(!S.fx||MFX_REDUCE||!S.on)return;opts=opts||{};
     if(kind==='roll'&&!(S.boss==='xochipilli'&&/xochi/.test(opts.caster||'')))return;
@@ -29621,14 +30112,33 @@ window.MFX={
     if(kind==='harvest'&&opts.uids&&bg){const sx=S.fx.w/(bg.clientWidth||1),sy=S.fx.h/(bg.clientHeight||1),spots=[];
       opts.uids.forEach(u=>{const el=document.querySelector('#screen-battle .uc[data-uid="'+String(u).replace(/"/g,'')+'"]');if(!el)return;const r=el.getBoundingClientRect();
         if(r.width)spots.push([(r.left+r.width/2)*sx,(r.bottom-4)*sy]);});
-      S.fx.play('harvest',spots.length?{spots}:{});return;}
-    S.fx.play(kind,kind==='roll'?{res:opts.res}:{});},
+      S.fx.play('harvest',spots.length?{spots}:{});window._mfxHoldUntil=performance.now()+S.fx.cine.dur*1000;return;}
+    S.fx.play(kind,kind==='roll'?{res:opts.res}:{});if(S.fx.cine)window._mfxHoldUntil=performance.now()+S.fx.cine.dur*1000;},
+  rollHits(hits,res){if(!S.fx||MFX_REDUCE||!S.on||!bg||!S.fx.cine||S.fx.cine.k!=='roll')return;
+    const sx=S.fx.w/(bg.clientWidth||1),sy=S.fx.h/(bg.clientHeight||1),spots=[];
+    /* v1491: hits is the ordered list of struck uids. Area faces (1, 5, 6) burst on everyone at once;
+       the random-hit faces (2-4) pop one after another, 0.15s apart, like the hits themselves. */
+    const seqd=res>=2&&res<=4;(hits||[]).forEach((uid,i)=>{const el=document.querySelector('#screen-battle .uc[data-uid="'+String(uid).replace(/"/g,'')+'"]');if(!el)return;const r=el.getBoundingClientRect();
+      if(r.width)spots.push([(r.left+r.width/2)*sx,(r.top+r.height*.4)*sy,seqd?i*.15:0]);});
+    S.fx.addRollHits(spots,res);const C=S.fx.cine;window._mfxHoldUntil=performance.now()+Math.max(0,C.dur-C.t)*1000;},
   bossFall(){if(!S.fx||MFX_REDUCE)return;const g=(typeof G!=='undefined')?G:null;
     if(g&&(g.enemies||[]).some(e=>e&&e.isBoss&&!e.isMiniBoss))S.fx.burst();},
   setEnabled(v){S.on=!!v;try{localStorage.setItem('teotlan_mfx',v?'on':'off');}catch(e){}if(!v){clearAll();S.fx=null;S.key=null;}},
   state(){return {on:S.on,key:S.key,boss:S.boss,bossKind:S.bossKind,lastFight:S.lastFight,overlay:!!S.ov,mode:S.fx&&S.fx.mode,intensity:S.fx&&S.fx.intensity,parts:S.fx&&S.fx.parts.length,cine:S.fx&&S.fx.cine&&S.fx.cine.k,attract:S.fx&&S.fx.attract,reduce:MFX_REDUCE};},
   _fx(){return S.fx;}
 };
+/* v1493: wrap the special-move functions and animateHit (see MFX._special). Delayed re-calls of animateHit
+   (drunk misfire, lunge cascade) are skipped here; the deferred call is the one recorded. */
+(function(){const fg0=window.fireGodSpecial,ef0=window.enemyFireSpecial,ah0=window.animateHit;
+  if(typeof fg0==='function')window.fireGodSpecial=function(u,ae,aa,ft){try{const gd=(typeof GODS!=='undefined'&&GODS.find(g=>g.id===u.baseGodId))||G.god;
+    const ob=G._useOblationSpecial;MFX._special(u,specialKey(ob?G._oblationAk:(gd&&gd.ak),ob?G._oblationAbility:(gd&&gd.ability),ob?null:gd),'p',ft);}catch(_e){}return fg0.apply(this,arguments);};
+  if(typeof ef0==='function')window.enemyFireSpecial=function(u){try{MFX._special(u,specialKey(u.ak,u.ability,u),'e');}catch(_e){}return ef0.apply(this,arguments);};
+  if(typeof ah0==='function')window.animateHit=function(uid,dmg,isHeal,isCrit,_pastFx){let wait=0;
+    try{if(_pastFx===undefined&&(dmg||dmg===0)&&!(dmg===0&&isHeal)&&!(G._drunkDelayIds&&G._drunkDelayIds.has(uid))&&!(G._fxDelayMap&&G._fxDelayMap[uid]>0)){wait=MFX._numDelay(uid,isHeal);MFX._hit(uid,dmg,isHeal,isCrit);}}catch(_e){wait=0;}
+    /* v1496: the number (and the card's own hit flash) waits for the special's impact beat */
+    if(wait>16){const a=arguments,self=this;setTimeout(()=>ah0.apply(self,a),wait);return;}
+    return ah0.apply(this,arguments);};})();
+window._mfxHoldMs=function(){return Math.min(2500,Math.max(0,(window._mfxHoldUntil||0)-performance.now()));};
 requestAnimationFrame(frame);
 })();
 </script>
