@@ -84,6 +84,28 @@ body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-
 .bind-ring{position:fixed;border-radius:50%;pointer-events:none;z-index:9998;border:2px solid rgba(240,205,100,.9);box-shadow:0 0 14px rgba(240,205,100,.55),inset 0 0 12px rgba(240,205,100,.35);animation:bindRing .85s ease-out forwards}
 @keyframes bindGlow{0%{opacity:0;transform:scale(.7)}40%{opacity:.85}100%{opacity:0;transform:scale(1.2)}}
 .bind-glow{position:fixed;border-radius:10px;pointer-events:none;z-index:9997;background:radial-gradient(ellipse,rgba(255,230,150,.75),rgba(180,140,40,0) 70%);animation:bindGlow .9s ease-out forwards}
+/* v1507 [Genaro]: Misery Blizzard and Undying (Ephemeral) Ember had no visual -- only a number, easy to lose at
+   round change. Blizzard: an icy wash over the board, then ice motes settle onto every card it hits. Ember: a
+   coal arcs from Huehueteotl (or the top of the board) onto the chosen enemy and bursts. */
+@keyframes mbWash{0%{opacity:0;transform:translateY(-30%)}30%{opacity:.55}100%{opacity:0;transform:translateY(25%)}}
+.mb-wash{position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:9996;
+  background:linear-gradient(180deg,rgba(190,235,255,.0),rgba(170,225,255,.32) 40%,rgba(120,190,240,.18) 70%,rgba(120,190,240,0));animation:mbWash .9s ease-out forwards}
+@keyframes mbFlake{0%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(0)}15%{opacity:1}80%{opacity:1}100%{opacity:0;transform:translate(0,0) rotate(var(--rot))}}
+.mb-flake{position:fixed;width:7px;height:7px;pointer-events:none;z-index:9999;background:#e8f8ff;box-shadow:0 0 6px #9fdcff,0 0 0 1px rgba(120,190,240,.6);
+  animation:mbFlake var(--dur,.55s) cubic-bezier(.3,.6,.4,1) forwards}
+.mb-flake.b{width:4px;height:4px;background:#9fdcff}
+@keyframes mbFrost{0%{opacity:0}35%{opacity:.85}100%{opacity:0}}
+.mb-frost{position:fixed;border-radius:8px;pointer-events:none;z-index:9997;
+  background:radial-gradient(ellipse at 50% 40%,rgba(220,245,255,.55),rgba(140,205,250,.28) 55%,rgba(140,205,250,0) 80%);
+  box-shadow:inset 0 0 18px rgba(170,225,255,.8);animation:mbFrost .8s ease-out forwards}
+.ee-orb{position:fixed;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;pointer-events:none;z-index:9999;
+  background:radial-gradient(circle at 40% 35%,#fff6c0,#ffb030 45%,#e04010 75%,#7a1500);box-shadow:0 0 12px #ff8a20,0 0 26px rgba(255,90,20,.7)}
+@keyframes eeTrail{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:translateY(-6px) scale(.3)}}
+.ee-trail{position:fixed;width:8px;height:8px;margin:-4px 0 0 -4px;pointer-events:none;z-index:9998;background:#ffb040;box-shadow:0 0 6px #ff7020;animation:eeTrail .45s ease-out forwards}
+@keyframes eeSpark{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.4)}}
+.ee-spark{position:fixed;width:5px;height:5px;margin:-2px 0 0 -2px;pointer-events:none;z-index:9999;background:#ffd060;box-shadow:0 0 6px #ff6a10;animation:eeSpark var(--dur,.5s) ease-out forwards}
+@keyframes eeFlash{0%{opacity:0;transform:scale(.6)}25%{opacity:.9}100%{opacity:0;transform:scale(1.25)}}
+.ee-flash{position:fixed;border-radius:10px;pointer-events:none;z-index:9997;background:radial-gradient(ellipse,rgba(255,190,80,.8),rgba(230,70,20,.35) 55%,rgba(230,70,20,0) 75%);animation:eeFlash .55s ease-out forwards}
 /* v858: Sak Tahn Waax completion pulse -- a gold long-count wheel expanding over the board. */
 @keyframes sakWheel{0%{opacity:0;transform:translate(-50%,-50%) scale(.2) rotate(0)}20%{opacity:.95}100%{opacity:0;transform:translate(-50%,-50%) scale(2.1) rotate(190deg)}}
 .sak-wheel{position:fixed;border-radius:50%;pointer-events:none;z-index:9998;border:3px double rgba(240,205,100,.95);box-shadow:0 0 26px rgba(240,205,100,.6),inset 0 0 22px rgba(240,205,100,.3);animation:sakWheel 1.15s cubic-bezier(.2,.7,.3,1) forwards}
@@ -2642,6 +2664,7 @@ Object.assign(T_EN,{
   'ui.ev.cost5Cacao':'(5 Cacao)',
   'ui.ev.shareFood':'You reach into your pack for something to share.',
   'ui.ev.ignore':'Ignore',
+  'ui.ev.tpHalfCost':'(−50% TP, all units)', /* v1508 */
   'ui.ev.ignoreDesc':'You have more important things to attend to.',
   'ui.ev.easyRoute':'Take the Easy Route',
   'ui.ev.easyDesc':'You follow the well-worn path. It looks safe enough.',
@@ -3710,6 +3733,7 @@ Object.assign(T_ES,{
   'ui.ev.cost5Cacao':'(5 de Cacao)',
   'ui.ev.shareFood':'Buscas en tu morral algo que compartir.',
   'ui.ev.ignore':'Ignorar',
+  'ui.ev.tpHalfCost':'(−50% de PT, todas las unidades)', /* v1508 */
   'ui.ev.ignoreDesc':'Tienes asuntos más importantes que atender.',
   'ui.ev.easyRoute':'Tomar el camino fácil',
   'ui.ev.easyDesc':'Sigues el sendero trillado. Parece bastante seguro.',
@@ -7358,7 +7382,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1498'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1510'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -11324,7 +11348,8 @@ initG();
    SPLIT-LIST: a new transient FX class must be added here. */
 const FX_TRANSIENT_CLASSES=['btn-ripple','btn-edge','uc-pick','spoils-pulse','cont-sweep','cont-chev',
   'lv-spark','lv-column','sg-mote','sg-ring','tz-steam','tz-wash','blood-drop','blood-spray',
-  'blood-pool','blood-stain','sac-flash','bind-mote','bind-ring','bind-glow','sak-wheel','sak-glyph','dmg-pop'];
+  'blood-pool','blood-stain','sac-flash','bind-mote','bind-ring','bind-glow','sak-wheel','sak-glyph','dmg-pop',
+  'mb-wash','mb-flake','mb-frost','ee-orb','ee-trail','ee-spark','ee-flash']; /* v1507 */
 /* v878 REGRESSION FIX (self-inflicted in v877). clearTransientFx() removed EVERY transient, and
    the v875 click listener runs in the CAPTURE phase -- i.e. before the button's own onclick. So on
    any button that changes screens the order was:
@@ -13682,7 +13707,41 @@ function layerLvBonus(){
   return (isL2?9:0)+(isL3?18:0)+(isL4?26:0)+(isL5?35:0)+(isL6?44:0)+(isL7?53:0)+(isL8?62:0)+(isL9?72:0)+(post?1:0)+(G.layer>=3?1:0)+(G.layer>=4?2:0)+(tp.enemyLvBonus||0); // v387: +1 past L2, +2 more past L3 (stacked)
 }
 
+/* v1509 [Genaro]: B5 / B8 escort HP. Regular battles scale enemy HP by battle number, the per-layer bonus
+   (LAYER_HP_BONUS) and the Hard ratio; escorts were built with a flat 0.7-1.2 and none of the three, so from
+   L3 on a miniboss's escorts were weaker than the B4 enemies before them, and L5/L7/L8 boss escorts ~30% weaker
+   than a Hard B7. Every ordinary escort (an 'en_' unit beside a boss or miniboss) now takes the same HP curve a
+   regular enemy of that battle number would. Level and ATK/MAG are untouched -- HP only.
+   Also: Boss Surge / Miniboss Surge always said "and their escorts" but only reached the boss itself. Escorts
+   now take them too (on top of Enemy Vassal Surge, which they already had as enemy vassals). The named escorts
+   built from boss templates (L6 trio, L7 Ometochtli) already carried bossHpMult; Mictlampehecatl (L4) did not.
+   Two more Surge bugs found while here, fixed below: Miniboss Surge never reached the minibosses (they took Boss
+   Surge instead), and Boss Surge never reached the L1-L5 layer bosses. */
 function buildEnemySet(bn,diff){
+  const set=_buildEnemySetRaw(bn,diff);
+  if((bn!==5&&bn!==8)||!Array.isArray(set)||(G.layer||1)>=9)return set;
+  try{
+    const tp=getTecpatlEffects(),vM=tp.vassalHpMult||1,encM=bn===8?(tp.bossHpMult||1):(tp.miniHpMult||1);
+    const curve=(0.5+bn*0.065)*(LAYER_HP_BONUS[G.layer]||1)*(diff==='hard'?hardHpRatio():1);
+    const bossM=tp.bossHpMult||1,miniM=tp.miniHpMult||1;
+    set.forEach(e=>{
+      if(!e)return;
+      /* Minibosses were built with bossHpMult (Boss Surge) and never saw miniHpMult -- Miniboss Surge did
+         nothing to them, Boss Surge did. Swap it. */
+      if(bn===5&&e.isMiniBoss&&(bossM!==1||miniM!==1)){const h=Math.max(1,Math.round(e.maxHp/bossM*miniM));e.maxHp=h;e.currentHp=h;return;}
+      /* L1-L5 layer bosses never applied Boss Surge at all (L6-L8 do, in their own builders). */
+      if(bn===8&&e.isBoss&&(G.layer||1)<=5&&bossM!==1){const h=Math.max(1,Math.round(e.maxHp*bossM));e.maxHp=h;e.currentHp=h;return;}
+      if(e.isBoss||e.isMiniBoss)return;
+      if(typeof e.id==='string'&&e.id.indexOf('en_')===0&&e.hp){
+        const h=Math.max(1,Math.round(sc(e.hp,e.enemyLevel||1)*curve*vM*encM));e.maxHp=h;e.currentHp=h;
+      }else if(e.id==='mict_escort_8'&&encM!==1){
+        const h=Math.max(1,Math.round(e.maxHp*encM));e.maxHp=h;e.currentHp=h;
+      }
+    });
+  }catch(_e){}
+  return set;
+}
+function _buildEnemySetRaw(bn,diff){
   const isL2=G.layer===2;
   const isL3=G.layer===3;
   const isL4=G.layer===4;
@@ -15019,7 +15078,8 @@ function evL1Xolo(el){
     if(cu){evLevelUnit(cu,-2);const el2=document.getElementById('event-content');evResult(el2,'😠',t('ui.evr.xolo.cacaoLoss',{v0:(cu.icon),v1:(cu.name)}),afterEvent);}
     else{const el2=document.getElementById('event-content');evResult(el2,'😠',t('ui.evr.xolo.cacao'),afterEvent);}
   }));
-  el.appendChild(evOpt('🚶',t('ui.ev.ignore'),'',t('ui.ev.ignoreDesc'),false,'',()=>{
+  /* v1508 [Genaro]: both L1 options below halve every unit's TP but showed no cost until AFTER you picked them */
+  el.appendChild(evOpt('🚶',t('ui.ev.ignore'),t('ui.ev.tpHalfCost'),t('ui.ev.ignoreDesc'),false,'',()=>{
     evDrainNPAll(0.5);
     const el2=document.getElementById('event-content');evResult(el2,'😤',t('ui.evr.xolo.ignore'),afterEvent);
   }));
@@ -15031,7 +15091,7 @@ function evL1Ruins(el){
     G.res.cacao+=100;renderRes('rb-event');
     const el2=document.getElementById('event-content');evResult(el2,'🏚',t('ui.evr.ruins.easy'),afterEvent);
   }));
-  el.appendChild(evOpt('⚠️',t('ui.ev.hardRoute'),'',t('ui.ev.hardDesc'),false,'',()=>{
+  el.appendChild(evOpt('⚠️',t('ui.ev.hardRoute'),t('ui.ev.tpHalfCost'),t('ui.ev.hardDesc'),false,'',()=>{
     evDrainNPAll(0.5);G.res.blood+=500;G.res.cacao+=250;const _r=grantRandomOffering('common');renderRes('rb-event');
     const el2=document.getElementById('event-content');evResult(el2,'⚔️',t('ui.evr.ruins.hard',{v0:(offeringRewardLine(_r))}),afterEvent);
   }));
@@ -17192,7 +17252,7 @@ function buildRoundQueue(){
       aP_mb.forEach(u=>{
         const dmg=Math.round(u.maxHp*0.10);
         u.currentHp=Math.max(0,u.currentHp-dmg);
-        animateHit(u.id,dmg,false);
+        const _uid=u.id;miseryBlizzardFx([_uid],()=>animateHit(_uid,dmg,false)); /* v1507: number on the frost's impact */
         if(u.currentHp<=0)handleDeath(u);
       });
       if(aP_mb.length)addLog(isEs()?`<span class="log-ab">🧊 Ventisca de Miseria: ¡todos los aliados −10% PV máx.! (la maldición de Ixquimilli)</span>`:`<span class="log-ab">🧊 Misery Blizzard: all allies −10% max HP! (Ixquimilli's curse)</span>`);
@@ -17203,7 +17263,7 @@ function buildRoundQueue(){
       aE.filter(e=>e.currentHp>0).forEach(e=>{
         const dmg=Math.round(e.maxHp*0.05);
         e.currentHp=Math.max(0,e.currentHp-dmg);
-        animateHit(e.id,dmg,false); // v339: show the damage tick (was silent)
+        const _eid=e.id;miseryBlizzardFx([_eid],()=>animateHit(_eid,dmg,false)); // v339: show the damage tick (was silent) · v1507: with the blizzard fx
         if(e.currentHp<=0&&!G.captureProcessed.has(e.id)){if(e.isBoss){handleDeath(e);}else{G.captureProcessed.add(e.id);G._unitStates[e.id]='defeated';G.captureQueue.push(e);if(!G.capActive)processNextCap();}} // v319: bosses are never capturable
       });
       addLog(isEs()?`<span class="log-ab">🧊 Ventisca de Miseria: ¡todos los enemigos −5% PV máx.!</span>`:`<span class="log-ab">🧊 Misery Blizzard: all enemies −5% max HP!</span>`);renderBattle();
@@ -17348,7 +17408,7 @@ function buildRoundQueue(){
       const emDmg=Math.round(pick.maxHp*0.10);
       pick.currentHp=Math.max(0,pick.currentHp-emDmg);
       addLog(isEs()?`<span class="log-burn">🪔 Brasa Imperecedera: ${pick.icon} ${liveName(pick)} −${emDmg} PV</span>`:`<span class="log-burn">🪔 Undying Ember: ${pick.icon} ${pick.name} −${emDmg} HP</span>`);
-      animateHit(pick.id,emDmg,false); // defers internally until after renderBattle below
+      {const _pid=pick.id;setTimeout(()=>undyingEmberFx(_pid,()=>animateHit(_pid,emDmg,false)),120);} // v1507: coal arcs in, number on impact (after renderBattle below)
       if(pick.currentHp<=0&&!G.captureProcessed.has(pick.id)){
         if(pick.isBoss){handleDeath(pick);} // v319: bosses are never capturable
         else{
@@ -18502,6 +18562,20 @@ function taRecord(uid,kind){ /* v1396 */
   const r=G&&G._taRec;if(!r||!uid||uid===r.from)return;
   if(!r.hits[uid]||(r.hits[uid]==='fx'&&kind!=='fx'))r.hits[uid]=kind;
 }
+/* v1500 [Genaro]: purple "+N TP" number, in the same big outlined style as damage numbers (v1497).
+   Pops a beat after the HP heal number on the same card, sitting a little lower so the two never overlap. */
+function animateTpGain(uid,amt){
+  if(!(amt>0))return;
+  let wait=0;try{if(window.MFX&&MFX._numDelay)wait=MFX._numDelay(uid,true)||0;}catch(_e){wait=0;}
+  setTimeout(()=>{
+    const el=document.querySelector(`[data-uid="${uid}"]`);if(!el)return;
+    const r=el.getBoundingClientRect(),num=document.createElement('div');
+    num.className='dmg-pop dmg-num';
+    num.textContent='+'+amt+' '+(isEs()?'PT':'TP');
+    num.style.cssText=`color:#c08cff;font-size:19px;left:${r.left+r.width/2}px;top:${r.top+r.height*.42}px;`;
+    document.body.appendChild(num);setTimeout(()=>num.remove(),1200);
+  },wait+260);
+}
 function animateHit(uid,dmg,isHeal,isCrit,_pastFx){
   if(!dmg&&dmg!==0)return;
   taRecord(uid,isHeal?'heal':'dmg');
@@ -18814,7 +18888,9 @@ function executeStrike(actor,target){
       // v374: Smoking Mirror Shard — basic strikes heal the attacker for 50% of HP damage dealt
       if(_oeStrk.strikeLifesteal>0&&hpDmg>0){const _ls=Math.round(hpDmg*_oeStrk.strikeLifesteal);if(_ls>0&&actor.currentHp>0&&actor.currentHp<actor.maxHp){actor.currentHp=healTo(actor,_ls);animateStatusPop(actor.id,'🪞 +'+_ls,'#50c080');addLog(isEs()?`<span class="log-heal">🪞 Espejo Humeante: ${actor.icon} +${_ls} PV de robo de vida</span>`:`<span class="log-heal">🪞 Smoking Mirror: ${actor.icon} +${_ls} HP lifesteal</span>`);}}
       if(actor.isGod)triggerDeadlyButterfly(actor,G.enemies.filter(u=>u.currentHp>0&&!G.captureProcessed.has(u.id)));
-      onHitContact(actor,target);
+      /* v1506 [Genaro]: a second onHitContact(actor,target) sat here. onHitContact already ran at the top of this
+         block, so every ALLY basic strike resolved contact effects twice -- boss Itzpapalotl's Deadly Butterfly
+         wounded the striker x2 per hit, and Flayed Skin / Axolotl Charm checks ran twice too. */
     }
     refreshCaptureTargets();
     if(target.currentHp<=0&&!G.captureTargets.has(target.id))handleDeath(target);
@@ -19115,7 +19191,9 @@ function captureTpRefund(){
   let _any=0;
   (G.units||[]).filter(x=>x&&x.isAlly&&x.currentHp>0&&x.maxNP).forEach(x=>{
     const _g=Math.round(x.maxNP*_ctp);
-    if(_g>0){const _b=x.currentNP||0;x.currentNP=Math.min(x.maxNP,_b+_g);_any+=x.currentNP-_b;}});
+    if(_g>0){const _b=x.currentNP||0;x.currentNP=Math.min(x.maxNP,_b+_g);_any+=x.currentNP-_b;
+      /* v1505 [Genaro]: show each unit's refund -- the purple +TP number Holy Harvest uses, after the capture binding settles */
+      const _d=x.currentNP-_b,_id=x.id;if(_d>0)setTimeout(()=>animateTpGain(_id,_d),450);}});
   if(_any>0)addLog(isEs()?`<span class="log-tp">\ud83e\udeb6 Casco de Serpiente Emplumada \u2014 la captura devuelve <strong>${_any}</strong> PT al grupo.</span>`:`<span class="log-tp">\ud83e\udeb6 Feather Snake Helmet \u2014 the capture returns <strong>${_any}</strong> TP to the party.</span>`);
   return _any;
 }
@@ -19529,9 +19607,10 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
     const hpPct=0.25+healBonusPP(u);const npPct=0.10+healBonusPP(u);
     aa.forEach(a=>{
       const h=Math.round(a.maxHp*hpPct);a.currentHp=healTo(a,h);
-      const npGain=Math.round((a.maxNP||0)*npPct);a.currentNP=Math.min(a.maxNP||0,(a.currentNP||0)+npGain);
+      const npGain=Math.round((a.maxNP||0)*npPct);const _np0=a.currentNP||0;a.currentNP=Math.min(a.maxNP||0,_np0+npGain);
       cleanseUnit(a);
       animateHit(a.id,h,true);
+      animateTpGain(a.id,a.currentNP-_np0); /* v1500 [Genaro]: show the TP restore too */
     });
     addLog(isEs()?`<span class="log-heal">🌽 ¡Cultivos Sagrados! +${Math.round(hpPct*100)}% PV + limpieza + ¡+${Math.round(npPct*100)}% PT a todos los aliados!</span>`:`<span class="log-heal">🌽 Holy Harvest! +${Math.round(hpPct*100)}% HP + cleanse + +${Math.round(npPct*100)}% TP all allies!</span>`);
   }
@@ -20145,7 +20224,7 @@ function fireMultiHit(actor,ae,hits,dmgPerHit,isAoeLogic,onDone){
     if(!live.length){if(onDone)onDone(totalDmg);return;}
     let tgt=live[Math.floor(Math.random()*live.length)];
     tgt=drunkSwapTarget(actor,tgt); // v564: PER-HIT misfire roll (locked spec §2.2) — array doctoring alone could yield zero chance on small boards
-    let dmg=Math.max(1,Math.round(dmgPerHit*(G.dte.specialBoostMult||1)));
+    let dmg=Math.max(1,Math.round((typeof dmgPerHit==='function'?dmgPerHit(tgt):dmgPerHit)*(G.dte.specialBoostMult||1))); /* v1503: per-target (DEF-reduced) damage */
     const hitIsCrit=rollCrit(-0.05,false,actor);if(hitIsCrit){dmg=Math.round(dmg*(actor._critMult||2));critCount++;}
     const hpHit=applyArmorDamage(tgt,dmg,false);
     if(hpHit>0){
@@ -20229,7 +20308,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   }
   // HEALS
   if(ab==='Thorn Lash'&&t){
-    const raw=Math.max(1,Math.round(bpn(u)*((u.atk||0)*1.5*(G.dte.specialBoostMult||1))));
+    const raw=Math.max(1,Math.round(bpn(u)*(((u.atk||0)*1.5-(t.def||0)*0.4)*(G.dte.specialBoostMult||1)))); /* v1503 [Genaro]: now reduced by target DEF/RES like every other special */
     const dmg=applyArmorDamage(t,raw,false);
     if(dmg>0){t.currentHp=Math.max(0,t.currentHp-dmg);animateHit(t.id,dmg,false,rollCrit._lc);}
     const _tlOK=applyPoison(t,1);
@@ -20239,7 +20318,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   if(ab==='Pollen Burst'){
     let tot=0;
     ae.filter(e=>e.currentHp>0).forEach(e=>{
-      const dmg=applyArmorDamage(e,Math.max(1,Math.round(bpn(u)*((u.mag||0)*(1+(0.10*(u.atkBuffStacks||0)))*1.1*(G.dte.specialBoostMult||1)))),false);
+      const dmg=applyArmorDamage(e,Math.max(1,Math.round(bpn(u)*(((u.mag||0)*(1+(0.10*(u.atkBuffStacks||0)))*1.1-(e.res||0)*0.4)*(G.dte.specialBoostMult||1)))),false); /* v1503 [Genaro]: now reduced by target DEF/RES like every other special */
       if(dmg>0){e.currentHp=Math.max(0,e.currentHp-dmg);tot+=dmg;animateHit(e.id,dmg,false,rollCrit._lc);onHitContact(u,e);refreshCaptureTargets();if(e.currentHp<=0)handleDeath(e);}
     });
     aa.forEach(a=>{a.atkBuffStacks=Math.min(buffCap(a),(a.atkBuffStacks||0)+1);a.atkBuffRounds=Math.max(a.atkBuffRounds||0,4);animateBuff(a.id);});
@@ -20280,7 +20359,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   }
   if(ab==='Feeding Frenzy'&&ae.length){
     const hits=3+Math.floor(Math.random()*2);
-    const dmgPer=Math.max(1,Math.round(bpn(u)*((u.atk||0)*0.55*(G.dte.specialBoostMult||1))));
+    const dmgPer=tg=>Math.max(1,Math.round(bpn(u)*((u.atk||0)*0.55-(tg.def||0)*0.4))); /* v1503 [Genaro]: now reduced by target DEF/RES like every other special; (boost is applied inside fireMultiHit -- it was being applied twice) */
     G._multiHitPending=true;
     fireMultiHit(u,ae,hits,dmgPer,false,(total)=>{
       G._multiHitPending=false;
@@ -20328,7 +20407,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
       if(hn>=hits){G._multiHitPending=false;if(crits)addLog(isEs()?`<span style="color:#ffd700;font-size:10px">⚡ ¡Crítico ×${crits}!</span>`:`<span style="color:#ffd700;font-size:10px">⚡ Critical ×${crits}!</span>`);addLog(isEs()?`<span class="log-ab">🔱 ¡Embestida de Tridente! ${hits} golpes → ${tot} en total + Parálisis</span>`:`<span class="log-ab">🔱 Trident Lunge! ${hits} hits → ${tot} total + Paralyze</span>`);return;}
       const live=ae.filter(e=>e.currentHp>0);if(!live.length){G._multiHitPending=false;return;}
       const tgt=live[Math.floor(Math.random()*live.length)];
-      let dmg=Math.max(1,Math.round(bpn(u)*((u.atk||0)*0.6*(G.dte.specialBoostMult||1))));
+      let dmg=Math.max(1,Math.round(bpn(u)*(((u.atk||0)*0.6-(tgt.def||0)*0.4)*(G.dte.specialBoostMult||1)))); /* v1503 [Genaro]: now reduced by target DEF/RES like every other special */
       const isC=rollCrit(-0.05,false,u);if(isC){dmg=Math.round(dmg*(u._critMult||2));crits++;}
       const h=applyArmorDamage(tgt,dmg,false);
       if(h>0){tgt.currentHp=Math.max(0,tgt.currentHp-h);tot+=h;renderBattle();animateHit(tgt.id,h,false,isC);onHitContact(u,tgt);if(!poisoned.has(tgt.id)){applyParalyze(tgt,1);poisoned.add(tgt.id);}refreshCaptureTargets();if(tgt.currentHp<=0&&!G.captureProcessed.has(tgt.id))handleDeath(tgt);}
@@ -20369,7 +20448,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   }
   // ── Layer 7 Teyōllōcuālōyān rosters — captured-ally (player) versions (v545) ──
   if(ab==='Ravenous Pack'&&ae.length){
-    const dmgPer=Math.max(1,Math.round(bpn(u)*((u.atk||0)*0.8)));
+    const dmgPer=tg=>Math.max(1,Math.round(bpn(u)*((u.atk||0)*0.8-(tg.def||0)*0.4))); /* v1503 [Genaro]: now reduced by target DEF/RES like every other special */
     G._multiHitPending=true;
     fireMultiHit(u,ae,3,dmgPer,false,(total)=>{G._multiHitPending=false;addLog(isEs()?`<span class="log-ab">🐺 ¡Jauría Voraz! 3 golpes → ${total} en total</span>`:`<span class="log-ab">🐺 Ravenous Pack! 3 hits → ${total} total</span>`);applyDayRecoil(u);});
     return;
@@ -20451,7 +20530,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     return;
   }
   if(ab==="Reveler's Flurry"&&ae.length){
-    const dmgPer=Math.max(1,Math.round(bpn(u)*((u.atk||0)*0.7)));
+    const dmgPer=tg=>Math.max(1,Math.round(bpn(u)*((u.atk||0)*0.7-(tg.def||0)*0.4))); /* v1503 [Genaro]: now reduced by target DEF/RES like every other special */
     G._multiHitPending=true;
     fireMultiHit(u,ae,4,dmgPer,false,(total)=>{G._multiHitPending=false;addLog(isEs()?`<span class="log-ab">🐇 ¡Ráfaga del Juerguista! 4 golpes → ${total} en total</span>`:`<span class="log-ab">🐇 Reveler's Flurry! 4 hits → ${total} total</span>`);});
     return;
@@ -20526,7 +20605,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
       const live=ae.filter(e=>e.currentHp>0);if(!live.length){G._multiHitPending=false;return;}
       const tgt=live[Math.floor(Math.random()*live.length)];
       const isCrit=rollCrit(0.10,false,u);
-      let dmg=Math.max(1,Math.round(bpn(u)*((u.atk||0)*0.5*(G.dte.specialBoostMult||1))));
+      let dmg=Math.max(1,Math.round(bpn(u)*(((u.atk||0)*0.5-(tgt.def||0)*0.4)*(G.dte.specialBoostMult||1)))); /* v1503 [Genaro]: now reduced by target DEF/RES like every other special */
       if(isCrit){dmg=Math.round(dmg*(u._critMult||2));addLog(isEs()?`<span style="color:#ffd700;font-size:10px">⚡ ¡Crítico!</span>`:`<span style="color:#ffd700;font-size:10px">⚡ Critical!</span>`);}
       const h2=applyArmorDamage(tgt,dmg,false);
       if(h2>0){tgt.currentHp=Math.max(0,tgt.currentHp-h2);renderBattle();animateHit(tgt.id,h2,false,rollCrit._lc);onHitContact(u,tgt);refreshCaptureTargets();if(tgt.currentHp<=0)handleDeath(tgt);}
@@ -20614,7 +20693,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
     if(!ae.length)return;
     const hits=4+spLv;
     const mult=ab==='Stone Fusillade'?0.8:0.6;
-    const dmgPer=Math.max(1,Math.round(bpn(u)*((u.atk||0)*mult*(G.dte.specialBoostMult||1))));
+    const dmgPer=tg=>Math.max(1,Math.round(bpn(u)*((u.atk||0)*mult-(tg.def||0)*0.4))); /* v1503 [Genaro]: now reduced by target DEF/RES like every other special; (boost applied once, inside fireMultiHit) */
     G._multiHitPending=true;
     fireMultiHit(u,ae,hits,dmgPer,false,(total)=>{
       G._multiHitPending=false;
@@ -20637,7 +20716,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
       }
       const tgt=ae[Math.floor(Math.random()*ae.length)];
       if(tgt&&tgt.currentHp>0){
-        let dmg=Math.max(1,Math.round(dmgPer*(G.dte.specialBoostMult||1)));
+        let dmg=Math.max(1,Math.round(bpn(u)*(((u.mag||0)*0.7-(tgt.res||0)*0.4)*(G.dte.specialBoostMult||1)))); /* v1503 [Genaro]: now reduced by target DEF/RES like every other special; (boost was applied twice) */
         if(rollCrit(-0.05,false,u)){dmg=Math.round(dmg*(u._critMult||2));addLog(isEs()?`<span style="color:#ffd700;font-size:10px">⚡ ¡Crítico!</span>`:`<span style="color:#ffd700;font-size:10px">⚡ Critical!</span>`);}
         const hh=applyArmorDamage(tgt,dmg,false);
         if(hh>0){tgt.currentHp=Math.max(0,tgt.currentHp-hh);hitTargets.add(tgt.id);renderBattle();animateHit(tgt.id,hh,false,rollCrit._lc);refreshCaptureTargets();if(tgt.currentHp<=0&&!G.captureTargets.has(tgt.id))handleDeath(tgt);}
@@ -20690,7 +20769,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
         return;
       }
       const tgt=live[Math.floor(Math.random()*live.length)];
-      let dmg=dmgPer;if(rollCrit(-0.05,false,u)){dmg=Math.round(dmg*(u._critMult||2));addLog(isEs()?`<span style="color:#ffd700;font-size:10px">⚡ ¡Crítico!</span>`:`<span style="color:#ffd700;font-size:10px">⚡ Critical!</span>`);}
+      let dmg=Math.max(1,Math.round(bpn(u)*(((u.atk||0)*0.3-(tgt.def||0)*0.4)*(G.dte.specialBoostMult||1))));/* v1503 [Genaro]: DEF-reduced */if(rollCrit(-0.05,false,u)){dmg=Math.round(dmg*(u._critMult||2));addLog(isEs()?`<span style="color:#ffd700;font-size:10px">⚡ ¡Crítico!</span>`:`<span style="color:#ffd700;font-size:10px">⚡ Critical!</span>`);}
       const hpHit=applyArmorDamage(tgt,dmg,false);
       if(hpHit>0){tgt.currentHp=Math.max(0,tgt.currentHp-hpHit);total+=hpHit;animateHit(tgt.id,hpHit,false,rollCrit._lc);
         onHitContact(u,tgt);hitTgts.add(tgt.id);refreshCaptureTargets();if(tgt.currentHp<=0)handleDeath(tgt);}
@@ -21497,7 +21576,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
       const live=aa.filter(a=>a.currentHp>0);if(!live.length){rjEDone();return;} /* v1329: party wiped mid-chain -- still hand back so advanceTurn can end the battle */
       const tgt=live[Math.floor(Math.random()*live.length)];
       const h=applyArmorDamage(tgt,dmgPer,true);
-      if(h>0){tgt.currentHp=Math.max(0,tgt.currentHp-h);G._animQueue.push({uid:tgt.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});hitTargets.add(tgt.id);onHitContact(u,tgt);onHitContact(u,tgt);if(tgt.currentHp<=0)handleDeath(tgt);}
+      if(h>0){tgt.currentHp=Math.max(0,tgt.currentHp-h);G._animQueue.push({uid:tgt.id,dmg:h,isHeal:false,isCrit:rollCrit._lc});hitTargets.add(tgt.id);onHitContact(u,tgt);/* v1506: was called twice per hit */if(tgt.currentHp<=0)handleDeath(tgt);}
       i++;epochTimeout(rjEHit,160); /* v1329: was setTimeout -- a chain from an abandoned battle must not hand back into a new one */
     }
     rjEHit();return;
@@ -23162,22 +23241,84 @@ function enemySlainFx(uid){
 /* v849: capture binding effect. Mirrors enemySlainFx structurally (rect read synchronously,
    everything spawned body-level at position:fixed so the re-render can't interrupt it) but runs
    the motion INWARD and swaps the palette to gold. */
+/* v1507 [Genaro]: Misery Blizzard -- icy wash, then ice motes settle onto each struck card. cb() runs on impact so
+   the damage number lands with the frost, not before it. */
+function miseryBlizzardFx(ids,cb){
+  const done=()=>{try{cb&&cb();}catch(e){}};
+  if(!fxOn()||!ids||!ids.length){done();return;}
+  const add=(cls,css)=>{const d=document.createElement('div');d.className=cls;d.style.cssText=css;document.body.appendChild(d);return d;};
+  /* one wash per blizzard: the round-end loops call this once per struck card */
+  const now=performance.now();let k0=0;
+  if(!(miseryBlizzardFx._t>now-250)){miseryBlizzardFx._t=now;miseryBlizzardFx._n=0;const w=add('mb-wash','');setTimeout(()=>w.remove(),950);}
+  k0=(miseryBlizzardFx._n=(miseryBlizzardFx._n||0)+ids.length)-ids.length;
+  ids.forEach((id,k)=>{k+=k0;
+    const c=fxCard(id);if(!c)return;const r=c.getBoundingClientRect();if(!r.width)return;
+    setTimeout(()=>{const f=add('mb-frost','left:'+r.left+'px;top:'+r.top+'px;width:'+r.width+'px;height:'+r.height+'px;');setTimeout(()=>f.remove(),850);},180+k*30);
+    for(let i=0;i<18;i++){
+      const x=r.left+r.width*(0.12+Math.random()*0.76),y=r.top+r.height*(0.15+Math.random()*0.6);
+      const dl=(Math.random()*0.18+k*0.03).toFixed(2);
+      const f=add('mb-flake'+(i%3===0?' b':''),'left:'+x.toFixed(1)+'px;top:'+y.toFixed(1)+'px;--dx:'+((Math.random()*2-1)*26).toFixed(1)+'px;--dy:'+(-(50+Math.random()*60)).toFixed(1)+'px;--rot:'+Math.round(Math.random()*180)+'deg;--dur:'+(0.45+Math.random()*0.25).toFixed(2)+'s;animation-delay:'+dl+'s;');
+      setTimeout(()=>f.remove(),1100);
+    }
+  });
+  setTimeout(done,380);
+}
+/* v1507 [Genaro]: Undying (Ephemeral) Ember -- a coal arcs onto the enemy and bursts; cb() on impact. */
+function undyingEmberFx(id,cb){
+  const done=()=>{try{cb&&cb();}catch(e){}};
+  const c=fxCard(id);if(!fxOn()||!c){done();return;}
+  const r=c.getBoundingClientRect();if(!r.width){done();return;}
+  const tx=r.left+r.width/2,ty=r.top+r.height*0.45;
+  const pc=(G.god&&fxCard('god_'+G.god.id));let sx,sy;
+  if(pc){const q=pc.getBoundingClientRect();sx=q.left+q.width/2;sy=q.top+q.height*0.35;}else{sx=tx-140;sy=Math.max(10,r.top-160);}
+  const orb=document.createElement('div');orb.className='ee-orb';document.body.appendChild(orb);
+  const T=480,t0=performance.now(),lift=Math.max(90,Math.abs(ty-sy)*0.35);let lastTrail=0;
+  (function step(now){
+    const p=Math.min(1,(now-t0)/T),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+    const x=sx+(tx-sx)*e,y=sy+(ty-sy)*e-Math.sin(Math.PI*e)*lift;
+    orb.style.left=x+'px';orb.style.top=y+'px';
+    if(now-lastTrail>28){lastTrail=now;const tr=document.createElement('div');tr.className='ee-trail';tr.style.cssText='left:'+x+'px;top:'+y+'px;';document.body.appendChild(tr);setTimeout(()=>tr.remove(),480);}
+    if(p<1){requestAnimationFrame(step);return;}
+    orb.remove();
+    const fl=document.createElement('div');fl.className='ee-flash';fl.style.cssText='left:'+(r.left+r.width*0.05)+'px;top:'+(r.top+r.height*0.08)+'px;width:'+(r.width*0.9)+'px;height:'+(r.height*0.75)+'px;';document.body.appendChild(fl);setTimeout(()=>fl.remove(),600);
+    for(let i=0;i<14;i++){const a=Math.PI*2*i/14+Math.random()*0.3,m=30+Math.random()*34;const sp=document.createElement('div');sp.className='ee-spark';
+      sp.style.cssText='left:'+tx+'px;top:'+ty+'px;--dx:'+(Math.cos(a)*m).toFixed(1)+'px;--dy:'+(Math.sin(a)*m-12).toFixed(1)+'px;--dur:'+(0.4+Math.random()*0.25).toFixed(2)+'s;';
+      document.body.appendChild(sp);setTimeout(()=>sp.remove(),700);}
+    done();
+  })(t0);
+}
 function captureBindFx(uid){
   const card=document.querySelector('[data-uid="'+String(uid||'').replace(/"/g,'')+'"]');
   if(!card)return;
   const r=card.getBoundingClientRect();
   if(!r.width||!r.height)return;
   const cx=r.left+r.width/2, cy=r.top+r.height*0.45;
+  /* v1504 [Genaro]: the binding was placed in fixed viewport coordinates once, so anything that moved
+     the card AFTER the capture click -- the B1 tutorial hint above the Enemy Codex changing height,
+     an auto-scroll -- left the ring floating above the captured unit. Everything now lives in one
+     wrapper that follows the card's position every frame for the length of the effect.
+     (A transformed parent is the containing block for its position:fixed children.) */
+  const wrap=document.createElement('div');
+  wrap.style.cssText='position:fixed;left:0;top:0;width:0;height:0;pointer-events:none;z-index:9998;transform:translate(0px,0px)';
+  document.body.appendChild(wrap);
+  const _uidSel='[data-uid="'+String(uid||'').replace(/"/g,'')+'"]',_x0=r.left,_y0=r.top,_tEnd=performance.now()+1300;
+  (function follow(){
+    if(!wrap.isConnected)return;
+    if(performance.now()>_tEnd){wrap.remove();return;}
+    const c=document.querySelector(_uidSel);
+    if(c){const q=c.getBoundingClientRect();if(q.width)wrap.style.transform='translate('+(q.left-_x0)+'px,'+(q.top-_y0)+'px)';}
+    requestAnimationFrame(follow);
+  })();
   const glow=document.createElement('div');glow.className='bind-glow';
   glow.style.cssText='left:'+(r.left+r.width*0.08)+'px;top:'+(r.top+r.height*0.08)+'px;width:'+(r.width*0.84)+'px;height:'+(r.height*0.72)+'px;';
-  document.body.appendChild(glow);setTimeout(function(){glow.remove();},950);
+  wrap.appendChild(glow);setTimeout(function(){glow.remove();},950);
   const size=Math.max(64,r.width*1.05);
   const ring=document.createElement('div');ring.className='bind-ring';ring.innerHTML='<svg viewBox="16 18 480 476"><use href="#tl-ring"/></svg>';
   ring.style.cssText='left:'+cx+'px;top:'+cy+'px;width:'+size+'px;height:'+size+'px;';
-  document.body.appendChild(ring);setTimeout(function(){ring.remove();},900);
+  wrap.appendChild(ring);setTimeout(function(){ring.remove();},900);
   const ring2=document.createElement('div');ring2.className='bind-ring';ring2.innerHTML='<svg viewBox="16 18 480 476"><use href="#tl-ring"/></svg>';
   ring2.style.cssText='left:'+cx+'px;top:'+cy+'px;width:'+(size*0.62)+'px;height:'+(size*0.62)+'px;animation-delay:.14s;';
-  document.body.appendChild(ring2);setTimeout(function(){ring2.remove();},1080);
+  wrap.appendChild(ring2);setTimeout(function(){ring2.remove();},1080);
   const n=16, reach=Math.max(52,r.width*0.9);
   for(let i=0;i<n;i++){
     const ang=(Math.PI*2*i)/n+(Math.random()*0.4-0.2);
@@ -23187,12 +23328,12 @@ function captureBindFx(uid){
       +'--dx:'+(Math.cos(ang)*mag).toFixed(1)+'px;'
       +'--dy:'+(Math.sin(ang)*mag).toFixed(1)+'px;'
       +'--dur:'+(0.6+Math.random()*0.35).toFixed(2)+'s;animation-delay:'+(Math.random()*0.16).toFixed(2)+'s;';
-    document.body.appendChild(m);setTimeout(function(){m.remove();},1250);
+    wrap.appendChild(m);setTimeout(function(){m.remove();},1250);
   }
   const lbl=document.createElement('div');lbl.className='dmg-pop';
   lbl.textContent='\u2726 '+t('ui.fx.captured'); /* v888 · v1415: ES */
   lbl.style.cssText='color:#ffe08a;font-weight:800;font-size:15px;left:'+(cx-46)+'px;top:'+(r.top+2)+'px;text-shadow:0 0 10px #a8791a,0 1px 3px #000;';
-  document.body.appendChild(lbl);setTimeout(function(){lbl.remove();},1100);
+  wrap.appendChild(lbl);setTimeout(function(){lbl.remove();},1100);
 }
 /* v858: the wheel completing had no visual at all. Its damage was pushed into G._animQueue from
    buildRoundQueue, but nothing flushes that queue at end-of-round -- the next enemy turn opens
@@ -25236,11 +25377,49 @@ function renderActionPanel(){
     // Detect if special is a heal/buff rather than damage
     const specAbility=gd?gd.ak:actor.ability;
     const healAbilities=HEAL_ABILITIES; /* v855: hoisted to a shared const so the Macuahuitl recoil gate reads the same list */
-    const buffAbilities=new Set([]);
-    const isHealSpec=healAbilities.has(specAbility)||healAbilities.has(specLabel);
-    const isBuffSpec=buffAbilities.has(specAbility)||buffAbilities.has(specLabel);
+    /* v1502 [Genaro]: specLabel is the DISPLAY name (Spanish in ES), so every table lookup below keyed on it
+       missed in Spanish and fell to the generic 1.0x+5 estimate -- Latigazo de Espinas read 75-79 next to an
+       84-89 Strike. _abEn is the English dispatch key (god ak / live vassal ability) the handlers use. */
+    const _abEn=gd?gd.ak:liveAbility(actor);
+    /* v1502: pure support specials (Chimalli / buffs / summon) were priced as a 1.0x AoE hit */
+    const buffAbilities=new Set(['Basalt Shield','Spiny Guard','Toast of War','Cinder Mend','Call of the Sun']);
+    const isHealSpec=healAbilities.has(specAbility)||healAbilities.has(specLabel)||healAbilities.has(_abEn);
+    const isBuffSpec=buffAbilities.has(specAbility)||buffAbilities.has(_abEn);
+    /* v1502 [Genaro] AUDIT: preview formulas taken from each special's handler, for every special whose
+       handler does not fit the generic (mult x stat - target DEF/RES x0.4) shape: hit count, random
+       targets, DEF ignored, or ATK where the unit type would have suggested MAG.
+       s=stat  m=mult  nd=ignores DEF/RES  n=hits  r=random targets  bu=ATK/MAG UP applies  full=bonus vs full-HP target
+       SPLIT-LIST: a handler formula change needs this entry updated too. */
+    const _pvSp=gd?getSpecialLevel('god_'+gd.id):getSpecialLevel(actor.baseId||actor.id);
+    const PV_OVR={
+      'Thorn Lash':{s:'atk',m:1.5},'Pollen Burst':{s:'mag',m:1.1,bs:1},
+      'War Rhythm':{s:'atk',m:1.2},'Pack Surge':{s:'atk',m:1.2},'Battle Tonic':{s:'atk',m:1.3},
+      'Cold Dash':{s:'atk',m:1.2,n:2},'Wind Lash':{s:'atk',m:0.85,n:2},'Marlin Pierce':{s:'atk',m:1.6,full:1.5},
+      'Prism Daze':{s:'mag',m:0.85},
+      'Bone Crush':{s:'atk',m:0.5,n:3+_pvSp,r:1},'Skull Flame':{s:'atk',m:0.6,n:3,r:1},
+      'Stone Fusillade':{s:'atk',m:0.8,n:4+_pvSp,r:1},'Bone Volley':{s:'atk',m:0.6,n:4+_pvSp,r:1},
+      'Static Burst':{s:'mag',m:0.7,n:4+_pvSp,r:1},'Dark Crush':{s:'atk',m:0.3,n:6,r:1},
+      'Feeding Frenzy':{s:'atk',m:0.55,n:'3–4',r:1},'Trident Lunge':{s:'atk',m:0.6,n:3,r:1},
+      'Ravenous Pack':{s:'atk',m:0.8,n:3,r:1},"Reveler's Flurry":{s:'atk',m:0.7,n:4,r:1},
+      'Sacred Arrow':{s:'atk',m:0.7,n:4,r:1,x:' + Slow'},'Ball Strike':{s:'atk',m:0.55,n:5,r:1,x:' + Slow'},
+      seismicRoar:{s:'atk',m:1.5},zappingStrike:{s:'atk',m:1.1,n:'1–2'},fieryStinger:{s:'mag',m:1.5},
+      sinistralMinacachalli:{s:'atk',m:1.2},octliDrench:{s:'mag',m:1.5+_pvSp*0.1},ixiptlatliBloom:{s:'mag',m:1.1},
+      xiuhcoatlMight:{s:'atk',m:0.5,n:3,r:1},godbaneBlowgun:{s:'atk',m:0.5,n:5,r:1},mictlanClaspPlayer:{s:'mag',m:0.5,bu:1},
+      oldFire:{s:'mag',m:1.6}
+    };
+    const _pvo=(!isHealSpec&&!isBuffSpec&&ae.length)?PV_OVR[_abEn]:null;
     let specLine2='';
-    if(gd?.ak==='featherEmbrace'){
+    if(_pvo){
+      const t=ae[0],isM=_pvo.s==='mag';
+      const red=_pvo.nd?0:(isM?(t.res||0):(t.def||0))*0.4;
+      const mul=(G.dte.specialBoostMult||1)*bpn(actor)*(_pvo.bu?(1+0.10*(actor.atkBuffStacks||0)):1);
+      const raw=(isM?(actor.mag||0):(actor.atk||0))*_pvo.m*(_pvo.bs?(1+0.10*(actor.atkBuffStacks||0)):1)-red; /* bs: ATK/MAG UP scales the stat term only */
+      const lo=Math.max(1,Math.round((raw-2)*mul)),hi=Math.max(1,Math.round((raw+2)*mul));
+      const nTxt=_pvo.n?(_pvo.n+'× '):'';
+      const fullTxt=(_pvo.full&&t.currentHp>=t.maxHp)?(isEs()?' (×1.5 a PV completos)':' (×1.5 full HP)'):'';
+      const burnSpecNote=(actor.burnStacks||0)>0?` <span style="color:#e07020;font-size:9px">🔥-${Math.round(Math.min(actor.burnStacks,4)*15)}%</span>`:'';
+      specLine2=`${nTxt}${(_pvo.r||isAoe)?'~':''}${lo===hi?hi:lo+'–'+hi} ${isM?'🪄':'🗡️'} ${statLbl(isM?'mag':'atk')}${_pvo.r?' random':_aoeLbl}${_pvo.x||''}${fullTxt}${burnSpecNote} · ${effCost} ${statLbl('tp')}`;
+    }else if(gd?.ak==='featherEmbrace'){
       // v310: mirror the actual execution formula (mag×1.5 − targetRES×0.4, ×ATK/MAG-UP, ×specialBoost)
       const feMult=1+(0.10*(actor.atkBuffStacks||0));
       const feBase=actor.mag*1.5*feMult*(G.dte.specialBoostMult||1);
@@ -25303,7 +25482,7 @@ function renderActionPanel(){
     }else if(isHealSpec){
       // Distinguish single-target heals from AoE heals for display
       const singleHealAbs=new Set(['Stone Mend','Stone Protection','Ancestral Storm']); // v599: Cinder Mend no longer single-heals
-      const healLabel=singleHealAbs.has(specAbility)||singleHealAbs.has(specLabel)?'Heal 1 ally':'Heal AoE';
+      const healLabel=singleHealAbs.has(specAbility)||singleHealAbs.has(_abEn)?'Heal 1 ally':'Heal AoE';
       specLine2=`💚 ${healLabel} · ${effCost} TP`;
     }else if(isBuffSpec){
       specLine2=`🛡️ Buff · ${effCost} TP`;
@@ -25315,7 +25494,7 @@ function renderActionPanel(){
       const boost=G.dte.specialBoostMult||1;
     // Special damage estimate — look up actual flat bonus from singleDmgMap
     const singleDmgRef={'Bone Shard':10,'Skull Flame':8,'Wail':8,'Thunder Yip':10,'Coil Crush':0,'Soul Drain':0,'Scorching Bite':12,'Seismic Bolt':16,'Static Bite':6,'Electro Bite':5,'Lightning Fang':8,'Life Siphon':0};
-    const godSpecFlat={'seismicRoar':8,'ophidianMother':0,'deluge':0,'tlalocanDeluge':0,'featherEmbrace':0,'oldFire':20,'cripplingShock':0,'riverJudge':0,'obsidianStorm':14,'holyHarvest':0,'zappingStrike':0,'aurumBreak':0,'frostMacuahuitl':0};
+    const godSpecFlat={'seismicRoar':0,'ophidianMother':0,'deluge':0,'tlalocanDeluge':0,'featherEmbrace':0,'oldFire':0,'cripplingShock':0,'riverJudge':0,'obsidianStorm':0,'holyHarvest':0,'zappingStrike':0,'aurumBreak':0,'frostMacuahuitl':0};
     const godSpecMult={'deluge':1.35,'tlalocanDeluge':1.35,'obsidianStorm':1.25,'aurumBreak':1.5,'frostMacuahuitl':1.5,'cihuateteoFury':0.6,'cripplingShock':0.6,'featherEmbrace':1.5,'godbaneBlowgun':0.5,'mictlanClaspPlayer':0.5,'octliDrench':1.5,'oldFire':1.6,'seismicRoar':1.5,'sinistralMinacachalli':1.2,'zappingStrike':1.1}; /* v924: 12 patron abilities were missing, previewing at 1.0x */
     // Vassal ability mult overrides (for abilities that use a mult formula instead of base+flat)
     const vassalSpecMult={'Rain Drop':1.3,'Soul Drain':1.3,'Life Siphon':1.35,'Coil Crush':1.4,'Wail':1.5,'Thorn Lash':1.5,'Vine Grasp':1.3,'Blood Drink':1.8,'Glass Cut':1.6,'Pollen Burst':1.1,'Ball Strike':0.55,'War Rhythm':1.2,'Heavy Cleave':1.3,'Razor Dive':1.3,'Haunt':1.3,'Venom Shade':1.3,'Thorn Mangle':1.5,'Ancient Crush':1.4,'Ice Burn Storm':1.1,'Death Screech':1.4,'Shard Breath':1.2,'Tremor':1.3,'Withering Touch':1.25,'Tectonic Slam':1.05,'Howling Gust':1.4,'Murk':1.2,'Magma Burst':1.2,'Septic Howl':1.25,'Collapse':1.2,'Haunt':1.1,'Frost Macuahuitl':1.5,'Solar Crush':1.6,'Craft Shard':1.1,'Permafrost':1.6,'Biting Draft':1.2,'Howling Chill':1.05,'Ash Surge':1.1,'Sandblast':1.1,'Howling Drift':1.1,'Virulent Gale':1.1,'Obsidian Blade':2.0,'Sun Dive':1.25,'Solar Pounce':1.6,'Sacred Arrow':0.7,'Prism Daze':0.5,'Filthwater Plume':0.75,'Drowning Grasp':1.5,'Writhing Bloom':1.2,'Colony Sting':0.9,'Voltaic Discharge':1.5,'Gnaw the Fallen':1.9,'Abyssal Lure':1.3,'Fang Flash':1.3,'Descent from the Trees':1.5,'Jestress Nightmare':1.1,'Arrow Rain':0.9,'Atlatl Rush':1.4,'Atlatl Throw':1.6,'Bone Shard':1.7,'Carrion Breath':1.3,'Copper Axe':1.7,'Diving Gust':1.6,'Dolphin Dash':1.2,'Electro Bite':1.4,'Five-Rabbit Haze':0.9,'Flint Sting':1.6,'Gale Strike':1.9,'Gar Chomp':1.5,'Heart Feast':1.7,'Hollow Blow':1.2,'Lava Fang':1.7,'Lightning Fang':1.4,'Marlin Pierce':1.6,'Mystical Shots':1.2,'Net Cast':0.8,'Open the Chest':1.7,'Pack Surge':1.2,'River Poison':1.2,'Rot Gore':1.8,'Scorching Bite':1.3,'Searing Stings':1.1,'Seismic Bolt':1.6,'Shadow Cut':1.5,'Stale Gust':1.2,'Static Bite':1.3,'Tainted Draught':1.2,'Thunder Yip':1.6,'Toxic Bloom':1.2,'Venom Coil':1.5,'Wind Rush':1.3};
@@ -25329,10 +25508,10 @@ function renderActionPanel(){
        SPLIT-LIST: a new vassal special needs an entry here as well as its handler. */
     // v579: 5-target vassal AoEs capped at 0.9x — wide coverage shouldn't also carry full power
     Object.keys(AOE_CAP_AB).forEach(function(_ab){if(AOE_CAP_AB[_ab]>=5&&vassalSpecMult[_ab]!==undefined&&vassalSpecMult[_ab]>0.9)vassalSpecMult[_ab]=0.9;});
-    let flatBonus=singleDmgRef[specLabel]??5;
-    if(gd?.ak&&godSpecFlat[gd.ak]!==undefined)flatBonus=godSpecFlat[gd.ak];
-    const specMult=gd?.ak&&godSpecMult[gd.ak]?godSpecMult[gd.ak]:((actor&&!actor.isGod&&(actor.baseId||actor.id)==='ocetekuani')?1.5:(vassalSpecMult[specLabel]||1)); /* v1348: per-hit 1.5x; Chest-Render keeps 1.7 */
-    if(vassalSpecMult[specLabel])flatBonus=0; // mult-based abilities don't use flat additive
+    let flatBonus=singleDmgRef[_abEn]??5;
+    if(gd)flatBonus=godSpecFlat[gd.ak]??0; /* v1502: no god handler adds the vassal +5 */
+    const specMult=gd?.ak&&godSpecMult[gd.ak]?godSpecMult[gd.ak]:((actor&&!actor.isGod&&(actor.baseId||actor.id)==='ocetekuani')?1.5:(vassalSpecMult[_abEn]||1)); /* v1348: per-hit 1.5x; Chest-Render keeps 1.7 */
+    if(vassalSpecMult[_abEn])flatBonus=0; // mult-based abilities don't use flat additive
     const mixBurnPenalty=(actor.type==='MIX'&&(actor.burnStacks||0)>0)?(1-Math.min(actor.burnStacks,4)*0.15):1;
     const burnPenalty=(actor.burnStacks||0)>0?(1-Math.min(actor.burnStacks,4)*0.15):1;
     const lo=Math.max(1,Math.round(((base*specMult)+flatBonus-def*0.4-2)*boost*(actor.type==='MIX'?mixBurnPenalty:burnPenalty)));
@@ -25357,10 +25536,10 @@ function renderActionPanel(){
           <div>💥 ${t('ui.battle.strike')} ${strikeEmoji}</div>${strikeSub}
         </button>
         <button class="btn btn-special" onclick="doPlayerSpecial()" ${canSpecial?'':'disabled'} style="line-height:1.35;opacity:${canSpecial?1:0.45}">
-          <div>🔮 ${specLabel||'Special'} ${isHealSpec?'❤️':specIsMagic(actor)?'🪄':'🗡️'}</div>
+          <div>🔮 ${specLabel||'Special'} ${isHealSpec?'❤️':(_pvo?_pvo.s==='mag':specIsMagic(actor))?'🪄':'🗡️'}</div>
           ${specSub}
         </button>
-        ${(()=>{if(!(actor.isGod&&G._oblationAk&&actor.id===('god_'+G.god?.id)))return '';const oblCost=oblationNpCost(actor);const canOb=actor.currentNP>=oblCost;const oblLabel=G._oblationAbility||'Oblated';/* v1030: estimate the OBLATED special exactly as the native one is estimated a few lines above. Now that the v1030 MIX flip gives the patron a REAL stat for the borrowed ability, the same base*mult-def arithmetic applies with no special-casing. */var _oblSub='';try{var _oak=G._oblationAk;var _oMag=(oblationSpecStat(_oak)==='mag');var _obase=_oMag?(actor.mag||0):(actor.atk||0);var _ot=(typeof ae!=='undefined'&&ae&&ae.length)?ae[0]:null;var _odef=_ot?(_oMag?(_ot.res||0):(_ot.def||0)):0;var _oboost=G.dte.specialBoostMult||1;var _OGM={'deluge':1.35,'tlalocanDeluge':1.35,'obsidianStorm':1.25,'aurumBreak':1.5,'frostMacuahuitl':1.5,'cihuateteoFury':0.6,'cripplingShock':0.6,'featherEmbrace':1.5,'godbaneBlowgun':0.5,'mictlanClaspPlayer':0.5,'octliDrench':1.5,'oldFire':1.6,'seismicRoar':1.5,'sinistralMinacachalli':1.2,'zappingStrike':1.1,'torridTornado':0.55,'torridTornadoBoss':0.6};var _OGH={'torridTornado':4,'torridTornadoBoss':5,'cripplingShock':4,'godbaneBlowgun':5};var _OGF={'seismicRoar':8,'oldFire':20,'obsidianStorm':14};var _omult=_OGM[_oak]||1;var _oflat=(_OGF[_oak]!==undefined?_OGF[_oak]:0);/* mixBurnPenalty/burnPenalty are block-scoped to the estimate branch above and are NOT visible here -- referencing them threw into the catch and the preview silently degraded to a bare cost. Computed inline instead, matching that branch's rule: MIX takes the reduced penalty. */var _obp=((actor.burnStacks||0)>0)?(1-Math.min(actor.burnStacks,4)*(actor.type==='MIX'?0.15:0.15)):1;if((()=>{const _oa=String(G._oblationAd||''),_os=/data-sty="(\w+)"/.exec(_oa);if(_os)return _os[1]==='SUP';return healAbilities.has(G._oblationAbility)||/heal|cleanse|restore/i.test(_oa);})()){/* v1375: was a text regex -- "restores 10% TP" made Xiuhcoatl Might a heal; the block's own type decides now */_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">💚 Heal · '+oblCost+' TP</div>';}else if(_ot){var _olo=Math.max(1,Math.round(((_obase*_omult)+_oflat-_odef*0.4-2)*_oboost*_obp));var _ohi=Math.max(1,Math.round(((_obase*_omult)+_oflat-_odef*0.4+2)*_oboost*_obp));var _ohits=_OGH[_oak]||1;_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">'+(_ohits>1?(_ohits+'× '):'')+'~'+_olo+'–'+_ohi+' '+(_oMag?'🪄 MAG':'🗡️ ATK')+(_ohits>1?' hits':'')+' · '+oblCost+' TP</div>';}}catch(e){}if(!_oblSub)_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">Cost '+oblCost+' TP</div>';return '<button class=\"btn btn-special\" onclick=\"doPlayerSpecial(true)\"'+(canOb?'':' disabled')+' style=\"line-height:1.35;opacity:'+(canOb?1:0.45)+'\"><div>✟ '+oblLabel+'</div>'+_oblSub+'</button>';})()}
+        ${(()=>{if(!(actor.isGod&&G._oblationAk&&actor.id===('god_'+G.god?.id)))return '';const oblCost=oblationNpCost(actor);const canOb=actor.currentNP>=oblCost;const oblLabel=G._oblationAbility||'Oblated';/* v1030: estimate the OBLATED special exactly as the native one is estimated a few lines above. Now that the v1030 MIX flip gives the patron a REAL stat for the borrowed ability, the same base*mult-def arithmetic applies with no special-casing. */var _oblSub='';try{var _oak=G._oblationAk;var _oMag=(oblationSpecStat(_oak)==='mag');var _obase=_oMag?(actor.mag||0):(actor.atk||0);var _ot=(typeof ae!=='undefined'&&ae&&ae.length)?ae[0]:null;var _odef=_ot?(_oMag?(_ot.res||0):(_ot.def||0)):0;var _oboost=G.dte.specialBoostMult||1;var _OGM={'deluge':1.35,'tlalocanDeluge':1.35,'obsidianStorm':1.25,'aurumBreak':1.5,'frostMacuahuitl':1.5,'cihuateteoFury':0.6,'cripplingShock':0.6,'featherEmbrace':1.5,'godbaneBlowgun':0.5,'mictlanClaspPlayer':0.5,'octliDrench':1.5,'oldFire':1.6,'seismicRoar':1.5,'sinistralMinacachalli':1.2,'zappingStrike':1.1,'torridTornado':0.55,'torridTornadoBoss':0.6,'fieryStinger':1.5,'ixiptlatliBloom':1.1,'xiuhcoatlMight':0.5};var _OGH={'torridTornado':4,'torridTornadoBoss':5,'cripplingShock':4,'godbaneBlowgun':5,'xiuhcoatlMight':3,'cihuateteoFury':4};var _OGF={};/* v1502: no god handler adds a flat bonus (audit) */var _omult=_OGM[_oak]||1;var _oflat=(_OGF[_oak]!==undefined?_OGF[_oak]:0);/* mixBurnPenalty/burnPenalty are block-scoped to the estimate branch above and are NOT visible here -- referencing them threw into the catch and the preview silently degraded to a bare cost. Computed inline instead, matching that branch's rule: MIX takes the reduced penalty. */var _obp=((actor.burnStacks||0)>0)?(1-Math.min(actor.burnStacks,4)*(actor.type==='MIX'?0.15:0.15)):1;if((()=>{const _oa=String(G._oblationAd||''),_os=/data-sty="(\w+)"/.exec(_oa);if(_os)return _os[1]==='SUP';return healAbilities.has(G._oblationAbility)||/heal|cleanse|restore/i.test(_oa);})()){/* v1375: was a text regex -- "restores 10% TP" made Xiuhcoatl Might a heal; the block's own type decides now */_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">💚 Heal · '+oblCost+' TP</div>';}else if(_ot){var _olo=Math.max(1,Math.round(((_obase*_omult)+_oflat-_odef*0.4-2)*_oboost*_obp));var _ohi=Math.max(1,Math.round(((_obase*_omult)+_oflat-_odef*0.4+2)*_oboost*_obp));var _ohits=_OGH[_oak]||1;_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">'+(_ohits>1?(_ohits+'× '):'')+'~'+_olo+'–'+_ohi+' '+(_oMag?'🪄 MAG':'🗡️ ATK')+(_ohits>1?' hits':'')+' · '+oblCost+' TP</div>';}}catch(e){}if(!_oblSub)_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">Cost '+oblCost+' TP</div>';return '<button class=\"btn btn-special\" onclick=\"doPlayerSpecial(true)\"'+(canOb?'':' disabled')+' style=\"line-height:1.35;opacity:'+(canOb?1:0.45)+'\"><div>✟ '+oblLabel+'</div>'+_oblSub+'</button>';})()}
       </div>
       ${specDesc?`<div style="font-size:11px;color:#5a7a9a;margin-top:6px;padding-top:5px;border-top:0.5px solid #2a3a4a">${/data-sty="/.test(String(specDesc))?`<div class="sf-hd"><span class="sf-nm">${specLabel}</span></div><div class="sf-bd">${specDesc}</div>`:`🔮 ${isHealSpec?'❤️':specIsMagic(actor)?'🪄':'🗡️'} <em>${specLabel}</em>: ${specDesc}`}</div>`:''}
       ${(()=>{
@@ -25827,7 +26006,7 @@ function showSpoils(){
         const _cEmo=(G.offerings||[]).filter(id=>OFFERINGS[id]&&OFFERINGS[id].eff&&OFFERINGS[id].eff.cacaoMult).map(id=>OFFERINGS[id].icon).join('')||'🪶';
         let blessedMult=1,blessedNote='';
         /* v702: hasPassive() so an oblated Blessed Crops still counts */
-        if(hasPassive('blessedCrops')){const natureAllies=[...(G.party||[]).map(id=>GODS.find(g=>g.id===id)).filter(g=>g&&g.element==='nature'),...(G.captured||[]).filter(cu=>cu.element==='nature')].length;if(natureAllies>0){blessedMult=1+natureAllies*0.05;blessedNote=`<div style="font-size:11px;color:#a0c060;text-align:center;margin-top:.4rem">${t('ui.spoils.blessedNote',{n:natureAllies,m:blessedMult.toFixed(2)})}</div>`;}}
+        if(hasPassive('blessedCrops')){/* v1501 [Genaro]: count only the Battle Codex (patron + deployed allies), not every Nature unit owned */ const _dep=G.deplSel||[];const natureAllies=[...(G.party||[]).filter(id=>(G.god&&id===G.god.id)||_dep.includes('god_'+id)).map(id=>GODS.find(g=>g.id===id)).filter(g=>g&&g.element==='nature'),...(G.captured||[]).filter(cu=>cu.element==='nature'&&_dep.includes(capKey(cu)))].length;if(natureAllies>0){blessedMult=1+natureAllies*0.05;blessedNote=`<div style="font-size:11px;color:#a0c060;text-align:center;margin-top:.4rem">${t('ui.spoils.blessedNote',{n:natureAllies,m:blessedMult.toFixed(2)})}</div>`;}}
         // v348: unfold the total one bonus at a time — base → Hard → Perfect → Blessed Crops → Offerings
         const steps=[];
         if(isHard)steps.push({bm:1.2,cm:1.2,bl:'(+20% 🔥)',cl:'(+20% 🔥)',src:t('ui.spoils.srcHard')}); /* v905 */
@@ -25885,7 +26064,7 @@ function showSpoils(){
                prints "Perfect Battle - +15% Blood & Cacao" as its own line, so this said the same
                thing twice, two lines apart. */
             if(isPerfect){G.perfectBattles=(G.perfectBattles||0)+1;}
-            note+=blessedNote;
+            /* v1499: Blessed Crops banner dropped for the same reason -- the source list already prints it. */
             if(note){const n=document.createElement('div');n.innerHTML=note;tot.appendChild(n);}
             G.res.blood+=curB;G.res.cacao+=curC;G._stage='spoils';saveRun();document.getElementById('spoils-cont').style.display='block';return;
           }
@@ -28892,7 +29071,7 @@ const LAYERS=[
   blasts:{every:[4,8],dur:1.4,power:3.4},turb:.5,
   pal:{ember:['#ff8a3a','#ffb050','#e0582a'],ash:['#7a6e66','#5e544e','#948880'],strip:['#cdb88c','#b59f70']}},
  {n:6,name:'Temiminayólan',sub:'El Lugar Donde Llueven las Flechas',fx:'Rain and arrow volleys',desc:'Fast thin rain on a slant. Arrows cut through often, and near Opochtli they come in volleys.',
-  count:46,mix:[['rain',1]],dir:'rain',speed:[2.2,3.0],sway:0,alpha:.55,arrows:{every:[2.0,0.8]},
+  count:46,mix:[['rain',1]],dir:'rain',speed:[2.2,3.0],sway:0,alpha:.55,arrows:{every:[0.5,0.2]}, /* v1510 [Genaro]: was [2.0,0.8] -- barely visible */
   pal:{rain:['#7f9bb0','#9ab3c4','#6a8698']}},
  {n:7,name:'Teyōllōcuālōyān',sub:'El Lugar Donde se Devoran los Corazones',fx:'Falling leaves and jungle mist',desc:'Leaves fall and settle on the ground. Jungle mist thickens as you near Mayahuel. A few red spores still pulse like a heartbeat.',
   count:40,mix:[['leaf',.86],['spore',.14]],dir:'down',speed:[.14,.3],sway:.5,alpha:.9,heartbeat:1.6,
@@ -29588,7 +29767,7 @@ class LayerFx{
     if(P.blasts){if(this.blastT>0)this.blastT-=dt;else{this.nextBlast-=dt;if(this.nextBlast<=0){this.blastT=P.blasts.dur;this.nextBlast=rnd(...P.blasts.every)*(1-.35*this.intensity);}}}
     // arrows (L6): more often toward the boss, and volleys late in the layer
     if(P.arrows){this.nextArrow-=dt;if(this.nextArrow<=0){this.nextArrow=this.lerp(P.arrows.every)*rnd(.6,1.4);
-      const n=Math.random()<this.intensity*.7?((rnd(3,6))|0):1,sp=1+.5*this.intensity,x0=rnd(-30,w*.55);
+      const n=Math.random()<.3+this.intensity*.55?((rnd(3,7))|0):((rnd(1,3))|0), /* v1510: volleys from the start, denser near Opochtli */sp=1+.5*this.intensity,x0=rnd(-w*.25,w*.9); /* v1510: across the whole screen (was the left half only) */
       for(let j=0;j<n;j++)this.events.push({k:'arrow',x:x0+j*rnd(5,10),y:-8-j*rnd(3,8),vx:1.7*sp,vy:3.4*sp,age:0,life:9});}}
     // butterflies (L3)
     if(P.butterfly){const nb=this.events.filter(e=>e.k==='bfly').length;if(nb<Math.round(this.lerp(P.butterfly.max))*(this.mode==='battle'?.5:1)){this.nextFly-=dt;if(this.nextFly<=0){this.nextFly=rnd(...P.butterfly.every)/(P.approach?1+1.5*this.intensity:1);const L=Math.random()<.5;this.events.push({k:'bfly',x:L?-6:w+6,y:rnd(h*.1,h*.7),vx:(L?1:-1)*rnd(.25,.45),ph:Math.random()*6,age:0,life:40,wob:rnd(1.6,2.8)});}}}
@@ -29743,9 +29922,10 @@ class LayerFx{
     for(const e of this.events){const t=e.age/e.life;
       if(e.k==='puff'){ctx.globalAlpha=A*.8*(1-t);ctx.fillStyle=e.col;ctx.fillRect(e.x|0,e.y|0,t<.4?2:1,t<.4?2:1);}
       else if(e.k==='pop'){const r=1+t*3;ctx.globalAlpha=A*(1-t);ctx.fillStyle=e.col;for(let k=0;k<8;k++){const an=k*Math.PI/4;ctx.fillRect(Math.round(e.x+Math.cos(an)*r),Math.round(e.y+Math.sin(an)*r),1,1);}}
-      else if(e.k==='arrow'){ctx.globalAlpha=Math.min(1,A*1.6);const ux=e.vx/Math.hypot(e.vx,e.vy),uy=e.vy/Math.hypot(e.vx,e.vy);
-        for(let s=0;s<9;s++){ctx.fillStyle=s===0?'#e2ddd2':s>6?'#b03a2e':'#6b5340';ctx.fillRect(Math.round(e.x-ux*s),Math.round(e.y-uy*s),1,1);}
-        ctx.fillStyle='#b03a2e';ctx.fillRect(Math.round(e.x-ux*8)-1,Math.round(e.y-uy*8),1,1);}
+      else if(e.k==='arrow'){ctx.globalAlpha=Math.min(1,A*2.6); /* v1510: brighter */const ux=e.vx/Math.hypot(e.vx,e.vy),uy=e.vy/Math.hypot(e.vx,e.vy);
+        /* v1510 [Genaro]: 2px-thick, longer arrow so it reads at a glance (was a 9x1 sliver) */
+        for(let s=0;s<15;s++){ctx.fillStyle=s<2?'#f0ece2':s>11?'#c0402e':'#7a6048';ctx.fillRect(Math.round(e.x-ux*s*1.5),Math.round(e.y-uy*s*1.5),2,2);}
+        ctx.fillStyle='#c0402e';ctx.fillRect(Math.round(e.x-ux*19)-2,Math.round(e.y-uy*19),2,2);ctx.fillRect(Math.round(e.x-ux*19)+2,Math.round(e.y-uy*19)-1,2,2);}
       else if(e.k==='bfly'){drawSpr(ctx,SPR.bfly[(Math.floor(e.ph)%2)],e.x,e.y,['#4b3d6b','#cdb0ff'],Math.min(1,A*1.1));}
       else if(e.k==='splash'){ctx.globalAlpha=A*(1-t);ctx.fillStyle=e.col;ctx.fillRect(e.x|0,e.y|0,1,1);}
       else if(e.k==='zap'){const on=t<.4||(t>.55&&t<.85);if(!on)continue;ctx.fillStyle='#bfe0ff';
@@ -30034,7 +30214,13 @@ function cardEl(uid){return document.querySelector('#screen-battle .uc[data-uid=
 function unitOf(uid){const g=(typeof G!=='undefined')?G:null;return g&&([...(g.units||[]),...(g.enemies||[])].find(u=>u&&u.id===uid));}
 function rectOf(uid){const el=cardEl(uid);if(!el||!S.fx||!bg)return null;const r=el.getBoundingClientRect();if(!r.width)return null;
   const sx=S.fx.w/(bg.clientWidth||1),sy=S.fx.h/(bg.clientHeight||1);return {x:r.left*sx,y:r.top*sy,w:r.width*sx,h:r.height*sy,el,uid};}
-function buildSpec(rec,my,their){const live=a=>(a||[]).filter(u=>u&&u.currentHp>0||rec.hits.some(h=>h.uid===(u&&u.id)));
+function buildSpec(rec,my,their){
+  /* v1507 [Genaro]: most ENEMY specials don't call animateHit -- they push their hits onto G._animQueue, which is
+     flushed later, after the cinematic has already been aimed. With nothing recorded, the animation fell back to the
+     first living party unit, so boss Ixquimilli's Frost Macuahuitl always swung at the wrong card. The hits queued
+     during the special's own call (rec.qhits) now stand in until real ones arrive. */
+  if(!rec.hits.length&&rec.qhits&&rec.qhits.length)rec={...rec,hits:rec.qhits};
+  const live=a=>(a||[]).filter(u=>u&&u.currentHp>0||rec.hits.some(h=>h.uid===(u&&u.id)));
   const caster=rectOf(rec.caster.id)||{x:0,y:0,w:10,h:10};
   const foeIds=[];rec.hits.forEach(h=>{if(!foeIds.includes(h.uid))foeIds.push(h.uid);});
   if(!foeIds.length)live(their).forEach(u=>foeIds.push(u.id));
@@ -30083,7 +30269,7 @@ window.MFX={
       S.fx.play(k);const C=S.fx.cine;if(!C)return;C.spec=buildSpec(rec,my,their);rec.cine=C;};
     const HEALISH=new Set(['ophidian','filth','steam','sustenance','harvest','peyote']);
     if(HEALISH.has(k)||k==='roll')setTimeout(go,0);
-    else{let n=0;const poll=()=>{if(rec.started)return;if(rec.hits.length||n++>=10)go();else setTimeout(poll,50);};setTimeout(poll,0);}},
+    else{let n=0;const poll=()=>{if(rec.started)return;if(rec.hits.length||(rec.qhits&&rec.qhits.length)||n++>=10)go();else setTimeout(poll,50);};setTimeout(poll,0);}},
   willSpecial(u){if(!u||!S.fx||MFX_REDUCE||!S.on||S.entScr)return false;
     if(u.isGod&&(G.units||[]).includes(u)){const gd=(typeof GODS!=='undefined'&&GODS.find(g=>g.id===u.baseGodId))||G.god,ob=G._useOblationSpecial;
       return !!specialKey(ob?G._oblationAk:(gd&&gd.ak),ob?G._oblationAbility:(gd&&gd.ability),ob?null:gd);}
@@ -30132,7 +30318,13 @@ window.MFX={
 (function(){const fg0=window.fireGodSpecial,ef0=window.enemyFireSpecial,ah0=window.animateHit;
   if(typeof fg0==='function')window.fireGodSpecial=function(u,ae,aa,ft){try{const gd=(typeof GODS!=='undefined'&&GODS.find(g=>g.id===u.baseGodId))||G.god;
     const ob=G._useOblationSpecial;MFX._special(u,specialKey(ob?G._oblationAk:(gd&&gd.ak),ob?G._oblationAbility:(gd&&gd.ability),ob?null:gd),'p',ft);}catch(_e){}return fg0.apply(this,arguments);};
-  if(typeof ef0==='function')window.enemyFireSpecial=function(u){try{MFX._special(u,specialKey(u.ak,u.ability,u),'e');}catch(_e){}return ef0.apply(this,arguments);};
+  if(typeof ef0==='function')window.enemyFireSpecial=function(u){try{MFX._special(u,specialKey(u.ak,u.ability,u),'e');}catch(_e){}
+    const q0=((G&&G._animQueue)||[]).length;const ret=ef0.apply(this,arguments);
+    /* v1507: hits this special queued (see buildSpec) */
+    try{const rec=S.rec;if(rec&&rec.caster===u&&!rec.started){const nq=(G._animQueue||[]).slice(q0);
+      rec.qhits=nq.filter(e=>e&&!e.isHeal&&e.uid&&(G.units||[]).some(x=>x.id===e.uid)).map(e=>({uid:e.uid,dmg:e.dmg||0,crit:!!e.isCrit}));
+      if(!rec.primary&&rec.qhits.length){let m=rec.qhits[0];rec.qhits.forEach(h=>{if(h.dmg>m.dmg)m=h;});rec.primary=m.uid;}}}catch(_e){}
+    return ret;};
   if(typeof ah0==='function')window.animateHit=function(uid,dmg,isHeal,isCrit,_pastFx){let wait=0;
     try{if(_pastFx===undefined&&(dmg||dmg===0)&&!(dmg===0&&isHeal)&&!(G._drunkDelayIds&&G._drunkDelayIds.has(uid))&&!(G._fxDelayMap&&G._fxDelayMap[uid]>0)){wait=MFX._numDelay(uid,isHeal);MFX._hit(uid,dmg,isHeal,isCrit);}}catch(_e){wait=0;}
     /* v1496: the number (and the card's own hit flash) waits for the special's impact beat */
