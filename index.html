@@ -2481,6 +2481,11 @@ Object.assign(T_EN,{
   'ui.ev.decline':'Decline',
   'ui.ev.scribeBows':'The scribe bows and moves on.',
   'ui.ev.gazeMirror':'Gaze into it',
+  'ui.ev.gazeOdds':'(60% fortune · 40% curse)', /* v1512 */
+  'ui.ev.gazeConfirmQ':'Gaze into the mirror?',
+  'ui.ev.gazeWin':'60% — Divine fortune: +{b} Blood, +{c} Cacao, +{f} Flowers',
+  'ui.ev.gazeLose':'40% — Curse: all units lose 50% of their HP and TP',
+  'ui.ev.gazeDo':'🪞 Gaze',
   'ui.ev.gazeDesc':'The smoke swirls. Faces flash across the surface.',
   'ui.ev.shatterMirror':'Shatter it',
   'ui.ev.shatterDesc':'You smash the mirror against the obsidian floor.',
@@ -3213,9 +3218,9 @@ Object.assign(T_EN,{
   'ui.evr.toll.pick':`<div style="font-size:14px;color:var(--am);margin-bottom:.75rem">Choose which vassal the mountain takes:</div>`,
   'ui.evr.toll.given':`{v0} <strong>{v1}</strong> is given to the mountain — taken whole.<br><em style="color:#70e070">All other units gained +5 levels!</em>`,
   'ui.evr.toll.charge':`The obsidian shards tear at you as you charge through.<br><em style="color:#e05050">All units start next battle at 50% HP, 50% TP, Wound ×1.</em><br>{v0}`,
-  'ui.evr.mirror.odds':`60%: +{v0} Blood, +{v1} Cacao, +{v2} FP (scaled x{v3}) · 40%: random unit loses 25% max HP`,
+  'ui.evr.mirror.odds':`60%: +{v0} Blood, +{v1} Cacao, +{v2} FP (scaled x{v3}) · 40%: all units lose 50% of their HP and TP`,
   'ui.evr.mirror.fortune':`The mirror reveals a path of divine fortune!<br><em style="color:#e05050">+{v0} Blood</em> &nbsp;<em style="color:#c0844a">+{v1} Cacao</em> &nbsp;<em style="color:#d4af37">+{v2} Flowers</em>`,
-  'ui.evr.mirror.death':`The mirror shows your death. {v0} <strong>{v1}</strong> withers under the vision.<br><em style="color:#e05050">-25% max HP permanently this run.</em>`,
+  'ui.evr.mirror.death':`The mirror shows your death. Your whole party withers under the vision.<br><em style="color:#e05050">All units lose 50% of their HP and TP.</em>`,
   'ui.evr.mirror.dark':'The mirror shows only darkness. Nothing is gained.',
   'ui.evr.mirror.shatter':`The mirror shatters into a thousand shards of smoke.<br><em style="color:#e05050">+{v0} Blood</em>`,
   'ui.evr.mirror.pass':'You walk past without looking. A calm energy fills the air.<br><em style="color:#7070e0">All units +25% TP!</em>',
@@ -3550,6 +3555,11 @@ Object.assign(T_ES,{
   'ui.ev.decline':'Rechazar',
   'ui.ev.scribeBows':'El escriba se inclina y sigue su camino.',
   'ui.ev.gazeMirror':'Mirar dentro',
+  'ui.ev.gazeOdds':'(60% fortuna · 40% maldición)', /* v1512 */
+  'ui.ev.gazeConfirmQ':'¿Mirar dentro del espejo?',
+  'ui.ev.gazeWin':'60% — Fortuna divina: +{b} de Sangre, +{c} de Cacao, +{f} Flores',
+  'ui.ev.gazeLose':'40% — Maldición: todas las unidades pierden 50% de sus PV y PT',
+  'ui.ev.gazeDo':'🪞 Mirar',
   'ui.ev.gazeDesc':'El humo se arremolina. Rostros destellan en la superficie.',
   'ui.ev.shatterMirror':'Romperlo',
   'ui.ev.shatterDesc':'Estrellas el espejo contra el suelo de obsidiana.',
@@ -4343,9 +4353,9 @@ Object.assign(T_ES,{
   'ui.evr.toll.pick':'<div style="font-size:14px;color:var(--am);margin-bottom:.75rem">Elige qué vasallo se lleva la montaña:</div>',
   'ui.evr.toll.given':'{v0} <strong>{v1}</strong> es entregado a la montaña — tomado entero.<br><em style="color:#70e070">¡Todas las demás unidades ganaron +5 niveles!</em>',
   'ui.evr.toll.charge':'Los fragmentos de obsidiana te desgarran mientras cargas a través de ellos.<br><em style="color:#e05050">Todas las unidades empiezan la siguiente batalla con 50% de PV, 50% de PT y Herida ×1.</em><br>{v0}',
-  'ui.evr.mirror.odds':'60%: +{v0} de Sangre, +{v1} de Cacao, +{v2} Flores (escala ×{v3}) · 40%: una unidad al azar pierde 25% de sus PV máx.',
+  'ui.evr.mirror.odds':'60%: +{v0} de Sangre, +{v1} de Cacao, +{v2} Flores (escala ×{v3}) · 40%: todas las unidades pierden 50% de sus PV y PT',
   'ui.evr.mirror.fortune':'¡El espejo revela un camino de fortuna divina!<br><em style="color:#e05050">+{v0} de Sangre</em> &nbsp;<em style="color:#c0844a">+{v1} de Cacao</em> &nbsp;<em style="color:#d4af37">+{v2} Flores</em>',
-  'ui.evr.mirror.death':'El espejo muestra tu muerte. {v0} <strong>{v1}</strong> se marchita ante la visión.<br><em style="color:#e05050">-25% de PV máx. de forma permanente en esta partida.</em>',
+  'ui.evr.mirror.death':'El espejo muestra tu muerte. Todo tu grupo se marchita ante la visión.<br><em style="color:#e05050">Todas las unidades pierden 50% de sus PV y PT.</em>',
   'ui.evr.mirror.dark':'El espejo solo muestra oscuridad. No ganas nada.',
   'ui.evr.mirror.shatter':'El espejo se rompe en mil fragmentos de humo.<br><em style="color:#e05050">+{v0} de Sangre</em>',
   'ui.evr.mirror.pass':'Pasas de largo sin mirar. Una energía serena llena el aire.<br><em style="color:#7070e0">¡Todas las unidades +25% de PT!</em>',
@@ -5729,9 +5739,9 @@ const STATUS_INFO={
     baseEs:'Las habilidades especiales cuestan <strong>30% más PT por carga</strong> (4 máx.).',
     fn:n=>t('st.lethargy.fn',{p:30*n,s:stacksTxt(n)})},
   drunk:{icon:'🍺',name:'Drunk',nameEs:'Ebriedad',color:'#e0a040',
-    base:'<strong>5% chance per stack</strong> an action hits the wrong target — its own side, itself included (4 max).',
-    baseEs:'<strong>5% de probabilidad por carga</strong> de que una acción golpee al objetivo equivocado — incluido su propio bando (4 máx.).',
-    fn:n=>t('st.drunk.fn',{p:5*n,s:stacksTxt(n)})},
+    base:'<strong>8% chance per stack</strong> an action hits the wrong target — its own side, itself included (4 max).',
+    baseEs:'<strong>8% de probabilidad por carga</strong> de que una acción golpee al objetivo equivocado — incluido su propio bando (4 máx.).',
+    fn:n=>t('st.drunk.fn',{p:Math.round(DRUNK_PER_STACK*100)*n,s:stacksTxt(n)})}, /* v1515 */
   slow:{icon:'🐢',name:'Slowed',nameEs:'Lentitud',color:'#7ec8e3',
     base:'Acts last this round. <em>(Cannot stack.)</em>',
     baseEs:'Actúa al final de esta ronda. <em>(No se acumula.)</em>',
@@ -7382,7 +7392,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1510'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1517'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -11533,9 +11543,12 @@ function renderRes(id){
   }
   // v512/v513: layer minimap — per-layer mini-boss icon at B5, 💀 layer boss at B8,
   // green = cleared, gold pill = current battle
-  const _mbIc={1:'🦎',2:'🗿',3:'🐊',4:'🌪️',5:'🦉',6:'🏹'}[G.layer||1]||'⚔';
+  const _mbIc={1:'🦎',2:'🗿',3:'🐊',4:'🌪️',5:'🦉',6:'🏹',7:'🐇',8:'🃏',9:'❓'}[G.layer||1]||'⚔'; /* v1516 [Genaro]: L7-L9 fell back to ⚔ -- now match the layer map (Ometochtli's rabbit, the L8 duo's card, L9's taunt) */
   const _mbNm=(isEs()?{1:'Xochitonal',2:'Quinametzin',3:'Xiuhnel y Mimich',4:'Mictlampehecatl',5:'Tlacateocotl',6:'Los Señores del Lago',7:'Ometochtli',8:'Ixpuxtequi y Nexoxcho'}:{1:'Xochitonal',2:'Quinametzin',3:'Xiuhnel & Mimich',4:'Mictlampehecatl',5:'Tlacateocotl',6:'The Lake Lords',7:'Ometochtli',8:'Ixpuxtequi & Nexoxcho'})[G.layer||1]||t('ui.hud.miniboss'); /* v1433: ES; L7/L8 named */
   let _mm='';for(let _b=1;_b<=8;_b++){const _cur=_b===G.battleNum,_done=_b<G.battleNum;const _ic=_b===5?_mbIc:_b===8?'💀':'●';const _col=_cur?'#ffd060':_done?'#50c080':'#3a3428';const _pill=_cur?'background:rgba(255,208,96,.20);border:1px solid #ffd060;border-radius:7px;padding:0 3px;':'';_mm+=`<span title="${t('ui.deploy.battleN',{n:_b})}${_b===5?' — '+t('ui.hud.miniboss')+': '+_mbNm:_b===8?' — '+t('ui.hud.layerBoss'):''}" style="color:${_col};font-size:${(_b===5||_b===8)?'11px':'9px'};${_pill}margin:0 1px">${_ic}</span>`;}
+  /* v1517 [Genaro]: the deploy screen draws the big battle-node map right below the bar, so the minimap here
+     only repeated it. Every other run screen (battle, event, Tianguis) keeps it -- there is always one map. */
+  if(id==='rb-deploy'&&document.getElementById('dmap-deploy'))_mm='';
   const _rbHead=`<div class="rb-head"><i role="img" aria-label="Teotlan"></i><span>${GAME_VERSION}</span></div>`; // v1320 · v1379: one row, Option A (Genaro)
   document.getElementById(id).innerHTML=resHtml+capChip+_rbHead+`<div class="res" style="margin-left:auto"><span style="letter-spacing:1px;margin-right:8px;white-space:nowrap">${_mm}</span><span style="font-size:11px;color:var(--td)">${t('ui.hud.layerBattle',{l:G.layer||1,n:G.battleNum})}/8</span></div>`;
 }
@@ -11864,7 +11877,7 @@ function applyParalyze(target,stacks){
   return true;
 }
 // ═══════════ v537: DRUNK — targeting-corruption status (L7 Pass 1) ═══════════
-// v693: 5% misfire per stack (cap 4 = 20%). PERMANENT until cleansed — no round decay; battles rebuild
+// v693: 5% misfire per stack (cap 4 = 20%) -- v1515: 8% (cap 32%), DRUNK_PER_STACK. PERMANENT until cleansed — no round decay; battles rebuild
 // units so it clears between battles. Offensive misfires redirect to the actor's OWN side (self
 // included, per ruling D2); beneficial misfires (heal/Chimalli) redirect to the OPPOSING side.
 // Pure self-buffs never roll (D4). Summon misfire lands in Pass 3 with the rabbit summon code —
@@ -11971,10 +11984,12 @@ function reverieRecalc(u){
   u.def=Math.round(u._revBase.def*m);u.res=Math.round(u._revBase.res*m);
   if(!st&&fk===1)delete u._revBase;
 }
+/* v1515 [Genaro]: misfire chance per Drunk stack, 5% -> 8% (cap 4 = 32%). Status text reads it too. */
+const DRUNK_PER_STACK=0.08;
 function drunkRoll(u){
   const st=(u&&u.drunkStacks)||0;
   if(st<=0||drunkExempt(u))return false;
-  return Math.random()<0.05*st;
+  return Math.random()<DRUNK_PER_STACK*st;
 }
 function drunkOwnPool(u){
   return u.isAlly?G.units.filter(x=>x.currentHp>0):G.enemies.filter(x=>x.currentHp>0&&!G.captureProcessed.has(x.id));
@@ -12016,7 +12031,7 @@ function drunkTwistArr(u,arr,kind){
   const vics=[]; // v540 (ruling 1a): DISTINCT victims per cast — sample without replacement; repeats only when the pool runs dry
   let avail=pool.slice();
   const out=arr.map(x=>{
-    if(Math.random()<0.05*st){
+    if(Math.random()<DRUNK_PER_STACK*st){ /* v1515 */
       if(!avail.length)avail=pool.slice(); // pool exhausted (e.g. lone survivor) → forced repeat
       const v=avail.splice(Math.floor(Math.random()*avail.length),1)[0];
       vics.push(v);return v;
@@ -12149,7 +12164,7 @@ function debugDrunkBattle(){ // v538: one-click misfire test — random Lv20 bat
   G.chosenDifficulty='easy';
   startBattle();
   [...(G.units||[]),...(G.enemies||[])].forEach(function(x){if(x&&x.currentHp>0)x.drunkStacks=Math.min(4,(x.drunkStacks||0)+2);reverieRecalc(x);});
-  addLog('<span style="color:#e0a040">🍺 DEBUG: Drunk Test Battle — all units start Drunk ×2 (10% misfire per action/target)</span>');
+  addLog('<span style="color:#e0a040">🍺 DEBUG: Drunk Test Battle — all units start Drunk ×2 (16% misfire per action/target)</span>');
   notify('🍺 Drunk test battle started — everyone Drunk ×2','#e0a040');
   if(typeof renderBattle==='function')renderBattle();
 }
@@ -14849,6 +14864,25 @@ function evLevelAllParty(delta){
   const godIds=[G.god?'god_'+G.god.id:null,...(G.party||[]).map(id=>id.startsWith('god_')?id:'god_'+id)].filter(Boolean);
   new Set(godIds).forEach(k=>{G.levels[k]=Math.max(1,(G.levels[k]||1)+delta);});
 }
+/* v1511: scale every roster unit's CURRENT HP (patron, ally gods, vassals). Absolute overrides are scaled
+   in place; everyone else carries a scale-free ratio, so the cut survives any later max-HP change. */
+/* v1512: +frac of MAX TP to every roster unit (patron, ally gods, vassals), capped at max */
+function evGainNPAll(frac){
+  const add=(k,mx)=>{const cur=G.unitNP[k]!==undefined?G.unitNP[k]:mx;G.unitNP[k]=Math.min(mx,Math.round(cur+mx*frac));};
+  (G.captured||[]).forEach(cu=>{const k=capKey(cu);add(k,maxNPFor(k,cu.np||20));});
+  const gids=[...(G.party||[])];if(G.god&&!gids.includes(G.god.id))gids.push(G.god.id);
+  gids.forEach(gid=>{const gd=GODS.find(g=>g.id===gid);if(!gd)return;const k='god_'+gid;add(k,maxNPFor(k,gd.np||30));});
+}
+function evScaleHpAll(f){
+  const keys=[...(G.party||[]).map(id=>'god_'+id),...(G.captured||[]).map(cu=>capKey(cu))];
+  if(G.god&&!keys.includes('god_'+G.god.id))keys.push('god_'+G.god.id);
+  G.unitHpRatio=G.unitHpRatio||{};
+  keys.forEach(k=>{
+    if(G.unitHpOverride&&G.unitHpOverride[k]!==undefined)G.unitHpOverride[k]=Math.max(1,Math.round(G.unitHpOverride[k]*f));
+    else G.unitHpRatio[k]=Math.max(0.01,(G.unitHpRatio[k]!==undefined?G.unitHpRatio[k]:1)*f);
+    if(G.unitHpSnap&&G.unitHpSnap[k])G.unitHpSnap[k].cur=Math.max(1,Math.round(G.unitHpSnap[k].cur*f));
+  });
+}
 function evRestoreHp(k){ /* v945: canonical full-HP restore -- mirrors doTemazcal (line ~15651) */
   if(G.unitHpOverride)delete G.unitHpOverride[k];
   if(G.unitHpRatio)delete G.unitHpRatio[k];
@@ -15516,28 +15550,30 @@ function evUTlacuilo(el){
 function mirrorScale(){return 1+0.10*Math.max(0,(G.layer||1)-1);}
 function evUObsidianMirror(el){
   const _ms=mirrorScale();
-  el.appendChild(evOpt('🪞',t('ui.ev.gazeMirror'),t('ui.evr.mirror.odds',{v0:(Math.round(5000*_ms)),v1:(Math.round(2500*_ms)),v2:(Math.round(30*_ms)),v3:(_ms.toFixed(2))}),
+  /* v1512 [Genaro]: the card now shows the odds, and choosing Gaze opens a confirm step that spells out both
+     outcomes with a Back button to return to the three options. */
+  const _gb=Math.round(5000*_ms),_gc=Math.round(2500*_ms),_gf=Math.round(30*_ms);
+  el.appendChild(evOpt('🪞',t('ui.ev.gazeMirror'),t('ui.ev.gazeOdds'),
     t('ui.ev.gazeDesc'),false,'',()=>{
       const el2=document.getElementById('event-content');
+      el2.innerHTML=`<div style="text-align:center;padding:1rem 0"><div style="font-size:34px;margin-bottom:.4rem">🪞</div>
+        <p style="font-size:14px;color:var(--am);margin-bottom:.9rem">${t('ui.ev.gazeConfirmQ')}</p>
+        <p style="font-size:12px;color:#7ee0a0;margin-bottom:.35rem">✨ ${t('ui.ev.gazeWin',{b:_gb.toLocaleString(),c:_gc.toLocaleString(),f:_gf})}</p>
+        <p style="font-size:12px;color:#e07070;margin-bottom:1.1rem">💀 ${t('ui.ev.gazeLose')}</p>
+        <div style="display:flex;gap:10px;justify-content:center"><button class="btn" id="ev-gaze-back">${t('ui.battle.back')}</button><button class="btn" id="ev-gaze-go">${t('ui.ev.gazeDo')}</button></div></div>`;
+      document.getElementById('ev-gaze-back').onclick=()=>showEvent('u_obsidian_mirror');
+      document.getElementById('ev-gaze-go').onclick=()=>{
       if(Math.random()<0.60){
         const _b=Math.round(5000*_ms),_c=Math.round(2500*_ms),_f=Math.round(30*_ms);
         G.res.blood+=_b;G.res.cacao+=_c;G.res.flower+=_f;renderRes('rb-event');
         evResult(el2,'✨',t('ui.evr.mirror.fortune',{v0:(_b.toLocaleString()),v1:(_c.toLocaleString()),v2:(_f)}),afterEvent);
       }else{
-        const pool=[...G.captured.filter(cu=>(cu.currentHp??1)>0)];
-        const godPool=G.party.map(id=>GODS.find(g=>g.id===id)).filter(Boolean);
-        const allPool=[...pool,...godPool];
-        if(allPool.length){
-          const victim=allPool[Math.floor(Math.random()*allPool.length)];
-          const baseHp=victim.maxHp??victim.hp??100;
-          const penalty=Math.round(baseHp*0.25);
-          victim.maxHp=Math.max(1,baseHp-penalty);
-          if(victim.currentHp!==undefined)victim.currentHp=Math.min(victim.currentHp,victim.maxHp);
-          evResult(el2,'💀',t('ui.evr.mirror.death',{v0:(victim.icon),v1:(victim.name)}),afterEvent);
-        }else{
-          evResult(el2,'💀',t('ui.evr.mirror.dark'),afterEvent);
-        }
+        /* v1511 [Genaro]: was a permanent -25% max HP on one random unit -- which wrote straight into the GODS
+           template / captured record. Now: every unit loses half its current HP and half its TP. */
+        evScaleHpAll(0.5);evDrainNPAll(0.5);
+        evResult(el2,'💀',t('ui.evr.mirror.death'),afterEvent);
       }
+      };
     }));
   el.appendChild(evOpt('💥',t('ui.ev.shatterMirror'),t('ui.ev.shatterCost',{n:Math.round(400*_ms),mult:_ms.toFixed(2)}),
     t('ui.ev.shatterDesc'),false,'',()=>{
@@ -15546,8 +15582,9 @@ function evUObsidianMirror(el){
       evResult(el2,'💥',t('ui.evr.mirror.shatter',{v0:(_sb.toLocaleString())}),afterEvent);
     }));
   el.appendChild(evOpt('🚶',t('ui.ev.walkAway'),t('ui.ev.walkAwayCost'),t('ui.ev.walkAwayDesc'),false,'',()=>{
-    const all=[...G.captured,...(G.units||[])];
-    all.forEach(u=>{if(u.maxNP){u.currentNP=Math.min(u.maxNP,(u.currentNP??0)+Math.round(u.maxNP*0.25));}});
+    /* v1512 [Genaro]: wrote to G.captured / G.units, which are not where TP lives between battles, so the
+       +25% never arrived. Goes through G.unitNP like every other event. */
+    evGainNPAll(0.25);
     const el2=document.getElementById('event-content');
     evResult(el2,'🪞',t('ui.evr.mirror.pass'),afterEvent);
   }));
@@ -17535,7 +17572,7 @@ function processCurrentSlot(){
       G._enemyWillSpecial=slot.unit.currentNP>=enemyNpCost(slot.unit);
       G._taPred=null;
       if(aa.length){
-        const _low=aa.reduce((a,b)=>a.currentHp<b.currentHp?a:b).id;
+        const _low=(enemyPrimaryTarget(slot.unit,aa)||aa[0]).id; /* v1514: same pick the attack makes */
         if(!G._enemyWillSpecial)G._targetedAllyId=_low;
         else{
           /* v1398: arrows are a WARNING before the hit, so a special's targets are predicted here:
@@ -21321,6 +21358,25 @@ function enemyIsDimmed(e){
   if(!q.length)return false;
   return !q.some(sl=>sl&&sl.side==='enemy'&&sl.unit&&sl.unit.id===e.id);
 }
+/* v1514 [Genaro]: ONE target rule for an enemy's main target, shared by the warning arrow and the attack.
+   Boss Ixquimilli hunts healers (lowest-HP healer, else lowest-HP ally); everyone else takes the lowest-HP ally.
+   The arrow used plain lowest-HP, so against Ixquimilli it pointed at one unit while she struck the healer.
+   Healer test also fixed for gods in Spanish: a god's .ability is the translated name, so it is checked by ak. */
+function enemyIsHealerTarget(a){
+  if(!a)return false;
+  try{if(a.isGod){const gd=GODS.find(g=>g.id===a.baseGodId);if(gd&&gd.ak&&HEAL_ABILITIES.has(gd.ak))return true;}}catch(_e){}
+  const ab=(typeof liveAbility==='function'?liveAbility(a):a.ability)||a.ability;
+  return !!(ab&&isHealAbl(ab));
+}
+function enemyPrimaryTarget(u,aa){
+  const live=(aa||[]).filter(a=>a&&a.currentHp>0);if(!live.length)return null;
+  const low=arr=>arr.reduce((a,b)=>a.currentHp<b.currentHp?a:b);
+  if(u&&u.isBoss&&!u._summonedGod&&u.id&&u.id.startsWith('boss_ixqui')){ /* v944: her own encounter only */
+    const allyUnits=live.filter(a=>a.isAlly);const healers=allyUnits.filter(enemyIsHealerTarget);
+    return healers.length?low(healers):(allyUnits.length?low(allyUnits):low(live));
+  }
+  return low(live);
+}
 function enemyActsTurn(u){
   /* v761: mark whether this unit is the first ENEMY to act this round. actedIds only tracks
      players (advanceTurn is called with no argument for enemy turns), so 'first on their own
@@ -21336,15 +21392,7 @@ function enemyActsTurn(u){
     addLog(isEs()?`<span style="color:#c0c030;font-weight:500">⚡ ${liveName(u)} con PARÁLISIS — ¡pierde su acción!</span>`:`<span style="color:#c0c030;font-weight:500">⚡ ${u.name} PARALYZED — skips action!</span>`);animateStatusPop(u.id,'⚡ '+t('ui.fx.paralyzed'),'#c0c030');resolveStatusAfterAction(u);return; // v318: pop
   }
   // Ixquimilli boss: always target healers first (lowest HP healer if multiple)
-  let lowestAlly;
-  if(u.isBoss&&!u._summonedGod&&u.id&&u.id.startsWith('boss_ixqui')){ /* v944: her hunt-the-healer AI is part of her own encounter; the prefix also matches the L9 B5 raised 'boss_ixqui_5_N' */
-    const allyUnits=aa.filter(a=>a.isAlly&&a.currentHp>0);
-    const healers=allyUnits.filter(a=>a.ability&&isHealAbl(a.ability));
-    if(healers.length){lowestAlly=healers.reduce((a,b)=>a.currentHp<b.currentHp?a:b);}
-    else{lowestAlly=allyUnits.length?allyUnits.reduce((a,b)=>a.currentHp<b.currentHp?a:b):aa.reduce((a,b)=>a.currentHp<b.currentHp?a:b);}
-  }else{
-    lowestAlly=aa.reduce((a,b)=>a.currentHp<b.currentHp?a:b);
-  }
+  let lowestAlly=enemyPrimaryTarget(u,aa); /* v1514: shared with the warning arrow */
   const useSpecial=u.currentNP>=enemyNpCost(u);
   if(useSpecial){
     u.currentNP-=enemyNpCost(u);
@@ -21407,10 +21455,8 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
   fxKickoff(u,_spT,isAoeOrAutoSpecial(u)); // v556: enemy special kinetics
   // Ixquimilli boss: prioritize healers as target
   let lowestAlly;
-  if(u.isBoss&&!u._summonedGod&&u.id&&u.id.startsWith('boss_ixqui')){ /* v944: her hunt-the-healer AI is part of her own encounter; the prefix also matches the L9 B5 raised 'boss_ixqui_5_N' */
-    const allyUnits=aa.filter(a=>a.isAlly&&a.currentHp>0);
-    const healers=allyUnits.filter(a=>a.ability&&isHealAbl(a.ability));
-    lowestAlly=healers.length?healers.reduce((a,b)=>a.currentHp<b.currentHp?a:b):(allyUnits.length?allyUnits.reduce((a,b)=>a.currentHp<b.currentHp?a:b):null);
+  if(u.isBoss&&!u._summonedGod&&u.id&&u.id.startsWith('boss_ixqui')){ /* v1514: shared rule (see enemyPrimaryTarget) */
+    lowestAlly=enemyPrimaryTarget(u,aa);
   }else{
     lowestAlly=aa.length?aa.reduce((a,b)=>a.currentHp<b.currentHp?a:b):null;
   }
@@ -29462,16 +29508,29 @@ const SPECIALS={
  /* ── batch 2 ── */
  /* Itzpapalotl — Obsidian Storm: a slanting shower of obsidian flints rains onto every target; each strike sparks, the last leaves a bleeding Wound */
  obsidian:{dur:1.6,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t;
-   if(!C.d){C.d=[];S.foes.forEach((T,i)=>{for(let k=0;k<9;k++){const t0=.05+i*.06+k*.07+rnd(0,.05);C.d.push({i,t0,tx:T.x+T.w*rnd(.2,.8),ty:T.y+T.h*rnd(.25,.75),dx:rnd(28,46),dy:rnd(70,100),L:rnd(5,8)|0});}});}
-   const dark=SPP(t,0,.2)*(1-SPP(t,1.2,1.5));px(0,0,W,H,'#0a0612',f*.3*dark);
-   for(const s of C.d){const v=SPP(t,s.t0,s.t0+.22);if(v<=0)continue;
-     if(v<1){const x=s.tx-s.dx*(1-v),y=s.ty-s.dy*(1-v),ux=s.dx/Math.hypot(s.dx,s.dy),uy=s.dy/Math.hypot(s.dx,s.dy);
-       for(let k=0;k<s.L;k++)px(x-ux*k,y-uy*k,k<2?2:1,1,k<2?'#2a2235':k<4?'#463a5e':'#6a5894',f*(1-k/s.L*.6));px(x,y,1,1,'#e6d2ff',f);}
-     else{const a=SPP(t,s.t0+.22,s.t0+.45);if(a<1){px(s.tx-1,s.ty-1,3,3,'#e6d2ff',f*(1-a));for(let k=0;k<4;k++){const an=k*1.57+.78;px(s.tx+Math.cos(an)*a*6,s.ty+Math.sin(an)*a*6,1,1,'#cdb0ff',f*(1-a));}}
-       px(s.tx-1,s.ty,3,1,'#2a2235',f*(1-SPP(t,1.3,1.6)));}}
+   /* v1513 [Genaro]: the flints were 1px dark slivers on a dark board -- barely visible. Now a real storm: a
+      background shower across the whole screen, ~16 big glinting blades per target, shard bursts on impact. */
+   if(!C.d){C.d=[];C.bg=[];
+     S.foes.forEach((T,i)=>{for(let k=0;k<16;k++){const t0=.03+i*.05+k*.045+rnd(0,.05);C.d.push({i,t0,tx:T.x+T.w*rnd(.12,.88),ty:T.y+T.h*rnd(.2,.8),dx:rnd(30,52),dy:rnd(80,115),L:rnd(9,14)|0,big:k%3===0});}});
+     for(let k=0;k<70;k++)C.bg.push({t0:rnd(0,1.05),x:rnd(-W*.1,W*1.05),dx:rnd(26,44),dy:H+40,sp:rnd(.35,.6),L:rnd(6,10)|0});}
+   const dark=SPP(t,0,.2)*(1-SPP(t,1.2,1.5));px(0,0,W,H,'#0a0612',f*.42*dark);
+   const blade=(x,y,ux,uy,L,a,big)=>{const w=big?3:2;
+     for(let k=0;k<L;k++){const c=k<2?'#f4ecff':k<4?'#9f88d8':k<L-3?'#3b2d58':'#5c4a86';px(x-ux*k,y-uy*k,w,w,c,a*(1-k/L*.45));}
+     px(x-ux*(L*.5)+1,y-uy*(L*.5),1,1,'#e6d2ff',a*.8);};
+   /* background storm, all over the board */
+   for(const b of C.bg){const v=(t-b.t0)/b.sp;if(v<0||v>1)continue;const ux=b.dx/Math.hypot(b.dx,b.dy),uy=b.dy/Math.hypot(b.dx,b.dy);
+     blade(b.x+b.dx*v,-20+b.dy*v,ux,uy,b.L,f*.55*(1-SPP(t,1.25,1.55)),false);}
+   /* targeted blades */
+   for(const s of C.d){const v=SPP(t,s.t0,s.t0+.2);if(v<=0)continue;
+     if(v<1){const x=s.tx-s.dx*(1-v),y=s.ty-s.dy*(1-v),ux=s.dx/Math.hypot(s.dx,s.dy),uy=s.dy/Math.hypot(s.dx,s.dy);blade(x,y,ux,uy,s.L,f,s.big);}
+     else{const a=SPP(t,s.t0+.2,s.t0+.5);
+       if(a<1){px(s.tx-2,s.ty-2,5,5,'#f4ecff',f*(1-a)*.9);px(s.tx-4,s.ty,9,1,'#cdb0ff',f*(1-a)*.7);
+         for(let k=0;k<6;k++){const an=k*1.047+.5;px(s.tx+Math.cos(an)*a*10,s.ty+Math.sin(an)*a*10-a*3,2,2,k%2?'#cdb0ff':'#3b2d58',f*(1-a));}}
+       /* the blade stays stuck in the card for a moment */
+       const st=1-SPP(t,1.25,1.6);px(s.tx-1,s.ty-5,2,6,'#3b2d58',f*st*.9);px(s.tx-1,s.ty-6,2,1,'#9f88d8',f*st);}}
    S.foes.forEach((T,i)=>{const [tx,ty]=SPC(T),w=SPP(t,.55+i*.06,.65+i*.06);if(w<=0)return;const fo=1-SPP(t,1.3,1.6);
-     px(tx-5,ty+3,10,1,'#d0303a',f*w*fo);px(tx-4,ty+5,8,1,'#d0303a',f*w*fo);for(let k=0;k<3;k++){const dv=((t-.6)*1.5+k*.33)%1;px(tx-3+k*3,ty+6+dv*7,1,1,'#a01a24',f*w*fo*(1-dv));}
-     spShake(C,i,t>.3&&t<.9?1.2:0);});}},
+     px(tx-6,ty+3,12,2,'#d0303a',f*w*fo);px(tx-5,ty+6,10,1,'#d0303a',f*w*fo);for(let k=0;k<3;k++){const dv=((t-.6)*1.5+k*.33)%1;px(tx-3+k*3,ty+7+dv*8,2,2,'#a01a24',f*w*fo*(1-dv));}
+     spShake(C,i,t>.25&&t<1?1.6:0);});}},
  /* Mixcoatl — Tlipotl Arrows: a lightning-trailed arrow flies to the target and pins it with a Paralyze crackle; a second one if he acted first */
  arrows:{dur:1.35,draw(ctx,C,W,H,u,f,px){const S=C.spec,t=C.t,[cx,cy]=SPC(S.caster),T=S.foes[0];if(!T)return;const [tx,ty]=SPC(T);
    const shots=S.first?[0,.38]:[0];
