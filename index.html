@@ -7392,7 +7392,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1517'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1518'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -30315,6 +30315,7 @@ window.MFX={
     if(S.entScr)return; /* never over a boss entrance */
     const D=(SPECIALS[k]&&SPECIALS[k].dur)||(k==='roll'?1.6:k==='harvest'?2.3:1.5);
     window._mfxHoldUntil=performance.now()+D*1000+150;
+    setTimeout(mfxRerender,Math.round(D*1000)+40); /* v1518: final status pips as the special ends */
     const rec={k,caster,side,hits:[],heals:[],t0:performance.now(),started:false,primary:ft&&ft.id};
     /* a physical single-target special lunges first: the game delays the main target's hit (_fxDelayMap) while splash
        hits land at once -- that pending entry IS the main target */
@@ -30387,8 +30388,16 @@ window.MFX={
   if(typeof ah0==='function')window.animateHit=function(uid,dmg,isHeal,isCrit,_pastFx){let wait=0;
     try{if(_pastFx===undefined&&(dmg||dmg===0)&&!(dmg===0&&isHeal)&&!(G._drunkDelayIds&&G._drunkDelayIds.has(uid))&&!(G._fxDelayMap&&G._fxDelayMap[uid]>0)){wait=MFX._numDelay(uid,isHeal);MFX._hit(uid,dmg,isHeal,isCrit);}}catch(_e){wait=0;}
     /* v1496: the number (and the card's own hit flash) waits for the special's impact beat */
-    if(wait>16){const a=arguments,self=this;setTimeout(()=>ah0.apply(self,a),wait);return;}
+    if(wait>16){const a=arguments,self=this;setTimeout(()=>{ah0.apply(self,a);mfxRerender();},wait);return;}
+    if(S.rec&&!S.rec.done)mfxRerender();
     return ah0.apply(this,arguments);};})();
+/* v1518 [Genaro]: statuses a special applies AFTER its own last renderBattle (Torrid Tornado's Burn lands once all
+   four hits are in; most multi-hits add Slow/Burn per hit after the render) sat invisible on the cards until the next
+   unit's turn re-rendered them. Re-render on every impact beat and once more as the special ends, so pips appear
+   with the hit instead of a turn late. Coalesced to one render per frame. */
+let _mfxRR=0;
+function mfxRerender(){if(_mfxRR)return;_mfxRR=requestAnimationFrame(()=>{_mfxRR=0;
+  try{const sc=document.getElementById('screen-battle');if(sc&&sc.classList.contains('active')&&typeof renderBattle==='function')renderBattle();}catch(_e){}});}
 window._mfxHoldMs=function(){return Math.min(2500,Math.max(0,(window._mfxHoldUntil||0)-performance.now()));};
 requestAnimationFrame(frame);
 })();
