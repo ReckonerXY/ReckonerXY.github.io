@@ -7496,8 +7496,8 @@ function calcTeotlEarned(){
    whole wall of text landing at once -- while cutting the wait to roughly half. The fade is
    shortened to match, so a line still finishes arriving before the next one starts. Both apply
    to every layer, since all nine route through runStory. */
-const STORY_LINE_MS=550;
-const STORY_FADE_MS=420;
+const STORY_LINE_MS=633; /* v1530 [Genaro]: 15% slower (was 550) -- read too fast on run 1 */
+const STORY_FADE_MS=483; /* v1530: scaled with the line pace (was 420) */
 const STORY_LINES=[
   "You wake to the sound of running water.",
   "Your divine power has been stripped away, your soul cast into <strong>Mictlan</strong>, the realm of the dead.",
@@ -7515,7 +7515,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1528'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1530'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -17787,22 +17787,32 @@ function buildRoundQueue(){
     if(_mFade)addLog(isEs()?`<span class="log-ab">😐 Las máscaras rituales se desvanecen — su poder fue fugaz.</span>`:`<span class="log-ab">😐 The ritual masks fade — their power was fleeting.</span>`);
   }
   // v304 (item 1): Undying Ember now logs AFTER the round divider and shows a damage pop
+  /* v1529 [Genaro: the HP dropped before the coal arrived, so it looked like the passive did nothing]:
+     the damage, log line and any kill/capture now all happen ON IMPACT, inside the coal's callback,
+     and the round's first action waits for that impact instead of racing it. */
+  let _emberWait=0;
   if(hasPassive('ephemeralEmber')){
     const rsE=G.enemies.filter(u=>u.currentHp>0&&!G.captureProcessed.has(u.id));
     if(rsE.length){
       const pick=rsE[Math.floor(Math.random()*rsE.length)];
-      const emDmg=Math.round(pick.maxHp*0.10);
-      pick.currentHp=Math.max(0,pick.currentHp-emDmg);
-      addLog(isEs()?`<span class="log-burn">🪔 Brasa Imperecedera: ${pick.icon} ${liveName(pick)} −${emDmg} PV</span>`:`<span class="log-burn">🪔 Undying Ember: ${pick.icon} ${pick.name} −${emDmg} HP</span>`);
-      {const _pid=pick.id;setTimeout(()=>undyingEmberFx(_pid,()=>animateHit(_pid,emDmg,false)),120);} // v1507: coal arcs in, number on impact (after renderBattle below)
-      if(pick.currentHp<=0&&!G.captureProcessed.has(pick.id)){
-        if(pick.isBoss){handleDeath(pick);} // v319: bosses are never capturable
-        else{
-          G.captureProcessed.add(pick.id);G._unitStates[pick.id]='slain';
-          G.captureQueue.push(pick);
-          if(!G.capActive)processNextCap();
+      const _pid=pick.id,_enemiesRef=G.enemies;
+      _emberWait=fxOn()?760:140; /* 120 lead-in + 480 flight + a beat for the number */
+      setTimeout(()=>undyingEmberFx(_pid,()=>{
+        if(G.battlePhase==='done'||G.enemies!==_enemiesRef||!(pick.currentHp>0)||G.captureProcessed.has(_pid))return;
+        const emDmg=Math.round(pick.maxHp*0.10);
+        pick.currentHp=Math.max(0,pick.currentHp-emDmg);
+        addLog(isEs()?`<span class="log-burn">🪔 Brasa Imperecedera: ${pick.icon} ${liveName(pick)} −${emDmg} PV</span>`:`<span class="log-burn">🪔 Undying Ember: ${pick.icon} ${pick.name} −${emDmg} HP</span>`);
+        renderBattle();
+        animateHit(_pid,emDmg,false);
+        if(pick.currentHp<=0&&!G.captureProcessed.has(_pid)){
+          if(pick.isBoss){handleDeath(pick);} // v319: bosses are never capturable
+          else{
+            G.captureProcessed.add(_pid);G._unitStates[_pid]='slain';
+            G.captureQueue.push(pick);
+            if(!G.capActive)processNextCap();
+          }
         }
-      }
+      }),120);
     }
   }
   const banEl=document.getElementById('round-banner');
@@ -17817,7 +17827,12 @@ function buildRoundQueue(){
   }
   renderBattle();
   // If a capture window is active (e.g. Teyolia Ember kill), wait for resolution before advancing
-  if(!G.capActive)setTimeout(processCurrentSlot,G.roundNum===1?0:650);
+  if(_emberWait){
+    /* v1529: let the Undying Ember land first; a kill on impact may have opened a capture window */
+    const _wait=Math.max(_emberWait,G.roundNum===1?0:650);
+    setTimeout(()=>{if(G.battlePhase==='done')return;if(!G.capActive)processCurrentSlot();else G._resumeAfterCap=true;},_wait);
+  }
+  else if(!G.capActive)setTimeout(processCurrentSlot,G.roundNum===1?0:650);
   else G._resumeAfterCap=true; // flag for resolveCap to call processCurrentSlot
 }
 
