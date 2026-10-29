@@ -454,6 +454,119 @@ body.codex-ui .cx-fold::before,body.codex-ui .cx-fold::after{content:"";flex:1;h
 body.codex-ui .cx-fold>span{white-space:nowrap;display:inline-flex;align-items:center}
 .cx-turn{display:none;margin-left:10px;padding:2px 9px;border-radius:5px;font-size:12px;font-weight:700;letter-spacing:1.2px;line-height:1.4;border:1px solid}
 .cx-turn-you{display:inline-block;color:#7af0a8;background:#0e2e1c;border-color:#2e8a52;box-shadow:0 0 8px #2e8a5266}
+.act-dock{display:flex;align-items:stretch;gap:10px;padding:.5rem .7rem} /* v1544 */
+.blog-hint{color:#c8a860;opacity:.85} /* v1552 */
+/* v1555 [Genaro]: the battle label ("Itzucuintlan · Batalla 3", "JEFE — Xolotl") moves from its own row above the enemy
+   codex to the far left of the round divider. The row it leaves held nothing else in codex UI (the round banner was
+   already hidden there), so the battle gains ~39px of height. Narrow screens keep the old row. */
+.cx-fold-row{position:relative}
+.cx-phase{display:none}
+@media (min-width:760px){
+ body.codex-ui #screen-battle .battle-head{display:none}
+ body.codex-ui #screen-battle .cx-phase:not(:empty){display:block;position:absolute;left:0;top:calc(50% + 1px);transform:translateY(-50%);z-index:2;
+   max-width:30%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;font-weight:600;line-height:1.3;color:#e8d5b0;
+   padding:1px 10px;border-radius:6px;background:#1a1a2a;border:1px solid #3a3a6a}
+}
+body.cap-focus #screen-battle .cx-phase{filter:grayscale(1) brightness(.45);transition:filter .25s ease}
+/* ═══ v1549 [Genaro, battle UI B2 build 4]: FIT THE BATTLE IN ONE LAPTOP SCREEN ═══════════════════════════════
+   Measured at 1366x768 (v1548): 994px tall (boss fights 1021) against a 768px screen. The top bar stays as it is.
+   Nothing here shrinks a sprite -- the height comes out of padding and spacing:
+     codex frames   the greca is drawn 16px wide in battle (24 elsewhere), so each codex's padding drops 26/20 -> 17/12
+     cards          12px padding -> 7, the Lv tag overlays the art instead of pushing it down, tighter body + bars
+     divider        10px top margin -> 3
+     bottom bar     slimmer, and PINNED to the bottom of the screen so it can never scroll away
+   Scoped to #screen-battle so the Tianguis / god-select cards keep their look. */
+body.codex-ui #screen-battle .cx-page{padding:15px 13px 9px;margin-top:8px!important}
+body.codex-ui #screen-battle .cx-page::after{-webkit-mask-box-image-width:14px;mask-border-width:14px}
+body.codex-ui #screen-battle .uc{padding:7px}
+body.codex-ui #screen-battle .uc>.uc-lvtag~.uc-art{padding-top:21px} /* v1551: was 3px -- the Lv/element tag (27px tall from the card top) covered the top 16px of every sprite; the cards grow 18px instead */
+body.codex-ui #screen-battle .uc-art{padding-bottom:1px}
+body.codex-ui #screen-battle .uc-body{padding:3px 6px 3px}
+body.codex-ui #screen-battle .uc-name{margin-bottom:4px} /* v1552: was 1px -- the serpent head on the HP bar rises 7px above the bar and ran into the name */
+body.codex-ui #screen-battle #party-section .uc:not(.tier-god):not(.tier-patron) .uc-name{margin-bottom:9px} /* v1552: vassals and Guardians sit in a row sized by the god cards' taller art, so this space was already empty */
+body.codex-ui #screen-battle .bar-row{margin:2px 0}
+body.codex-ui #screen-battle .cx-fold{margin-top:3px}
+#act-panel-area .act-panel.act-dock{margin:.15rem 0 0;padding:.2rem .6rem}
+.act-dock .act-btns>.btn{padding-top:2px;padding-bottom:2px}
+body.codex-ui #act-panel-area{position:sticky;bottom:0;z-index:30;background:var(--bd);min-height:76px!important;box-sizing:border-box} /* v1550: a floor, not a ceiling -- the bar grows instead of clipping its buttons */
+/* every other panel shown in that slot (your-turn prompt, target picking, enemy acting) is one row of the same height */
+body.codex-ui #act-panel-area .act-panel:not(.act-dock){display:flex;align-items:center;gap:12px;flex-wrap:nowrap;margin:.15rem 0 0;padding:.3rem .8rem;min-height:70px;box-sizing:border-box;overflow:hidden}
+body.codex-ui #act-panel-area .act-panel:not(.act-dock)>.act-panel-title{margin:0;flex:0 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.codex-ui #act-panel-area .act-panel:not(.act-dock)>div:not(.act-panel-title){margin:0!important;flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.codex-ui #act-panel-area .act-panel:not(.act-dock)>button{flex:0 0 auto;width:auto!important;margin:0!important}
+/* v1549 pass 2: rows were taller than their content */
+body.codex-ui #screen-battle .bar-row{margin:1px 0;line-height:1}
+body.codex-ui #screen-battle .bar-row .bar-icon{font-size:11px;line-height:1}
+body.codex-ui #screen-battle .uc-name{line-height:1.05}
+body.codex-ui #screen-battle #erow .uc:is(.miniboss,.cx-big) .uc-body>div[style*="italic"]{white-space:normal;line-height:1.1} /* v1552b: was one line with "…" -- the card is wider now, and the few titles that still do not fit wrap to a second line */
+body.codex-ui #screen-battle .cx-fold .cx-turn,body.codex-ui #screen-battle .cx-fold .cx-cancel,body.codex-ui #screen-battle .cx-fold .cx-capnote{padding-top:0;padding-bottom:0;line-height:1.3}
+body.codex-ui #screen-battle .cx-fold>span{line-height:1.2}
+.act-dock .act-btns>.btn{line-height:1.2!important}
+/* v1549: the defeated card matches a normal enemy card's height, so the codex does not grow while you choose */
+body.codex-ui #screen-battle .uc.cap-pending{gap:3px;padding:6px}
+body.codex-ui #screen-battle .cap-pending .cap-artw{min-height:66px}
+body.codex-ui #screen-battle .cap-pending .cap-btns .btn{padding:3px 6px}
+body.codex-ui #screen-battle .cap-pending .btn-slay .slay-gain{margin-top:0}
+/* v1549 pass 3 */
+body.codex-ui #screen-battle .cx-fold{font-size:12px;margin-top:2px}
+body.codex-ui #screen-battle #party-section{margin-top:0!important} /* v1552: was .4rem -- pays for the name gap above the HP bars */
+body.codex-ui #screen-battle .cx-fold .cx-turn{font-size:11px}
+body.codex-ui #screen-battle .uc-foot:empty{display:none}
+body.codex-ui #screen-battle #erow .uc.cx-big.miniboss .uc-art{min-height:106px}
+body.codex-ui #screen-battle #erow .uc.cx-big:not(.miniboss) .uc-art{min-height:142px}
+
+.act-dock .dock-who{flex:0 0 230px;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:4px;font-size:12px;color:#d4af37;line-height:1.2}
+.act-dock .dock-who .act-back{margin-left:0;align-self:flex-start}
+.act-dock .dock-nm,.act-dock .dock-sub{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} /* v1550: long names ("Anguila del Río Negro") wrapped to 3 lines */
+.act-dock .dock-sub{color:#9a7d5a;font-size:.9em}
+body.codex-ui .act-dock .dock-who .act-back{display:none} /* Back lives on the round divider */
+.act-dock .act-btns{flex:0 0 auto;flex-wrap:nowrap;align-items:stretch}
+.act-dock .act-btns>.btn{min-width:140px}
+.act-dock .dock-desc{flex:1 1 auto;min-width:0;display:flex;align-items:center;border:1px solid #3a2e12;border-radius:8px;background:#140e06;padding:5px 10px;font-size:11px;color:#8aa0b8;line-height:1.3}
+.act-dock .dk-pane{display:none;min-width:0}
+.act-dock[data-dk="spec"] .dk-pane[data-dk="spec"],.act-dock[data-dk="obl"] .dk-pane[data-dk="obl"]{display:block}
+@media (hover:none){.act-dock:not([data-dk])[data-sel="spec"] .dk-pane[data-dk="spec"],.act-dock:not([data-dk])[data-sel="obl"] .dk-pane[data-dk="obl"]{display:block}} /* touch: no hover, so show the shown special by default */
+.dock-cyc{position:relative;display:flex;align-items:stretch;gap:0} /* v1545 */
+.dock-cyc>.cyc-item{display:none;border-radius:0;min-width:220px}
+.act-dock[data-sel="spec"] .dock-cyc>.cyc-item[data-k="spec"],.act-dock[data-sel="obl"] .dock-cyc>.cyc-item[data-k="obl"]{display:block}
+.dock-cyc>.cyc-arw{min-width:0!important;width:30px;padding:0;border-radius:0;background:#081428;border-color:#2a5a8a;color:#90c0ff;display:flex;align-items:center;justify-content:center}
+.dock-cyc>.cyc-arw:first-child{border-radius:8px 0 0 8px}
+.dock-cyc>.cyc-arw:nth-last-child(2){border-radius:0 8px 8px 0}
+.dock-cyc>.cyc-arw:hover{background:#102240;color:#c8e0ff}
+.cyc-dots{position:absolute;left:50%;bottom:3px;transform:translateX(-50%);display:flex;gap:4px;pointer-events:none}
+.cyc-dots i{width:5px;height:5px;border-radius:3px;background:#3a4a7a}
+.act-dock[data-sel="spec"] .cyc-dots i[data-k="spec"],.act-dock[data-sel="obl"] .cyc-dots i[data-k="obl"]{background:#ffd060}
+#cap-area.cap-intro{position:fixed;inset:0;z-index:9000;margin:0;background:rgba(10,6,3,.62);display:flex;align-items:center;justify-content:center} /* v1546 */
+#cap-area.cap-intro .cap-pop{max-width:520px;width:calc(100% - 48px);box-shadow:0 0 34px rgba(212,175,55,.35);border-color:#d4af37}
+.uc.cap-pending{border:3px solid #ffd060!important;box-shadow:0 0 16px rgba(255,208,96,.5);display:flex;flex-direction:column;align-items:stretch;gap:4px;padding:6px;cursor:default;min-width:140px}
+.cap-pending .cap-artw{position:relative;display:flex;align-items:center;justify-content:center;min-height:84px}
+.cap-pending .cap-art{display:flex;align-items:center;justify-content:center;filter:grayscale(1) brightness(.6)}
+.cap-pending .cap-ribbon,.cap-pop .cap-tag{font-size:12px;font-weight:700;letter-spacing:2px;color:#ffd060;text-shadow:0 1px 2px #000} /* v1548 */
+.cap-pending .cap-ribbon{position:absolute;left:-6px;right:-6px;bottom:0;text-align:center;background:rgba(20,14,8,.82);padding:2px 0} /* along the art's bottom edge -- the unit stays readable */
+.cap-pop .cap-tag{margin-bottom:4px}
+.cap-spr{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle}
+.cap-spr img,.cap-spr svg{image-rendering:pixelated}
+.cap-spr-s{margin-left:2px}
+/* v1548 [Genaro]: the two choices glow softly so they read as the thing to press */
+@keyframes capGlowG{from{box-shadow:0 0 6px rgba(80,224,144,.35)}to{box-shadow:0 0 14px rgba(80,224,144,.75)}}
+@keyframes capGlowS{from{box-shadow:0 0 6px rgba(255,176,80,.3)}to{box-shadow:0 0 14px rgba(255,176,80,.7)}}
+.cap-pending .btn-cap,.cap-pop .btn-cap{animation:capGlowG 1.4s ease-in-out infinite alternate}
+.cap-pending .btn-slay,.cap-pop .btn-slay{animation:capGlowS 1.4s ease-in-out infinite alternate}
+body.fx-min .cap-pending .btn-cap,body.fx-min .cap-pop .btn-cap{animation:none;box-shadow:0 0 10px rgba(80,224,144,.55)}
+body.fx-min .cap-pending .btn-slay,body.fx-min .cap-pop .btn-slay{animation:none;box-shadow:0 0 10px rgba(255,176,80,.5)}
+/* v1547 [Genaro]: while a capture choice is open, the rest of the battle goes grey so attention lands on the defeated card
+   (and its note on the round divider). Pointer events stay on -- nothing else is clickable in that phase anyway. */
+body.cap-focus #screen-battle .uc:not(.cap-pending),body.cap-focus #screen-battle #act-panel-area,body.cap-focus #screen-battle .battle-head{filter:grayscale(1) brightness(.45);transition:filter .25s ease}
+body.cap-focus #screen-battle .cx-page::after{filter:grayscale(1) brightness(.5)}
+body.cap-focus #screen-battle .cx-fold>span>*:not(.cx-capnote),body.cap-focus #screen-battle .cx-fold #cx-turn{opacity:.35;animation:none!important} /* the turn tag's pulse animation overrides a filter */
+body.cap-focus #screen-battle .uc.cap-pending{position:relative;z-index:3}
+.cap-pending .uc-name{text-align:center;color:#f0d080;line-height:1.1}
+.cap-pending .cap-btns{display:flex;flex-direction:column;gap:4px}
+.cap-pending .cap-btns .btn{width:100%;margin:0;padding:5px 6px;font-size:12px;line-height:1.2}
+.cap-pending .cap-slay{display:flex;flex-direction:column;align-items:center;gap:1px} /* label over amounts, like v1543's slay button -- one line did not fit */
+.cap-pending .cap-slay .slay-gain{font-size:10px;white-space:nowrap}
+.cx-capnote{margin-left:10px;padding:2px 10px;border:1px solid #8a6a10;border-radius:5px;background:#2a2008;color:#f0d080;font-size:12px;white-space:normal;max-width:520px}
+.cx-capnote>div{margin:0!important;font-size:inherit!important;color:inherit!important;display:inline}
 .cx-cancel{margin-left:8px;padding:2px 10px;border-radius:5px;font:inherit;font-size:12px;font-weight:700;letter-spacing:1px;line-height:1.4;cursor:pointer;
   color:#f0d080;background:#2a2008;border:1px solid #8a6a10;box-shadow:0 0 8px #8a6a1066} /* v1542 */
 .cx-cancel:hover{background:#3a2c0c;color:#ffe9a0}
@@ -489,14 +602,14 @@ body.codex-ui #erow.cx-bf::before{content:"";grid-column:var(--cxdiv,2);grid-row
 body.codex-ui #erow.cx-bf.cx-solo{grid-template-columns:repeat(var(--cxbig,1),auto);grid-template-rows:auto}
 body.codex-ui #erow.cx-bf.cx-solo::before{display:none}
 body.codex-ui #erow.cx-bf>.uc{grid-column:var(--cxc,auto);grid-row:var(--cxr,auto)}
-body.codex-ui #erow .uc.cx-big:not(.miniboss){min-width:230px!important;max-width:250px!important;width:240px}
-body.codex-ui #erow .uc.cx-big.miniboss{min-width:172px!important;max-width:190px!important;width:180px}
+body.codex-ui #erow .uc.cx-big:not(.miniboss){min-width:270px!important;max-width:290px!important;width:280px} /* v1553: was 240 -- titles up to 'Dios Jaguar Gemelo Matadioses' fit on one line */
+body.codex-ui #erow .uc.cx-big.miniboss{min-width:240px!important;max-width:260px!important;width:250px} /* v1553: was 180 -- 'Semidiosa de la Ola que Corre' and most titles fit on one line */
 body.codex-ui #erow .uc.cx-big:not(.miniboss) .uc-art{min-height:150px}
 body.codex-ui #erow .uc.cx-big.miniboss .uc-art{min-height:116px}
 body.codex-ui #erow .uc.cx-big:not(.miniboss) .uc-art img{width:140px!important;height:140px!important}
-body.codex-ui #erow .uc.cx-big.miniboss .uc-art img{width:100px!important;height:100px!important}
+body.codex-ui #erow .uc.cx-big.miniboss .uc-art img{width:120px!important;height:120px!important} /* v1554: was 100 -- Guardians read bigger than the vassals beside them */
 body.codex-ui #erow .uc.cx-big:not(.miniboss) .ico-emoji{font-size:96px!important}
-body.codex-ui #erow .uc.cx-big.miniboss .ico-emoji{font-size:70px!important}
+body.codex-ui #erow .uc.cx-big.miniboss .ico-emoji{font-size:84px!important}
 body.codex-ui #erow .uc.cx-big:not(.miniboss) .uc-name{font-size:17px}
 body.codex-ui #erow .uc.cx-big.miniboss .uc-name{font-size:14px}
 body.codex-ui #erow .uc.cx-big .bar-wrap{height:17px}
@@ -2033,11 +2146,11 @@ body.fx-min .bless-spark{display:none}
   <div class="action-msg" id="action-msg"></div>
   <div id="tut-area"></div><div id="cap-area"></div>
   <div class="cx-page cx-enemy" id="cx-enemy"><div class="row-lbl" data-i18n="ui.battle.enemies">Enemies</div><div class="unit-row" id="erow"></div></div>
-  <div class="cx-fold" id="cx-fold"></div>
+  <div class="cx-fold-row"><div class="cx-phase" id="cx-phase"></div><div class="cx-fold" id="cx-fold"></div></div>
   <div style="margin-top:.75rem" id="party-section" class="cx-page cx-ally"></div>
   <div id="act-panel-area"></div>
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
-    <button onclick="(function(){const b=document.getElementById('blog');const open=b.style.display!=='none';b.style.display=open?'none':'block';this.textContent=open?t('ui.battle.logClosed'):t('ui.battle.logOpen')}).call(this)" style="font-size:10px;color:var(--td);background:none;border:none;cursor:pointer;padding:0" data-i18n="ui.battle.logClosed">📜 Battle Log ▸</button>
+    <button onclick="(function(){const b=document.getElementById('blog');const open=b.style.display!=='none';b.style.display=open?'none':'block';this.innerHTML=open?t('ui.battle.logClosed'):t('ui.battle.logOpen')}).call(this)" style="font-size:10px;color:var(--td);background:none;border:none;cursor:pointer;padding:0" data-i18n="ui.battle.logClosed">📜 Battle Log ▸</button>
     <button id="dl-log-btn" onclick="downloadBattleLog()" style="display:none" data-i18n="ui.battle.download">⬇ Download</button>
   </div>
   <div class="blog" id="blog" style="display:none"></div>
@@ -2470,7 +2583,7 @@ Object.assign(T_EN,{
   'ui.card.levelWord':'Level',
   'ui.card.patronGod':'★ Patron God',
   'ui.card.allyGod':'✦ Ally God',
-  'ui.card.vassal':'Vassal','ui.card.guardian':'Guardian', /* v1538 */
+  'ui.card.vassal':'Vassal','ui.card.guardian':'Guardian','ui.card.defeatedTag':'DEFEATED', /* v1538 · v1548 */
   'ui.card.synergy':'🔗 Elemental Synergy: +{pct}% ATK/MAG/DEF/RES ({n} bonds)',
   'ui.altar.fallen':'Fallen',
   'ui.altar.oblLabel':'Sacred Oblation:',
@@ -2968,12 +3081,12 @@ Object.assign(T_EN,{
   'ui.msg.wiped':'All data wiped. Fresh start.',
   'ui.offering.ballRing':'🏀 Ball Game Ring: +{n} Flowers',
   'ui.battle.chooseAction':'{name} — choose action',
-  'ui.battle.back':'↩ Back',
+  'ui.battle.back':'↩ Back','ui.battle.chooseShort':'choose action','ui.battle.prevSpecial':'Previous special','ui.battle.nextSpecial':'Next special', /* v1545 */
   'ui.battle.strike':'Strike',
   'ui.battle.yourTurn':'✦ YOUR TURN — Select a unit to act',
   'ui.battle.yourTurnHint':'{Tap} any ally in Your Codex that hasn\'t acted yet', /* v1384: matches the YOUR CODEX label */
   'ui.battle.logClosed':'📜 Battle Log ▸',
-  'ui.battle.logOpen':'📜 Battle Log ▾',
+  'ui.battle.logOpen':'📜 Battle Log ▾ <span class="blog-hint">· Scroll down to view ↓</span>',
   'ui.battle.roundBanner':'⚔ Round {n}',
   'ui.battle.cxEnemy':'Enemy codex','ui.battle.cxBoss':'Boss codex','ui.battle.cxAlly':'Your codex', /* v1357 */
   'ui.battle.cxVictory':'Victory!','ui.battle.cxFallen':'{name} has fallen', /* v1366 */
@@ -3555,7 +3668,7 @@ Object.assign(T_ES,{
   'ui.card.levelWord':'Nivel',
   'ui.card.patronGod':'★ Dios patrón',
   'ui.card.allyGod':'✦ Dios aliado',
-  'ui.card.vassal':'Vasallo','ui.card.guardian':'Guardián', /* v1538 */
+  'ui.card.vassal':'Vasallo','ui.card.guardian':'Guardián','ui.card.defeatedTag':'DERROTADO', /* v1538 · v1548 [Genaro] */
   'ui.card.synergy':'🔗 Sinergia Elemental: +{pct}% ATQ/MAG/DEF/RES ({n} vínculos)',
   'ui.altar.fallen':'Caídos',
   'ui.altar.oblLabel':'Oblación Sagrada:',
@@ -4052,12 +4165,12 @@ Object.assign(T_ES,{
   'ui.msg.wiped':'Todos los datos borrados. Empiezas de cero.',
   'ui.offering.ballRing':'🏀 Aro del Juego de Pelota: +{n} Flores',
   'ui.battle.chooseAction':'{name} — elige acción',
-  'ui.battle.back':'↩ Atrás',
+  'ui.battle.back':'↩ Atrás','ui.battle.chooseShort':'elige acción','ui.battle.prevSpecial':'Especial anterior','ui.battle.nextSpecial':'Especial siguiente', /* v1545 */
   'ui.battle.strike':'Golpe',
   'ui.battle.yourTurn':'✦ TU TURNO — Elige una unidad para actuar',
   'ui.battle.yourTurnHint':'{Tap} cualquier aliado de Tu Códice que aún no haya actuado', /* v1384 */
   'ui.battle.logClosed':'📜 Registro de batalla ▸',
-  'ui.battle.logOpen':'📜 Registro de batalla ▾',
+  'ui.battle.logOpen':'📜 Registro de batalla ▾ <span class="blog-hint">· Desplázate hacia abajo para verlo ↓</span>',
   'ui.battle.roundBanner':'⚔ Ronda {n}',
   'ui.battle.cxEnemy':'Códice enemigo','ui.battle.cxBoss':'Códice del jefe','ui.battle.cxAlly':'Tu códice', /* v1357 */
   'ui.battle.cxVictory':'¡Victoria!','ui.battle.cxFallen':'{name} ha caído', /* v1366 */
@@ -7576,7 +7689,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1543'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1555'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -19375,6 +19488,7 @@ function executeStrike(actor,target){
 
 function doPlayerSpecial(useOblation){
   if(G.battlePhase!=='player_selected'||!G.selectedActorId)return;
+  try{G._dockSpec=G._dockSpec||{};G._dockSpec[G.selectedActorId]=useOblation?'obl':'spec';}catch(e){} /* v1545: the arrows reopen on it */
   const actor=G.units.find(u=>u.id===G.selectedActorId);
   if(!actor||actor.currentHp<=0)return;
   if(actor.currentNP<effectiveNpCost(actor)){notify(t('ui.msg.noTp'),'#9050c0');return;}
@@ -19587,12 +19701,13 @@ function triggerCaptureWindow(dead,base,_already){
   const em=ELEM_META[dead.element];
   const isMiniboss=dead.isMiniBoss;
   const canCapture=!!base;
-  const _capW=LANG==='es'?'Capturar':'Capture';const capBtnLabel=isMiniboss?`${_capW} ${dead.icon} (${LANG==='es'?'¡Guardián!':'Guardian!'})`:`${_capW} ${dead.icon}`; /* v1385: ES */
+  const _capW=LANG==='es'?'Capturar':'Capture';const _cSpr='<span class="cap-spr cap-spr-s">'+unitIconHtml(dead,22)+'</span>'; /* v1548 [Genaro]: pixel sprite, not the emoji */
+  const capBtnLabel=isMiniboss?`${_capW} ${_cSpr} (${LANG==='es'?'¡Guardián!':'Guardian!'})`:`${_capW} ${_cSpr}`; /* v1385: ES */
   const capNote=isMiniboss
     ?'<div style="font-size:11px;color:#60a0e0;margin-bottom:4px">'+(LANG==='es'?'✦ Guardián — ¡captúralo para botín extra!':'✦ Guardian — capture for bonus spoils!')+'</div>'
     :'<div style="font-size:12px;color:var(--td);margin-bottom:.6rem">'+(LANG==='es'?'Captura para reclutar, o elimina para obtener recursos extra.':'Capture to recruit, or slay for bonus resources.')+'</div>'; /* v1385 */
-  document.getElementById('cap-area').innerHTML=`<div class="cap-pop">
-    <div style="font-size:13px;font-weight:500;color:#50e090;margin-bottom:4px">${dead.icon} ${dead.name} ${(em&&G.dte.synergyUnlocked)?`<span class="elem-badge ${em.cls}">${em.icon} ${L(em,'label')}</span>`:''}</div>
+  const _capHtml=`<div class="cap-pop">
+    <div class="cap-tag">${t('ui.card.defeatedTag')}</div><div style="font-size:13px;font-weight:500;color:#50e090;margin-bottom:4px"><span class="cap-spr">${unitIconHtml(dead,32)}</span> ${dead.name} ${(em&&G.dte.synergyUnlocked)?`<span class="elem-badge ${em.cls}">${em.icon} ${L(em,'label')}</span>`:''}</div>
     ${mn}
     ${canCapture
       ?`${capNote}<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
@@ -19603,8 +19718,27 @@ function triggerCaptureWindow(dead,base,_already){
         <button class="btn btn-ca btn-slay" onclick="resolveCap('${dead.id}',false)">${slayBtnHtml(dead)}</button>`
     }
   </div>`;
+  /* v1546 [Genaro, battle UI B2]: WHERE the choice appears.
+     - The very first capture of the very first run: this same box, as a centered pop-up over a dimmed screen (the intro).
+     - Every capture after that: Capture / Slay sit on the defeated enemy's own card, and the note moves to the round divider.
+     - Fallback: if that card is not on screen for any reason, the old box -- a capture must never be unreachable. */
+  const _ca=document.getElementById('cap-area');
+  _ca.classList.remove('cap-intro');G._capCard=null;
+  if(capIntroDue()){
+    try{V.capPopSeen='1';saveV();}catch(e){}
+    _ca.innerHTML=_capHtml;_ca.classList.add('cap-intro');renderBattle();return;
+  }
+  G._capCard={id:dead.id,can:canCapture,mini:!!isMiniboss,note:mn+(canCapture?capNote:'<div>'+(LANG==='es'?'No se puede reclutar. Elimina para obtener recursos.':'Cannot recruit. Slay for resources.')+'</div>')};
+  _ca.innerHTML='';
   renderBattle();
-  captureAutoScroll(); // v1154: bring the capture / slay choice on screen
+  const _card=document.querySelector('#screen-battle .uc.cap-pending[data-uid="'+String(dead.id).replace(/"/g,'')+'"]');
+  if(!_card){G._capCard=null;_ca.innerHTML=_capHtml;renderBattle();captureAutoScroll();return;}
+  requestAnimationFrame(function(){try{_asScroll(_card,'nearest');}catch(e){}}); /* only moves if the card is off screen */
+}
+/* v1546: the centered capture pop-up is the run-1 introduction -- shown once, on the first capture of a save's first run. */
+function capIntroDue(){
+  try{if(V&&V.capPopSeen)return false;}catch(e){}
+  try{return DT.teotl===0&&[...DT.unlocked].length===0&&(DT.tecpatl_level||0)===0;}catch(e){return false;}
 }
 
 /* ═══ v1103: ONE capture-reward calculator ════════════════════════════════════
@@ -19672,6 +19806,9 @@ function captureTpRefund(){
 }
 function resolveCap(enemyId,doCapture){
   try{relicTipHide();}catch(e){} // v825: same as handleDeath -- the card is about to be replaced
+  G._capCard=null;{const _ca=document.getElementById('cap-area');if(_ca)_ca.classList.remove('cap-intro');}
+  try{document.body.classList.remove('cap-focus');}catch(e){} /* v1547 */
+  try{document.querySelectorAll('.uc.cap-pending button').forEach(b=>{b.disabled=true;});}catch(e){} /* v1546: one choice per card, even on a double-click */
   const dead=G.enemies.find(u=>u.id===enemyId);
   document.getElementById('cap-area').innerHTML='';
   const allCaps=[...MICTLAN_CAPS,...TEPEME_CAPS,...OBSIDIAN_CAPS,...NATURE_CAPS,...HUMANITY_CAPS,...CEHUYLOAN_WATER_CAPS,...CEHUYLOAN_WIND_CAPS,...TONATIUH_DAY_CAPS,...PANCUET_FIRE_CAPS,...PANCUET_WIND_CAPS,...TEMIMINA_WATER_CAPS,...TEMIMINA_HUMAN_CAPS,...TEYOLLO_NATURE_CAPS,...TEYOLLO_DAY_CAPS,...APANO_NIGHT_CAPS,...APANO_THUNDER_CAPS];
@@ -25428,6 +25565,7 @@ function renderBattle(){try{amoxScanSeen();}catch(_amx){} /* v1440 */
   document.getElementById('phase-ban').textContent=bt;
   const _isL5=G.layer===5;
   document.getElementById('phase-ban').style.borderColor=G.battleNum===8?'#8b2020':G.battleNum===5?(_isL5?'#8a4010':isL4?'#204080':isL3?'#4a3a8a':isL2?'#5a4a10':'#2a6a8a'):'#3a3a6a';
+  {const _cp=document.getElementById('cx-phase');if(_cp){_cp.textContent=bt;_cp.style.borderColor=document.getElementById('phase-ban').style.borderColor;}} /* v1555: the same label, on the round divider */
   // Enemies
   const er=document.getElementById('erow');
   // Patch existing enemy cards in-place to avoid icon flicker
@@ -25466,6 +25604,16 @@ function renderBattle(){try{amoxScanSeen();}catch(_amx){} /* v1440 */
     return (e&&e.id&&e.id.indexOf('boss_cipactli_')===0)?_cipWrap:_hostWrap;
   };
   G.enemies.forEach(e=>{
+    if(e.currentHp<=0&&G._capCard&&G._capCard.id===e.id){ /* v1546: capture / slay on the card */
+      const d=document.createElement('div');
+      d.className='uc cap-pending'+(e.isMiniBoss?' miniboss':'');d.dataset.uid=e.id;
+      const _em=ELEM_META[e.element],_cw=LANG==='es'?'Capturar':'Capture';
+      d.innerHTML=`<div class="uc-lvtag"><span>${lvAb()}${e.enemyLevel||1}</span>${_em?`<span style="font-size:14px;vertical-align:middle;margin-left:3px">${_em.icon}</span>`:''}</div>`
+        +`<div class="cap-artw"><div class="cap-art">${unitIconHtml(e,64)}</div><span class="cap-ribbon">${t('ui.card.defeatedTag')}</span></div>` /* v1548 [Genaro]: greyed art + DEFEATED (v1547 dropped the skull) */
+        +`<div class="uc-name">${e.name}</div>`
+        +`<div class="cap-btns">${G._capCard.can?`<button class="btn btn-cap" onclick="resolveCap('${e.id}',true)">${_cw}${G._capCard.mini?' ✦':''}</button>`:''}<button class="btn btn-ca btn-slay cap-slay" onclick="resolveCap('${e.id}',false)">${slayBtnHtml(e)}</button></div>`;
+      if(_erSync){_erBuilt.push(d);return;} _placeCip(d,e);_dest(e).appendChild(d);return;
+    }
     if(e.currentHp<=0){
       const st=G._unitStates[e.id]||'slain';
       const d=document.createElement('div');
@@ -25653,8 +25801,19 @@ function renderBattle(){try{amoxScanSeen();}catch(_amx){} /* v1440 */
    add the panel's own padding and border, and use that. The result is exactly wide enough
    for Strike / Special / Oblated on one line and no wider, then centred under the card and
    clamped so it never runs off either edge. The special description wraps inside it. */
+/* v1544: which special's details the dock shows -- '' hides them */
+function dockDesc(btn,k){try{const d=btn&&btn.closest('.act-dock');if(!d)return;if(k)d.setAttribute('data-dk',k);else d.removeAttribute('data-dk');}catch(e){}}
+window.dockDesc=dockDesc;
+/* v1545: step the special slot. Only the shown one is visible, so its hover handlers drive the description as before. */
+function dockCycle(btn,dir){try{const d=btn&&btn.closest('.act-dock');if(!d)return;
+  const ks=[...d.querySelectorAll('.cyc-item')].map(b=>b.getAttribute('data-k'));if(ks.length<2)return;
+  const i=ks.indexOf(d.getAttribute('data-sel')),nk=ks[(i+dir+ks.length)%ks.length];
+  d.setAttribute('data-sel',nk);d.removeAttribute('data-dk');
+  if(G&&G.selectedActorId){G._dockSpec=G._dockSpec||{};G._dockSpec[G.selectedActorId]=nk;}}catch(e){}}
+window.dockCycle=dockCycle;
 function alignActPanel(){
   const el=document.getElementById('act-panel-area');if(!el)return;
+  if(el.querySelector('.act-dock')||document.body.classList.contains('codex-ui')){el.style.width='';el.style.maxWidth='';el.style.marginLeft='';return;} /* v1544: the dock is full width · v1549: so is every panel in the pinned slot */
   const sel=G.selectedActorId?document.querySelector(`[data-uid="${G.selectedActorId}"]`):null;
   if(!sel||!['player_selected','player_targeting','player_ally_targeting','player_aoe_targeting'].includes(G.battlePhase)){
     el.style.width='';el.style.maxWidth='';el.style.marginLeft='';return; // full width (turn-start prompt etc.)
@@ -25780,7 +25939,9 @@ let _apEpoch=-1;
    whole board 25px down and back every enemy turn. Same ratchet. */
 function apHeightRatchet(){
   const reset=_apEpoch!==BATTLE_EPOCH;_apEpoch=BATTLE_EPOCH;
-  ['act-panel-area','action-msg'].forEach(function(id){const el=document.getElementById(id);if(!el)return;
+  /* v1549: with the bar pinned, the action area has ONE fixed height in codex UI (CSS) -- a ratcheted min-height there would pin
+     the tallest panel of the battle over the party cards. Off codex UI it still ratchets as v1534 did. */
+  (document.body.classList.contains('codex-ui')?['action-msg']:['act-panel-area','action-msg']).forEach(function(id){const el=document.getElementById(id);if(!el)return;
     if(reset){el.style.minHeight='';el._apMax=0;}
     const h=el.scrollHeight;if(h>(el._apMax||0)){el._apMax=h;el.style.minHeight=h+'px';}});
 }
@@ -25789,7 +25950,10 @@ window.addEventListener('resize',function(){_apEpoch=-1;});
 /* v1542: one cancel for every target-picking phase -- used by the panel buttons' twin in the divider, Esc and right-click. */
 const TGT_PHASES=['player_targeting','player_aoe_targeting','player_ally_targeting'];
 function cancelTargeting(){
-  if(typeof G==='undefined'||!G||!TGT_PHASES.includes(G.battlePhase))return false;
+  if(typeof G==='undefined'||!G)return false;
+  /* v1544: from the action menu itself, the same gesture steps back to choosing a unit (Back moved to the divider) */
+  if(G.battlePhase==='player_selected'&&G.selectedActorId){G.selectedActorId=null;G.battlePhase='player_choose';try{setB1Hint('');}catch(e){}renderBattle();return true;}
+  if(!TGT_PHASES.includes(G.battlePhase))return false;
   G.pendingAction=null;G.aoeSelected=[];G.aoeCap=0;G.battlePhase='player_selected';
   try{setB1Hint('');}catch(e){}
   renderBattle();return true;
@@ -25797,15 +25961,26 @@ function cancelTargeting(){
 window.cancelTargeting=cancelTargeting;
 /* v1542 [Genaro: "the cancel button is usually offscreen"]: a Cancel chip beside YOUR TURN on the round divider. The divider sits
    between the two codices, so it is on screen whenever the enemies are -- which is exactly when you are picking a target. */
+/* v1546: while Capture / Slay sits on a card, its note rides the round divider -- in the middle of the screen, never above it */
+function cxCapNote(){
+  try{document.body.classList.toggle('cap-focus',!!G._capCard);}catch(e){} /* v1547 */
+  const fold=document.getElementById('cx-fold');if(!fold)return;
+  const host=fold.querySelector('span');let n=document.getElementById('cx-capnote');
+  if(!(G._capCard&&G._capCard.note)){if(n)n.style.display='none';return;}
+  if(!host)return;
+  if(!n||n.parentNode!==host){if(n)n.remove();n=document.createElement('span');n.id='cx-capnote';n.className='cx-capnote';host.appendChild(n);}
+  n.innerHTML=G._capCard.note;n.style.display='';
+}
 function cxCancelChip(){
   const fold=document.getElementById('cx-fold');if(!fold)return;
   const host=fold.querySelector('span');let b=document.getElementById('cx-cancel');
-  const on=TGT_PHASES.includes(G.battlePhase);
+  const back=G.battlePhase==='player_selected'&&!!G.selectedActorId; /* v1544 */
+  const on=back||TGT_PHASES.includes(G.battlePhase);
   if(!on){if(b)b.style.display='none';return;}
   if(!host)return;
   if(!b||b.parentNode!==host){if(b)b.remove();b=document.createElement('button');b.id='cx-cancel';b.type='button';b.className='cx-cancel';
     b.onclick=function(e){e.stopPropagation();cancelTargeting();};host.appendChild(b);}
-  b.innerHTML='↩ '+t('ui.common.cancel')+' <kbd>Esc</kbd>';b.style.display='';
+  b.innerHTML=(back?t('ui.battle.back'):'↩ '+t('ui.common.cancel'))+' <kbd>Esc</kbd>';b.style.display='';
 }
 document.addEventListener('keydown',function(e){
   if(e.key!=='Escape')return;
@@ -25824,6 +25999,7 @@ function renderActionPanel(){
   requestAnimationFrame(apHeightRatchet); // v1534
   battleAutoScroll(); // v1154
   try{cxCancelChip();}catch(e){} // v1542
+  try{cxCapNote();}catch(e){} // v1546
   // Clear for any non-interactive phases — prevents stale Cancel button from targeting phase
   if(!['player_choose','player_selected','player_targeting','player_ally_targeting','player_aoe_targeting'].includes(G.battlePhase)){el.innerHTML='';return;}
   if(G.battlePhase==='player_choose'){
@@ -26085,19 +26261,31 @@ function renderActionPanel(){
     const specSub=(G.dte.dmgPreview&&specLine2)
       ?'<div style="font-size:10px;color:'+specCostCol+';margin-top:1px">'+prevLoc(specLine2)+'</div>'
       :'<div style="font-size:10px;color:'+specCostCol+';margin-top:1px">'+t('ui.battle.specCost',{n:effCost})+'</div>';
-    el.innerHTML=`<div class="act-panel">
-      <div class="act-panel-title act-head"><span>${t('ui.battle.chooseAction',{name:liveName(actor)})}</span><button class="btn act-back" onclick="G.selectedActorId=null;G.battlePhase='player_choose';renderBattle();">${t('ui.battle.back')}</button></div>
+    /* v1544 [Genaro, battle UI B2]: the action panel is a one-row DOCK -- who is acting | Strike, Special (+ oblated special) |
+       the hovered special's details. Descriptions only show while that special's button is hovered or focused (dockDesc);
+       touch-only screens have no hover, so there the native special's details show by default (CSS). Back moved to the
+       round divider (cxCancelChip) in codex UI; the dock keeps its own Back button only when the divider is not shown. */
+    /* v1545 [Genaro, battle UI B2]: a unit with more than one special (today: the oblated patron) gets ONE special slot with
+       arrows -- the hidden one is still in the DOM, just not shown. Which one shows is remembered per unit (G._dockSpec),
+       and firing a special stores it, so the next turn opens on whatever the unit used last. */
+    const _hasObl=!!(actor.isGod&&G._oblationAk&&actor.id===('god_'+G.god?.id));
+    const _sel=(_hasObl&&G._dockSpec&&G._dockSpec[actor.id]==='obl')?'obl':'spec';
+    el.innerHTML=`<div class="act-panel act-dock" data-sel="${_sel}">
+      <div class="dock-who"><span class="dock-nm" title="${liveName(actor)}">${liveName(actor)}</span><span class="dock-sub">${t('ui.battle.chooseShort')}</span><button class="btn act-back" onclick="G.selectedActorId=null;G.battlePhase='player_choose';renderBattle();">${t('ui.battle.back')}</button></div>
       <div class="act-btns">
         <button class="btn btn-strike" onclick="doPlayerStrike()" style="line-height:1.35">
           <div>💥 ${t('ui.battle.strike')} ${strikeEmoji}</div>${strikeSub}
         </button>
-        <button class="btn btn-special" onclick="doPlayerSpecial()" ${canSpecial?'':'disabled'} style="line-height:1.35;opacity:${canSpecial?1:0.45}">
+        ${_hasObl?`<div class="dock-cyc"><button type="button" class="btn cyc-arw" aria-label="${t('ui.battle.prevSpecial')}" onclick="dockCycle(this,-1)"><svg width="10" height="14" viewBox="0 0 10 14" aria-hidden="true"><path d="M8 2L3 7l5 5" fill="none" stroke="currentColor" stroke-width="2.4"/></svg></button>`:''}
+        <button class="btn btn-special cyc-item" data-k="spec" onclick="doPlayerSpecial()" ${canSpecial?'':'disabled'} onmouseenter="dockDesc(this,'spec')" onmouseleave="dockDesc(this,'')" onfocus="dockDesc(this,'spec')" onblur="dockDesc(this,'')" style="line-height:1.35;opacity:${canSpecial?1:0.45}">
           <div>🔮 ${specLabel||'Special'} ${isHealSpec?'❤️':(_pvo?_pvo.s==='mag':specIsMagic(actor))?'🪄':'🗡️'}</div>
           ${specSub}
         </button>
-        ${(()=>{if(!(actor.isGod&&G._oblationAk&&actor.id===('god_'+G.god?.id)))return '';const oblCost=oblationNpCost(actor);const canOb=actor.currentNP>=oblCost;const oblLabel=G._oblationAbility||'Oblated';/* v1030: estimate the OBLATED special exactly as the native one is estimated a few lines above. Now that the v1030 MIX flip gives the patron a REAL stat for the borrowed ability, the same base*mult-def arithmetic applies with no special-casing. */var _oblSub='';try{var _oak=G._oblationAk;var _oMag=(oblationSpecStat(_oak)==='mag');var _obase=_oMag?(actor.mag||0):(actor.atk||0);var _ot=(typeof ae!=='undefined'&&ae&&ae.length)?ae[0]:null;var _odef=_ot?(_oMag?(_ot.res||0):(_ot.def||0)):0;var _oboost=G.dte.specialBoostMult||1;var _OGM={'deluge':1.35,'tlalocanDeluge':1.35,'obsidianStorm':1.25,'aurumBreak':1.5,'frostMacuahuitl':1.5,'cihuateteoFury':0.6,'cripplingShock':0.6,'featherEmbrace':1.5,'godbaneBlowgun':0.5,'mictlanClaspPlayer':0.5,'octliDrench':1.5,'oldFire':1.6,'seismicRoar':1.5,'sinistralMinacachalli':1.2,'zappingStrike':1.1,'torridTornado':0.55,'torridTornadoBoss':0.6,'fieryStinger':1.5,'ixiptlatliBloom':1.1,'xiuhcoatlMight':0.5};var _OGH={'torridTornado':4,'torridTornadoBoss':5,'cripplingShock':4,'godbaneBlowgun':5,'xiuhcoatlMight':3,'cihuateteoFury':4};var _OGF={};/* v1502: no god handler adds a flat bonus (audit) */var _omult=_OGM[_oak]||1;var _oflat=(_OGF[_oak]!==undefined?_OGF[_oak]:0);/* mixBurnPenalty/burnPenalty are block-scoped to the estimate branch above and are NOT visible here -- referencing them threw into the catch and the preview silently degraded to a bare cost. Computed inline instead, matching that branch's rule: MIX takes the reduced penalty. */var _obp=((actor.burnStacks||0)>0)?(1-Math.min(actor.burnStacks,4)*(actor.type==='MIX'?0.15:0.15)):1;if((()=>{const _oa=String(G._oblationAd||''),_os=/data-sty="(\w+)"/.exec(_oa);if(_os)return _os[1]==='SUP';return healAbilities.has(G._oblationAbility)||/heal|cleanse|restore/i.test(_oa);})()){/* v1375: was a text regex -- "restores 10% TP" made Xiuhcoatl Might a heal; the block's own type decides now */_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">💚 Heal · '+oblCost+' TP</div>';}else if(_ot){var _olo=Math.max(1,Math.round(((_obase*_omult)+_oflat-_odef*0.4-2)*_oboost*_obp));var _ohi=Math.max(1,Math.round(((_obase*_omult)+_oflat-_odef*0.4+2)*_oboost*_obp));var _ohits=_OGH[_oak]||1;_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">'+(_ohits>1?(_ohits+'× '):'')+'~'+_olo+'–'+_ohi+' '+(_oMag?'🪄 MAG':'🗡️ ATK')+(_ohits>1?' hits':'')+' · '+oblCost+' TP</div>';}}catch(e){}if(!_oblSub)_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">Cost '+oblCost+' TP</div>';return '<button class=\"btn btn-special\" onclick=\"doPlayerSpecial(true)\"'+(canOb?'':' disabled')+' style=\"line-height:1.35;opacity:'+(canOb?1:0.45)+'\"><div>✟ '+oblLabel+'</div>'+_oblSub+'</button>';})()}
+        ${(()=>{if(!(actor.isGod&&G._oblationAk&&actor.id===('god_'+G.god?.id)))return '';const oblCost=oblationNpCost(actor);const canOb=actor.currentNP>=oblCost;const oblLabel=G._oblationAbility||'Oblated';/* v1030: estimate the OBLATED special exactly as the native one is estimated a few lines above. Now that the v1030 MIX flip gives the patron a REAL stat for the borrowed ability, the same base*mult-def arithmetic applies with no special-casing. */var _oblSub='';try{var _oak=G._oblationAk;var _oMag=(oblationSpecStat(_oak)==='mag');var _obase=_oMag?(actor.mag||0):(actor.atk||0);var _ot=(typeof ae!=='undefined'&&ae&&ae.length)?ae[0]:null;var _odef=_ot?(_oMag?(_ot.res||0):(_ot.def||0)):0;var _oboost=G.dte.specialBoostMult||1;var _OGM={'deluge':1.35,'tlalocanDeluge':1.35,'obsidianStorm':1.25,'aurumBreak':1.5,'frostMacuahuitl':1.5,'cihuateteoFury':0.6,'cripplingShock':0.6,'featherEmbrace':1.5,'godbaneBlowgun':0.5,'mictlanClaspPlayer':0.5,'octliDrench':1.5,'oldFire':1.6,'seismicRoar':1.5,'sinistralMinacachalli':1.2,'zappingStrike':1.1,'torridTornado':0.55,'torridTornadoBoss':0.6,'fieryStinger':1.5,'ixiptlatliBloom':1.1,'xiuhcoatlMight':0.5};var _OGH={'torridTornado':4,'torridTornadoBoss':5,'cripplingShock':4,'godbaneBlowgun':5,'xiuhcoatlMight':3,'cihuateteoFury':4};var _OGF={};/* v1502: no god handler adds a flat bonus (audit) */var _omult=_OGM[_oak]||1;var _oflat=(_OGF[_oak]!==undefined?_OGF[_oak]:0);/* mixBurnPenalty/burnPenalty are block-scoped to the estimate branch above and are NOT visible here -- referencing them threw into the catch and the preview silently degraded to a bare cost. Computed inline instead, matching that branch's rule: MIX takes the reduced penalty. */var _obp=((actor.burnStacks||0)>0)?(1-Math.min(actor.burnStacks,4)*(actor.type==='MIX'?0.15:0.15)):1;if((()=>{const _oa=String(G._oblationAd||''),_os=/data-sty="(\w+)"/.exec(_oa);if(_os)return _os[1]==='SUP';return healAbilities.has(G._oblationAbility)||/heal|cleanse|restore/i.test(_oa);})()){/* v1375: was a text regex -- "restores 10% TP" made Xiuhcoatl Might a heal; the block's own type decides now */_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">💚 Heal · '+oblCost+' TP</div>';}else if(_ot){var _olo=Math.max(1,Math.round(((_obase*_omult)+_oflat-_odef*0.4-2)*_oboost*_obp));var _ohi=Math.max(1,Math.round(((_obase*_omult)+_oflat-_odef*0.4+2)*_oboost*_obp));var _ohits=_OGH[_oak]||1;_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">'+(_ohits>1?(_ohits+'× '):'')+'~'+_olo+'–'+_ohi+' '+(_oMag?'🪄 MAG':'🗡️ ATK')+(_ohits>1?' hits':'')+' · '+oblCost+' TP</div>';}}catch(e){}if(!_oblSub)_oblSub='<div style=\"font-size:10px;color:#a060e0;margin-top:1px\">Cost '+oblCost+' TP</div>';return '<button class=\"btn btn-special cyc-item\" data-k=\"obl\" onclick=\"doPlayerSpecial(true)\" onmouseenter=\"dockDesc(this,\'obl\')\" onmouseleave=\"dockDesc(this,\'\')\" onfocus=\"dockDesc(this,\'obl\')\" onblur=\"dockDesc(this,\'\')\"'+(canOb?'':' disabled')+' style=\"line-height:1.35;opacity:'+(canOb?1:0.45)+'\"><div>🔮 '+oblLabel+' '+(HEAL_ABILITIES.has(G._oblationAk)||HEAL_ABILITIES.has(G._oblationAbility)?'❤️':(oblationSpecStat(G._oblationAk)==='mag'?'🪄':'🗡️'))+'</div>'+prevLoc(_oblSub)+'</button>';})()}
+        ${_hasObl?`<button type="button" class="btn cyc-arw" aria-label="${t('ui.battle.nextSpecial')}" onclick="dockCycle(this,1)"><svg width="10" height="14" viewBox="0 0 10 14" aria-hidden="true"><path d="M2 2l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.4"/></svg></button><span class="cyc-dots" aria-hidden="true"><i data-k="spec"></i><i data-k="obl"></i></span></div>`:''}
       </div>
-      ${specDesc?`<div style="font-size:11px;color:#5a7a9a;margin-top:6px;padding-top:5px;border-top:0.5px solid #2a3a4a">${/data-sty="/.test(String(specDesc))?`<div class="sf-hd"><span class="sf-nm">${specLabel}</span></div><div class="sf-bd">${specDesc}</div>`:`🔮 ${isHealSpec?'❤️':specIsMagic(actor)?'🪄':'🗡️'} <em>${specLabel}</em>: ${specDesc}`}</div>`:''}
+      <div class="dock-desc">
+      ${specDesc?`<div class="dk-pane" data-dk="spec">${/data-sty="/.test(String(specDesc))?`<div class="sf-bd">${specDesc}</div>`:specDesc}</div>`:''}
       ${(()=>{
         /* v1248: the oblated special had a button but no description line, so the borrowed
            ability was the only action on the panel you could not read. Same gate as the button.
@@ -26109,8 +26297,9 @@ function renderActionPanel(){
         const _oName=(_og&&_og.ability)||G._oblationAbility||'';
         const _oDesc=(_og&&_og.ad)||G._oblationAd||'';
         if(!_oDesc)return '';
-        return `<div style="font-size:11px;color:#8a6ab0;margin-top:4px">✟ <em>${_oName}</em>: ${_oDesc}</div>`;
+        return `<div class="dk-pane" data-dk="obl" style="color:#b09ad0">${_oDesc}</div>`; /* v1544: name is on its button */
       })()}
+      </div>
     </div>`;
     return;
   }
@@ -28292,7 +28481,7 @@ function buildEditPartyRows(){
     const slotsFull=G.deplSel.length>=ma;
     const disabled=!inParty&&slotsFull;
     const lv=getLevel(uid);
-    const uType=unitTypeLbl(u.type||(u.mag>0?'MAG':'PHYS'));
+    const uType=unitTypeLbl(u.type||(u.godData&&u.godData.type)||(u.mag>0?'MAG':'PHYS')); /* v1554: ally gods carry no type/mag in the pool, so every god read FÍS (Tlaloc is MAG) */
     /* v984: deploying a unit that is sitting in the Sacrifice Slot clears the slot on the spot.
        Previously both showed it until the modal was reopened. Deployment wins -- you cannot
        fight with a unit you have already promised to the sun. */
