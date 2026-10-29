@@ -454,6 +454,11 @@ body.codex-ui .cx-fold::before,body.codex-ui .cx-fold::after{content:"";flex:1;h
 body.codex-ui .cx-fold>span{white-space:nowrap;display:inline-flex;align-items:center}
 .cx-turn{display:none;margin-left:10px;padding:2px 9px;border-radius:5px;font-size:12px;font-weight:700;letter-spacing:1.2px;line-height:1.4;border:1px solid}
 .cx-turn-you{display:inline-block;color:#7af0a8;background:#0e2e1c;border-color:#2e8a52;box-shadow:0 0 8px #2e8a5266}
+.cx-cancel{margin-left:8px;padding:2px 10px;border-radius:5px;font:inherit;font-size:12px;font-weight:700;letter-spacing:1px;line-height:1.4;cursor:pointer;
+  color:#f0d080;background:#2a2008;border:1px solid #8a6a10;box-shadow:0 0 8px #8a6a1066} /* v1542 */
+.cx-cancel:hover{background:#3a2c0c;color:#ffe9a0}
+.cx-cancel kbd{font:inherit;font-size:9px;opacity:.6;margin-left:4px;padding:0 3px;border:1px solid currentColor;border-radius:3px}
+@media (hover:none) and (pointer:coarse){.cx-cancel kbd{display:none}} /* v1543 [Genaro]: no Esc hint on phones/iPads -- touch-only devices have no Esc key */
 .cx-turn-enemy{display:inline-block;color:#ff9a8a;background:#2e1210;border-color:#a0382c;box-shadow:0 0 8px #a0382c66} /* v1385 */
 /* v1390: Gamepalooza -- the tag read as static, so a side change was easy to miss.
    (1) the tag pops in on every swap, (2) YOUR TURN breathes while it waits for input,
@@ -557,7 +562,7 @@ body.codex-ui .cx-page>.row-lbl{top:-2px;z-index:6}
 .choice-card{border-color:transparent!important;padding:calc(.9rem + 10px)}
 .choice-card.easy{--gkc:#3a9a5a}.choice-card.hard{--gkc:#b04040}.choice-card.event{--gkc:#c8a030}
 .party-chips{border-color:transparent;padding:calc(.6rem + 10px) calc(.6rem + 12px)}
-.gk-ware{border-color:transparent!important;padding:20px 16px!important}
+.gk-ware{border-color:transparent!important;padding:28px 28px 24px!important} /* v1535: the fret is 24px wide -- 16px side padding put the text under it (worst in Spanish) */
 /* v1371: LIGHT greca variant (single rail, short hooked fret, square corners) -- a subordinate of the
    chunky page frame. Roster box: replaces the heavy frame so it no longer crowds the party slots.
    Battle unit cards (codex mode): replaces the traced v1130 frame; colour is still --fc, the turn-state channel. */
@@ -1758,7 +1763,7 @@ body.fx-min .bless-spark{display:none}
     <div class="debug-row" style="flex-wrap:wrap"><div><div style="font-size:12px;color:#a888e0">✦ Boss Hints (v1409)</div><div style="font-size:10px;color:#a070c0">Auto-lose ends any B5/B8 boss fight on start. Jump, lose twice, see the hint.</div><div id="dbg-bosshint-state" style="font-size:10px;color:#c0a0e0;margin-top:2px">Streak: none · auto-lose OFF</div></div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px"><button id="dbg-autolose-btn" class="btn btn-debug" onclick="dbgToggleAutoLoseBoss()" style="font-size:11px;padding:4px 9px">Auto-lose: OFF</button><select id="dbg-bosshint-layer" title="Layer" style="font-size:11px;padding:3px 6px;background:#1a0a2a;border:0.5px solid #4a2a6a;color:#c0a0e0;border-radius:6px"><option value="1">L1</option><option value="2">L2</option><option value="3">L3</option><option value="4">L4</option><option value="5">L5</option><option value="6">L6</option><option value="7">L7</option><option value="8">L8</option><option value="9">L9</option></select><button class="btn btn-debug" onclick="dbgBossHintJump(5)" style="font-size:11px;padding:4px 9px">Jump B5</button><button class="btn btn-debug" onclick="dbgBossHintJump(8)" style="font-size:11px;padding:4px 9px">Jump B8</button><button class="btn btn-debug" onclick="dbgBossHintReset()" style="font-size:11px;padding:4px 9px">Reset streak</button><select id="dbg-bosshint-key" title="Hint to preview" style="font-size:11px;padding:3px 6px;background:#1a0a2a;border:0.5px solid #4a2a6a;color:#c0a0e0;border-radius:6px"><option value="L1-B5">L1-B5</option><option value="L1-B8">L1-B8</option><option value="L2-B5">L2-B5</option><option value="L2-B8">L2-B8</option><option value="L3-B5">L3-B5</option><option value="L3-B8">L3-B8</option><option value="L4-B5">L4-B5</option><option value="L4-B8">L4-B8</option><option value="L5-B5">L5-B5</option><option value="L5-B8-malinalxochitl">L5-B8-malinalxochitl</option><option value="L5-B8-xiuhtecuhtli">L5-B8-xiuhtecuhtli</option><option value="L6-B5">L6-B5</option><option value="L6-B8">L6-B8</option><option value="L7-B5">L7-B5</option><option value="L7-B8">L7-B8</option><option value="L8-B5">L8-B5</option><option value="L8-B8">L8-B8</option><option value="L9-B5">L9-B5</option><option value="L9-B8">L9-B8</option></select><button class="btn btn-debug" onclick="dbgBossHintPreview()" style="font-size:11px;padding:4px 9px">Preview</button></div></div>
     <div class="debug-row"><div><div style="font-size:12px;color:#d4af37">📜 Codex Battle UI</div><div style="font-size:10px;color:#a070c0">Codex pages, round fold, acted tag (test toggle, remembered)</div></div><button id="dbg-codexui-btn" class="btn btn-debug" onclick="debugToggleCodexUI()" style="font-size:11px;padding:4px 10px">Codex UI: OFF</button></div>
     <div class="debug-row"><div><div style="font-size:12px;color:#e0a040">🍺 DRUNK Misfire Test</div><div style="font-size:10px;color:#a070c0">Test Battle: instant random battle, everyone Drunk ×2 &middot; Apply: drunk a battle already in progress</div></div><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-debug" onclick="debugDrunkBattle()" style="font-size:11px;padding:4px 10px;background:#2a1a0a;border-color:#8a5010;color:#e0a040">⚔️ Test Battle</button><button class="btn btn-debug" onclick="debugDrunkAll()" style="font-size:11px;padding:4px 10px">🍺 Apply</button></div></div>
-    <div class="debug-row"><div><div style="font-size:12px;color:#b090e0">⚡ BELIC RUSH Test</div><div style="font-size:10px;color:#a070c0">Mixcoatl patron + Tlapetlanmichin / Void Xolo / Spirit Hound / Xolo Guardian / Xolotl vs 6 foes, full TP, party pre-damaged &amp; statused &middot; Audit logs each cascaded action's target count against the ability's cap</div></div><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-debug" onclick="debugBelicRushBattle()" style="font-size:11px;padding:4px 10px;background:#1a0a2a;border-color:#6a40a0;color:#c0a0ff">⚡ Test Battle</button><button id="dbg-belicaudit-btn" class="btn btn-debug" onclick="debugToggleBelicAudit()" style="font-size:11px;padding:4px 10px">Audit: OFF</button></div></div>
+    <div class="debug-row"><div><div style="font-size:12px;color:#b090e0">⚡ BELIC RUSH Test</div><div style="font-size:10px;color:#a070c0">Mixcoatl patron + Tlapetlanmichin / Void Xolo / Spirit Hound / Xolo Sentinel / Xolotl vs 6 foes, full TP, party pre-damaged &amp; statused &middot; Audit logs each cascaded action's target count against the ability's cap</div></div><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-debug" onclick="debugBelicRushBattle()" style="font-size:11px;padding:4px 10px;background:#1a0a2a;border-color:#6a40a0;color:#c0a0ff">⚡ Test Battle</button><button id="dbg-belicaudit-btn" class="btn btn-debug" onclick="debugToggleBelicAudit()" style="font-size:11px;padding:4px 10px">Audit: OFF</button></div></div>
     <div class="debug-row"><div style="font-size:12px">✦ Ometeotl Blessing</div><div style="display:flex;gap:4px;flex-wrap:wrap">
       <button class="btn btn-debug" onclick="debugCycleBlessing()" style="font-size:11px;padding:4px 8px">Next god</button>
       <button class="btn btn-debug" onclick="debugRerollBlessing()" style="font-size:11px;padding:4px 8px">Reroll</button>
@@ -2465,7 +2470,7 @@ Object.assign(T_EN,{
   'ui.card.levelWord':'Level',
   'ui.card.patronGod':'★ Patron God',
   'ui.card.allyGod':'✦ Ally God',
-  'ui.card.vassal':'Vassal',
+  'ui.card.vassal':'Vassal','ui.card.guardian':'Guardian', /* v1538 */
   'ui.card.synergy':'🔗 Elemental Synergy: +{pct}% ATK/MAG/DEF/RES ({n} bonds)',
   'ui.altar.fallen':'Fallen',
   'ui.altar.oblLabel':'Sacred Oblation:',
@@ -2617,7 +2622,7 @@ Object.assign(T_EN,{
   'ui.deploy.easier':'Easier Path',
   'ui.deploy.harder':'Harder Path',
   'ui.deploy.harderDesc':'+20% Blood & Cacao.',
-  'ui.deploy.miniBossTag':'[Mini-Boss]',
+  'ui.deploy.miniBossTag':'[Guardian]',
   'ui.ev.offerVitality':'Offer your vitality to the flame',
   'ui.ev.offerVitalityCost':'(−60% patron HP) Patron god gains +5 permanent levels',
   'ui.ev.flameDrinks':'The flame drinks deep.',
@@ -2829,7 +2834,7 @@ Object.assign(T_EN,{
   'ui.amox.pantheonDone':'The Pantheon is conquered — every god has reclaimed Mictlan',
   'ui.sb.godAffinity':'God Affinity',
   'ui.sb.godHealth':'God Health Boost',
-  'ui.sb.vassalHealth':'Vassal Health Boost',
+  'ui.sb.vassalHealth':'Vassal & Guardian HP Boost',
   'ui.sb.pantheon':'Pantheon Boost',
   'ui.sb.divineStr':'Divine Strength',
   'ui.sb.othersDep1':'{n} other god deployed',
@@ -2907,7 +2912,7 @@ Object.assign(T_EN,{
   'ui.msg.patronCap':'Cannot surpass your patron\'s power',
   'ui.msg.oblateLv':'God must be at least Lv{n} to oblate!',
   'ui.msg.releasedMany':'🕊 Released {n} units — +{b} 🩸 +{c} 🫘',
-  'ui.msg.miniNext':'⚔ A Mini-boss guards the next battle!',
+  'ui.msg.miniNext':'⚔ A Guardian protects the next battle!',
   'ui.msg.bossNext':'💀 The Layer Boss awaits beyond the Tianguis!',
   'ui.msg.warnOff':'⚠ Pre-battle warning disabled',
   'ui.msg.warnOn':'⚠ Pre-battle warning enabled',
@@ -2920,7 +2925,7 @@ Object.assign(T_EN,{
   'ui.msg.pochtecaEmpty':'The Pochteca has nothing else to offer.',
   'ui.msg.waresRerolled':'Wares rerolled',
   'ui.msg.recordFull':'Already recorded 3 vassals',
-  'ui.msg.noCloneMini':'Mini-bosses cannot be cloned',
+  'ui.msg.noCloneMini':'Guardians cannot be cloned',
   'ui.msg.oneClone':'Only one clone at a time',
   'ui.msg.alreadyUnlocked':'Already unlocked!',
   'ui.msg.prereqFirst':'Unlock prerequisites first',
@@ -3003,7 +3008,7 @@ Object.assign(T_EN,{
   'ui.altar.deployedNote':'⚔ Units in the battle party cannot be sacrificed',
   'ui.pochteca.intro':'💎 The Wandering Pochteca lays out his wares. Effects apply at the start of each battle and persist for the run.',
   'ui.dtIntro.title':'Divinity Tree Unlocked!','ui.dtIntro.body':'Each run you earn <span style="color:#60c0ff;font-weight:600"><svg class="tl tl-teotl"><use href="#tl-teotl"/></svg> TEOTL</span> — the sacred power of the gods — based on how far you advance.<br><br>Spend TEOTL here to permanently strengthen your next run. Upgrades carry over across all future runs, so every attempt makes you stronger.<br><br><span style="color:#d4af37;font-size:12px;font-style:italic">The gods reward those who persist.</span>','ui.dtIntro.ok':"I'm ready", /* v1381 */
-  'ui.pochteca.firstFree':'🎁 Your first purchase is free!','ui.pochteca.free':'Free!', /* v1372 */
+  'ui.pochteca.firstFree':'🎁 Your first purchase is free!','ui.pochteca.free':'Free!','ui.pochteca.acquired':'Acquired ✦', /* v1372 · v1535 */
   'ui.pochteca.introTitle':'The Pochteca Has Arrived',
   'ui.pochteca.introBody':'A wandering merchant has set up in the Tianguis under the <strong>✨ Special</strong> tab. He sells <strong style="color:#c0e060">Offerings</strong> — relics that boost your party for the rest of the run. They apply automatically at the start of every battle.',
   'ui.pochteca.introXochi':'Xochitonal waits ahead — choose wisely.',
@@ -3202,7 +3207,7 @@ Object.assign(T_EN,{
   'ui.badge.defup':'DEF/RES UP',
   'ui.badge.critup':'CRIT UP',
   /* v1403 */
-  'ui.deploy.miniBossBattle':'⚔ Mini-Boss Battle',
+  'ui.deploy.miniBossBattle':'⚔ Guardian Battle',
   'ui.deploy.enterBattle':'Enter Battle',
   'ui.altar.recruitBtn':'Recruit',
   'ui.tip.atkup':'⬆ ATK/MAG UP ×{n}',
@@ -3478,7 +3483,7 @@ Object.assign(T_EN,{
   'ui.tlac.recordWhich':'Record which vassal? They leave your party now and rejoin next run at <strong>{lv}</strong>.',
   'ui.tlac.back':'← Back',
   'ui.tlac.cloneWhich':'Clone which vassal? An identical copy at the <strong>same level</strong> (with its Soul Surge) joins your roster.',
-  'ui.tlac.noMiniClone':'Mini-bosses cannot be cloned — record them instead.',
+  'ui.tlac.noMiniClone':'Guardians cannot be cloned — record them instead.',
   'ui.tlac.recorded':'Recorded: {list}','ui.tlac.slotLeft':'{n} slot left','ui.tlac.slotsLeft':'{n} slots left','ui.tlac.full':'(full)',
   'ui.tlac.carries':'Carries up to 3 vassals into your next run at {lv}.',
   'ui.tlac.all3':'All 3 recorded','ui.tlac.noVassals':'No vassals','ui.tlac.needCacao':'Need {n} Cacao','ui.tlac.recordBtn':'Record…',
@@ -3537,7 +3542,7 @@ Object.assign(T_EN,{
   "ui.penPick.title":"Tecpatl Tribute",
   "ui.penPick.sub":"Choose one penance to carry forward. The blade does not forgive.",
   "ui.penPick.warn":"⚠ All enemies are <strong>{p}% stronger</strong>.",
-  "ui.hud.miniboss":"Mini-boss",
+  "ui.hud.miniboss":"Guardian",
   "ui.hud.layerBoss":"Layer Boss",
   "ui.end.reunited":"<strong>Reunited</strong> — Mayahuel joins Patecatl's party as a free vassal (Lv {lv}). The four hundred sing.",
   "ui.end.unlockedPatron":"{name} has been unlocked as a patron!","ui.end.unlockedPatronF":"{name} has been unlocked as a patron!",
@@ -3550,7 +3555,7 @@ Object.assign(T_ES,{
   'ui.card.levelWord':'Nivel',
   'ui.card.patronGod':'★ Dios patrón',
   'ui.card.allyGod':'✦ Dios aliado',
-  'ui.card.vassal':'Vasallo',
+  'ui.card.vassal':'Vasallo','ui.card.guardian':'Guardián', /* v1538 */
   'ui.card.synergy':'🔗 Sinergia Elemental: +{pct}% ATQ/MAG/DEF/RES ({n} vínculos)',
   'ui.altar.fallen':'Caídos',
   'ui.altar.oblLabel':'Oblación Sagrada:',
@@ -3702,7 +3707,7 @@ Object.assign(T_ES,{
   'ui.deploy.easier':'Ruta fácil',
   'ui.deploy.harder':'Ruta difícil',
   'ui.deploy.harderDesc':'+20% de Sangre y Cacao.',
-  'ui.deploy.miniBossTag':'[Minijefe]',
+  'ui.deploy.miniBossTag':'[Guardián]',
   'ui.ev.offerVitality':'Ofrecer tu vitalidad a la llama',
   'ui.ev.offerVitalityCost':'(−60% de PV del patrón) El dios patrón gana +5 niveles permanentes',
   'ui.ev.flameDrinks':'La llama bebe hondo.',
@@ -3913,7 +3918,7 @@ Object.assign(T_ES,{
   'ui.amox.pantheonDone':'El Panteón está conquistado — cada dios ha reclamado el Mictlán',
   'ui.sb.godAffinity':'Afinidad Divina',
   'ui.sb.godHealth':'Aumento de Vida Divina',
-  'ui.sb.vassalHealth':'Aumento de Vida de Vasallos',
+  'ui.sb.vassalHealth':'Aumento de PV de Vasallos y Guardianes',
   'ui.sb.pantheon':'Impulso del Panteón',
   'ui.sb.divineStr':'Fuerza Divina',
   'ui.sb.othersDep1':'{n} otro dios desplegado',
@@ -3991,7 +3996,7 @@ Object.assign(T_ES,{
   'ui.msg.patronCap':'No puede superar el poder de tu patrón',
   'ui.msg.oblateLv':'¡El dios debe ser al menos Nv{n} para la oblación!',
   'ui.msg.releasedMany':'🕊 Liberaste {n} unidades — +{b} 🩸 +{c} 🫘',
-  'ui.msg.miniNext':'⚔ ¡Un minijefe custodia la siguiente batalla!',
+  'ui.msg.miniNext':'⚔ ¡Un Guardián custodia la siguiente batalla!',
   'ui.msg.bossNext':'💀 ¡El Jefe del Nivel espera más allá del Tianguis!',
   'ui.msg.warnOff':'⚠ Aviso antes de la batalla desactivado',
   'ui.msg.warnOn':'⚠ Aviso antes de la batalla activado',
@@ -4004,7 +4009,7 @@ Object.assign(T_ES,{
   'ui.msg.waresRerolled':'Mercancía renovada',
   'ui.msg.recordFull':'Ya registraste 3 vasallos',
   'ui.msg.noCacao':'No hay suficiente Cacao',
-  'ui.msg.noCloneMini':'Los minijefes no se pueden clonar',
+  'ui.msg.noCloneMini':'Los Guardianes no se pueden clonar',
   'ui.msg.oneClone':'Solo un clon a la vez',
   'ui.msg.alreadyUnlocked':'¡Ya está desbloqueado!',
   'ui.msg.prereqFirst':'Desbloquea primero los requisitos',
@@ -4087,7 +4092,7 @@ Object.assign(T_ES,{
   'ui.altar.deployedNote':'⚔ Las unidades del grupo de batalla no se pueden sacrificar',
   'ui.pochteca.intro':'💎 El Pochteca Errante extiende su mercancía. Los efectos se aplican al inicio de cada batalla y duran toda la partida.',
   'ui.dtIntro.title':'¡Árbol de Divinidad desbloqueado!','ui.dtIntro.body':'En cada partida ganas <span style="color:#60c0ff;font-weight:600"><svg class="tl tl-teotl"><use href="#tl-teotl"/></svg> TEOTL</span> — el poder sagrado de los dioses — según qué tan lejos llegues.<br><br>Gasta TEOTL aquí para fortalecer de forma permanente tu próxima partida. Las mejoras se conservan en todas tus partidas futuras, así que cada intento te hace más fuerte.<br><br><span style="color:#d4af37;font-size:12px;font-style:italic">Los dioses recompensan a quienes perseveran.</span>','ui.dtIntro.ok':'¡Listo!', /* v1381 */
-  'ui.pochteca.firstFree':'🎁 ¡Tu primera compra es gratis!','ui.pochteca.free':'¡Gratis!', /* v1372 */
+  'ui.pochteca.firstFree':'🎁 ¡Tu primera compra es gratis!','ui.pochteca.free':'¡Gratis!','ui.pochteca.acquired':'Adquirida ✦', /* v1372 · v1535: agrees with "ofrenda" */
   'ui.pochteca.introTitle':'Llegó el Pochteca',
   'ui.pochteca.introBody':'Un mercader errante se instaló en el Tianguis, en la pestaña <strong>✨ Especial</strong>. Vende <strong style="color:#c0e060">Ofrendas</strong>: reliquias que fortalecen a tu grupo por el resto de la partida. Se aplican solas al inicio de cada batalla.',
   'ui.pochteca.introXochi':'Xochitonal te espera más adelante: elige con cuidado.',
@@ -4348,7 +4353,7 @@ Object.assign(T_ES,{
   'ui.badge.defup':'DEF/RES ↑',
   'ui.badge.critup':'CRIT ↑',
   /* v1403 */
-  'ui.deploy.miniBossBattle':'⚔ Batalla contra Minijefe',
+  'ui.deploy.miniBossBattle':'⚔ Batalla contra Guardián',
   'ui.deploy.enterBattle':'Entrar a la batalla',
   'ui.altar.recruitBtn':'Reclutar',
   'ui.tip.atkup':'⬆ AUMENTO ATQ/MAG ×{n}',
@@ -4624,7 +4629,7 @@ Object.assign(T_ES,{
   'ui.tlac.recordWhich':'¿Qué vasallo registrar? Deja tu grupo ahora y vuelve en la próxima partida en <strong>{lv}</strong>.',
   'ui.tlac.back':'← Atrás',
   'ui.tlac.cloneWhich':'¿Qué vasallo clonar? Una copia idéntica del <strong>mismo nivel</strong> (con su Oleada de Alma) se une a tu grupo.',
-  'ui.tlac.noMiniClone':'Los mini jefes no se pueden clonar — regístralos en su lugar.',
+  'ui.tlac.noMiniClone':'Los Guardianes no se pueden clonar — regístralos en su lugar.',
   'ui.tlac.recorded':'Registrados: {list}','ui.tlac.slotLeft':'queda {n} espacio','ui.tlac.slotsLeft':'quedan {n} espacios','ui.tlac.full':'(lleno)',
   'ui.tlac.carries':'Lleva hasta 3 vasallos a tu próxima partida en {lv}.',
   'ui.tlac.all3':'Los 3 registrados','ui.tlac.noVassals':'Sin vasallos','ui.tlac.needCacao':'Necesitas {n} de Cacao','ui.tlac.recordBtn':'Registrar…',
@@ -4683,7 +4688,7 @@ Object.assign(T_ES,{
   "ui.penPick.title":"Tributo de Tecpatl",
   "ui.penPick.sub":"Elige una penitencia para llevar contigo. La hoja no perdona.",
   "ui.penPick.warn":"⚠ Todos los enemigos son <strong>{p}% más fuertes</strong>.",
-  "ui.hud.miniboss":"Mini jefe",
+  "ui.hud.miniboss":"Guardián",
   "ui.hud.layerBoss":"Jefe del nivel",
   "ui.end.reunited":"<strong>Reunidos</strong> — Mayahuel se une al grupo de Patecatl como vasalla gratuita (Nv. {lv}). Los cuatrocientos cantan.",
   "ui.end.unlockedPatron":"¡Nuevo patrón desbloqueado: {name}!","ui.end.unlockedPatronF":"¡Nueva patrona desbloqueada: {name}!",
@@ -4817,8 +4822,8 @@ const TREE_NODES=[
   {id:'god_special_up',label:'God Health Boost I',labelEs:'Aumento de Vida Divina I',desc:'Increase all God HP by 10%',descEs:'Aumenta los PV de todos los dioses en 10%',cost:500,cat:'gods',req:['god_stats_1'],tier:2,x:588,y:196},
   {id:'sacred_oblation',label:'Sacred Oblation',labelEs:'Oblación Sagrada',desc:'Sacrifice an Ally God at the Altar to bestow their patron ability upon your Patron God — once per run',descEs:'Sacrifica a un Dios Aliado en el Altar para otorgar su habilidad de patrón a tu Dios Patrón — uno por partida',cost:1250,cat:'gods',req:['god_special_up'],tier:3,x:588,y:114},
   {id:'god_special_up_2',label:'God Health Boost II',labelEs:'Aumento de Vida Divina II',desc:'Increase all God HP by another 10% (total +20%)',descEs:'Aumenta los PV de todos los dioses otro 10% (total +20%)',cost:1600,cat:'gods',req:['god_special_up'],tier:3,x:450,y:114},
-  {id:'ally_special_up_2',label:'Vassal Health Boost II',labelEs:'Aumento de Vida de Vasallos II',desc:'Increase all Vassal HP by another 10% (total +20%)',descEs:'Aumenta los PV de todos los vasallos otro 10% (total +20%)',cost:1500,cat:'allies',req:['ally_special_up'],tier:4,x:458,y:594},
-  {id:'godly_compassion',label:'Godly Compassion',labelEs:'Compasión Divina',desc:'Spare vassals at the Altar for a small Blood or Cacao reward instead of Flowers',descEs:'Perdona vasallos en el Altar por una pequeña recompensa de Sangre o Cacao en vez de Flores' /* v1334 */,cost:400,cat:'allies',req:['ally_slot_3'],tier:2,x:550,y:520},
+  {id:'ally_special_up_2',label:'Vassal & Guardian HP Boost II',labelEs:'Aumento de PV de Vasallos y Guardianes II',desc:'Increase all Vassal and Guardian HP by another 10% (total +20%)',descEs:'Aumenta los PV de todos los vasallos y Guardianes otro 10% (total +20%)',cost:1500,cat:'allies',req:['ally_special_up'],tier:4,x:458,y:594},
+  {id:'godly_compassion',label:'Godly Compassion',labelEs:'Compasión Divina',desc:'Spare units at the Altar for a small Blood or Cacao reward instead of Flowers',descEs:'Perdona unidades en el Altar por una pequeña recompensa de Sangre o Cacao en vez de Flores' /* v1334 */,cost:400,cat:'allies',req:['ally_slot_3'],tier:2,x:550,y:520},
   {id:'pantheon_boost',label:'Pantheon Boost',labelEs:'Impulso del Panteón',desc:'Each additional deployed god grants all gods +2.5% ATK/MAG/DEF/RES',descEs:'Cada dios desplegado adicional otorga a todos los dioses +2.5% ATQ/MAG/DEF/RES',cost:700,cat:'gods',req:['synergy_unlock'],tier:3,x:357,y:114},
   {id:'pantheon_boost_2',label:'Pantheon Boost II',labelEs:'Impulso del Panteón II',desc:'Each additional deployed god grants all gods another +2.5% ATK/MAG/DEF/RES (total +5%)',descEs:'Cada dios desplegado adicional otorga a todos los dioses otro +2.5% ATQ/MAG/DEF/RES (total +5%)' /* v1334 */,cost:2500,cat:'gods',req:['pantheon_boost'],tier:4,x:357,y:32},
   // ═══ SOUTH — ALLIES ═══
@@ -4826,7 +4831,7 @@ const TREE_NODES=[
   {id:'ally_slot_4',label:'4 Ally Slots',labelEs:'4 Espacios de Aliado',desc:'Unlocks a 4th ally slot on the battle codex.',descEs:'Desbloquea un 4º espacio de aliado en el códice de batalla.',cost:245,cat:'allies',req:['ally_slot_3'],tier:2,x:450,y:520},
   {id:'vassal_affinity',label:'Vassal Affinity',labelEs:'Afinidad de Vasallos',desc:'50% chance each non-boss battle guarantees at least one enemy of the same element as your patron god (replaces one enemy slot)',descEs:'50% de probabilidad en cada batalla sin jefe de garantizar al menos un enemigo del mismo elemento que tu dios patrón (reemplaza un espacio de enemigo)',cost:550,cat:'allies',req:['ally_slot_4'],tier:2,x:312,y:520},
   {id:'ally_slot_5',label:'5 Ally Slots',labelEs:'5 Espacios de Aliado',desc:'Unlocks a 5th ally slot on the battle codex.',descEs:'Desbloquea un 5º espacio de aliado en el códice de batalla.',cost:4200,cat:'allies',req:['ally_slot_4'],tier:3,x:374,y:594},
-  {id:'ally_special_up',label:'Vassal Health Boost I',labelEs:'Aumento de Vida de Vasallos I',desc:'Increase all Vassal HP by 10%',descEs:'Aumenta los PV de todos los vasallos en 10%',cost:350,cat:'allies',req:['ally_slot_4'],tier:3,x:545,y:594},
+  {id:'ally_special_up',label:'Vassal & Guardian HP Boost I',labelEs:'Aumento de PV de Vasallos y Guardianes I',desc:'Increase all Vassal and Guardian HP by 10%',descEs:'Aumenta los PV de todos los vasallos y Guardianes en 10%',cost:350,cat:'allies',req:['ally_slot_4'],tier:3,x:545,y:594},
   // ═══ ECONOMY — STARTERS ═══
   {id:'blood_starter_1',label:'Blood Starter I',labelEs:'Sangre Inicial I',desc:'Start each run with +100 Blood',descEs:'Empieza cada partida con +100 de Sangre',cost:200,cat:'qol',req:['cost_reduce_1'],tier:2,x:130,y:510},
   {id:'cacao_starter_1',label:'Cacao Starter I',labelEs:'Cacao Inicial I',desc:'Start each run with +50 Cacao',descEs:'Empieza cada partida con +50 de Cacao',cost:200,cat:'qol',req:['cost_reduce_1'],tier:2,x:130,y:580},
@@ -4979,20 +4984,26 @@ const OFFERINGS={
   mallinalli_flower:{name:'Mallinalli Flower',nameEs:'Flor de Mallinalli',tier:'common',icon:'🌿',price:100,priceType:'cacao',desc:'All units +5% MAG',descEs:'Todas las unidades +5% MAG',flavor:'A twist of sacred grass in bloom — the day-sign of green and growing things.',flavorEs:'Un manojo de hierba sagrada en flor — el signo del día de lo verde y lo que crece.',eff:{magMult:1.05}},
   jaguar_pelt:{name:'Jaguar Pelt',nameEs:'Piel de Jaguar',tier:'common',icon:'🐆',price:100,priceType:'cacao',desc:'All units +5% DEF',descEs:'Todas las unidades +5% DEF',flavor:'The spotted hide of an ocelotl knight, proof against claw and club.',flavorEs:'La piel manchada de un caballero ocelotl, a prueba de garra y de macana.',eff:{defMult:1.05}},
   citlacue_shard:{name:'Citlacue Shard',nameEs:'Fragmento de Citlacue',tier:'common',icon:'✨',price:100,priceType:'cacao',desc:'All units +8% RES',descEs:'Todas las unidades +8% RES',flavor:"A shard of the star-skirt goddess's mantle, scattering hostile magic like night sky.",flavorEs:'Un fragmento del manto de la diosa de la falda de estrellas, que dispersa la magia hostil como el cielo nocturno.',eff:{resMult:1.08}},
-  greenstone_figurine:{name:'Greenstone Figurine',nameEs:'Figurilla de Piedra Verde',tier:'common',icon:'🟩',price:100,priceType:'cacao',desc:'Vassals +10% max HP',descEs:'Vasallos +10% de PV máx.',flavor:'A polished jade celt, cool to the touch — the stone the gods prize above gold.',flavorEs:'Un hacha pulida de jade, fría al tacto — la piedra que los dioses aprecian más que el oro.',eff:{vassalHpMult:1.10}},
+  greenstone_figurine:{name:'Greenstone Figurine',nameEs:'Figurilla de Piedra Verde',tier:'common',icon:'🟩',price:100,priceType:'cacao',desc:'Vassals +15% max HP',descEs:'Vasallos +15% de PV máx.',flavor:'A polished jade celt, cool to the touch — the stone the gods prize above gold.',flavorEs:'Un hacha pulida de jade, fría al tacto — la piedra que los dioses aprecian más que el oro.',eff:{vassalHpMult:1.15}}, /* v1537 [Genaro]: 10% -> 15% */
+  /* v1536 [Genaro]: Tzoalli Candy -- amaranth-and-honey dough shaped into the gods and eaten. +5% vassal max HP, DEF and
+     RES for EACH god in the Battle Codex (the patron counts), additive: 1 god +5%, 3 gods +15% (v1537). Counted by codexGodCount(). */
+  tzoalli_candy:{name:'Tzoalli Candy',nameEs:'Dulce de Tzoalli',tier:'common',icon:'🍬',price:100,priceType:'cacao',desc:'Vassals +5% max HP and DEF/RES for each god in the Battle Codex',descEs:'Vasallos +5% de PV máx. y DEF/RES por cada dios en el Códice de Batalla',flavor:'Amaranth and honey shaped into the gods themselves, then eaten; whoever tastes it carries a little of their strength.',flavorEs:'Amaranto y miel moldeados con la forma de los dioses y luego comidos; quien lo prueba lleva un poco de su fuerza.',eff:{tzoalliPerGod:0.05}}, /* v1537 [Genaro]: 15% -> 5% per god */
+  /* v1539 [Genaro]: the first two GUARDIAN offerings (Guardians stopped counting as vassals in v1538). */
+  coatepantli_stone:{name:'Coatepantli Stone',nameEs:'Piedra del Coatepantli',tier:'common',icon:'🧱',price:100,priceType:'cacao',desc:'Guardians +10% max HP and DEF/RES',descEs:'Guardianes +10% de PV máx. y DEF/RES',flavor:'A block from the wall of carved serpents that ringed the sacred precinct; nothing crossed it that the gods did not allow.',flavorEs:'Un bloque del muro de serpientes talladas que rodeaba el recinto sagrado; nada lo cruzaba sin el permiso de los dioses.',eff:{guardianStatMult:1.10}},
+  tlahuiztli_suit:{name:'Tlahuiztli Suit',nameEs:'Traje Tlahuiztli',tier:'common',icon:'🪶',price:100,priceType:'cacao',desc:'Guardians start each battle with Chimalli worth 7% of max HP',descEs:'Los Guardianes comienzan cada batalla con Chimalli por 7% de sus PV máx.',flavor:'The feathered war suit of a proven warrior, earned with captives and worn by those who hold the line.',flavorEs:'El traje de guerra emplumado de un guerrero probado, ganado con cautivos y portado por quienes sostienen la línea.',eff:{guardianStartChimalli:0.07}},
   rubber_ball:{name:'Rubber Ball (Ōlli)',nameEs:'Pelota de Hule (Ōlli)',tier:'common',icon:'⚫',price:100,priceType:'cacao',desc:'HUMANITY units +8% ATK',descEs:'Unidades de HUMANIDAD +8% ATQ',flavor:'Hardened ōlli from the sacred ballcourt; it remembers every game played for the gods.',flavorEs:'Ōlli endurecido del juego de pelota sagrado; recuerda cada partido jugado para los dioses.',eff:{flatAtkByElement:{humanity:10},pctAtkByElement:{humanity:.08}}},
   wind_jewel:{name:'Ehecacōzcatl (Wind Jewel)',nameEs:'Ehecacōzcatl (Joya del Viento)',tier:'common',icon:'🌀',price:100,priceType:'cacao',desc:'WIND units +8% MAG',descEs:'Unidades de VIENTO +8% MAG',flavor:"Quetzalcoatl's spiral conch-jewel, humming with the breath of the four winds.",flavorEs:'La joya de caracol en espiral de Quetzalcoatl, que zumba con el aliento de los cuatro vientos.',eff:{flatMagByElement:{wind:10},pctMagByElement:{wind:.08}}},
   cacao_effigy:{name:'Cacao Effigy',nameEs:'Efigie de Cacao',tier:'uncommon',icon:'🟤',price:250,priceType:'cacao',desc:'+10% Cacao on spoils \u2014 battles won in 3 rounds or less',descEs:'+10% de Cacao en el botín — batallas ganadas en 3 rondas o menos' /* v903: common -> uncommon. v904: and conditional -- an unconditional economy multiplier compounds across a whole run. */,flavor:"A small clay statue cradling a cacao pod — the merchants' quiet blessing.",flavorEs:'Una estatuilla de barro que acuna una mazorca de cacao — la bendición callada de los comerciantes.',eff:{cacaoMultSwift:1.10}},
   spondylus_pendant:{name:'Spondylus Pendant',nameEs:'Pendiente de Spondylus',tier:'uncommon',icon:'🐚',price:250,priceType:'cacao',desc:'+10% Blood on spoils \u2014 Perfect Battles only',descEs:'+10% de Sangre en el botín — solo en Batallas Perfectas' /* v903: common -> uncommon. v904: and conditional. */,flavor:'Crimson shell traded from distant seas, dearer than jade to the old kings.',flavorEs:'Concha carmesí traída de mares lejanos, más preciada que el jade para los viejos reyes.',eff:{bloodMultPerfect:1.10}},
   copal_brazier:{name:'Copal Brazier',nameEs:'Brasero de Copal',tier:'common',icon:'🔥',price:100,priceType:'cacao',desc:'All units −5% TP cost',descEs:'Todas las unidades −5% de costo de PT',flavor:'Sweet copal smoke curling upward — the gods lean close to listen.',flavorEs:'Humo dulce de copal que sube en espiral — los dioses se acercan para escuchar.',eff:{tpCostMult:0.95}} /* v1090: was tpCostFlat:5. A flat discount decays like every other flat -- 22.7% of a Lv5 cost, 1.9% of a Lv95 one. */,
-  yauhtli_flower:{name:'Yauhtli Flower',nameEs:'Flor de Yauhtli',tier:'common',icon:'🌼',price:100,priceType:'cacao',desc:'During the first round, all allies are cleansed of ailments after every enemy action',descEs:'Durante la primera ronda, todos los aliados se limpian de dolencias tras cada acción enemiga' /* v1327: was "at the start of the first round" -- it actually cleanses after each enemy action through round 1 (advanceTurn) */,flavor:"Sacred marigold of Tlaloc, burned to drive sickness from the body.",flavorEs:'Cempasúchil sagrado de Tlaloc, quemado para expulsar la enfermedad del cuerpo.',eff:{roundCleanse:1}},
+  yauhtli_flower:{name:'Yauhtli Flower',nameEs:'Flor de Yauhtli',tier:'common',icon:'🌼',price:100,priceType:'cacao',desc:'During the first round, all allies are cleansed of ailments after every enemy action',descEs:'Durante la primera ronda, todos los aliados se limpian de dolencias tras cada acción enemiga' /* v1327: was "at the start of the first round" -- it actually cleanses after each enemy action through round 1 (advanceTurn) */,flavor:"Tlaloc's fragrant yauhtli, burned as incense to drive sickness from the body.",flavorEs:'El fragante yauhtli de Tlaloc, el pericón, quemado como incienso para expulsar la enfermedad del cuerpo.' /* v1535 [Genaro]: yauhtli is Tagetes lucida (pericón), not cempasúchil */,eff:{roundCleanse:1}},
   // Pochteca — Uncommon (750 Cacao) — v370
   stingray_spine:{name:'Stingray Spine',nameEs:'Espina de Mantarraya',tier:'uncommon',icon:'🦴',price:250,priceType:'cacao',desc:'All ally strikes apply Poison \u00d71',descEs:'Todos los golpes aliados aplican Veneno ×1',flavor:"A bloodletter's barb, still slick with the venom of devotion.",flavorEs:'La púa de un sangrador, aún húmeda con el veneno de la devoción.',eff:{strikePoison:1}},
   head_old_god:{name:'Head of the Old God',nameEs:'Cabeza del Dios Viejo',tier:'uncommon',icon:'🪔',price:250,priceType:'cacao',desc:"FIRE units' strikes apply Burn \u00d71",descEs:'Los golpes de las unidades de FUEGO aplican Quemadura ×1',flavor:'A clay brazier-head of Huehueteotl; the oldest fire never truly goes out.',flavorEs:'Un brasero de barro con el rostro de Huehueteotl; el fuego más viejo nunca se apaga del todo.',eff:{strikeBurnFire:1}},
   chaac_axe:{name:"Chaac's Axe",nameEs:'Hacha de Chaac',tier:'uncommon',icon:'🪓',price:250,priceType:'cacao',desc:"THUNDER units' strikes apply Paralyze \u00d71",descEs:'Los golpes de las unidades de TRUENO aplican Parálisis ×1',flavor:'The lightning-axe of the rain god; each blow cracks the sky open.',flavorEs:'El hacha de relámpago del dios de la lluvia; cada golpe abre el cielo en dos.',eff:{strikeParalyzeThunder:1}},
   moctezuma_shield:{name:'Moctezuma Shield',nameEs:'Escudo de Moctezuma',tier:'uncommon',icon:'<svg class="tl tl-chimalli"><use href="#tl-chimalli"/></svg>',price:250,priceType:'cacao',desc:'One random unit starts with Chimalli worth 5% of max HP',descEs:'Una unidad al azar comienza con Chimalli por 5% de sus PV máx.',flavor:'A turquoise war-shield fit for an emperor; it chooses whom it guards.',flavorEs:'Un escudo de guerra de turquesa digno de un emperador; él elige a quién protege.',eff:{startChimalliRandom:0.05}},
   chac_mool:{name:'Chac Mool',nameEs:'Chac Mool',tier:'uncommon',icon:'🗿',price:250,priceType:'cacao',desc:'All allies regenerate 5% HP per round',descEs:'Todos los aliados regeneran 5% de PV por ronda',flavor:'The reclining messenger waits with his bowl, patient to carry offerings to the gods.',flavorEs:'El mensajero reclinado espera con su cuenco, paciente para llevar las ofrendas a los dioses.',eff:{roundRegenPct:0.05}},
-  mictlantecuhtli_idol:{name:'Mictlantecuhtli Idol',nameEs:'Ídolo de Mictlantecuhtli',tier:'uncommon',icon:'💀',price:250,priceType:'cacao',desc:'Consumable: revive the first fallen vassal at 50% HP',descEs:'Consumible: revive al primer vasallo caído con 50% de PV',flavor:'The grinning lord of the dead returns one soul — and only one — to the fight.',flavorEs:'El señor sonriente de los muertos devuelve un alma — y solo una — a la pelea.',consumable:true,eff:{reviveVassal:0.5}},
+  mictlantecuhtli_idol:{name:'Mictlantecuhtli Idol',nameEs:'Ídolo de Mictlantecuhtli',tier:'uncommon',icon:'💀',price:250,priceType:'cacao',desc:'Consumable: revive the first fallen vassal or Guardian at 50% HP',descEs:'Consumible: revive al primer vasallo o Guardián caído con 50% de PV',flavor:'The grinning lord of the dead returns one soul — and only one — to the fight.',flavorEs:'El señor sonriente de los muertos devuelve un alma — y solo una — a la pelea.',consumable:true,eff:{reviveVassal:0.5}},
   mictecacihuatl_figure:{name:'Mictecacihuatl Figure',nameEs:'Figura de Mictecacihuatl',tier:'uncommon',icon:'🌺',price:250,priceType:'cacao',desc:'Consumable: revive the first fallen non-patron ally god at 50% HP',descEs:'Consumible: revive al primer dios aliado no patrón que caiga, con 50% de PV',flavor:'The Lady of the Dead keeps her marigold vigil — she sends one god back across the river.',flavorEs:'La Señora de los Muertos mantiene su vigilia de cempasúchil — devuelve a un dios al otro lado del río.',consumable:true,eff:{reviveGod:0.5}},
   turquoise_serpent:{name:'Turquoise Serpent Pectoral',nameEs:'Pectoral de Serpiente de Turquesa',tier:'uncommon',icon:'🐍',price:250,priceType:'cacao',desc:'+20% DEF & +20% RES to your lowest-HP unit',descEs:'+20% DEF y +20% RES a tu unidad con menos PV',flavor:"Two turquoise heads — a king's unbroken ward, given to the one who needs it most.",flavorEs:'Dos cabezas de turquesa — la guardia intacta de un rey, dada a quien más la necesita.',eff:{weakestFlatDefRes:20,weakestPctDefRes:.20}},
   mezcala_mask:{name:'Mezcala Mask',nameEs:'Máscara de Mezcala',tier:'uncommon',icon:'😐',price:250,priceType:'cacao',desc:'Party +15% MAG & +15% RES for the first 2 rounds',descEs:'Grupo +15% MAG y +15% RES durante las primeras 2 rondas',flavor:"A spare stone face from the Mezcala hills, older than memory — it sharpens the mind's eye.",flavorEs:'Un rostro de piedra sobrio de los cerros de Mezcala, más viejo que la memoria — afila el ojo de la mente.',eff:{roundBuff:2,magMult2r:1.15,resMult2r:1.15}},
@@ -5037,7 +5048,7 @@ const OFFERINGS={
   axolotl_charm:{name:'Axolotl Charm',nameEs:'Amuleto de Ajolote',tier:'uncommon',icon:'\u{1F98E}',price:250,priceType:'cacao',desc:'Once per battle, the first vassal to fall below 25% HP heals 30%',descEs:'Una vez por batalla, el primer vasallo que baje de 25% de PV se cura 30%',flavor:'The salamander that refuses to finish becoming anything else. It simply grows the piece back.',flavorEs:'La salamandra que se niega a terminar de volverse otra cosa. Simplemente le crece la parte de nuevo.',eff:{axolotlHeal:0.30}},
   /* v806: the three Layer 8 rares from the L8 design doc, none of which had been built. */
   ball_game_ring:{name:'Ball Game Ring',nameEs:'Aro del Juego de Pelota',tier:'rare',icon:'\u{1F3C0}',price:600,priceType:'cacao',flowerPrice:20,desc:'+10% of the slain enemy\u2019s Flower value per kill by a HUMANITY ally',descEs:'+10% del valor en Flores del enemigo abatido por cada baja de un aliado de HUMANIDAD',flavor:'The stone hoop of the tlachtli court \u2014 every sinking of the ball was a sun set right.',flavorEs:'El aro de piedra de la cancha de tlachtli — cada pelota encestada era un sol puesto en su sitio.'},
-  tzompantli_skull:{name:'Tzompantli Skull',nameEs:'Cráneo del Tzompantli',tier:'rare',icon:'\u{1F480}',price:600,priceType:'cacao',flowerPrice:20,desc:'+0.5% ATK/MAG per vassal sacrificed at the Altar (max +30%)',descEs:'+0.5% ATQ/MAG por cada vasallo sacrificado en el Altar (máx. +30%)' /* v929: only your own vassals can be sacrificed -- "enemy" implied it counted kills */,flavor:'A rack of skulls, each one a debt the sun no longer has to collect.',flavorEs:'Una hilera de cráneos, cada uno una deuda que el sol ya no tiene que cobrar.'},
+  tzompantli_skull:{name:'Tzompantli Skull',nameEs:'Cráneo del Tzompantli',tier:'rare',icon:'\u{1F480}',price:600,priceType:'cacao',flowerPrice:20,desc:'+0.5% ATK/MAG per unit sacrificed at the Altar (max +30%)',descEs:'+0.5% ATQ/MAG por cada unidad sacrificada en el Altar (máx. +30%)' /* v929: only your own vassals can be sacrificed -- "enemy" implied it counted kills */,flavor:'A rack of skulls, each one a debt the sun no longer has to collect.',flavorEs:'Una hilera de cráneos, cada uno una deuda que el sol ya no tiene que cobrar.'},
   sak_tahn_waax:{name:'Sak Tahn Waax Calendar',nameEs:'Calendario Sak Tahn Waax',tier:'rare',icon:'\u{1F4C5}',price:600,priceType:'cacao',flowerPrice:20,desc:'Every 12 rounds, deal 20% of max HP to all enemies \u2014 the count carries between battles',descEs:'Cada 12 rondas, inflige 20% de PV máx. a todos los enemigos — la cuenta continúa entre batallas',flavor:'A Maya long-count wheel, patient as erosion. It does not care which fight you are in.',flavorEs:'Una rueda de cuenta larga maya, paciente como la erosión. No le importa en qué pelea estés.'},
   // Event-exclusive — Patecatl's Apothecary (migrated from runBoosts)
   sacred_atole:{name:t('ui.ev.sacredAtole'),nameEs:'Atole Sagrado',tier:'event',icon:'🌽',desc:'Party +25% max HP',descEs:'Grupo +25% de PV máx.',flavor:t('ui.ev.atoleDesc'),flavorEs:'El calor se te asienta en los huesos.',eff:{hpMult:1.25}},
@@ -5170,6 +5181,9 @@ function getOfferingEffects(){
     if(f.atkMult)e.atkMult*=f.atkMult; if(f.magMult)e.magMult*=f.magMult;
     if(f.defMult)e.defMult*=f.defMult; if(f.resMult)e.resMult*=f.resMult;
     if(f.hpMult)e.hpMult*=f.hpMult; if(f.vassalHpMult)e.vassalHpMult*=f.vassalHpMult;
+    if(f.tzoalliPerGod)e.tzoalliPerGod=(e.tzoalliPerGod||0)+f.tzoalliPerGod; /* v1536 */
+    if(f.guardianStatMult)e.guardianStatMult=(e.guardianStatMult||1)*f.guardianStatMult; /* v1539 */
+    if(f.guardianStartChimalli)e.guardianStartChimalli=(e.guardianStartChimalli||0)+f.guardianStartChimalli; /* v1539 */
     if(f.tpMult)e.tpMult*=f.tpMult; if(f.tpCostFlat)e.tpCostFlat+=f.tpCostFlat;
     if(f.cacaoMult)e.cacaoMult*=f.cacaoMult; if(f.bloodMult)e.bloodMult*=f.bloodMult;
     if(f.flatAtkByElement)Object.keys(f.flatAtkByElement).forEach(el=>e.flatAtkByElement[el]=(e.flatAtkByElement[el]||0)+f.flatAtkByElement[el]);
@@ -5317,12 +5331,25 @@ function weakestAlly(pool){
     return ((a.def||0)+(a.res||0))<=((b.def||0)+(b.res||0))?a:b;
   });
 }
+/* v1536: gods in the Battle Codex = the patron (always deployed) + every other god in deplSel. One source for the battle
+   build AND the card/modal preview, so the two can never disagree. */
+function codexGodCount(){
+  let n=G&&G.god?1:0;
+  (G&&G.deplSel||[]).forEach(function(sid){if(String(sid).indexOf('god_')===0&&!(G.god&&sid==='god_'+G.god.id))n++;});
+  return n;
+}
+function tzoalliMult(oe,isGod){return (!isGod&&(oe.tzoalliPerGod||0)>0)?1+oe.tzoalliPerGod*codexGodCount():1;}
 function applyOfferings(){
   const oe=getOfferingEffects();
   (G.units||[]).forEach(u=>{
     if(!u.isAlly)return;
-    let hpM=oe.hpMult; if(!u.isGod)hpM*=oe.vassalHpMult;
+    const _gdn=isGuardian(u); /* v1538: Guardians are not vassals -- Greenstone / Tzoalli skip them */
+    let hpM=oe.hpMult; if(!u.isGod&&!_gdn)hpM*=oe.vassalHpMult;
+    hpM*=tzoalliMult(oe,u.isGod||_gdn); /* v1536 */
+    if(_gdn&&(oe.guardianStatMult||1)!==1)hpM*=oe.guardianStatMult; /* v1539: Coatepantli Stone */
     if(hpM!==1){const nm=Math.round(u.maxHp*hpM);const ratio=u.maxHp>0?u.currentHp/u.maxHp:1;u.maxHp=nm;u.currentHp=Math.min(nm,Math.round(nm*ratio));}
+    {const _tz=tzoalliMult(oe,u.isGod||_gdn);if(_tz!==1){u.def=Math.round((u.def||0)*_tz);u.res=Math.round((u.res||0)*_tz);}} /* v1536 */
+    if(_gdn&&(oe.guardianStatMult||1)!==1){u.def=Math.round((u.def||0)*oe.guardianStatMult);u.res=Math.round((u.res||0)*oe.guardianStatMult);} /* v1539 */
     /* v1021: was raising the ceiling and leaving current TP behind, so a max-TP relic silently
        started every unit BELOW full. Ratio-preserving now: full stays full. */
     if(oe.tpMult!==1&&u.maxNP){const _r0=u.maxNP>0?(u.currentNP||0)/u.maxNP:1;u.maxNP=Math.round(u.maxNP*oe.tpMult);u.currentNP=Math.min(u.maxNP,Math.round(u.maxNP*_r0));}
@@ -5450,6 +5477,12 @@ function applyOfferings(){
     });
     if(n)addLog(isEs()?`<span class="log-ab">\u{1F4A1} ${v.label}: hasta +${shown} ATQ/MAG a ${n} durante ${relicWindow(v.rounds)} rondas</span>`:`<span class="log-ab">\u{1F4A1} ${v.label}: up to +${shown} ATK/MAG to ${n} for ${relicWindow(v.rounds)} rounds</span>`);
   });
+  /* v1539: Tlahuiztli Suit -- every living Guardian ally starts shielded. Same grant path as the Conch below. */
+  if((oe.guardianStartChimalli||0)>0){
+    const _gh=(G.units||[]).filter(u=>u&&u.isAlly&&u.currentHp>0&&isGuardian(u)&&!u._sacVictim);
+    _gh.forEach(u=>grantChimalli(u,oe.guardianStartChimalli,'Tlahuiztli Suit'));
+    if(_gh.length)addLog(isEs()?`<span class="log-sh">\u{1FAB6} Traje Tlahuiztli: ${_gh.length} ${_gh.length>1?'Guardianes':'Guardián'} +Chimalli</span>`:`<span class="log-sh">\u{1FAB6} Tlahuiztli Suit: ${_gh.length} Guardian${_gh.length>1?'s':''} +Chimalli</span>`);
+  }
   /* v881: Tecciztecatl Conch — Chimalli to EVERY unit of an element (Moctezuma Shield picks one at random). */
   Object.keys(oe.startChimalliByElement||{}).forEach(el=>{
     const amt=oe.startChimalliByElement[el];if(!(amt>0))return;
@@ -5531,8 +5564,13 @@ function offeringStatLayer(base,element,isGod,type,turquoise,isTlaloqueU,isPatro
      caller that omits it simply gets those two listed on nobody, which is the safe direction. */
   const oe=getOfferingEffects();const t={...base};
   const usesAtk=type?(type!=='MAG'):((base.atk||0)>0), usesMag=type?(type==='MAG'||type==='MIX'):((base.mag||0)>0); // v351: only list ATK/MAG offerings on units that use that stat (MIX uses both)
-  let hpM=oe.hpMult; if(!isGod)hpM*=oe.vassalHpMult;
+  const _gdn=!isGod&&isGuardianKey(capk||surgeKey); /* v1538: mirrors applyOfferings */
+  let hpM=oe.hpMult; if(!isGod&&!_gdn)hpM*=oe.vassalHpMult;
+  hpM*=tzoalliMult(oe,isGod||_gdn); /* v1536: mirrors applyOfferings */
+  if(_gdn&&(oe.guardianStatMult||1)!==1)hpM*=oe.guardianStatMult; /* v1539 */
   if(hpM!==1)t.hp=Math.round(t.hp*hpM);
+  {const _tz=tzoalliMult(oe,isGod||_gdn);if(_tz!==1){t.def=Math.round(t.def*_tz);t.res=Math.round(t.res*_tz);}}
+  if(_gdn&&(oe.guardianStatMult||1)!==1){t.def=Math.round(t.def*oe.guardianStatMult);t.res=Math.round(t.res*oe.guardianStatMult);} /* v1539 */
   if(oe.tpMult!==1)t.tp=Math.round(t.tp*oe.tpMult);
   if(oe.tpFlat)t.tp+=oe.tpFlat; // v821: Cucurbita Pumpkin -- flat, so it lands after the multiplier, matching how it is applied to the live unit
   if(oe.atkMult!==1)t.atk=Math.round(t.atk*oe.atkMult);
@@ -5675,7 +5713,8 @@ function offeringStatLayer(base,element,isGod,type,turquoise,isTlaloqueU,isPatro
     if(f.tpFlat)hit=true;
     if((f.flatAtkParty&&usesAtk)||(f.flatMagParty&&usesMag)||f.flatDefParty||f.flatResParty||f.flatHpParty)hit=true; /* v1008 */
     if(f.vialElements&&f.vialElements.indexOf(element)>=0&&(!G.roundNum||G.roundNum<=relicWindow(f.vialRounds||0)))hit=true; /* v893 */
-    if(f.firstHitReduction||f.axolotlHeal)hit=true;
+    if(f.firstHitReduction)hit=true;
+    if(f.axolotlHeal&&!isGod&&!_gdn)hit=true; /* v1538: vassal-only -- was listed on gods too */
     /* v1107: was unconditional, so Llorona Tear and Snake Scale listed themselves on EVERY unit --
        including patron gods, which weakestDeployedVassal() explicitly excludes. The stat math was
        always right (battle start resolves one target and boosts only that one); it was the panel
@@ -5685,7 +5724,9 @@ function offeringStatLayer(base,element,isGod,type,turquoise,isTlaloqueU,isPatro
        deployed there is no lowest-level vassal to name yet. */
     if((f.weakestHpMult||f.weakestDefBuff)&&_isWeakest)hit=true;
     if(f.weakestElemDefRes&&remedy)hit=true; /* v1123: listed on whoever actually received it */
-    if(f.vassalHpMult&&!isGod)hit=true;
+    if(f.vassalHpMult&&!isGod&&!_gdn)hit=true; /* v1538 */
+    if(f.tzoalliPerGod&&!isGod&&!_gdn)hit=true; /* v1536 */
+    if((f.guardianStatMult||f.guardianStartChimalli)&&_gdn)hit=true; /* v1539 */
     if(_B(f.flatAtkByElement)&&usesAtk)hit=true;
     if(_B(f.flatMagByElement)&&usesMag)hit=true;
     if(_B(f.flatDefByElement))hit=true;
@@ -6777,7 +6818,7 @@ function renderPochtecaReal(){
       var _fp=getDTEffects().offeringFlowerPay; /* v1326: Flower button hidden until Flower Barter */
       var _free=pochFreeAvail();if(_free){cEff=0;_fp=false;} /* v1372 */
       var canC=(G.res.cacao||0)>=cEff,canF=(G.res.flower||0)>=fEff;
-      var btn=it.sold?'<span style="margin-top:auto;font-size:11px;color:#50c080;font-weight:600">Acquired ✦</span>':
+      var btn=it.sold?'<span style="margin-top:auto;font-size:11px;color:#50c080;font-weight:600">'+t('ui.pochteca.acquired')+'</span>':
         ('<div style="margin-top:auto;width:100%;display:flex;gap:4px">'+
          '<button class="btn btn-ca" '+(canC?'':'disabled')+' onclick="buyOffering('+i+',\'cacao\')" style="flex:1;font-size:14px;font-weight:600'+(canC?'':';opacity:.4')+'"><svg class="tl tl-cacao"><use href="#tl-cacao"/></svg> '+(_free?t('ui.pochteca.free'):cEff)+'</button>'+
          (_fp?'<button class="btn btn-ca" '+(canF?'':'disabled')+' onclick="buyOffering('+i+',\'flower\')" style="flex:1;font-size:14px;font-weight:600'+(canF?'':';opacity:.4')+'"><svg class="tl tl-quincunx"><use href="#tl-quincunx"/></svg> '+fEff+'</button>':'')+
@@ -6882,11 +6923,31 @@ function doTlacuiloRecord(k){
    Recording is deliberately still allowed: carrying one forward at Lv1 is a slow, single-copy
    reward. Cloning is not -- it duplicates a mini-boss at its CURRENT level with its Soul Surge
    intact, and two of them at once is out of line with everything else on the roster. */
-function isMinibossCapture(cu){
-  if(!cu)return false;
-  const bid=cu.baseId||cu.id||'';
-  return !!(typeof MINIBOSS_CAP_STATS!=='undefined'&&MINIBOSS_CAP_STATS[bid]);
+/* v1538 [Genaro]: GUARDIANS. Captured minibosses are their own class now -- not vassals, not gods. Identity is the species
+   (baseId) against every miniboss template plus MINIBOSS_CAP_STATS, because capture strips isMiniBoss from the roster entry.
+   This also fixes v890's test, which only knew the 5 species in MINIBOSS_CAP_STATS: the other 8 (Mictlampehecatl, Tlacateocotl,
+   the Lake Lords, Ometochtli, Ixpuxtequi, Nexoxcho) could be cloned and levelled at the plain vassal Blood price. */
+let _guardianIds=null;
+function guardianIds(){
+  if(_guardianIds)return _guardianIds;
+  const ids=new Set();
+  try{(typeof MINIBOSS_TEMPLATES!=='undefined'?MINIBOSS_TEMPLATES:[]).forEach(t=>{if(t&&t.id)ids.add(t.id);});}catch(e){}
+  try{if(typeof MINIBOSS_CAP_STATS!=='undefined')Object.keys(MINIBOSS_CAP_STATS).forEach(k=>ids.add(k));}catch(e){}
+  if(ids.size)_guardianIds=ids;
+  return ids;
 }
+function isGuardian(u){
+  if(!u||u.isGod||u.isAlly===false&&u.isMiniBoss)return false; /* a live enemy miniboss is a foe, not a Guardian ally */
+  return guardianIds().has(u.baseId||u.id||'');
+}
+function isGuardianKey(key){
+  if(!key||String(key).startsWith('god_'))return false;
+  const cu=(G.captured||[]).find(c=>capKey(c)===key)||(G.units||[]).find(u=>u&&(u.id===key||capKey(u)===key));
+  return isGuardian(cu);
+}
+/* growth role for scR/npMaxFor: true = god, 'guardian', false = vassal */
+function growthRoleKey(key){return isGodKey(key)?true:(isGuardianKey(key)?'guardian':false);}
+function isMinibossCapture(cu){return isGuardian(cu);} /* v1538: kept for the Tlacuilo + Blood-cost callers */
 function tlacCloneVassals(){return (typeof tlacVassals==='function'?tlacVassals():[]).filter(function(cu){return !isMinibossCapture(cu);});}
 function doTlacuiloClone(k){
   var cu=(G.captured||[]).find(function(c){return capKey(c)===k;});if(!cu||cu.isGod)return;
@@ -7342,9 +7403,9 @@ const TECPATL_MODS=[
   {id:'vassal_surge_2',family:'Enemy Vassal Surge',tier:2,name:'Enemy Vassal Surge II',nameEs:'Oleada de Vasallos Enemigos II',icon:'\u{1F5FF}',desc:'Enemy vassals have +50% max HP.',descEs:'Los vasallos enemigos tienen +50% de PV máx.',effect:'vassalHpMult:1.5',req:'vassal_surge_1'},
   {id:'vassal_surge_3',family:'Enemy Vassal Surge',tier:3,name:'Enemy Vassal Surge III',nameEs:'Oleada de Vasallos Enemigos III',icon:'\u{1F5FF}',desc:'Enemy vassals have +100% max HP.',descEs:'Los vasallos enemigos tienen +100% de PV máx.',effect:'vassalHpMult:2.0',req:'vassal_surge_2'},
   // MINIBOSS HP
-  {id:'mini_surge_1',family:'Miniboss Surge',tier:1,name:'Miniboss Surge I',nameEs:'Oleada de Minijefes I',icon:'\u{1F409}',desc:'Minibosses and their escorts have +25% max HP.',descEs:'Los minijefes y sus escoltas tienen +25% de PV máx.',effect:'miniHpMult:1.25'},
-  {id:'mini_surge_2',family:'Miniboss Surge',tier:2,name:'Miniboss Surge II',nameEs:'Oleada de Minijefes II',icon:'\u{1F409}',desc:'Minibosses and their escorts have +50% max HP.',descEs:'Los minijefes y sus escoltas tienen +50% de PV máx.',effect:'miniHpMult:1.5',req:'mini_surge_1'},
-  {id:'mini_surge_3',family:'Miniboss Surge',tier:3,name:'Miniboss Surge III',nameEs:'Oleada de Minijefes III',icon:'\u{1F409}',desc:'Minibosses and their escorts have +100% max HP.',descEs:'Los minijefes y sus escoltas tienen +100% de PV máx.',effect:'miniHpMult:2.0',req:'mini_surge_2'},
+  {id:'mini_surge_1',family:'Miniboss Surge',tier:1,name:'Guardian Surge I',nameEs:'Oleada de Guardianes I',icon:'\u{1F409}',desc:'Guardians and their escorts have +25% max HP.',descEs:'Los Guardianes y sus escoltas tienen +25% de PV máx.',effect:'miniHpMult:1.25'},
+  {id:'mini_surge_2',family:'Miniboss Surge',tier:2,name:'Guardian Surge II',nameEs:'Oleada de Guardianes II',icon:'\u{1F409}',desc:'Guardians and their escorts have +50% max HP.',descEs:'Los Guardianes y sus escoltas tienen +50% de PV máx.',effect:'miniHpMult:1.5',req:'mini_surge_1'},
+  {id:'mini_surge_3',family:'Miniboss Surge',tier:3,name:'Guardian Surge III',nameEs:'Oleada de Guardianes III',icon:'\u{1F409}',desc:'Guardians and their escorts have +100% max HP.',descEs:'Los Guardianes y sus escoltas tienen +100% de PV máx.',effect:'miniHpMult:2.0',req:'mini_surge_2'},
   // DEADLY TIMER — a hard clock on long battles
   {id:'deadly_timer_1',family:'Deadly Timer',tier:1,name:'Deadly Timer I',nameEs:'Cuenta Mortal I',icon:'\u23F3',desc:'From round 12, each of your units loses 40% of its max HP after it acts.',descEs:'A partir de la ronda 12, cada una de tus unidades pierde 40% de sus PV máx. después de actuar.',effect:'deadlyTimerRound:12'},
   {id:'deadly_timer_2',family:'Deadly Timer',tier:2,name:'Deadly Timer II',nameEs:'Cuenta Mortal II',icon:'\u23F3',desc:'From round 10, each of your units loses 40% of its max HP after it acts.',descEs:'A partir de la ronda 10, cada una de tus unidades pierde 40% de sus PV máx. después de actuar.',effect:'deadlyTimerRound:10',req:'deadly_timer_1'},
@@ -7515,7 +7576,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1530'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1543'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -7943,7 +8004,7 @@ const GODS=[
     ability:'She Who Eats Filth',abilityEs:'La Que Come Inmundicia',ad:'Heals all allies 25% HP + Cleanse + {{st:poison}} ×1 to ALL enemies + as Patron, also {{st:poison}} ×1 to ALL allies',adEs:'Cura 25% de PV a todos los aliados + Limpieza + {{st:poison}} ×1 a TODOS los enemigos + como patrón, también {{st:poison}} ×1 a TODOS los aliados',ak:'sheWhoEatsFilth',locked:true,unlockCriteria:'Conquer Apanohualóyan'},
   {id:'xochiquetzal',name:'Xochiquetzal',flavor:'Princess Goddess of Flowers and Beauty',flavorEs:'Diosa Princesa de las Flores y la Belleza',element:'nature',icon:'🌸',
     type:'MAG',hp:162,atk:0,mag:16,def:8,res:12,np:42,npCost:22,
-    passive:'Floral Sepulture: Sacrificing vassals at the altar yields +20% Flowers.',passiveEs:'Sepultura Floral: sacrificar vasallos en el altar rinde +20% de Flores.',pk:'floralSepulture',pv:.20,
+    passive:'Floral Sepulture: Every unit sacrificed at the altar yields +20% Flowers.',passiveEs:'Sepultura Floral: cada unidad sacrificada en el altar rinde +20% de Flores.',pk:'floralSepulture',pv:.20,
     ability:'Ixiptlatli Bloom',abilityEs:'Floración Ixiptlatli',ad:'1.1×MAG to 5 targets + Chimalli worth 3% max HP to every {{elem:nature}} unit in party',adEs:'1.1×MAG a 5 enemigos + Chimalli por 3% de PV máx. a cada unidad {{elem:nature}} del grupo',ak:'ixiptlatliBloom',
     locked:true,unlockCriteria:'Answer her flower offering in Chiconahualoyán'},
   {id:'huitzilopochtli',name:'Huitzilopochtli',flavor:'Hummingbird God of War',flavorEs:'Dios Colibrí de la Guerra',element:'day',icon:'🐦',
@@ -7978,7 +8039,7 @@ const GODS=[
      because the no-casualty streak is not tracked -- so he is debug-only until those land. */
   {id:'xbalanque',name:'Xbalanque',flavor:'Twin Jaguar God Killer',flavorEs:'Dios Jaguar Gemelo Matadioses',element:'humanity',icon:'\u{1F406}',
     type:'PHYS',hp:155,atk:21,mag:0,def:12,res:8,np:40,npCost:24,
-    passive:'Nullifidian Rage: Xbalanque and his allies gain +5% HP, ATK, MAG, DEF and RES per vassal in the party',passiveEs:'Furia Nulifidiana: Xbalanque y sus aliados ganan +5% de PV, ATQ, MAG, DEF y RES por cada vasallo en el grupo',pk:'nullifidianRage',
+    passive:'Nullifidian Rage: Xbalanque and his allies gain +5% HP, ATK, MAG, DEF and RES per non-god ally in the party',passiveEs:'Furia Nulifidiana: Xbalanque y sus aliados ganan +5% de PV, ATQ, MAG, DEF y RES por cada aliado que no sea dios en el grupo',pk:'nullifidianRage',
     ability:'Godbane Blowgun',abilityEs:'Cerbatana Matadioses',ad:'0.5×ATK, 5 hits to random enemies + 2× damage against GODS',adEs:'0.5×ATQ, 5 golpes a enemigos al azar + 2× de daño contra DIOSES',ak:'godbaneBlowgun',
     locked:true,unlockCriteria:'Defeat him in Apanohual\u00f3yan'} /* v907: naming Xbalanque on a ??? card gave the secret boss away before the player ever met him */,
   {id:'mictlantecuhtli',name:'Mictlantecuhtli',flavor:'God King of the Dead',flavorEs:'Dios Rey de los Muertos',element:'night',icon:'\u{1F480}',
@@ -8160,7 +8221,7 @@ const MICTLAN_CAPS=[
   {id:'mf3',name:'Tletamazolin',nameEs:'Tletamazolin',icon:'🐸',element:'fire',type:'MAG',hp:95,atk:0,mag:12,def:4,res:5,np:26,npCost:13,ability:'Magma Burst',abilityEs:'Estallido de Magma',ad:'1.2×MAG to 3 targets + {{st:burn}} ×1',adEs:'1.2×MAG a 3 enemigos + {{st:burn}} ×1',acd:11,fv:3},
   {id:'mf4',name:'Ash Hound',nameEs:'Sabueso de Ceniza',icon:'🐕',element:'fire',type:'PHYS',hp:85,atk:15,mag:0,def:5,res:4,np:22,npCost:9,ability:'Scorching Bite',abilityEs:'Mordida Abrasadora',ad:'1.3×ATK to 1 target + {{st:burn}} ×2',adEs:'1.3×ATQ a 1 enemigo + {{st:burn}} ×2',acd:9,fv:4},
   // THUNDER — balanced DEF/RES, fast, versatile
-  {id:'mt1',name:'Xolo Guardian',nameEs:'Xolo Guardián',icon:'🦮',element:'thunder',type:'PHYS',hp:80,atk:15,mag:0,def:9,res:8,np:22,npCost:11,ability:'Static Bite',abilityEs:'Mordida Estática',ad:'1.3×ATK to 1 target + {{st:poison}} ×1 + {{st:paralyze}} ×1',adEs:'1.3×ATQ a 1 enemigo + {{st:poison}} ×1 + {{st:paralyze}} ×1',acd:9,fv:4},
+  {id:'mt1',name:'Xolo Sentinel',nameEs:'Xolo Centinela', /* v1538 [Genaro]: was Xolo Guardian -- clashed with the Guardian class */icon:'🦮',element:'thunder',type:'PHYS',hp:80,atk:15,mag:0,def:9,res:8,np:22,npCost:11,ability:'Static Bite',abilityEs:'Mordida Estática',ad:'1.3×ATK to 1 target + {{st:poison}} ×1 + {{st:paralyze}} ×1',adEs:'1.3×ATQ a 1 enemigo + {{st:poison}} ×1 + {{st:paralyze}} ×1',acd:9,fv:4},
   {id:'mt2',name:'Storm Ahuizotl',nameEs:'Ahuizotl de Tormenta',icon:'🐶',element:'thunder',type:'PHYS',hp:65,atk:13,mag:0,def:8,res:7,np:20,npCost:8,ability:'Thunder Yip',abilityEs:'Ladrido de Trueno',ad:'1.6×ATK to 1 target + {{st:paralyze}} ×1',adEs:'1.6×ATQ a 1 enemigo + {{st:paralyze}} ×1',acd:8,fv:3},
   {id:'mt3',name:'Void Xolo',nameEs:'Xolo del Vacío',icon:'🐺',element:'thunder',type:'MAG',hp:90,atk:0,mag:16,def:7,res:9,np:26,npCost:13,ability:'Septic Howl',abilityEs:'Aullido Séptico',ad:'1.25×MAG to 3 targets + {{st:poison}} ×1',adEs:'1.25×MAG a 3 enemigos + {{st:poison}} ×1',acd:10,fv:4},
   {id:'mt4',name:'Spirit Hound',nameEs:'Sabueso Espiritual',icon:'🧙',element:'thunder',type:'MAG',hp:85,atk:0,mag:12,def:7,res:9,np:28,npCost:20,ability:'Storm Mend',abilityEs:'Remiendo de Tormenta',ad:'AoE heal 20% all + cleanse',adEs:'Curación en área de 20% a todos + Limpieza',acd:12,fv:4}
@@ -10402,7 +10463,7 @@ const AMOX_LORE={
   "mf2":{en:"A cloaked figure holding a live coal in both hands, always offering it forward. It is the last warmth of a home fire that followed its family into death. It does not fight so much as encourage, fanning the courage of those around it and hardening their resolve.",es:"Una figura encapuchada que sostiene una brasa viva con ambas manos, siempre ofreciéndola. Es el último calor de un fogón que siguió a su familia hasta la muerte. No pelea tanto como alienta: aviva el valor de quienes la rodean y endurece su determinación."},
   "mf3":{en:"A squat toad with a crust of black rock cracked over molten orange, glowing at every seam. Its name means something like \"fire toad\", and it earns it: when it bursts, it showers the area in burning slag. It is wide, low and very hard to move.",es:"Un sapo rechoncho con una costra de roca negra agrietada sobre naranja fundido, brillando en cada juntura. Su nombre significa algo como \"sapo de fuego\", y se lo gana: cuando revienta, baña el área de escoria ardiente. Es ancho, bajo y muy difícil de mover."},
   "mf4":{en:"A lean hound with an ash-grey coat, ember eyes and smoke rising from its spine. It is kin to the xolos that guide the dead, but something burned the kindness out of it. It runs the riverbank at night, and its bite leaves wounds that keep smoldering long after.",es:"Un sabueso flaco de pelaje gris ceniza, ojos de brasa y humo saliendo de su lomo. Es pariente de los xolos que guían a los muertos, pero algo le quemó la bondad. Recorre la orilla de noche, y su mordida deja heridas que siguen ardiendo mucho después."},
-  "mt1":{en:"A classic xoloitzcuintli, hairless and alert, with static crackling between its upright ears. These are Xolotl's own dogs, the ones that carry worthy souls across the Apanuiayo. It guards the crossing fiercely, and its bite carries both the sickness and the lightning of its master.",es:"Un xoloitzcuintle clásico, sin pelo y alerta, con estática chisporroteando entre sus orejas erguidas. Son los propios perros de Xolotl, los que cruzan a las almas dignas por el Apanuiayo. Guarda el cruce con fiereza, y su mordida lleva tanto la enfermedad como el rayo de su amo."},
+  "mt1":{en:"A classic xoloitzcuintli, hairless and alert, with static crackling between its upright ears. These are Xolotl's own dogs, the ones that carry worthy souls across the Apanuiayo. It keeps watch over the crossing like a sentinel, and its bite carries both the sickness and the lightning of its master.",es:"Un xoloitzcuintle clásico, sin pelo y alerta, con estática chisporroteando entre sus orejas erguidas. Son los propios perros de Xolotl, los que cruzan a las almas dignas por el Apanuiayo. Vigila el cruce como un centinela, y su mordida lleva tanto la enfermedad como el rayo de su amo."},
   "mt2":{en:"A small, wet, otter-like creature with a hand at the tip of its tail. Fishermen feared the ahuizotl: it drowned people by pulling them under with that hand, and took only their eyes, nails and teeth. This one crackles with storm, and its sharp yip stuns whatever it strikes.",es:"Una criatura pequeña, mojada y parecida a una nutria, con una mano en la punta de la cola. Los pescadores temían al ahuízotl: ahogaba a la gente jalándola al fondo con esa mano y solo se quedaba con sus ojos, uñas y dientes. Este chisporrotea de tormenta, y su ladrido agudo aturde a lo que golpea."},
   "mt3":{en:"A xolo whose body is only an outline filled with night and points of light, like a hole cut into the sky. It is said to be one of the dogs that walked with Xolotl into darkness and never came back the same. Its howl spreads sickness through everything that hears it.",es:"Un xolo cuyo cuerpo es solo un contorno lleno de noche y puntos de luz, como un hueco recortado en el cielo. Se dice que es uno de los perros que caminó con Xolotl hacia la oscuridad y nunca volvió igual. Su aullido esparce enfermedad en todo lo que lo escucha."},
   "mt4":{en:"A ghostly xolo of pale gold, sitting calmly while everything around it rages. It is the oldest of Xolotl's pack, the one that waits with the dead who are too frightened to cross. When it lifts its head, a warm storm passes over its allies and their wounds close.",es:"Un xolo fantasmal de oro pálido, sentado con calma mientras todo a su alrededor se enfurece. Es el más viejo de la jauría de Xolotl, el que espera con los muertos demasiado asustados para cruzar. Cuando alza la cabeza, una tormenta cálida pasa sobre sus aliados y sus heridas se cierran."},
@@ -11524,6 +11585,8 @@ function resumeRun(){
   try{refreshCaptureNames();}catch(e){} /* v1102 */
   try{i18nResyncRun();}catch(e){} /* v1299: re-read language-frozen snapshot text from live templates */
   try{migrateSurgePaid();}catch(e){} /* v1126: seed force.paid on pre-v1126 records */
+  /* v1538: roster entries snapshot the name at capture -- carry saved Xolo Guardians over to the new name */
+  try{const _xt=tplById('mt1');if(_xt)[...(G.captured||[]),...((G.mercPool)||[])].forEach(c=>{if(c&&(c.baseId||c.id)==='mt1'&&c.name!==_xt.name){c.name=_xt.name;c.nameEs=_xt.nameEs;}});}catch(e){}
   if(repairMinibossCaptures()>0){try{saveRun();}catch(e){}} // v844: repair pre-v843 Feather Embrace miniboss captures, then persist so it only runs once
   G.dte=getDTEffects();
   loadV();
@@ -11843,14 +11906,14 @@ function scA(base,lv){return Math.round(base*growthCurve(lv));}
    enemy lead on identical base at Lv70:  vs god 18.4%   vs vassal 25.5%
       (was 5.7% / 11.9% at v993 rates; 58.7% before v993)
    ONE constant each -- retune here and nowhere else. */
-const ALLY_MILESTONE={god:1.03,vassal:1.02}; /* v1002: third step down. 1.07/1.06 -> 1.05/1.04 -> 1.04/1.03 -> 1.03/1.02 */
+const ALLY_MILESTONE={god:1.04,guardian:1.03,vassal:1.02}; /* v1538 [Genaro]: gods 1.03 -> 1.04, Guardians new at 1.03, vassals 1.02 */ /* v1002: third step down. 1.07/1.06 -> 1.05/1.04 -> 1.04/1.03 -> 1.03/1.02 */
 /* v1466: ally milestones count only the 10-level marks crossed AFTER the unit joined (any level
    gained after joining counts, event levels included). A Lv80 recruit starts with none. joinLv
    defaults to 1, which is the pre-v1466 behaviour -- old saves and any call site that does not
    pass it are unchanged. Enemy milestones (sc) are untouched. */
 function growthMult(lv,isGod,joinLv){
   const n=Math.floor((Math.max(1,lv||1)-1)/10)-Math.floor((Math.max(1,joinLv||1)-1)/10);
-  return Math.pow(isGod?ALLY_MILESTONE.god:ALLY_MILESTONE.vassal,Math.max(0,n));
+  return Math.pow(isGod==='guardian'?ALLY_MILESTONE.guardian:isGod?ALLY_MILESTONE.god:ALLY_MILESTONE.vassal,Math.max(0,n)); /* v1538: 3rd arg may be 'guardian' */
 }
 function scR(base,lv,isGod,joinLv){return Math.round(base*growthCurve(lv)*growthMult(lv,isGod,joinLv));}
 /* v1466: join level per unit key, recorded at every acquisition site via markJoin. Missing = 1. */
@@ -12010,7 +12073,7 @@ function capKey(cu){return cu._captureId||cu.id;}
    than each re-deriving it. */
 function weakestDeployedVassal(){
   /* v988: the Sacrifice Slot victim is not a real party member -- see weakestAlly. */
-  const pool=(G.units||[]).filter(u=>u&&u.isAlly&&!u.isGod&&u.currentHp>0&&!u._sacVictim);
+  const pool=(G.units||[]).filter(u=>u&&u.isAlly&&!u.isGod&&!isGuardian(u)&&u.currentHp>0&&!u._sacVictim); /* v1538: Llorona Tear / Snake Scale are vassal-only */
   if(!pool.length)return null;
   let best=pool[0],bestLv=getLevel(capKey(best));
   pool.forEach(u=>{const lv=getLevel(capKey(u));if(lv<bestLv){best=u;bestLv=lv;}});
@@ -12506,9 +12569,9 @@ function surgeForceBadge(key){
   }else s=G.surge&&G.surge[key];
   if(!s||!s.forces)return'';
   const parts=[];const F=s.forces;
-  if((F.ihiyotl||{}).lv)parts.push('💪 Ihiyotl '+forceLvAb()+F.ihiyotl.lv);
-  if((F.teyolia||{}).lv)parts.push('🫀 Teyolia '+forceLvAb()+F.teyolia.lv);
-  if((F.tonalli||{}).lv)parts.push('🔮 Tonalli '+forceLvAb()+F.tonalli.lv);
+  if((F.ihiyotl||{}).lv)parts.push(surgeIco('ihiyotl')+' Ihiyotl '+forceLvAb()+F.ihiyotl.lv);
+  if((F.teyolia||{}).lv)parts.push(surgeIco('teyolia')+' Teyolia '+forceLvAb()+F.teyolia.lv);
+  if((F.tonalli||{}).lv)parts.push(surgeIco('tonalli')+' Tonalli '+forceLvAb()+F.tonalli.lv);
   return parts.length?'<div style="font-size:10px;color:#c8a040;margin-bottom:3px">'+parts.join(' · ')+'</div>':'';
 }
 function unitBaseFor(key){
@@ -12650,8 +12713,8 @@ function npRateProduct(lv){
    over a special-cost increase). Player side only -- enemy pools are built with sc(). */
 const TP_POOL_MULT=1.05;
 function npMaxFor(base,lv,isGod,joinLv){return Math.round((base||0)*growthCurve(lv)*TP_POOL_MULT*growthMult(lv,isGod,joinLv));}
-function maxNPFor(key,baseNp){return npMaxFor(baseNp,getLevel(key),isGodKey(key),joinLvOf(key))+surgeBonus(key).tp;} /* v1004 */
-function allyMaxHpFor(key,baseHp,mult){return Math.round(scR(baseHp,getLevel(key),isGodKey(key),joinLvOf(key))*(mult||1))+surgeBonus(key).hp;} /* v993 */
+function maxNPFor(key,baseNp){return npMaxFor(baseNp,getLevel(key),growthRoleKey(key),joinLvOf(key))+surgeBonus(key).tp;} /* v1004 */
+function allyMaxHpFor(key,baseHp,mult){return Math.round(scR(baseHp,getLevel(key),growthRoleKey(key),joinLvOf(key))*(mult||1))+surgeBonus(key).hp;} /* v993 */
 // v514: current roster HP for a unit between battles. Precedence: absolute override (event
 // penalties/heals — always pre-offering scale) → persisted RATIO from the last battle → full.
 // Ratios are scale-free, which fixes the v511–v513 bug where offering-multiplied battle HP was
@@ -12761,7 +12824,7 @@ function surgePick(key,force){
   // (new bonus − replaced bonus); accumulated totals live on the force badge instead.
   G._surgeFlash={key,deltas:{atk:(f.atk||0)-prev.atk,mag:(f.mag||0)-prev.mag,hp:(f.hp||0)-prev.hp,def:(f.def||0)-prev.def,res:(f.res||0)-prev.res,tp:(f.tp||0)-prev.tp,cost:(f.cost||0)-prev.cost}};
   setTimeout(()=>{if(G._surgeFlash&&G._surgeFlash.key===key){G._surgeFlash=null;if(document.getElementById('training-list'))renderTraining();}},3000);
-  const fname=force==='ihiyotl'?'💪 Ihiyotl':force==='teyolia'?'🫀 Teyolia':'🔮 Tonalli';
+  const fname=surgeIco(force)+' '+(force==='ihiyotl'?'Ihiyotl':force==='teyolia'?'Teyolia':'Tonalli'); /* v1533 */
   surgeFx('.train-card[data-uk="'+String(key).replace(/"/g,'')+'"]',force); /* v873: BEFORE renderTraining() replaces the card */
   notify(t('ui.msg.channeled',{name:fname,lv:f.lv}),'#d4af37');
   if(document.getElementById('training-list'))renderTraining();
@@ -12788,13 +12851,18 @@ const SURGE_FORCES=[
    d:'M2 0h2v1h-2zM7 0h2v1h-2zM1 1h4v1h-4zM6 1h4v1h-4zM0 2h11v1h-11zM0 3h11v1h-11zM0 4h11v1h-11zM1 5h9v1h-9zM2 6h7v1h-7zM3 7h5v1h-5zM4 8h3v1h-3zM5 9h1v1h-1z'},
   {id:'tonalli',col:'#b07ae8',tint:'rgba(176,122,232,.12)',glow:'rgba(176,122,232,.35)',vb:'0 0 11 11',w:44,h:44,
    d:'M5 0h1v1h-1zM1 1h1v1h-1zM5 1h1v1h-1zM9 1h1v1h-1zM2 2h1v1h-1zM8 2h1v1h-1zM4 3h3v1h-3zM3 4h5v1h-5zM0 5h2v1h-2zM3 5h5v1h-5zM9 5h2v1h-2zM3 6h5v1h-5zM4 7h3v1h-3zM2 8h1v1h-1zM8 8h1v1h-1zM1 9h1v1h-1zM5 9h1v1h-1zM9 9h1v1h-1zM5 10h1v1h-1z'}];
+/* v1533 [Genaro]: the picker's pixel force icons, inline at text size -- replaces the 💪 🫀 🔮 emoji on the cards.
+   Height tracks the surrounding font (1em); width follows each glyph's own viewBox so Teyolia's 11x10 heart isn't squashed. */
+function surgeIco(id){const f=SURGE_FORCES.find(x=>x.id===id);if(!f)return'';const v=f.vb.split(' '),w=(+v[2]/+v[3]).toFixed(3);
+  return '<svg class="sg-ico" viewBox="'+f.vb+'" style="height:1em;width:'+w+'em;vertical-align:-.12em;fill:'+f.col+'" shape-rendering="crispEdges" aria-hidden="true"><path d="'+f.d+'"/></svg>';}
 function surgeStatsFor(key,extra){
   const b=surgeBaseFor(key);if(!b)return null;
   const lv=getLevel(key),g=isGodKey(key),jl=joinLvOf(key),sb=surgeBonus(key),x=extra||{};
   const isPat=!!(G.god&&key==='god_'+G.god.id);
   const bc=g?(b.npCost||14):(b.npCost||9);
-  return{hp:scR(b.hp||50,lv,g,jl)+sb.hp+(x.hp||0),atk:scR(b.atk||0,lv,g,jl)+sb.atk+(x.atk||0),mag:scR(b.mag||0,lv,g,jl)+sb.mag+(x.mag||0),
-    def:scR(b.def||0,lv,g,jl)+sb.def+(x.def||0),res:scR(b.res||5,lv,g,jl)+sb.res+(x.res||0),tp:npMaxFor(b.np||20,lv,g,jl)+sb.tp+(x.tp||0),
+  const gr=growthRoleKey(key); /* v1538 */
+  return{hp:scR(b.hp||50,lv,gr,jl)+sb.hp+(x.hp||0),atk:scR(b.atk||0,lv,gr,jl)+sb.atk+(x.atk||0),mag:scR(b.mag||0,lv,gr,jl)+sb.mag+(x.mag||0),
+    def:scR(b.def||0,lv,gr,jl)+sb.def+(x.def||0),res:scR(b.res||5,lv,gr,jl)+sb.res+(x.res||0),tp:npMaxFor(b.np||20,lv,gr,jl)+sb.tp+(x.tp||0),
     cost:modelNpCost(bc,lv,sb.cost+(x.cost||0),b.element,isPat)};
 }
 function showSurgeModal(key){
@@ -13433,7 +13501,7 @@ function runStory(overrideLines){
 
 // Simplified ability descriptions for god selection screen (no damage formulas)
 const GOD_SELECT_DESC={
-  xochiquetzal:{passive:'Floral Sepulture: Sacrificing vassals at the altar yields +20% Flowers.',passiveEs:'Sepultura Floral: sacrificar vasallos en el altar rinde +20% de Flores.',ability:'Ixiptlatli Bloom',abilityEs:'Floración Ixiptlatli',ad:'1.1×MAG to 5 targets + Chimalli worth 3% max HP to every {{elem:nature}} unit in party',adEs:'1.1×MAG a 5 enemigos + Chimalli por 3% de PV máx. a cada unidad {{elem:nature}} del grupo'},
+  xochiquetzal:{passive:'Floral Sepulture: Every unit sacrificed at the altar yields +20% Flowers.',passiveEs:'Sepultura Floral: cada unidad sacrificada en el altar rinde +20% de Flores.',ability:'Ixiptlatli Bloom',abilityEs:'Floración Ixiptlatli',ad:'1.1×MAG to 5 targets + Chimalli worth 3% max HP to every {{elem:nature}} unit in party',adEs:'1.1×MAG a 5 enemigos + Chimalli por 3% de PV máx. a cada unidad {{elem:nature}} del grupo'},
   huitzilopochtli:{passive:'Golden War Cry: {{elem:day}} allies +10% ATK and PHYS/MIX allies +10% ATK at battle start (can be stacked)',passiveEs:'Grito de Guerra Dorado: los aliados {{elem:day}} +10% ATQ y los aliados FÍS/MIX +10% ATQ al inicio de la batalla (es acumulable)',ability:'Xiuhcoatl Might',abilityEs:'Poder de Xiuhcoatl',ad:'0.5×ATK, 3 hits to random enemies + if it defeats an enemy, that hit restores 10% TP and grants {{st:atkup}} ×1 to ALL allies',adEs:'0.5×ATQ, 3 golpes a enemigos al azar + si derrota a un enemigo, ese golpe restaura 10% de PT y otorga {{st:atkup}} ×1 a TODOS los aliados'},
   toci:{passive:'Tlalli Iyollo: Healing can carry allies past MAX HP (up to 120%), and the excess persists between battles. +1 Status and Buff Stack.',passiveEs:'Tlalli Iyollo: la curación puede llevar a los aliados por encima de sus PV MÁX. (hasta 120%), y el excedente persiste entre batallas. +1 carga de estado y de mejora.',ability:'Tlalli Steam',abilityEs:'Vapor Tlalli',ad:'Heals all allies 25% HP + Cleanse + {{st:burn}} ×1 to ALL enemies',adEs:'Cura 25% de PV a todos los aliados + Limpieza + {{st:burn}} ×1 a TODOS los enemigos'},
   quetzalcoatl:{passive:"Divinity Mercy: Captures give bonus {{res:blood}} & {{res:cacao}}",passiveEs:'Piedad Divina: las capturas dan {{res:blood}} y {{res:cacao}} extra' /* v1387 */,ability:'Feather Embrace',abilityEs:'Abrazo de Plumas',ad:'1.5×MAG to 1 target, if it defeats the enemy it auto-captures for 2× the capture reward',adEs:'1.5×MAG a 1 enemigo, si derrota al enemigo lo captura automáticamente por el doble de recompensa'},
@@ -14598,9 +14666,10 @@ function mkCap(cu,slot,b1){
   const lv=getLevel(ck);
   const sb=surgeBonus(ck); // v309: Soul Surge flat bonuses
   const _jl=joinLvOf(ck); /* v1466 */
-  const maxNP=npMaxFor(cu.np||20,lv,false,_jl)+sb.tp; /* v1004 */
+  const _gr=isGuardian(cu)?'guardian':false; /* v1538 */
+  const maxNP=npMaxFor(cu.np||20,lv,_gr,_jl)+sb.tp; /* v1004 */
   const hpPenalty=G.unitHpPenalty&&G.unitHpPenalty[ck]?G.unitHpPenalty[ck]:0;
-  const baseMaxHp=Math.round(scR(cu.hp,lv,false,_jl)*(G.dte.vassalHpMult||1))+sb.hp; /* v993 */
+  const baseMaxHp=Math.round(scR(cu.hp,lv,_gr,_jl)*(G.dte.vassalHpMult||1))+sb.hp; /* v993 · v1538: Teotl-tree HP boost covers Guardians too */
   const overrideHp=G.unitHpOverride?G.unitHpOverride[ck]:undefined;
   const ratioHp=G.unitHpRatio?G.unitHpRatio[ck]:undefined;
   // v514: absolute override (event penalty, pre-offering scale) consumed once; else persisted ratio
@@ -14612,8 +14681,8 @@ function mkCap(cu,slot,b1){
   if(overrideHp!==undefined)delete G.unitHpOverride[ck]; // consume once
   return{...cu,id:'cap_'+(cu._captureId||cu.id)+'_'+slot,baseId:cu.baseId||cu.id,_captureId:cu._captureId,level:lv, /* v1048: was baseId:cu.id -- see note above */
     maxHp:baseMaxHp,currentHp:startHp,
-    atk:scR(cu.atk||0,lv,false,_jl)+sb.atk,mag:scR(cu.mag||0,lv,false,_jl)+sb.mag, /* v993 */
-    def:scR(cu.def,lv,false,_jl)+sb.def,res:scR(cu.res||4,lv,false,_jl)+sb.res,
+    atk:scR(cu.atk||0,lv,_gr,_jl)+sb.atk,mag:scR(cu.mag||0,lv,_gr,_jl)+sb.mag, /* v993 */
+    def:scR(cu.def,lv,_gr,_jl)+sb.def,res:scR(cu.res||4,lv,_gr,_jl)+sb.res,
     maxNP,currentNP:getUnitNP(ck,maxNP),
     npCost:Math.max(1,baseNpCostFor(ck)-sb.cost-getOfferingEffects().tpCostFlat),
     _npBase:baseNpCostFor(ck),_npReduce:(sb.cost+getOfferingEffects().tpCostFlat),
@@ -18593,6 +18662,9 @@ function resolveStatusAfterAction(unit){
 function selectActor(unitId){
   // v425: tapping another unit while picking AoE targets cancels the AoE and opens that unit's menu
   if(G.battlePhase==='player_aoe_targeting'){G.pendingAction=null;G.aoeSelected=[];G.aoeCap=0;G.battlePhase='player_selected';setB1Hint('');}
+  /* v1542 [Genaro]: same for a STRIKE / single-target special -- clicking another ally (or the actor itself) drops the pending
+     target pick, so the Cancel button no longer has to be on screen. The actor itself reopens its action menu. */
+  if(G.battlePhase==='player_targeting'){G.pendingAction=null;G.battlePhase='player_selected';setB1Hint('');}
   // v304 (item 3): allow direct actor switching — player_selected is a valid origin phase now
   if(G.battlePhase!=='player_choose'&&G.battlePhase!=='player_selected')return;
   const u=G.units.find(x=>x.id===unitId);
@@ -19515,9 +19587,9 @@ function triggerCaptureWindow(dead,base,_already){
   const em=ELEM_META[dead.element];
   const isMiniboss=dead.isMiniBoss;
   const canCapture=!!base;
-  const _capW=LANG==='es'?'Capturar':'Capture';const capBtnLabel=isMiniboss?`${_capW} ${dead.icon} (${LANG==='es'?'¡Minijefe!':'Mini-boss!'})`:`${_capW} ${dead.icon}`; /* v1385: ES */
+  const _capW=LANG==='es'?'Capturar':'Capture';const capBtnLabel=isMiniboss?`${_capW} ${dead.icon} (${LANG==='es'?'¡Guardián!':'Guardian!'})`:`${_capW} ${dead.icon}`; /* v1385: ES */
   const capNote=isMiniboss
-    ?'<div style="font-size:11px;color:#60a0e0;margin-bottom:4px">✦ Mini-boss — capture for bonus spoils!</div>'
+    ?'<div style="font-size:11px;color:#60a0e0;margin-bottom:4px">'+(LANG==='es'?'✦ Guardián — ¡captúralo para botín extra!':'✦ Guardian — capture for bonus spoils!')+'</div>'
     :'<div style="font-size:12px;color:var(--td);margin-bottom:.6rem">'+(LANG==='es'?'Captura para reclutar, o elimina para obtener recursos extra.':'Capture to recruit, or slay for bonus resources.')+'</div>'; /* v1385 */
   document.getElementById('cap-area').innerHTML=`<div class="cap-pop">
     <div style="font-size:13px;font-weight:500;color:#50e090;margin-bottom:4px">${dead.icon} ${dead.name} ${(em&&G.dte.synergyUnlocked)?`<span class="elem-badge ${em.cls}">${em.icon} ${L(em,'label')}</span>`:''}</div>
@@ -19641,7 +19713,7 @@ function resolveCap(enemyId,doCapture){
     if(!G._spoilIdx)G._spoilIdx=0;
     G.spoils.captured.push({unit:dead,blood:bR,cacao:cR,mercyBonus:mercy&&mb>0,boosts:_rw.boosts,_idx:++G._spoilIdx});
     if(G.runStats)G.runStats.captured++; // v829
-    const label=dead.isMiniBoss?(isEs()?'¡Botín de mini jefe!':'Mini-boss spoils!'):(isEs()?'¡Captura!':'Captured!'); /* v1434: ES */
+    const label=dead.isMiniBoss?(isEs()?'¡Botín de Guardián!':'Guardian spoils!'):(isEs()?'¡Captura!':'Captured!'); /* v1434: ES */
     addLog(isEs()?`<span class="log-cp">${dead.icon} ${liveName(dead)} — ${label}${mercy?' (+Piedad)':''}</span> <span class="log-gain">+${bR} <svg class="tl tl-blood"><use href="#tl-blood"/></svg> +${cR} <svg class="tl tl-cacao"><use href="#tl-cacao"/></svg></span>`:`<span class="log-cp">${dead.icon} ${dead.name} — ${label}${mercy?' (+Mercy)':''}</span> <span class="log-gain">+${bR} <svg class="tl tl-blood"><use href="#tl-blood"/></svg> +${cR} <svg class="tl tl-cacao"><use href="#tl-cacao"/></svg></span>`);
     flashResGain(bR,cR);renderRes('rb-battle');
     if(!hasV('first_capture_seen')){markV('first_capture_seen');notify(t('ui.msg.capJoin'),'#50c080');}
@@ -19803,7 +19875,7 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
         captureTpRefund(); /* v1103: Feather Snake Helmet fires on this capture too */
         if(G.runStats)G.runStats.captured++; /* v1103: FE captures were never counted */
         G._kukulkanPending=true; /* v856: deferred to advanceTurn -- see the note there */
-        addLog(isEs()?`<span class="log-cp">🐍 Abrazo de Plumas — <span style="color:#60e0c0">¡CAPTURA AUTOMÁTICA! ${pickT.isMiniBoss?'¡Mini jefe! ':''}¡Recompensa 2×!</span></span>`:`<span class="log-cp">🐍 Feather Embrace — <span style="color:#60e0c0">AUTO-CAPTURE! ${pickT.isMiniBoss?'Mini-boss! ':''}2× reward!</span></span>`);
+        addLog(isEs()?`<span class="log-cp">🐍 Abrazo de Plumas — <span style="color:#60e0c0">¡CAPTURA AUTOMÁTICA! ${pickT.isMiniBoss?'¡Guardián! ':''}¡Recompensa 2×!</span></span>`:`<span class="log-cp">🐍 Feather Embrace — <span style="color:#60e0c0">AUTO-CAPTURE! ${pickT.isMiniBoss?'Mini-boss! ':''}2× reward!</span></span>`);
         notify(t('ui.msg.autoCaptured',{name:pickT.name}),'#60e0c0');
       }else if(pickT.isBoss){
         // v319: boss can't be captured — FE still grants 2.5× resources, but the death MUST go
@@ -20458,7 +20530,7 @@ function onHitContact(attacker,target){
    living, it does not undo a death. */
 function checkAxolotlCharm(target){
   if(G._axolotlUsed)return;
-  if(!target||!target.isAlly||target.isGod)return;
+  if(!target||!target.isAlly||target.isGod||isGuardian(target))return; /* v1538: vassal-only */
   if(target.currentHp<=0)return;
   const pct=getOfferingEffects().axolotlHeal;
   if(!(pct>0))return;
@@ -20740,12 +20812,12 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   }
   if(ab==='Death Bloom'){
     const pct=0.16+spLv*0.02;
-    aa.forEach(a=>{a.currentHp=healTo(a,Math.round(a.maxHp*pct));applyDefBuff(a,1);});
+    aa.forEach(a=>{const _h=Math.round(a.maxHp*pct);a.currentHp=healTo(a,_h);applyDefBuff(a,1);animateHit(a.id,_h,true);}); /* v1531: heal numbers were never drawn */
     addLog(isEs()?`<span class="log-heal">${u.icon} Floración Mortal: +${Math.round(pct*100)}% a todos + ¡AUMENTO DEF/RES×1!</span>`:`<span class="log-heal">${u.icon} Death Bloom: +${Math.round(pct*100)}% all + DEF/RES UP×1!</span>`);return;
   }
   if(ab==='Dark Waters'){
     const pct=0.16+spLv*0.02;
-    aa.forEach(a=>{a.currentHp=healTo(a,Math.round(a.maxHp*pct));applyAtkBuff(a,1);});
+    aa.forEach(a=>{const _h=Math.round(a.maxHp*pct);a.currentHp=healTo(a,_h);applyAtkBuff(a,1);animateHit(a.id,_h,true);}); /* v1531: heal numbers were never drawn */
     addLog(isEs()?`<span class="log-heal">${u.icon} Aguas Oscuras: +${Math.round(pct*100)}% a todos + ¡AUMENTO ATQ/MAG×1!</span>`:`<span class="log-heal">${u.icon} Dark Waters: +${Math.round(pct*100)}% all + ATK/MAG UP×1!</span>`);return;
   }
   if(ab==='Uapantotli'){
@@ -20967,7 +21039,7 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   }
   if(ab==='Earth Bloom'){
     const pct=0.20+spLv*0.02; /* v1345: was 0.15 -- raised to match the enemy side and the original text (Genaro) */
-    aa.forEach(a=>{a.currentHp=healTo(a,Math.round(a.maxHp*pct));applyAtkBuff(a,1);});
+    aa.forEach(a=>{const _h=Math.round(a.maxHp*pct);a.currentHp=healTo(a,_h);applyAtkBuff(a,1);animateHit(a.id,_h,true);}); /* v1531: heal numbers were never drawn */
     addLog(isEs()?`<span class="log-heal">${u.icon} Floración de Tierra: +${Math.round(pct*100)}% a todos + ¡AUMENTO ATQ/MAG ×1!</span>`:`<span class="log-heal">${u.icon} Earth Bloom: +${Math.round(pct*100)}% all + ATK/MAG UP ×1!</span>`);return;
   }
   if(ab==='Gust Mend'){
@@ -20987,12 +21059,12 @@ function fireUnitSpecial(u,ae,aa,ft){rollCrit._lc=false;
   }
   if((ab==='Stone Mend'||ab==='Stone Protection')&&aa.length){
     const tgt=aa.reduce((a,b)=>a.currentHp<b.currentHp?a:b);const pct=0.35+spLv*0.02;
-    tgt.currentHp=healTo(tgt,Math.round(tgt.maxHp*pct));const chimaAmt=Math.max(1,Math.round((tgt.maxHp||0)*0.03))+sp2; /* v964 */tgt.armor=(tgt.armor||0)+chimaAmt;
+    const _h=Math.round(tgt.maxHp*pct);tgt.currentHp=healTo(tgt,_h);const chimaAmt=Math.max(1,Math.round((tgt.maxHp||0)*0.03))+sp2; /* v964 */tgt.armor=(tgt.armor||0)+chimaAmt;animateHit(tgt.id,_h,true); /* v1531 */
     addLog(isEs()?`<span class="log-heal">${u.icon} Protección de Piedra: +${Math.round(pct*100)}% + ${chimaAmt} de Chimalli → ${tgt.icon}</span>`:`<span class="log-heal">${u.icon} Stone Protection: +${Math.round(pct*100)}% + ${chimaAmt} Chimalli → ${tgt.icon}</span>`);return;
   }
   if(ab==='Ancestral Storm'&&aa.length){
     const tgt=aa.reduce((a,b)=>a.currentHp<b.currentHp?a:b);const pct=0.43+spLv*0.02;
-    tgt.currentHp=healTo(tgt,Math.round(tgt.maxHp*pct));const chimaAmt=Math.max(1,Math.round((tgt.maxHp||0)*0.04))+sp2; /* v964 */tgt.armor=(tgt.armor||0)+chimaAmt;
+    const _h=Math.round(tgt.maxHp*pct);tgt.currentHp=healTo(tgt,_h);const chimaAmt=Math.max(1,Math.round((tgt.maxHp||0)*0.04))+sp2; /* v964 */tgt.armor=(tgt.armor||0)+chimaAmt;animateHit(tgt.id,_h,true); /* v1531 */
     addLog(isEs()?`<span class="log-heal">${u.icon} Tormenta Ancestral: +${Math.round(pct*100)}% + ${chimaAmt} de Chimalli → ${tgt.icon}</span>`:`<span class="log-heal">${u.icon} Ancestral Storm: +${Math.round(pct*100)}% + ${chimaAmt} Chimalli → ${tgt.icon}</span>`);return;
   }
   // BUFF
@@ -25147,7 +25219,8 @@ function mkUnitCard(u){
   const isSlowWaiting=isSlowedThisRound&&G.units.some(x=>x.currentHp>0&&!G.actedIds.has(x.id)&&!slowedSet.has(x.id));
   const isSelectable=(G.battlePhase==='player_choose'&&u.isAlly&&!acted&&!isSlowWaiting)
     ||(G.battlePhase==='player_selected'&&u.isAlly&&!acted&&!isSlowWaiting&&u.id!==G.selectedActorId)
-    ||(G.battlePhase==='player_aoe_targeting'&&u.isAlly&&!acted&&!isSlowWaiting&&u.id!==G.selectedActorId); // v303 (1A): switch actor without Back
+    ||(G.battlePhase==='player_aoe_targeting'&&u.isAlly&&!acted&&!isSlowWaiting&&u.id!==G.selectedActorId) // v303 (1A): switch actor without Back
+    ||(G.battlePhase==='player_targeting'&&u.isAlly&&!acted&&!isSlowWaiting&&u.id!==G.selectedActorId); /* v1542 */
   const isSelected=u.id===G.selectedActorId;
   const isTargetedByEnemy=u.id===G._targetedAllyId;
   let cls='uc';
@@ -25515,7 +25588,7 @@ function renderBattle(){try{amoxScanSeen();}catch(_amx){} /* v1440 */
         const isSel=u.id===G.selectedActorId;
         const isAct=G.actedIds.has(u.id);
         const isAllyTarget=G.battlePhase==='player_ally_targeting'&&u.isAlly&&u.currentHp>0;
-        const isSelectable=(G.battlePhase==='player_choose'&&u.isAlly&&!isAct)||(G.battlePhase==='player_selected'&&u.isAlly&&!isAct&&!isSel)||(G.battlePhase==='player_aoe_targeting'&&u.isAlly&&!isAct&&!isSel); // v303 (1A)
+        const isSelectable=(G.battlePhase==='player_choose'&&u.isAlly&&!isAct)||(G.battlePhase==='player_selected'&&u.isAlly&&!isAct&&!isSel)||(G.battlePhase==='player_aoe_targeting'&&u.isAlly&&!isAct&&!isSel)||(G.battlePhase==='player_targeting'&&u.isAlly&&!isAct&&!isSel); // v303 (1A) · v1542
         // Update level text for ALL units (gods and vassals)
         existing.classList.toggle('syn-on',synCardOn(u)); /* v1393: same predicate as create */
         {const _lvEl=existing.querySelector('.unit-lv');if(_lvEl){_lvEl.textContent=''+lvAb()+unitDisplayLevel(u);}} // v816: was its own getLevel chain, which ignored u.level and reset raised allies to Lv1
@@ -25625,8 +25698,33 @@ function alignActPanel(){
    CHANGES -- one scroll per transition, never during a repaint. Scrolling is also
    skipped entirely while the battle screen is not the active one. */
 let _asKey='';
+/* v1534 [Genaro, Oct 27 playtest: "scrolling bounces too much when trying to scroll down"]. Measured: the battle page is
+   only 12-144px taller than a laptop viewport, yet every action swung it 150-290px DOWN (player_selected, panel to the
+   bottom edge) and straight back UP (targeting/acting, enemies centred) -- two smooth scrolls per action, and a third
+   on the enemy turn, fighting any scroll the player was doing. Two rules now:
+     1. Auto-scroll only when the target is not fully on screen, and then by the least distance (block:'nearest').
+        This retires v1156's "enemies must be CENTRED" -- on a page this short, visible is enough.
+     2. Hands off for 1.5s after the player scrolls themselves (wheel / touch / scroll keys). */
+let _asUserT=0;
+['wheel','touchmove'].forEach(function(ev){window.addEventListener(ev,function(){_asUserT=Date.now();},{passive:true,capture:true});});
+window.addEventListener('keydown',function(e){if(['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(e.key))_asUserT=Date.now();},{capture:true});
+/* v1541 [Genaro: "auto-target specials don't bring the camera back to the enemies"]: a click or tap is a deliberate action,
+   so it ends the hands-off window -- scrolling down to reach the special button no longer blocks the camera when you press it. */
+window.addEventListener('pointerdown',function(){_asUserT=0;},{capture:true,passive:true});
+/* v1541: the battle header is position:sticky and 48px tall, and it sits ON TOP of whatever scrolls under it. The visibility test
+   counted the enemy row as on screen while its top was hidden behind the bar, and block:'nearest' parked the row at y=0 --
+   exactly under it, so every enemy card lost its top (name + art) during the special. Both now measure from the bar's bottom. */
+function _asTopInset(){
+  try{const sk=document.querySelector('#screen-battle .battle-sticky');if(!sk)return 0;
+    const cs=getComputedStyle(sk);if(cs.position!=='sticky'&&cs.position!=='fixed')return 0;
+    const r=sk.getBoundingClientRect();return r.bottom>0?Math.ceil(r.bottom)+8:0;}catch(e){return 0;}
+}
 function _asScroll(el,block){
   if(!el)return;
+  if(Date.now()-_asUserT<1500)return; /* v1534 rule 2 */
+  if(_asFullyVisible(el))return;       /* v1534 rule 1 */
+  block='nearest';
+  try{el.style.scrollMarginTop=_asTopInset()+'px';}catch(e){} /* v1541: land below the sticky bar, not under it */
   let smooth=true;
   try{ smooth=!window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
   try{ el.scrollIntoView({behavior:smooth?'smooth':'auto',block:block||'center',inline:'nearest'}); }
@@ -25637,7 +25735,7 @@ function _asFullyVisible(el){
   const r=el.getBoundingClientRect();
   if(!r.height)return true; // nothing rendered yet -- nothing to scroll to
   const vh=window.innerHeight||document.documentElement.clientHeight;
-  return r.top>=0 && r.bottom<=vh;
+  return r.top>=_asTopInset() && r.bottom<=vh; /* v1541: was r.top>=0 -- ignored the sticky bar */
 }
 function _asScrollIfHidden(el,block){ if(!_asFullyVisible(el))_asScroll(el,block); }
 function battleAutoScroll(){
@@ -25673,11 +25771,59 @@ function captureAutoScroll(){
   });
 }
 
+/* v1534: the action panel is 0px between actions, ~70px on the turn prompt, ~140px while targeting and ~255px with a unit
+   selected, so the whole page grew and shrank by up to 260px every action. When it shrank under the current scroll position
+   the browser clamped the page upward on its own -- the other half of the "bounce". The panel's slot now keeps the tallest
+   height it has reached this battle (reset on each new battle and on resize), so the page only ever grows, once. */
+let _apEpoch=-1;
+/* #action-msg ("X uses Y!") is 0px on player turns and ~25px on enemy turns -- it sits ABOVE the enemies, so it nudged the
+   whole board 25px down and back every enemy turn. Same ratchet. */
+function apHeightRatchet(){
+  const reset=_apEpoch!==BATTLE_EPOCH;_apEpoch=BATTLE_EPOCH;
+  ['act-panel-area','action-msg'].forEach(function(id){const el=document.getElementById(id);if(!el)return;
+    if(reset){el.style.minHeight='';el._apMax=0;}
+    const h=el.scrollHeight;if(h>(el._apMax||0)){el._apMax=h;el.style.minHeight=h+'px';}});
+}
+window.apHeightRatchet=apHeightRatchet;
+window.addEventListener('resize',function(){_apEpoch=-1;});
+/* v1542: one cancel for every target-picking phase -- used by the panel buttons' twin in the divider, Esc and right-click. */
+const TGT_PHASES=['player_targeting','player_aoe_targeting','player_ally_targeting'];
+function cancelTargeting(){
+  if(typeof G==='undefined'||!G||!TGT_PHASES.includes(G.battlePhase))return false;
+  G.pendingAction=null;G.aoeSelected=[];G.aoeCap=0;G.battlePhase='player_selected';
+  try{setB1Hint('');}catch(e){}
+  renderBattle();return true;
+}
+window.cancelTargeting=cancelTargeting;
+/* v1542 [Genaro: "the cancel button is usually offscreen"]: a Cancel chip beside YOUR TURN on the round divider. The divider sits
+   between the two codices, so it is on screen whenever the enemies are -- which is exactly when you are picking a target. */
+function cxCancelChip(){
+  const fold=document.getElementById('cx-fold');if(!fold)return;
+  const host=fold.querySelector('span');let b=document.getElementById('cx-cancel');
+  const on=TGT_PHASES.includes(G.battlePhase);
+  if(!on){if(b)b.style.display='none';return;}
+  if(!host)return;
+  if(!b||b.parentNode!==host){if(b)b.remove();b=document.createElement('button');b.id='cx-cancel';b.type='button';b.className='cx-cancel';
+    b.onclick=function(e){e.stopPropagation();cancelTargeting();};host.appendChild(b);}
+  b.innerHTML='↩ '+t('ui.common.cancel')+' <kbd>Esc</kbd>';b.style.display='';
+}
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Escape')return;
+  const mo=document.getElementById('mo');if(mo&&mo.classList.contains('open'))return; /* a modal owns Esc */
+  const sc=document.getElementById('screen-battle');if(!sc||!sc.classList.contains('active'))return;
+  if(cancelTargeting())e.preventDefault();
+});
+document.addEventListener('contextmenu',function(e){
+  const sc=document.getElementById('screen-battle');if(!sc||!sc.classList.contains('active')||!sc.contains(e.target))return;
+  if(cancelTargeting())e.preventDefault(); /* right-click / two-finger tap backs out of a target pick */
+});
 function renderActionPanel(){
   document.body.classList.toggle('tgt-pulse',['player_targeting','player_aoe_targeting','player_ally_targeting'].includes(G.battlePhase)); /* v1305 */
   const el=document.getElementById('act-panel-area');if(!el)return;
   requestAnimationFrame(alignActPanel); // v600: after paint, when card positions are final
+  requestAnimationFrame(apHeightRatchet); // v1534
   battleAutoScroll(); // v1154
+  try{cxCancelChip();}catch(e){} // v1542
   // Clear for any non-interactive phases — prevents stale Cancel button from targeting phase
   if(!['player_choose','player_selected','player_targeting','player_ally_targeting','player_aoe_targeting'].includes(G.battlePhase)){el.innerHTML='';return;}
   if(G.battlePhase==='player_choose'){
@@ -27927,7 +28073,7 @@ function showUnitTooltip(u){
   const _sk=u.isGod?((u.id&&u.id.indexOf('god_')===0)?u.id:'god_'+(u.baseGodId||(G.god&&G.god.id)||'')):_tk;
   const sb=surgeBonus(_tk);
   const _jl=joinLvOf(u.isGod?_sk:_tk); /* v1466 */
-  const _uG=!!u.isGod; /* v993: mirror mkGod/mkCap -- a flat tooltip over a curved stat is the classic create-vs-patch lie */
+  const _uG=u.isGod?true:(isGuardian(u)?'guardian':false); /* v993: mirror mkGod/mkCap -- a flat tooltip over a curved stat is the classic create-vs-patch lie · v1538: role */
   let hp=scR(bo.hp||100,lv,_uG,_jl)+sb.hp,atk=scR(bo.atk||0,lv,_uG,_jl)+sb.atk,mag=scR(bo.mag||0,lv,_uG,_jl)+sb.mag,def=scR(bo.def||0,lv,_uG,_jl)+sb.def,res=scR(bo.res||0,lv,_uG,_jl)+sb.res,np=scR(bo.np||20,lv,_uG,_jl)+sb.tp;
   /* v1030: mirror mkGod's cross-type MIX flip, or the tooltip shows 0 MAG on a patron that
      fields a real one in battle. */
@@ -28087,6 +28233,7 @@ function showUnitTooltip(u){
     +'<div class="tc-meta"><div class="tc-lv">'+t('ui.card.levelWord')+' '+lv+'</div><div style="margin-top:2px">'
     +(u.isPatron?'<span class="elem-badge" style="background:#2a1e04;color:#d4af37;border:0.5px solid #6a5210;font-size:9px">'+t('ui.card.patronGod')+'</span> '
       :u.isGod?'<span class="elem-badge" style="background:#241a2e;color:#c0a060;border:0.5px solid #5a4470;font-size:9px">'+t('ui.card.allyGod')+'</span> '
+      :isGuardian(u)?'<span class="elem-badge" style="background:#0a1e2a;color:#60a0e0;border:0.5px solid #2a6a8a;font-size:9px">'+t('ui.card.guardian')+'</span> ' /* v1538 */
       :'<span class="elem-badge" style="background:#1a2418;color:#8ab070;border:0.5px solid #3a5a34;font-size:9px">'+t('ui.card.vassal')+'</span> ')
     +eb(u.element)
     +' <span '+typeAttrs(bo.type==='MAG'?'MAG':bo.type==='MIX'?'MIX':'PHYS',specTypeEmoji(_adTxt)==='❤️')+'><span style="font-size:11px">'+(bo.type==='MAG'?'🪄':bo.type==='MIX'?'🗡️🪄':'🗡️')+'</span> <b style="font-size:10px">'+unitTypeLbl(bo.type)+'</b>'+(specTypeEmoji(_adTxt)==='❤️'?' ❤️':'')+'</span>'
@@ -28301,7 +28448,7 @@ function renderTraining(){
     const isPrim=_trType==='MAG';
     const primStat=isPrim?u.mag:u.atk;const primEmoji=isPrim?'🪄':'🗡️';
     const sbPrim=isPrim?sbT.mag:sbT.atk;
-    const _uG=!!u.isGod; /* v993: role for scR, used by every stat line and delta below */
+    const _uG=u.isGod?true:(isGuardian(u)?'guardian':false); /* v993: role for scR, used by every stat line and delta below · v1538 */
     const _jl=joinLvOf(uk); /* v1466: recruit-only milestones */
     const cr=scR(u.res||5,lv,_uG,_jl)+sbT.res,cr2=scR(u.res||5,lv+1,_uG,_jl)+sbT.res;
     const cp=scR(primStat||0,lv,_uG,_jl)+sbPrim,ch=scR(u.hp,lv,_uG,_jl)+sbT.hp,cd2=scR(u.def,lv,_uG,_jl)+sbT.def;
@@ -28355,9 +28502,9 @@ function renderTraining(){
       const p1=surgePreview(uk,'ihiyotl'),p2=surgePreview(uk,'teyolia'),p3=surgePreview(uk,'tonalli');
       rightColHtml='<div style="display:flex;flex-direction:column;gap:4px;min-width:175px">'
         +'<div style="font-size:10px;color:#d4af37;text-align:center;font-weight:600">'+(sgT.pending?t('ui.tc.surgePick'):t('ui.tc.blessedPick'))+((sgT.bonus||0)>0?'<span style="color:#c0a0e0">'+t('ui.tc.left',{n:(sgT.pending?1:0)+(sgT.bonus||0)})+'</span>':'')+'</div>'
-        +'<button class="btn surge-pick" onclick="surgePick(\''+ukJs+'\',\'ihiyotl\')" onmouseenter="surgeHover(\''+ukJs+'\',\'ihiyotl\',1)" onmouseleave="surgeHover(\''+ukJs+'\',\'ihiyotl\',0)" style="font-size:13px">💪 <b>Ihiyotl '+forceLvAb()+p1.lv+'</b> <span style="font-size:12px;opacity:.85">'+p1.txt+'</span></button>'
-        +'<button class="btn surge-pick" onclick="surgePick(\''+ukJs+'\',\'teyolia\')" onmouseenter="surgeHover(\''+ukJs+'\',\'teyolia\',1)" onmouseleave="surgeHover(\''+ukJs+'\',\'teyolia\',0)" style="font-size:13px">🫀 <b>Teyolia '+forceLvAb()+p2.lv+'</b> <span style="font-size:12px;opacity:.85">'+p2.txt+'</span></button>'
-        +'<button class="btn surge-pick" onclick="surgePick(\''+ukJs+'\',\'tonalli\')" onmouseenter="surgeHover(\''+ukJs+'\',\'tonalli\',1)" onmouseleave="surgeHover(\''+ukJs+'\',\'tonalli\',0)" style="font-size:13px">🔮 <b>Tonalli '+forceLvAb()+p3.lv+'</b> <span style="font-size:12px;opacity:.85">'+p3.txt+'</span></button>' // v627: single row, larger, bold force names
+        +'<button class="btn surge-pick" onclick="surgePick(\''+ukJs+'\',\'ihiyotl\')" onmouseenter="surgeHover(\''+ukJs+'\',\'ihiyotl\',1)" onmouseleave="surgeHover(\''+ukJs+'\',\'ihiyotl\',0)" style="font-size:13px">'+surgeIco('ihiyotl')+' <b>Ihiyotl '+forceLvAb()+p1.lv+'</b> <span style="font-size:12px;opacity:.85">'+p1.txt+'</span></button>'
+        +'<button class="btn surge-pick" onclick="surgePick(\''+ukJs+'\',\'teyolia\')" onmouseenter="surgeHover(\''+ukJs+'\',\'teyolia\',1)" onmouseleave="surgeHover(\''+ukJs+'\',\'teyolia\',0)" style="font-size:13px">'+surgeIco('teyolia')+' <b>Teyolia '+forceLvAb()+p2.lv+'</b> <span style="font-size:12px;opacity:.85">'+p2.txt+'</span></button>'
+        +'<button class="btn surge-pick" onclick="surgePick(\''+ukJs+'\',\'tonalli\')" onmouseenter="surgeHover(\''+ukJs+'\',\'tonalli\',1)" onmouseleave="surgeHover(\''+ukJs+'\',\'tonalli\',0)" style="font-size:13px">'+surgeIco('tonalli')+' <b>Tonalli '+forceLvAb()+p3.lv+'</b> <span style="font-size:12px;opacity:.85">'+p3.txt+'</span></button>' // v627: single row, larger, bold force names
         +'</div>';
     }else if(capped){
       // v311: not `disabled` — clicking routes through doLevelUp's cap guard, which fires the notify
@@ -28373,9 +28520,9 @@ function renderTraining(){
     // v612: trading-card layout (Genaro's mockup). Emojis locked to the original mock: 🔮 special, ✨ TP cost.
     const _F=sgT.forces; // v613: row appears only once the surge mechanic has been touched; L0 forces stay hidden
     const _fParts=[];
-    if(_F.ihiyotl.lv)_fParts.push('<span>💪 Ihiyotl '+forceLvAb()+_F.ihiyotl.lv+'</span>');
-    if(_F.teyolia.lv)_fParts.push('<span>🫀 Teyolia '+forceLvAb()+_F.teyolia.lv+'</span>');
-    if(_F.tonalli.lv)_fParts.push('<span>🔮 Tonalli '+forceLvAb()+_F.tonalli.lv+'</span>');
+    if(_F.ihiyotl.lv)_fParts.push('<span>'+surgeIco('ihiyotl')+' Ihiyotl '+forceLvAb()+_F.ihiyotl.lv+'</span>');
+    if(_F.teyolia.lv)_fParts.push('<span>'+surgeIco('teyolia')+' Teyolia '+forceLvAb()+_F.teyolia.lv+'</span>');
+    if(_F.tonalli.lv)_fParts.push('<span>'+surgeIco('tonalli')+' Tonalli '+forceLvAb()+_F.tonalli.lv+'</span>');
     const forcesRow=_fParts.length?('<div class="tc-forces">'+_fParts.join(' · ')+'</div>'):'';
     const costFlash=(fl&&fl.cost>0)?('<span class="stat-up-glow"> ▼−'+fl.cost+'</span>'):((lvf&&lvf.cost>0)?('<span class="stat-up-glow-red"> +'+lvf.cost+'</span>'):'');
     const specBlock=u.ability?('<div class="tc-spec'+_sfHd(liveAd(u))+'"><span class="tc-spec-name">'+specNameHtml(L(u,'ability'),liveAd(u))+'</span>'
@@ -28410,7 +28557,8 @@ function renderTraining(){
       +'<div style="margin-top:2px">'
       +(u.isPatron?'<span class="elem-badge" style="background:#2a1e04;color:#d4af37;border:0.5px solid #6a5210;font-size:9px">'+t('ui.card.patronGod')+'</span> '
         :u.isGod?'<span class="elem-badge" style="background:#241a2e;color:#c0a060;border:0.5px solid #5a4470;font-size:9px">'+t('ui.card.allyGod')+'</span> '
-        :'<span class="elem-badge" style="background:#1a2418;color:#8ab070;border:0.5px solid #3a5a34;font-size:9px">'+t('ui.card.vassal')+'</span> ')
+        :isGuardian(u)?'<span class="elem-badge" style="background:#0a1e2a;color:#60a0e0;border:0.5px solid #2a6a8a;font-size:9px">'+t('ui.card.guardian')+'</span> ' /* v1538 */
+      :'<span class="elem-badge" style="background:#1a2418;color:#8ab070;border:0.5px solid #3a5a34;font-size:9px">'+t('ui.card.vassal')+'</span> ')
       +eb(u.element)+((calcSynergy().count>0&&synMatchesPatron(u.element))?'<div style="font-size:9px;color:#d4af37;margin-top:2px" '+SYN_ATTRS+'>'+t('ui.tc.synergy',{pct:Math.round(calcSynergy().pct*100)})+'</div>':'')+'</div></div>' /* v617–v620 · v640 pill · v647 total · v648: a trailing // comment had commented out these closing divs, shattering the card layout */
       +'</div>'
       +'<div class="tc-mid">'
@@ -30765,6 +30913,12 @@ window.MFX={
     return ret;};
   if(typeof ah0==='function')window.animateHit=function(uid,dmg,isHeal,isCrit,_pastFx){let wait=0;
     try{if(_pastFx===undefined&&(dmg||dmg===0)&&!(dmg===0&&isHeal)&&!(G._drunkDelayIds&&G._drunkDelayIds.has(uid))&&!(G._fxDelayMap&&G._fxDelayMap[uid]>0)){wait=MFX._numDelay(uid,isHeal);MFX._hit(uid,dmg,isHeal,isCrit);}}catch(_e){wait=0;}
+    /* v1532 [Genaro: heals read too fast]: HEAL BEAT. Any heal that draws a number holds the next actor until
+       HEAL_BEAT_MS after that number pops. Rides the same _mfxHoldUntil that both the ally (_mfxHoldMs) and enemy
+       (_afterEnemy) turn hand-offs already wait on, so one line covers every heal source. Set at CALL time with the
+       impact delay folded in, because the caller schedules advanceTurn right after this returns. */
+    try{if(isHeal&&dmg>0&&_pastFx===undefined){const _hb=performance.now()+Math.max(0,wait)+(typeof paceMs==='function'?paceMs(HEAL_BEAT_MS):HEAL_BEAT_MS);
+      if(!(window._mfxHoldUntil>_hb))window._mfxHoldUntil=_hb;}}catch(_e){}
     /* v1496: the number (and the card's own hit flash) waits for the special's impact beat */
     if(wait>16){const a=arguments,self=this;setTimeout(()=>{ah0.apply(self,a);mfxRerender();},wait);return;}
     if(S.rec&&!S.rec.done)mfxRerender();
@@ -30776,6 +30930,7 @@ window.MFX={
 let _mfxRR=0;
 function mfxRerender(){if(_mfxRR)return;_mfxRR=requestAnimationFrame(()=>{_mfxRR=0;
   try{const sc=document.getElementById('screen-battle');if(sc&&sc.classList.contains('active')&&typeof renderBattle==='function')renderBattle();}catch(_e){}});}
+const HEAL_BEAT_MS=650; /* v1532: tune here */
 window._mfxHoldMs=function(){return Math.min(2500,Math.max(0,(window._mfxHoldUntil||0)-performance.now()));};
 requestAnimationFrame(frame);
 })();
