@@ -344,6 +344,32 @@ body.codex-ui .uc>.uc-lvtag~.uc-art{padding-top:14px}
 .nc{width:7px;height:2px;background:var(--br)}
 .spoils-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid var(--br);opacity:0;transition:opacity .4s}
 .spoils-row.show{opacity:1}
+/* v1631: enemy lists become unit cards (route choice, Guardian, boss previews, spoils). One row, cards shrink to fit. */
+.ec-row{display:flex;gap:10px;justify-content:center;align-items:flex-end;margin:14px 0 4px;width:100%;box-sizing:border-box}
+.ec-row.ec-spoils{align-items:stretch;margin:12px 0 10px}
+.ec{position:relative;flex:0 1 140px;min-width:0;box-sizing:border-box;border:2px solid #4a3b2c;background:#1c110b;border-radius:3px;display:flex;flex-direction:column;align-items:center}
+.ec-top{align-self:stretch;display:flex;justify-content:space-between;align-items:center;gap:3px;padding:3px 5px 0;font-size:11px;color:#c9b896;min-height:18px;flex-wrap:wrap}
+.ec-top .elem-badge{margin:0;font-size:10px;padding:0 4px}
+.ec-art{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;padding:4px 10px;box-sizing:border-box}
+.ec-art img{width:100%!important;height:100%!important;object-fit:contain}
+.ec-art .ico-emoji{font-size:44px!important}
+.ec-nm{align-self:stretch;border-top:1px solid #3a2c20;padding:4px 4px 5px;text-align:center;font-size:13px;line-height:1.1;color:#e8786a;overflow-wrap:anywhere}
+.ec-fl{font-size:10px;line-height:1.15;color:#a8957a;padding:0 5px 6px;text-align:center;font-style:italic}
+.ec-tag{position:absolute;top:-9px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:.5px;padding:0 6px;border-radius:3px;white-space:nowrap;text-transform:uppercase;z-index:1}
+.ec-guard{flex-basis:180px;border-color:#4f8fd8;background:#121a2a;box-shadow:0 0 12px rgba(79,143,216,.4)}
+.ec-guard .ec-tag{background:#6fb0f0;color:#0d1420}.ec-guard .ec-nm{color:#8cc4ff;border-top-color:#26405e}
+.ec-boss{flex-basis:210px;border-color:#e0903a;background:#2a160a;box-shadow:0 0 14px rgba(224,144,58,.45)}
+.ec-boss .ec-tag{background:#f2a64a;color:#1a0d05}.ec-boss .ec-nm{color:#ff9a6a;border-top-color:#5a3a1a}
+.ec-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:3px;padding:0 4px 5px}
+.ec-chips>span{margin-left:0!important}
+.ec-foot{align-self:stretch;display:flex;justify-content:center;gap:10px;padding:3px 0 4px;background:#140b07;border-top:1px solid #3a2c20;font-size:14px;margin-top:auto}
+.ec-foot{gap:6px;flex-wrap:wrap;font-size:13px;padding:3px 2px 4px}.ec-foot .tl{width:1em;height:1em;vertical-align:-.15em;margin:0 1px 0 0} /* v1632: icons fit the 140px card */
+.ec-otag{font-size:10px;padding:0 5px;border-radius:3px;white-space:nowrap}
+.ec-dim .ec-art img{filter:saturate(.55) brightness(.85)}
+.ec-cap{border-color:#2e8a52;background:#10241a}.ec-cap .ec-nm{border-top-color:#1e4a32}
+.ec-fallen{border-color:#6a1a1a}
+.ec-nm.ec-ally{color:#f2e6c8}
+.spoils-card{opacity:0;transition:opacity .4s}.spoils-card.show{opacity:1}
 .spoils-section-lbl{font-size:11px;color:var(--td);padding:6px 0 3px;text-transform:uppercase;letter-spacing:.5px}
 .notif{position:absolute;top:10px;right:10px;background:#1a2a1a;border:0.5px solid #2a6a2a;border-radius:8px;padding:7px 13px;font-size:13px;color:#50c080;z-index:999;display:none}
 .mo{position:fixed;top:0;left:0;width:100%;height:100%;background:#00000099;display:none;align-items:flex-start;justify-content:center;z-index:100;padding:1rem;overflow-y:auto}
@@ -423,6 +449,7 @@ body.codex-ui .uc>.uc-lvtag~.uc-art{padding-top:14px}
 .elem-humanity{background:#2a1a08;color:#e0a040;border:0.5px solid #6a4a10}
 .elem-day{background:#2a1800;color:#ffd060;border:0.5px solid #c08000}
 .battle-choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:.75rem 0}
+.battle-choice>.choice-card:only-child{grid-column:1/-1;justify-self:center;width:min(100%,680px);box-sizing:border-box} /* v1633: the only option sits centered */
 .choice-card{background:var(--bm);border:0.5px solid var(--br);border-radius:12px;padding:.9rem}
 .choice-card.easy{border-color:#1a6a3a}.choice-card.hard{border-color:#6a1a1a}
 .choice-card.event{border-color:#8a6a10;box-shadow:0 0 10px rgba(212,175,55,0.20)}
@@ -487,6 +514,9 @@ body.codex-ui .cx-fold>span{white-space:nowrap;display:inline-flex;align-items:c
 .act-dock{display:flex;align-items:stretch;gap:10px;padding:.5rem .7rem} /* v1544 */
 .blog-hint{color:#c8a860;opacity:.85} /* v1552 */
 .deploy-head-r{display:flex;flex-direction:column;align-items:flex-end;gap:8px;margin-left:auto} /* v1574 */
+#deploy-grid{grid-template-columns:1fr!important} /* v1633: single column while the synergy panel is hidden */
+#deploy-grid .row-lbl{text-align:center}
+#screen-deploy #deploy-enter-btn{position:relative;font-size:18px!important;font-weight:600;padding:18px 44px!important;border-color:transparent;--sqc:#d4af37;--sqw:34px} /* v1633: same as the Tianguis Continue */
 #screen-deploy:has(#step-deploy[style*="none"]) #deploy-enter-btn{display:none}
 /* ═══ v1561 [Genaro]: ENEMY DEFEATED burst. Fires the moment an enemy drops to 0 HP (before Capture / Slay), so it is
    deliberately NOT blood -- the blood spray stays the Slay payoff. Reads as the body breaking and its teotl leaving:
@@ -633,6 +663,48 @@ body.cap-focus #screen-battle .uc.cap-pending{position:relative;z-index:3}
 .cx-cancel kbd{font:inherit;font-size:9px;opacity:.6;margin-left:4px;padding:0 3px;border:1px solid currentColor;border-radius:3px}
 @media (hover:none) and (pointer:coarse){.cx-cancel kbd{display:none}} /* v1543 [Genaro]: no Esc hint on phones/iPads -- touch-only devices have no Esc key */
 .cx-turn-enemy{display:inline-block;color:#ff9a8a;background:#2e1210;border-color:#a0382c;box-shadow:0 0 8px #a0382c66} /* v1385 */
+/* v1629: turn tracker -- the next 2 actions beside the turn tag. Chips are 20px so the fold keeps its height. */
+.cxq{display:inline-flex;align-items:center;gap:4px;margin-left:8px;vertical-align:middle}
+.cxq-lbl{font-size:10px;letter-spacing:1px;color:#8a7558;text-transform:uppercase;margin-right:1px}
+.cxq-sep{color:#6b5a44;font-size:12px;line-height:1}
+.cxq-chip{position:relative;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;box-sizing:border-box;border:1px solid #c8463c;border-radius:3px;background:#2a1410;overflow:visible;cursor:default;font-size:12px;line-height:1}
+.cxq-chip img{width:18px!important;height:18px!important;display:block}
+.cxq-chip>span:not(.cxq-hg){font-size:12px!important}
+.cxq-2{opacity:.8}
+.cxq-you{border-color:#3aa592;background:#12322e}
+.cxq-you svg{width:13px;height:13px}
+.cxq-slow{} /* v1640 [Genaro]: a slowed chip keeps its side colour (red enemy / green ally) -- the turtle pip alone marks Slow */
+.cxq-hg{position:absolute;right:-6px;bottom:-5px;width:13px;height:13px;border-radius:3px;background:#0e1e24;border:1px solid #7ec8e3;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:9px!important;line-height:1}
+.cxq-hg svg{width:6px;height:8px}
+/* v1639: a Slow that reorders the queue is shown happening -- chips slide to their new places (FLIP), the
+   slowed chip flashes Slow blue, and a unit pushed out of the 2-ahead view slides off to the right. */
+.cxq-slowfx{animation:cxqSlowFx .9s ease-out both}
+@keyframes cxqSlowFx{0%{box-shadow:0 0 0 0 #7ec8e3,0 0 14px #7ec8e3}35%{box-shadow:0 0 0 3px #7ec8e3aa,0 0 18px #7ec8e3}100%{box-shadow:0 0 0 0 #7ec8e300,0 0 0 #7ec8e300}}
+.cxq-slowfx .cxq-hg{animation:cxqPipPop .5s cubic-bezier(.2,.9,.3,1.4) both}
+@keyframes cxqPipPop{0%{transform:scale(0)}100%{transform:scale(1)}}
+.cxq-push{animation:cxqPush .7s ease-in both;pointer-events:none} /* v1640: keeps the red enemy frame */
+@keyframes cxqPush{0%{opacity:1;transform:translateX(0)}30%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(40px)}}
+body.fx-min .cxq-slowfx,body.fx-min .cxq-slowfx .cxq-hg,body.fx-min .cxq-push{animation:none}
+#cx-queue .cxq-chip .cxq-hg{font-size:5px!important;line-height:1!important;overflow:hidden} /* font sizes pass through the UI text scaler (x1.8 at laptop size), so 5px renders ~9px inside the 13px pip */
+.cxq-r{font-size:10px;line-height:1;color:#170d08;background:#e0b25a;border-radius:2px;padding:1px 4px;margin-right:-1px;white-space:nowrap;text-transform:uppercase;letter-spacing:.5px}
+.am-ico{display:inline-block;vertical-align:middle;line-height:1}
+.am-ico img{width:22px!important;height:22px!important;vertical-align:middle}
+.uc .sl-ico img{width:32px!important;height:32px!important}
+/* v1632: hover name tooltip removed -- the greca band covered it; hover still outlines the unit's card */
+.cxq-in{animation:cxqIn .32s cubic-bezier(.2,.9,.3,1.3) both}
+.cxq-out{filter:grayscale(1);border-style:dashed;border-color:#6b5a44;animation:cxqOut .38s ease-in both}
+.cxq-out::before{content:"";position:absolute;inset:0;background:linear-gradient(45deg,transparent 44%,#e8786a 44% 56%,transparent 56%),linear-gradient(-45deg,transparent 44%,#e8786a 44% 56%,transparent 56%);z-index:1}
+@keyframes cxqIn{0%{transform:scale(.3);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes cxqOut{0%{opacity:.9;transform:scale(1)}60%{opacity:.6;transform:scale(1)}100%{opacity:0;transform:scale(.4);margin-right:-24px}}
+.uc.cxq-hl{outline:2px solid #f2c45a;outline-offset:2px}
+body.fx-min .cxq-in,body.fx-min .cxq-out{animation:none}
+.cx-rtoast{position:fixed;z-index:80;transform:translate(-50%,-6px);opacity:0;pointer-events:none;display:flex;flex-direction:column;align-items:center;padding:3px 14px 4px;border:2px solid #e0b25a;border-radius:4px;background:#2a1d0e;box-shadow:0 3px 0 #0d0704;font-family:'Jersey 20','Courier New',monospace;text-align:center;white-space:nowrap}
+.cx-rtoast.on{animation:cxRtoast 1.6s ease-out both}
+.cx-rtoast b{font-weight:400;font-size:20px;line-height:1;letter-spacing:2px;color:#f2c45a;text-transform:uppercase}
+.cx-rtoast i{font-style:normal;font-size:12px;line-height:1.2;color:#c9b4f5}
+@keyframes cxRtoast{0%{opacity:0;transform:translate(-50%,-10px)}12%{opacity:1;transform:translate(-50%,0)}78%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-4px)}}
+body.fx-min .cx-rtoast.on{animation:cxRtoastMin 1.6s step-end both}
+@keyframes cxRtoastMin{0%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
 /* v1390: Gamepalooza -- the tag read as static, so a side change was easy to miss.
    (1) the tag pops in on every swap, (2) YOUR TURN breathes while it waits for input,
    (3) the side that is acting gets a lit edge so the eye knows which row to watch. */
@@ -789,6 +861,7 @@ body.codex-ui .uc.cx-unfold{transform-origin:0 50%;animation:kaUnfold calc(.55s*
 .amx-sec.gold{border-color:#d4af37;box-shadow:inset 0 0 0 3px #120d0a,inset 0 0 0 4px #d4af37}
 .amx-lbl{position:absolute;top:-13px;left:16px;padding:0 10px;background:#1a1009;font-size:10.5px;letter-spacing:1px;color:#d4af37;display:flex;align-items:center;gap:8px}
 .amx-sec.dim .amx-lbl{color:#6a5a40}
+.amx-lbl .amx-lsym{margin:-4px 0} /* v1636: Ian's layer glyph before the layer title, in the label's own colour */
 .amx-cnt{position:absolute;top:-12px;right:16px;padding:0 10px;background:#1a1009;font-size:9.5px;color:#9a7d5a}
 .amx-lstar{font-size:15.5px;line-height:1;color:#d4af37;text-shadow:0 0 10px rgba(212,175,55,.7)}
 .amx-grid{display:grid;gap:8px}
@@ -1344,6 +1417,9 @@ body.fx-min .relic.relic-fire{animation:none}
    by the extra frame weight so nothing inside the card moves under it. Battle cards keep the traced frame. */
 .train-card{--fw:20px;padding:calc(1.15rem + 8px) calc(1.2rem + 8px)}
 .train-card.tc-patron{--fw:22px}
+/* v1634 [Genaro]: inside a modal Ian's frame already borders the card -- drop the card's own greca so there is one frame, not two */
+#mo-body .train-card::before{display:none}
+#mo-body .train-card{border:none;background:transparent;padding:.4rem .3rem}
 .train-card::before{
   -webkit-mask-box-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2772%27%20height%3D%2772%27%20viewBox%3D%270%200%2072%2072%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27square%27%3E%3Cpath%20d%3D%27M2.5%202.5H69.5V69.5H2.5Z%27%2F%3E%3Cpath%20d%3D%27M21.5%2021.5H50.5V50.5H21.5Z%27%2F%3E%3Cpath%20d%3D%27M43.5%2021.5V8H30V16.5H38V12.5%27%2F%3E%3Cpath%20d%3D%27M43.5%2050.5V64H30V55.5H38V59.5%27%2F%3E%3Cpath%20d%3D%27M21.5%2043.5H8V30H16.5V38H12.5%27%2F%3E%3Cpath%20d%3D%27M50.5%2043.5H64V30H55.5V38H59.5%27%2F%3E%3Cpath%20d%3D%27M8%2016V8H16V12.5H12%27%2F%3E%3Cpath%20d%3D%27M64%2016V8H56V12.5H60%27%2F%3E%3Cpath%20d%3D%27M8%2056V64H16V59.5H12%27%2F%3E%3Cpath%20d%3D%27M64%2056V64H56V59.5H60%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") 24 round;-webkit-mask-box-image-width:var(--fw,20px);
   mask-border:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2772%27%20height%3D%2772%27%20viewBox%3D%270%200%2072%2072%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27square%27%3E%3Cpath%20d%3D%27M2.5%202.5H69.5V69.5H2.5Z%27%2F%3E%3Cpath%20d%3D%27M21.5%2021.5H50.5V50.5H21.5Z%27%2F%3E%3Cpath%20d%3D%27M43.5%2021.5V8H30V16.5H38V12.5%27%2F%3E%3Cpath%20d%3D%27M43.5%2050.5V64H30V55.5H38V59.5%27%2F%3E%3Cpath%20d%3D%27M21.5%2043.5H8V30H16.5V38H12.5%27%2F%3E%3Cpath%20d%3D%27M50.5%2043.5H64V30H55.5V38H59.5%27%2F%3E%3Cpath%20d%3D%27M8%2016V8H16V12.5H12%27%2F%3E%3Cpath%20d%3D%27M64%2016V8H56V12.5H60%27%2F%3E%3Cpath%20d%3D%27M8%2056V64H16V59.5H12%27%2F%3E%3Cpath%20d%3D%27M64%2056V64H56V59.5H60%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") 24 / var(--fw,20px) round}
@@ -1831,6 +1907,8 @@ body.fx-min #continue-btn.cont-ready{animation:none;box-shadow:0 0 0 2px #ffd24d
 .intro-codex{display:flex;align-items:center;justify-content:center;gap:10px}
 .champ-chap{display:inline-flex;align-items:center;gap:8px}
 .amx-tab-lbl{display:inline-flex;align-items:center;gap:8px}
+.amx-tab{align-items:center} /* v1635: label, icon and % share one row (baseline pushed the % below an icon) */
+.amx-tab .amx-teotl{width:32px;height:32px;flex:none;margin:0;color:inherit!important} /* takes the tab's ink, like the creatures seal */
 /* v1622: Mictlan seal beside the map title; layer glyph on the battle label */
 .mm-title-seal{margin-right:14px;position:relative;top:-4px}
 .ph-sym{margin-right:7px;position:relative;top:-1px;--sc:#e8c060}
@@ -2294,7 +2372,7 @@ body.fx-min .bless-spark{display:none}
     <div class="deploy-head-r"><div class="dmap" id="dmap-deploy"></div>
       <!-- v1574 [Genaro]: Enter Battle moves up here, where the Tianguis puts Continue -- on endgame boss fights the
            8-enemy preview pushed it below the screen. Shown only on the deploy step (CSS). -->
-      <button class="btn" id="deploy-enter-btn" onclick="startBattle()" data-i18n="ui.deploy.enterBattle">Enter Battle</button></div>
+      <button class="btn sq-frame" id="deploy-enter-btn" onclick="startBattle()" data-i18n="ui.deploy.enterBattle">Enter Battle</button></div>
   </div>
   <div id="step-choice"><div class="party-chips" id="choice-party-chips"></div><div id="tecpatl-panel-deploy"></div><div class="battle-choice" id="battle-choice-cards"></div></div>
   <div id="step-deploy" style="display:none">
@@ -2302,7 +2380,7 @@ body.fx-min .bless-spark{display:none}
       <div id="chosen-banner" style="font-size:12px;padding:4px 10px;border-radius:8px"></div>
       <button class="btn" id="change-btn" onclick="resetChoice()" style="font-size:11px;padding:4px 10px" data-i18n="ui.battle.change">Change</button>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:.75rem">
+    <div id="deploy-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:.75rem">
       <div><div class="row-lbl" data-i18n="ui.battle.enemies">Enemies</div><div id="enemy-preview-list"></div></div>
       <div id="synergy-col"><div class="row-lbl" data-i18n="ui.battle.synergy">Synergy Bonuses</div><div id="synergy-panel"></div><div id="god-affinity-panel"></div></div>
     </div>
@@ -2914,7 +2992,7 @@ Object.assign(T_EN,{
   'ui.deploy.easier':'Easier Path',
   'ui.deploy.harder':'Harder Path',
   'ui.deploy.harderDesc':'+20% Blood & Cacao.',
-  'ui.deploy.miniBossTag':'[Guardian]',
+  'ui.deploy.miniBossTag':'[Guardian]','ui.deploy.bossTag':'Boss', /* v1631 */
   'ui.ev.offerVitality':'Offer your vitality to the flame',
   'ui.ev.offerVitalityCost':'(−60% patron HP) Patron god gains +5 permanent levels',
   'ui.ev.flameDrinks':'The flame drinks deep.',
@@ -3275,6 +3353,7 @@ Object.assign(T_EN,{
   'ui.battle.cxVictory':'Victory!','ui.battle.cxFallen':'{name} has fallen', /* v1366 */
   'ui.battle.cxFallenPl':'{name} have fallen', /* v1368 */
   'ui.battle.roundLog':'Round {n}',
+  'ui.battle.qNext':'Next','ui.battle.qYou':'Your turn','ui.battle.qRound':'Round {n}','ui.battle.rtSlow1':'{name} is slowed and acts last','ui.battle.rtSlowN':'{n} slowed units act last', /* v1629 */
   'ui.battle.deadStir':' · 💀 The dead stir',
   'ui.spoils.killed':'killed',
   'ui.spoils.captured':'captured',
@@ -4015,7 +4094,7 @@ Object.assign(T_ES,{
   'ui.deploy.easier':'Ruta fácil',
   'ui.deploy.harder':'Ruta difícil',
   'ui.deploy.harderDesc':'+20% de Sangre y Cacao.',
-  'ui.deploy.miniBossTag':'[Guardián]',
+  'ui.deploy.miniBossTag':'[Guardián]','ui.deploy.bossTag':'Jefe', /* v1631 */
   'ui.ev.offerVitality':'Ofrecer tu vitalidad a la llama',
   'ui.ev.offerVitalityCost':'(−60% de PV del patrón) El dios patrón gana +5 niveles permanentes',
   'ui.ev.flameDrinks':'La llama bebe hondo.',
@@ -4375,6 +4454,7 @@ Object.assign(T_ES,{
   'ui.battle.cxVictory':'¡Victoria!','ui.battle.cxFallen':'{name} ha caído', /* v1366 */
   'ui.battle.cxFallenPl':'{name} han caído', /* v1368 */
   'ui.battle.roundLog':'Ronda {n}',
+  'ui.battle.qNext':'Siguiente','ui.battle.qYou':'Tu turno','ui.battle.qRound':'Ronda {n}','ui.battle.rtSlow1':'{name} tiene Lentitud y actúa al final','ui.battle.rtSlowN':'{n} unidades con Lentitud actúan al final', /* v1629 */
   'ui.battle.deadStir':' · 💀 Los muertos se agitan',
   'ui.spoils.killed':'abatido',
   'ui.spoils.captured':'capturado',
@@ -7913,7 +7993,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1628'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1640'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -10868,7 +10948,7 @@ function amxDexHtml(){
   let h='<div class="amx-top"><div><button class="btn" onclick="goMainMenu()" style="font-size:10px">'+t('ui.common.mainmenu')+'</button></div>'
     +'<div class="amx-title jersey">'+t('ui.amox.title')+'</div><div></div></div>';
   h+='<div class="amx-tabs">'
-    +'<button type="button" class="amx-tab'+(AMX.tab==='gods'?' on':'')+'" onclick="amxTab(\'gods\')" aria-pressed="'+(AMX.tab==='gods')+'"><span>'+t('ui.amox.tabGods')+'</span><span class="amx-pct" id="amx-pct-gods">'+pc.gods+'%</span>'+_amxPendBadge('gods')+'</button>'
+    +'<button type="button" class="amx-tab'+(AMX.tab==='gods'?' on':'')+'" onclick="amxTab(\'gods\')" aria-pressed="'+(AMX.tab==='gods')+'"><span class="amx-tab-lbl"><svg class="tl tl-teotl amx-teotl" aria-hidden="true"><use href="#tl-teotl"/></svg><span>'+t('ui.amox.tabGods')+'</span></span><span class="amx-pct" id="amx-pct-gods">'+pc.gods+'%</span>'+_amxPendBadge('gods')+'</button>'
     +'<button type="button" class="amx-tab'+(AMX.tab==='creatures'?' on':'')+'" onclick="amxTab(\'creatures\')" aria-pressed="'+(AMX.tab==='creatures')+'"><span class="amx-tab-lbl">'+mtlSym('seal32',1)+'<span>'+t('ui.amox.tabCreatures')+'</span></span><span class="amx-pct" id="amx-pct-creatures">'+pc.cre+'%</span>'+_amxPendBadge('creatures')+'</button>'
     +'</div><div class="amx-banner" id="amx-banner">'+(AMX.banner||'')+'</div><div class="amx-scroll" id="amx-scroll">';
   if(AMX.tab==='gods'){
@@ -10881,7 +10961,7 @@ function amxDexHtml(){
       const bound=l.items.filter(function(e){return ((A.e[e.key]||{}).t||0)>=3;}).length;
       const lay=(typeof MICTLAN_LAYERS!=='undefined'&&MICTLAN_LAYERS[l.n-1])||{name:''};
       const star=amxLayerStar(l.items);
-      h+='<div class="amx-sec'+(known?'':' dim')+(star?' gold':'')+'" data-sec="L'+l.n+'"><div class="amx-lbl"><span>'+AMX_ROMAN[l.n]+' · '+(known?_amxEsc(String(lay.name).toUpperCase()):t('ui.amox.unknownLayer'))+'</span>'+(star?'<span class="amx-lstar">★</span>':'')+'</div>'
+      h+='<div class="amx-sec'+(known?'':' dim')+(star?' gold':'')+'" data-sec="L'+l.n+'"><div class="amx-lbl">'+mtlSym(String(l.n),1,'amx-lsym')+'<span>'+AMX_ROMAN[l.n]+' · '+(known?_amxEsc(String(lay.name).toUpperCase()):t('ui.amox.unknownLayer'))+'</span>'+(star?'<span class="amx-lstar">★</span>':'')+'</div>'
         +'<div class="amx-cnt">'+bound+' / '+l.items.length+'</div>';
       if(l.vas.length)h+='<div class="amx-grid c12">'+l.vas.map(amxCellHtml).join('')+'</div>';
       if(l.rest.length)h+='<div class="amx-grid c12'+(l.vas.length?' rule':'')+'">'+l.rest.map(amxCellHtml).join('')+'</div>';
@@ -14692,8 +14772,8 @@ function showL5BossChoice(onChoice){
     const color=isMal?'#e07070':'#60a0e0';
     const label=isMal?'🌵 Malinalxochitl':'🔵 Xiuhtecuhtli';
     const sublabel=L(isMal?MALINALXOCHITL_BOSS_TPL:XIUHTECUHTLI_BOSS_TPL,'flavor'); // v342 · v1422: ES from the boss templates
-    let list=`<div class="choice-enemy"><span style="color:${color};font-weight:600">${boss.icon} ${boss.name}</span> <span style="font-size:10px;color:var(--td)">${lvAb()}${lv} [Boss]</span></div>`;
-    escorts.forEach(e=>{if(!e)return;const em=ELEM_META[e.element];list+=`<div class="choice-enemy">${e.icon} ${e.name} <span style="font-size:10px;color:var(--td)">${lvAb()}${lv}</span>${em?` <span class="${em.cls} elem-badge">${em.icon}</span>`:''}</div>`;});
+    let list=enemyCardRow([{...boss,isBoss:true,enemyLevel:lv},...escorts.filter(Boolean).map(e=>({...e,enemyLevel:lv}))],{flavor:false}); /* v1631: sublabel already carries the flavor */
+    
     return {boss,escorts,color,label,sublabel,list};
   }
   window._l5ChoiceCb=onChoice;
@@ -15483,9 +15563,43 @@ function showDeployStep(){
   else if(G.chosenDifficulty==='boss'){banner.textContent=t('ui.deploy.bossBattle');banner.style.cssText='font-size:12px;padding:4px 10px;border-radius:8px;background:#2a0a0a;color:#e07070;border:0.5px solid #6a1a1a';}
   else if(G.chosenDifficulty==='easy'){banner.textContent=t('ui.deploy.easier');banner.style.cssText='font-size:12px;padding:4px 10px;border-radius:8px;background:#0a2a14;color:#50c080;border:0.5px solid #1a6a3a';}
   else{banner.textContent=t('ui.deploy.harderBanner');banner.style.cssText='font-size:12px;padding:4px 10px;border-radius:8px;background:#2a0a0a;color:#e07070;border:0.5px solid #6a1a1a';}
-  document.getElementById('synergy-col').style.display=G.battleNum===1?'none':'block';
+  document.getElementById('synergy-col').style.display='none'; /* v1633 [Genaro]: synergy panel hidden for now -- enemies take the full width */
   renderEnemyPreview();if(G.battleNum>1){renderSynPanel();renderAffPanel();}renderDeployChips();
   renderTecpatlModPanel('tecpatl-panel-deploy2');
+}
+/* v1631 [Genaro, GCMX]: one unit card for every enemy list outside battle. Bosses and Guardians get the big
+   framed card with their flavor line; the pixel portrait comes through unitIconHtml (emoji fallback when a unit
+   has no sprite). Boss/god ids are stripped the way the old boss preview did so their portrait resolves. */
+function ecIcon(u,sz){
+  if(!u.isAlly&&(u.isGod||u.isBoss))return unitIconHtml({...u,id:String(u.id||'').replace(/^en_/,'').replace(/^boss_/,'').replace(/_\d+.*/,''),isGod:false,icon:u.icon},sz);
+  return unitIconHtml(u,sz);
+}
+function enemyCardHtml(u,o){
+  o=o||{};if(!u)return '';
+  const kind=u.isAlly?'':u.isBoss?'boss':u.isMiniBoss?'guard':'';
+  const em=ELEM_META[u.element];
+  const lv=(o.lv!==false&&u.enemyLevel)?'<span>'+lvAb()+u.enemyLevel+'</span>':'<span></span>';
+  const el=(o.elem!==false&&em)?'<span class="elem-badge '+em.cls+'">'+em.icon+'</span>':'';
+  const right=(o.otag||'')+(o.otag?'':el);
+  const left=o.otag?'<span style="display:inline-flex;gap:3px;align-items:center">'+lv+el+'</span>':lv;
+  const tag=kind==='boss'?t('ui.deploy.bossTag'):kind==='guard'?t('ui.deploy.miniBossTag').replace(/[\[\]]/g,''):'';
+  const fl=(kind&&o.flavor!==false&&typeof flavorDisp==='function')?flavorDisp(u):'';
+  return '<div class="ec'+(kind?' ec-'+kind:'')+(o.cls||'')+'">'
+    +(tag?'<span class="ec-tag">'+tag+'</span>':'')
+    +'<div class="ec-top">'+left+right+'</div>'
+    +'<div class="ec-art">'+ecIcon(u,96)+'</div>'
+    +'<div class="ec-nm'+(u.isAlly?' ec-ally':'')+'">'+u.name+'</div>'
+    +(fl?'<div class="ec-fl">'+fl+'</div>':'')
+    +(o.chips?'<div class="ec-chips">'+o.chips+'</div>':'')
+    +(o.foot?'<div class="ec-foot">'+o.foot+'</div>':'')
+    +'</div>';
+}
+function enemyCardRow(list,o){
+  let a=(list||[]).filter(Boolean);
+  /* a lone Boss/Guardian sits in the middle of its escorts -- display order only, never the turn order */
+  const big=a.filter(function(e){return e.isBoss||e.isMiniBoss;});
+  if(big.length===1&&a.length>=3){const b=big[0];a=a.filter(function(e){return e!==b;});a.splice(Math.floor(a.length/2),0,b);}
+  return '<div class="ec-row">'+a.map(function(e){return enemyCardHtml(e,o);}).join('')+'</div>';
 }
 function renderChoiceCards(){
   renderTecpatlModPanel('tecpatl-panel-deploy');
@@ -15504,7 +15618,7 @@ function renderChoiceCards(){
     if(G.battleNum===1){return;}
     // Hard battle card — RIGHT
     const hCard=document.createElement('div');hCard.className='choice-card hard';
-    let hList='';(G.cachedHard||[]).forEach(e=>{const em=ELEM_META[e.element];const mb=e.isMiniBoss?' <span style="font-size:10px;color:#60a0e0">'+t('ui.deploy.miniBossTag')+'</span>':'';hList+=`<div class="choice-enemy">${e.icon} ${e.name}${mb} <span style="font-size:10px;color:var(--td)">${lvAb()}${e.enemyLevel}</span>${em?` <span class="${em.cls} elem-badge">${em.icon}</span>`:''}</div>`;});
+    let hList=enemyCardRow(G.cachedHard); /* v1631 */
     hCard.innerHTML=`<div style="font-size:13px;font-weight:500;color:#e07070;margin-bottom:4px">${t('ui.deploy.harder')}</div><div style="font-size:11px;color:var(--td);margin-bottom:.6rem">${t('ui.deploy.harderDesc')}</div>${hList}<button class="btn btn-hard" onclick="pickDiff('hard')" style="width:100%;margin-top:.5rem">${t('ui.ev.choose')}</button>`;
     el.appendChild(hCard);
   }else{
@@ -15512,14 +15626,14 @@ function renderChoiceCards(){
     if(hasMB){
       // Mini-boss battle: hard path only
       const card=document.createElement('div');card.className='choice-card hard';
-      let list='';(G.cachedHard||[]).forEach(e=>{const em=ELEM_META[e.element];const mb=e.isMiniBoss?' <span style="font-size:10px;color:#60a0e0">'+t('ui.deploy.miniBossTag')+'</span>':'';list+=`<div class="choice-enemy">${e.icon} ${e.name}${mb} <span style="font-size:10px;color:var(--td)">${lvAb()}${e.enemyLevel}</span>${em?` <span class="${em.cls} elem-badge">${em.icon}</span>`:''}</div>`;});
+      let list=enemyCardRow(G.cachedHard); /* v1631 */
       card.innerHTML=`<div style="font-size:13px;font-weight:500;color:#e07070;margin-bottom:4px">${t('ui.deploy.miniBossBattle')}</div>${list}<button class="btn btn-hard" onclick="pickDiff('hard')" style="width:100%;margin-top:.5rem">${t('ui.deploy.enterBattle')}</button>`; /* v1403: ES */
       el.appendChild(card);
     }else{
       // Normal Easy / Hard cards
       [['easy',G.cachedEasy,t('ui.deploy.easier'),''],['hard',G.cachedHard,t('ui.deploy.harder'),t('ui.deploy.harderDesc')]].forEach(([diff,enemies,label,desc])=>{
         const card=document.createElement('div');card.className=`choice-card ${diff}`;
-        let list='';(enemies||[]).forEach(e=>{const em=ELEM_META[e.element];const mb=e.isMiniBoss?' <span style="font-size:10px;color:#60a0e0">'+t('ui.deploy.miniBossTag')+'</span>':'';list+=`<div class="choice-enemy">${e.icon} ${e.name}${mb} <span style="font-size:10px;color:var(--td)">${lvAb()}${e.enemyLevel}</span>${em?` <span class="${em.cls} elem-badge">${em.icon}</span>`:''}</div>`;});
+        let list=enemyCardRow(enemies); /* v1631 */
         card.innerHTML=`<div style="font-size:13px;font-weight:500;color:${diff==='easy'?'#50c080':'#e07070'};margin-bottom:4px">${label}</div>${desc?`<div style="font-size:11px;color:var(--td);margin-bottom:.6rem">${desc}</div>`:''} ${list}<button class="btn btn-${diff==='easy'?'easy':'hard'}" onclick="pickDiff('${diff}')" style="width:100%;margin-top:.5rem">${t('ui.ev.choose')}</button>`;
         el.appendChild(card);
       });
@@ -17829,23 +17943,10 @@ function afterEvent(){
 }
 function resetChoice(){if(G.battleNum===1)return;G.chosenDifficulty=null;G.pendingEnemies=null;document.getElementById('step-choice').style.display='block';document.getElementById('step-deploy').style.display='none';renderChoiceCards();}
 function renderEnemyPreview(){
+  /* v1631: unit cards (was a text list with emoji; only B8 bosses showed a sprite) */
   const el=document.getElementById('enemy-preview-list');el.innerHTML='';
   if(!G.pendingEnemies)return;
-  const isBoss=G.battleNum===8;
-  G.pendingEnemies.forEach(e=>{
-    const em=ELEM_META[e.element];
-    const d=document.createElement('div');d.className='enemy-preview';
-    const icon=e.isGod||e.isBoss?`<span style="display:inline-flex;align-items:center">${unitIconHtml({...e,id:e.id.replace(/^boss_/,'').replace(/_\d+.*/,''),isGod:false,icon:e.icon},28)}</span>`:`<span style="font-size:20px">${e.icon}</span>`;
-    const nameCol=e.isBoss?'#ff8060':e.isMiniBoss?'#60a0e0':'#e07070';
-    if(isBoss){
-      // Boss: pixel sprite (36px) + name + level + element
-      const sprite=`<span style="display:inline-flex;align-items:center">${unitIconHtml({...e,id:e.id.replace(/^en_/,'').replace(/^boss_/,'').replace(/_\d+.*/,''),isGod:false,icon:e.icon},36)}</span>`;
-      d.innerHTML=`<div style="display:flex;align-items:center;gap:8px">${sprite}<span style="font-size:13px;font-weight:600;color:${nameCol}">${e.name}</span><span style="font-size:10px;color:var(--td)">${lvAb()}${e.enemyLevel||1}</span>${em?`<span class="elem-badge ${em.cls}">${em.icon}</span>`:''}</div>`;
-    }else{
-      d.innerHTML=`<div style="display:flex;align-items:center;gap:5px;margin-bottom:2px"><span style="font-size:16px">${e.icon}</span><span style="font-size:12px;font-weight:500;color:${nameCol}">${e.name}</span>${e.isMiniBoss?'<span style="font-size:10px;color:#60a0e0">[MB]</span>':''}<span style="font-size:10px;color:var(--td)">${lvAb()}${e.enemyLevel||1}</span>${em?`<span class="elem-badge ${em.cls}">${em.icon}</span>`:''}</div>`;
-    }
-    el.appendChild(d);
-  });
+  el.innerHTML=enemyCardRow(G.pendingEnemies);
 }
 
 function renderSynPanel(){
@@ -18725,8 +18826,8 @@ function buildRoundQueue(){
   G.slowedThisRound=new Set([...pSlow.map(u=>u.id),...eSlow.map(u=>u.id)]);
   // Round queue order: [normal players + normal enemies interleaved] → [slowed players] → [slowed enemies]
   // This ensures slowed enemies always act AFTER all normal units, which is the intended slow effect
-  const slowedPlayerSlots=pSlow.map(()=>({side:'player'})); // anonymous player slots
-  const slowedEnemySlots=eSlow.map(e=>({unit:e,side:'enemy'}));
+  const slowedPlayerSlots=pSlow.map(()=>({side:'player',_slow:true})); // anonymous player slots · v1638: _slow tags the slow tail
+  const slowedEnemySlots=eSlow.map(e=>({unit:e,side:'enemy',_slow:true})); /* v1638 */
   G.roundQueue=[...interleaveSlots(pNorm,eNorm),...slowedPlayerSlots,...slowedEnemySlots];
   // Belic Rush: if Mixcoatl is patron, ALL allies are immune to Slow — remove them from slow sets
   /* v1577 [Genaro: ruling = all allies]: this scrub only covered Thunder allies while _applySlowCore blocked every
@@ -18881,6 +18982,7 @@ function buildRoundQueue(){
     banEl.textContent=t('ui.battle.roundBanner',{n:G.roundNum})+(mictlanSummonPending()?t('ui.battle.deadStir'):'')+_stw; // v758/v806 · v1262
     banEl.className='round-banner new-round';
     {const _cf=document.getElementById('cx-fold');if(_cf){_cf.innerHTML='<span>'+banEl.innerHTML+'<span class="cx-turn" id="cx-turn"></span></span>';G._cxTurn='';cxTurnTag();_cf.classList.remove('new-round','cx-r1');void _cf.offsetWidth;_cf.classList.add('new-round');if(G.roundNum===1)_cf.classList.add('cx-r1'); /* v1393 */}} /* v1357: codex fold carries the round */
+    try{cxRoundToast();}catch(e){console.warn('cxRoundToast',e);} /* v1629 */
     setTimeout(()=>{if(banEl)banEl.classList.remove('new-round');},1500);
   }
   renderBattle();
@@ -18912,7 +19014,7 @@ function processCurrentSlot(){
   if(G.qIdx>=G.roundQueue.length&&G.thisRoundSlowTail.length){
     const pSlowTail=G.thisRoundSlowTail.filter(s=>s.side==='player');
     const eSlowTail=G.thisRoundSlowTail.filter(s=>s.side==='enemy');
-    G.roundQueue=[...G.roundQueue,...interleaveSlots(pSlowTail.map(s=>s.unit),eSlowTail.map(s=>s.unit))];
+    G.roundQueue=[...G.roundQueue,...interleaveSlots(pSlowTail.map(s=>s.unit),eSlowTail.map(s=>s.unit)).map(s=>({...s,_slow:true}))]; /* v1638 */
     G.thisRoundSlowTail=[];
     while(G.qIdx<G.roundQueue.length&&G.roundQueue[G.qIdx].unit&&
       (G.roundQueue[G.qIdx].unit.currentHp<=0||
@@ -19521,7 +19623,7 @@ function _applySlowCore(target,hadArmorBefore){
         if(G.roundQueue[i].side==='player'){G.roundQueue.splice(i,1);spliced=true;break;}
       }
       // Always append a new player slot to the END of roundQueue so the slowed player acts last
-      G.roundQueue.push({side:'player'});
+      G.roundQueue.push({side:'player',_slow:true}); /* v1638 */
       addLog(isEs()?`<span class="slow-pip">🐢 ${liveName(target)} con Lentitud (fin de ronda)</span>`:`<span class="slow-pip">🐢 ${target.name} Slowed (end of round)</span>`);
     }
     return;
@@ -25639,6 +25741,50 @@ function applyArmorDamage(target,dmg,isEnemyAttacking){
   return dmg;
 }
 
+/* v1638: move a cleansed unit's turn out of the slow tail and back into the normal part of the round.
+   Only slots AFTER qIdx are rebuilt. The normal remainder is re-interleaved with the unit added to its side,
+   alternating from whichever side was already next, so the cleansed unit lands where an unslowed unit would.
+   Skipped when the unit has acted, is acting right now, or was never slowed THIS round (a next-round slow is
+   just a flag, which cleanseUnit already clears). */
+function deSlowRequeue(u){
+  if(!u||!G||!Array.isArray(G.roundQueue))return false;
+  const uid=u.id;
+  const _inTail=!u.isAlly&&Array.isArray(G.thisRoundSlowTail)&&G.thisRoundSlowTail.some(s=>s&&s.unit&&s.unit.id===uid); /* enemies slowed mid-round live in the tail, not slowedThisRound */
+  if(!((G.slowedThisRound&&G.slowedThisRound.has(uid))||_inTail))return false;
+  if(G.actedIds&&G.actedIds.has(uid))return false;
+  if(!u.isAlly&&G._enemyActedIds&&G._enemyActedIds.has(uid))return false;
+  if(uid===G.selectedActorId||uid===G._actingEnemy)return false; /* its own action is in flight */
+  if(G._serendipityFreeAction)return false; /* bonus actions sit outside the queue (v685) */
+  const i0=(G.qIdx||0)+1,q=G.roundQueue,rest=q.slice(i0);
+  let removed=false;
+  if(u.isAlly){
+    const k=rest.findIndex(s=>s&&s.side==='player'&&s._slow);
+    if(k>=0){rest.splice(k,1);removed=true;}
+  }else{
+    const k=rest.findIndex(s=>s&&s.side==='enemy'&&s._slow&&s.unit&&s.unit.id===uid);
+    if(k>=0){rest.splice(k,1);removed=true;}
+    else if(G.thisRoundSlowTail){
+      const tk=G.thisRoundSlowTail.findIndex(s=>s&&s.unit&&s.unit.id===uid);
+      if(tk>=0){G.thisRoundSlowTail.splice(tk,1);removed=true;}
+    }
+  }
+  if(!removed)return false;
+  const lead=[];while(rest.length&&rest[0]&&rest[0]._desmodus)lead.push(rest.shift()); /* a pending double act stays first */
+  const norm=rest.filter(s=>s&&!s._slow),slow=rest.filter(s=>s&&s._slow);
+  const ps=norm.filter(s=>s.side==='player');
+  const es=norm.filter(s=>s.side==='enemy');
+  if(u.isAlly)ps.push({side:'player'});else es.push({unit:u,side:'enemy'});
+  const cur=q[i0-1];let side=(cur&&cur.side)?(cur.side==='player'?'enemy':'player'):(norm.length?norm[0].side:(u.isAlly?'player':'enemy')); /* alternate from the slot now resolving -- a Slow splice can leave two enemies adjacent, so the next slot is not a reliable guide */
+  const out=[];
+  while(ps.length||es.length){
+    if(side==='player'&&ps.length)out.push(ps.shift());
+    else if(side==='enemy'&&es.length)out.push(es.shift());
+    else out.push((ps.length?ps:es).shift());
+    side=side==='player'?'enemy':'player';
+  }
+  G.roundQueue=[...q.slice(0,i0),...lead,...out,...slow];
+  return true;
+}
 function cleanseUnit(u){
   /* v1028: count what is actually on the unit BEFORE the strip, so the callout only fires when a
      cleanse had something to remove. A "CLEANSED" over a clean unit is noise. */
@@ -25669,6 +25815,12 @@ function cleanseUnit(u){
   // ahead of the remaining enemies, instead of from the slow tail. Its old tail slot is later reached
   // with every player already acted and is simply stepped over (line ~4743). We only ever ADD a slot,
   // never remove one, so no queued player or enemy action can be lost; a unit can't act twice once in actedIds.
+  /* v1638 [Genaro: "cleansing a slowed unit still sends it to the end"]: until now the cleanse only cleared the
+     slow FLAGS. The queue kept the unit's turn parked in the slow tail -- for an ally the normal section was one
+     player slot short (Slow had spliced it out), for an enemy its named slot stayed at the back -- so a cleansed
+     unit still acted last. deSlowRequeue() moves that ONE slot back: net slot count is unchanged, so no turn is
+     added or lost (the v407 flood cannot come back), and qIdx is never touched (the v368 misalignment). */
+  try{deSlowRequeue(u);}catch(_dsr){console.warn('deSlowRequeue',_dsr);}
   const _revertSlow=u.isAlly&&G.roundQueue&&G.slowedThisRound&&G.slowedThisRound.has(uid)&&G.actedIds&&!G.actedIds.has(uid);
   if(G.slowedThisRound)G.slowedThisRound.delete(uid);
   if(G.nextRoundSlowIds)G.nextRoundSlowIds.delete(uid);
@@ -26550,6 +26702,148 @@ function cxTurnTag(){
   if(side){void el.offsetWidth;el.classList.add('cx-turn-pop');} /* v1390: pop on every swap */
   if(document.body){document.body.classList.toggle('turn-you',side==='you');document.body.classList.toggle('turn-enemy',side==='enemy');}
 }
+/* v1629 [Genaro, GCMX]: TURN TRACKER -- the next 2 actions after the current one, on the round fold.
+   READ-ONLY: it walks a copy of the live queue with the same skip rules processCurrentSlot uses and never
+   writes G. Player slots are anonymous (any ready ally), so they show as a sun chip. When the round runs out
+   the next round is PREDICTED from buildRoundQueue's ordering (nextRoundSlowIds -> back of the round); units
+   that only arrive at round build (reinforcements, Undead Forces, Xbalanque) correct the chip live. */
+function turnPreview(max){
+  const out=[];
+  if(typeof G==='undefined'||!G||!G.roundQueue||G.battlePhase==='done')return out;
+  const cap=G.captureProcessed||new Set();
+  const acted=G.actedIds||new Set();
+  const eDone=G._enemyActedIds||new Set();
+  const alive=u=>u&&u.currentHp>0&&!cap.has(u.id);
+  const q=G.roundQueue,i=G.qIdx||0,cur=q[i];
+  const seenE=new Set();
+  if(cur&&cur.side==='enemy'&&cur.unit)seenE.add(cur.unit.id);
+  let pr=(G.units||[]).filter(u=>u&&u.currentHp>0&&!acted.has(u.id)).length;
+  if(cur&&cur.side==='player'&&pr>0)pr--; /* the current player slot spends one of them */
+  const slots=q.slice(i+1);
+  const tail=G.thisRoundSlowTail||[];
+  if(tail.length)slots.push(...interleaveSlots(tail.filter(x=>x.side==='player').map(x=>x.unit),tail.filter(x=>x.side==='enemy').map(x=>x.unit)));
+  const slowNow=new Set([...(G.slowedThisRound||[]),...tail.map(x=>x&&x.unit&&x.unit.id).filter(Boolean)]); /* enemies slowed this round live in the tail, not slowedThisRound */
+  for(const s of slots){
+    if(out.length>=max)break;
+    if(!s)continue;
+    if(s.side==='player'){if(pr>0){out.push({kind:'you'});pr--;}continue;}
+    const u=s.unit;
+    if(!alive(u)||s._fired||acted.has(u.id)||eDone.has(u.id)||seenE.has(u.id))continue;
+    seenE.add(u.id);out.push({kind:'enemy',u:u,slow:slowNow.has(u.id)});
+  }
+  if(out.length<max){
+    const aP=(G.units||[]).filter(u=>u&&u.currentHp>0);
+    const aE=(G.enemies||[]).filter(alive);
+    if(aP.length&&aE.length){
+      const ns=G.nextRoundSlowIds||new Set();
+      const belic=(typeof hasPassive==='function')&&hasPassive('belicRush');
+      const pSlowN=belic?0:aP.filter(u=>ns.has(u.id)).length;
+      let eN=aE.filter(u=>!ns.has(u.id));
+      try{eN=orderEnemyTurns(eN);}catch(e){}
+      const nq=[...interleaveSlots(new Array(aP.length-pSlowN).fill(0),eN),
+        ...new Array(pSlowN).fill(0).map(()=>({side:'player'})),
+        ...aE.filter(u=>ns.has(u.id)).map(u=>({unit:u,side:'enemy',slow:true}))];
+      const rn=(G.roundNum||0)+1;let first=true;
+      for(const s of nq){
+        if(out.length>=max)break;
+        const it=s.side==='player'?{kind:'you'}:{kind:'enemy',u:s.unit,slow:!!s.slow};
+        if(first){it.round=rn;first=false;}
+        out.push(it);
+      }
+    }
+  }
+  return out;
+}
+/* v1630: unit portrait sized for a line of text (falls back to the emoji when a unit has no sprite) */
+function amIco(u){return u?'<span class="am-ico">'+unitIconHtml(u,22)+'</span>':'';}
+function cxqClearHl(){document.querySelectorAll('.uc.cxq-hl').forEach(function(c){c.classList.remove('cxq-hl');});}
+function cxqHl(ids){cxqClearHl();ids.forEach(function(id){const c=document.querySelector('.uc[data-uid="'+id+'"]');if(c)c.classList.add('cxq-hl');});}
+function cxqEsc(x){return String(x==null?'':x).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+const CXQ_SUN='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="none" stroke="#7ff0c8" stroke-width="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4" stroke="#7ff0c8" stroke-width="3"/></svg>';
+const CXQ_HG='\u{1F422}'; /* v1639: the Slow status turtle, matching the card pip (was an hourglass) */
+function cxQueueTag(){
+  const fold=document.getElementById('cx-fold');
+  let el=document.getElementById('cx-queue');
+  const host=fold&&fold.querySelector('span');
+  const _l3=(host&&typeof G!=='undefined'&&G&&G.battlePhase!=='done')?turnPreview(3):[];
+  const list=_l3.slice(0,2),_after=list.length===2?_l3[2]:null; /* v1632: the 3rd action only drives the trailing arrow */
+  if(!list.length){if(el){el.remove();cxqClearHl();}G._cxqSig='';G._cxqPrevE=[];return;}
+  const turnEl=document.getElementById('cx-turn');
+  if(!el||el.parentNode!==host){
+    if(el)el.remove();
+    el=document.createElement('span');el.id='cx-queue';el.className='cxq';G._cxqSig='';
+    if(turnEl&&turnEl.parentNode===host)host.insertBefore(el,turnEl.nextSibling);else host.appendChild(el);
+  }
+  const sig=list.map(function(it){return (it.round?'R'+it.round+':':'')+(it.kind==='you'?'p':'e'+it.u.id+(it.slow?'s':''));}).join('|')+'|T'+(_after?(_after.round||'x'):'-')+'#'+LANG;
+  if(sig===G._cxqSig)return;
+  G._cxqSig=sig;
+  cxqClearHl();
+  /* v1639: remember where every chip sat before the rebuild, keyed by unit (sun chips by their order) */
+  const _fxOk=(typeof fxOn==='function')?fxOn():true;
+  const _keyOf=function(c,n){return c.dataset.q==='you'?'you'+n:c.dataset.q;};
+  const _oldX={};
+  if(_fxOk){let _n=0;el.querySelectorAll('.cxq-chip[data-q]').forEach(function(c){_oldX[_keyOf(c,c.dataset.q==='you'?_n++:0)]=c.getBoundingClientRect().left;});}
+  const _prevSlow=G._cxqPrevSlow||[];
+  const prevE=G._cxqPrevE||[];
+  const nowE=list.filter(function(it){return it.kind==='enemy';}).map(function(it){return it.u.id;});
+  /* a chip that left because its unit died or was captured plays out as a crossed-out ghost */
+  const gone=prevE.filter(function(id){if(nowE.includes(id))return false;const u=(G.enemies||[]).find(function(x){return x&&x.id===id;});return !u||u.currentHp<=0||(G.captureProcessed&&G.captureProcessed.has(id));});
+  G._cxqPrevE=nowE;
+  /* v1639: a living unit that left the view because Slow sent it back slides off instead of vanishing */
+  const _slowNowAll=new Set([...(G.slowedThisRound||[]),...((G.thisRoundSlowTail||[]).map(function(x){return x&&x.unit&&x.unit.id;}))]);
+  const pushed=prevE.filter(function(id){if(nowE.includes(id)||gone.includes(id))return false;return _slowNowAll.has(id);});
+  const nowSlow=list.filter(function(it){return it.kind==='enemy'&&it.slow;}).map(function(it){return it.u.id;});
+  G._cxqPrevSlow=nowSlow;
+  let h='<span class="cxq-lbl">'+t('ui.battle.qNext')+'</span>';
+  gone.forEach(function(id){const u=(G.enemies||[]).find(function(x){return x&&x.id===id;});if(u)h+='<span class="cxq-chip cxq-out" data-ghost="1">'+unitIconHtml(u,18)+'</span>';});
+  list.forEach(function(it,k){
+    if(k>0)h+='<span class="cxq-sep">›</span>';
+    if(it.round)h+='<span class="cxq-r">'+cxqEsc(t('ui.battle.qRound',{n:it.round}))+'</span>'; /* v1630: Round N / Ronda N, not R N */
+    const nth=k>0?' cxq-2':'';
+    if(it.kind==='you'){h+='<span class="cxq-chip cxq-you'+nth+'" data-q="you" data-name="'+cxqEsc(t('ui.battle.qYou'))+'">'+CXQ_SUN+'</span>';return;}
+    const fresh=prevE.length&&!prevE.includes(it.u.id)?' cxq-in':'';
+    h+='<span class="cxq-chip'+(it.slow?' cxq-slow':'')+nth+fresh+'" data-q="'+cxqEsc(it.u.id)+'" data-name="'+cxqEsc(liveName(it.u))+'">'+unitIconHtml(it.u,18)+(it.slow?'<span class="cxq-hg">'+CXQ_HG+'</span>':'')+'</span>';
+  });
+  if(_after){h+='<span class="cxq-sep">\u203a</span>';if(_after.round)h+='<span class="cxq-r">'+cxqEsc(t('ui.battle.qRound',{n:_after.round}))+'</span>';} /* v1632 */
+  if(_fxOk)pushed.forEach(function(id){const u=(G.enemies||[]).find(function(x){return x&&x.id===id;});if(u)h+='<span class="cxq-chip cxq-push" data-ghost="1">'+unitIconHtml(u,18)+'<span class="cxq-hg">'+CXQ_HG+'</span></span>';});
+  el.innerHTML=h;
+  if(_fxOk){
+    let _n=0;
+    el.querySelectorAll('.cxq-chip[data-q]').forEach(function(c){
+      const k=_keyOf(c,c.dataset.q==='you'?_n++:0);
+      if(c.dataset.q!=='you'&&nowSlow.includes(c.dataset.q)&&!_prevSlow.includes(c.dataset.q))c.classList.add('cxq-slowfx'); /* just slowed */
+      if(_oldX[k]===undefined||!c.animate)return;
+      const dx=_oldX[k]-c.getBoundingClientRect().left;
+      if(Math.abs(dx)>1)c.animate([{transform:'translateX('+dx+'px)'},{transform:'translateX(0)'}],{duration:420,easing:'cubic-bezier(.3,.7,.2,1)'});
+    });
+  }
+  el.querySelectorAll('.cxq-chip[data-q]').forEach(function(c){
+    c.onmouseenter=function(){
+      const q=c.dataset.q;
+      if(q==='you')cxqHl((G.units||[]).filter(function(u){return u&&u.currentHp>0&&!(G.actedIds&&G.actedIds.has(u.id));}).map(function(u){return u.id;}));
+      else cxqHl([q]);
+    };
+    c.onmouseleave=cxqClearHl;
+  });
+  if(gone.length||pushed.length){const _el=el;setTimeout(function(){_el.querySelectorAll('[data-ghost]').forEach(function(g){g.remove();});},_fxOk?(pushed.length?720:400):0);} /* v1639: + pushed ghosts */
+}
+/* v1629: round-start pill under the fold (round 2+). Rides a fixed overlay so the fold keeps its size. */
+function cxRoundToast(){
+  if(typeof G==='undefined'||!G||(G.roundNum||0)<2)return;
+  const fold=document.getElementById('cx-fold');if(!fold)return;
+  const r=fold.getBoundingClientRect();if(!r.width)return;
+  let el=document.getElementById('cx-rtoast');
+  if(!el){el=document.createElement('div');el.id='cx-rtoast';el.className='cx-rtoast';document.body.appendChild(el);}
+  const sl=G.slowedThisRound||new Set();
+  const slowed=[...(G.units||[]),...(G.enemies||[])].filter(function(u){return u&&u.currentHp>0&&sl.has(u.id);});
+  let sub='';
+  if(slowed.length===1)sub=t('ui.battle.rtSlow1',{name:liveName(slowed[0])});
+  else if(slowed.length>1)sub=t('ui.battle.rtSlowN',{n:slowed.length});
+  el.innerHTML='<b>'+cxqEsc(t('ui.battle.qRound',{n:G.roundNum}))+'</b>'+(sub?'<i>'+cxqEsc(sub)+'</i>':'');
+  el.style.left=Math.round(r.left+r.width/2)+'px';el.style.top=Math.round(r.bottom+6)+'px';
+  el.classList.remove('on');void el.offsetWidth;el.classList.add('on');
+  clearTimeout(G._cxRtT);G._cxRtT=setTimeout(function(){el.classList.remove('on');},1700);
+}
 /* v1395: TARGETING ARROWS (playtest: "not clear which unit is going to be targeted").
    One fixed SVG overlay. Arrows are derived from state every time, never stored:
      - enemy turn, target chosen (G._targetedAllyId) -> red arrow, acting enemy -> that ally
@@ -26719,7 +27013,7 @@ function renderBattle(){try{amoxScanSeen();}catch(_amx){} /* v1440 */
       d.className=(st==='captured'?'uc captured-enemy':'uc slain')+' st-'+st; /* v1129: the outcome, not just 'not captured' */
       d.dataset.uid=e.id;
       const label=st==='captured'?'<span style="color:#50c080;font-size:10px">'+t('ui.card.captured')+'</span>':st==='reanimated'?'<span style="color:#d4af37;font-size:11px"><svg class="tl tl-skull"><use href="#tl-skull"/></svg> '+t('ui.card.reanimated')+'</span>':st==='defeated'?'<span style="color:#e8c040;font-size:10px">'+t('ui.card.defeated')+'</span>':st==='devoured'?'<span style="color:#c8403a;font-size:11px">\u{1F9B7} '+t('ui.card.devoured')+'</span>':'<span style="color:#e05050;font-size:11px"><svg class="tl tl-skull"><use href="#tl-skull"/></svg> '+t('ui.card.slain')+'</span>'; /* v1400: ES */ // v813
-      d.innerHTML=`<div style="font-size:18px">${e.icon}</div><div style="font-size:12px">${e.name}</div>${label}`;
+      d.innerHTML=`<div class="sl-ico" style="font-size:18px">${unitIconHtml(e,32)}</div><div style="font-size:12px">${e.name}</div>${label}`; /* v1630: pixel portrait, not the emoji */
       if(_erSync){_erBuilt.push(d);return;} /* v952 */ _placeCip(d,e);_dest(e).appendChild(d);return; // v784/v786: slain cards keep their cell, so a downed limb leaves a real gap in the body
     }
     const pp=Math.min(100,Math.round(e.currentHp/e.maxHp*100)),em=ELEM_META[e.element]; /* v1065: enemies can overheal now — label still shows true HP */
@@ -26870,6 +27164,7 @@ function renderBattle(){try{amoxScanSeen();}catch(_amx){} /* v1440 */
     syncChildren(ps,[al,ar]);
   }
   cxTurnTag(); /* v1385 */
+  try{cxQueueTag();}catch(e){console.warn('cxQueueTag',e);} /* v1629 */
   // Action message
   const amEl=document.getElementById('action-msg');
   if(amEl){
@@ -26877,9 +27172,9 @@ function renderBattle(){try{amoxScanSeen();}catch(_amx){} /* v1440 */
       const eu=G.enemies.find(u=>u.id===G._actingEnemy);
       if(eu){
         const ta=G._targetedAllyId?G.units.find(u=>u.id===G._targetedAllyId):null;
-        if(ta)amEl.innerHTML=t('ui.battle.enemyTargets',{eicon:eu.icon,enemy:eu.name,aicon:ta.icon,ally:ta.name}); /* v1399: ES */
-        else if(G._enemyWillSpecial)amEl.innerHTML=t('ui.battle.enemyReadies',{eicon:eu.icon,enemy:eu.name,ab:(typeof abilityDisp==='function'?abilityDisp(eu):eu.ability)||t('ui.battle.aSpecial')}); /* v1399 · v1399: ES, localized ability name */
-        else amEl.innerHTML=t('ui.battle.enemyActing',{eicon:eu.icon,enemy:eu.name});
+        if(ta)amEl.innerHTML=t('ui.battle.enemyTargets',{eicon:amIco(eu),enemy:eu.name,aicon:amIco(ta),ally:ta.name}); /* v1399: ES */
+        else if(G._enemyWillSpecial)amEl.innerHTML=t('ui.battle.enemyReadies',{eicon:amIco(eu),enemy:eu.name,ab:(typeof abilityDisp==='function'?abilityDisp(eu):eu.ability)||t('ui.battle.aSpecial')}); /* v1399 · v1399: ES, localized ability name */
+        else amEl.innerHTML=t('ui.battle.enemyActing',{eicon:amIco(eu),enemy:eu.name});
       }else amEl.innerHTML='';
     }else amEl.innerHTML='';
   }
@@ -27406,7 +27701,7 @@ function renderActionPanel(){
     const slot=G.roundQueue[G.qIdx];
     const eu=slot?.unit;
     el.innerHTML=`<div class="act-panel" style="border-color:#5a1010">
-      <div class="act-panel-title" style="color:#e07070">${eu?t('ui.battle.enemyActing',{eicon:eu.icon,enemy:eu.name}):t('ui.battle.enemyTurn')}</div>
+      <div class="act-panel-title" style="color:#e07070">${eu?t('ui.battle.enemyActing',{eicon:amIco(eu),enemy:eu.name}):t('ui.battle.enemyTurn')}</div>
     </div>`;
     return;
   }
@@ -27844,7 +28139,14 @@ function showSpoils(){
   const eE=[...dedup(G.spoils.killed.map(e=>({...e,type:'killed'}))),...dedup(G.spoils.captured.map(e=>({...e,type:'captured'})))];
   const aE=G.spoils.allyDeaths.map(e=>({unit:e.unit,blood:0,cacao:0,type:'fallen'}));
   let all=[];if(eE.length){all.push({lbl:true,label:t('ui.spoils.secEnemies')});all=[...all,...eE];}if(aE.length){all.push({lbl:true,label:t('ui.spoils.secAllies')});all=[...all,...aE];}
-  let tb=0,tc=0,i=0;
+  let tb=0,tc=0,i=0,_spGrid=null; /* v1631: the current section's card row */
+  /* v1632 [Genaro]: the total is on screen from the first card and climbs as each one lands. Same markup as the
+     final paint() below, so the bonus steps pick up seamlessly from these numbers. */
+  const _runTot=document.getElementById('spoils-total');
+  const spRun=(pop)=>{if(!_runTot)return;_runTot.style.display='flex';_runTot.style.flexDirection='column';_runTot.style.alignItems='center';_runTot.style.gap='4px';
+    const pc=pop?'spoil-pop':'';
+    _runTot.innerHTML=`<div style="display:flex;gap:32px;align-items:flex-start"><div style="text-align:center"><div style="font-size:22px;line-height:1.1"><svg class="tl tl-blood"><use href="#tl-blood"/></svg></div><div class="${pop&&pop.b?pc:''}" style="font-size:24px;font-weight:600;color:#e05050">+${tb}</div><div style="font-size:11px;color:var(--td);min-height:15px;margin:1px 0"></div><div style="font-size:14px;font-weight:700;color:#e05050;letter-spacing:1.5px">${t('ui.spoils.blood')}</div></div><div style="text-align:center"><div style="font-size:22px;line-height:1.1"><svg class="tl tl-cacao"><use href="#tl-cacao"/></svg></div><div class="${pop&&pop.c?pc:''}" style="font-size:24px;font-weight:600;color:#c0844a">+${tc}</div><div style="font-size:11px;color:var(--td);min-height:15px;margin:1px 0"></div><div style="font-size:14px;font-weight:700;color:#c0844a;letter-spacing:1.5px">${t('ui.spoils.cacao')}</div></div></div>`;};
+  if(all.some(x=>!x.lbl))spRun(null);
   function next(){
     if(i>=all.length){setTimeout(()=>{
         const baseTb=tb,baseTc=tc,_oe=getOfferingEffects();
@@ -27926,12 +28228,13 @@ function showSpoils(){
         };
         if(steps.length)setTimeout(runStep,500);else runStep();
       },400);return;}
-    const entry=all[i++];if(entry.lbl){const lbl=document.createElement('div');lbl.className='spoils-section-lbl';lbl.textContent=entry.label;list.appendChild(lbl);setTimeout(next,100);return;}
+    const entry=all[i++];if(entry.lbl){const lbl=document.createElement('div');lbl.className='spoils-section-lbl';lbl.textContent=entry.label;list.appendChild(lbl);_spGrid=document.createElement('div');_spGrid.className='ec-row ec-spoils';list.appendChild(_spGrid);setTimeout(next,100);return;}
     const e=entry;tb+=e.blood||0;tc+=e.cacao||0;
+    const _popRun=(e.blood||e.cacao)?{b:!!e.blood,c:!!e.cacao}:null; /* v1632 */
     const tc2=e.type==='captured'?'#50c080':e.type==='fallen'?'#e07070':'#e05050';
     const tbg=e.type==='captured'?'#0e3a22':e.type==='fallen'?'#2a0a0a':'#3a1010';
     const em=ELEM_META[e.unit.element];
-    const mt=e.mercyBonus?`<span style="font-size:10px;color:#d4af37;margin-left:4px">Mercy+</span>`:'';
+    const mt=e.mercyBonus?`<span style="font-size:10px;color:#d4af37;margin-left:4px">${isEs()?'Piedad+':'Mercy+'}</span>`:'';
     const ft=e.featherBonus?`<span style="font-size:10px;color:#60e0c0;margin-left:4px">🐍 2×</span>`:'';
     /* v921: one tag per offering that raised THIS kill's payout, in the same shape as Mercy+ and
        the Feather Embrace 2x so the row reads consistently. */
@@ -27946,9 +28249,15 @@ function showSpoils(){
     /* v813: Reanimated reads as its own outcome. These units were killed by Mictlan Clasp and
        raised, not spared and captured, so labelling them "captured" misrepresented what happened. */
     const tlLabel=e.tlaloqueJoin?`<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:#0a2035;color:#60c0ff;margin-left:4px">${t('ui.spoils.joinsParty')}</span>`:e.rebirthJoin?`<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:#35102a;color:#ffb0d0;margin-left:4px">${t('ui.spoils.rebornLv1')}</span>`:e.reanimated?`<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:#1a1200;color:#d4af37;margin-left:4px">${t('ui.spoils.reanimated')}</span>`:'';
-    const row=document.createElement('div');row.className='spoils-row';
-    row.innerHTML=`<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:16px">${e.unit.icon}</span><span style="font-size:13px">${e.unit.name}</span>${lt}${(em&&G.dte.synergyUnlocked)?`<span class="elem-badge ${em.cls}">${em.icon}</span>`:''}<span style="font-size:11px;padding:2px 7px;border-radius:10px;background:${tbg};color:${tc2}">${spoilOutcomeLbl(e.type)}</span>${mt}${bt}${ft}${tlLabel}</div><div style="display:flex;gap:10px">${e.blood?`<span style="color:#e05050;font-size:13px">+${e.blood}</span>`:''}${e.cacao?`<span style="color:#c0844a;font-size:13px">+${e.cacao}</span>`:''}</div>`;
-    list.appendChild(row);setTimeout(()=>{row.classList.add('show');setTimeout(next,450);},50);
+    /* v1631: each kill/capture/fallen ally is a unit card; offering chips ride between the name and the payout strip */
+    const _w=document.createElement('div');
+    _w.innerHTML=enemyCardHtml(e.unit,{lv:!e.unit.isAlly,elem:!!(em&&G.dte.synergyUnlocked),flavor:false,
+      otag:`<span class="ec-otag" style="background:${tbg};color:${tc2}">${spoilOutcomeLbl(e.type)}</span>`,
+      chips:mt+bt+ft+tlLabel,
+      foot:(e.blood||e.cacao)?`${e.blood?`<span class="res-pip" style="color:#e05050"><svg class="tl tl-blood"><use href="#tl-blood"/></svg>+${e.blood}</span>`:''}${e.cacao?`<span class="res-pip" style="color:#c0844a"><svg class="tl tl-cacao"><use href="#tl-cacao"/></svg>+${e.cacao}</span>`:''}`:'', /* v1632: resource icons */
+      cls:e.type==='captured'?' ec-cap':e.type==='fallen'?' ec-fallen':' ec-dim'});
+    const row=_w.firstElementChild;row.classList.add('spoils-card');
+    (_spGrid||list).appendChild(row);setTimeout(()=>{row.classList.add('show');if(_popRun)spRun(_popRun);setTimeout(next,450);},50);
   }
   next();
 }
