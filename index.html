@@ -1,4 +1,5 @@
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"> <!-- v1646 [Genaro: iPad gen7 for GCMX]: without this iOS lays out at a fake 980px width and shrinks everything -->
 
 <style>
 /* v1187: touch-action:manipulation removes iOS Safari's ~350ms wait between touchend and
@@ -626,6 +627,28 @@ body.codex-ui #screen-battle .cx-fold{min-height:30px}
 .cyc-dots{position:absolute;left:50%;bottom:3px;transform:translateX(-50%);display:flex;gap:4px;pointer-events:none}
 .cyc-dots i{width:5px;height:5px;border-radius:3px;background:#3a4a7a}
 .act-dock[data-sel="spec"] .cyc-dots i[data-k="spec"],.act-dock[data-sel="obl"] .cyc-dots i[data-k="obl"]{background:#ffd060}
+/* v1647 [Genaro: iPad gen7 at GCMX, portrait first but both must play]: below 900px wide the dock's fixed 230px name
+   block + 430px of buttons left the description ~76px, so it wrapped one word per line, grew the dock to ~350px and
+   pushed the page wider than the screen. Narrow screens now put the description on its own full-width row. */
+@media (max-width:899px){
+  .act-dock{flex-wrap:wrap;row-gap:6px}
+  .act-dock .dock-who{flex:1 1 140px}
+  .act-dock .act-btns{flex:0 1 auto;min-width:0}
+  .act-dock .dock-desc{flex:1 1 100%;order:3}
+}
+/* v1647: short touch screens (iPad landscape, 810px tall) were ~115px over, so the sticky dock covered the bottom of
+   the party cards. Touch-only so desktop windows of the same height keep the current layout. */
+@media (pointer:coarse) and (max-height:860px) and (orientation:landscape){
+  body.codex-ui #screen-battle .tut-box{padding:.4rem .7rem;margin-bottom:.35rem;font-size:12px;line-height:1.35}
+  /* v1649: these two pairs lost to the later base cx-big rules (same specificity, earlier in the file) -- #screen-battle added */
+  body.codex-ui #screen-battle #erow .uc.cx-big:not(.miniboss) .uc-art{min-height:108px}
+  body.codex-ui #screen-battle #erow .uc.cx-big:not(.miniboss) .uc-art img{width:100px!important;height:100px!important}
+  body.codex-ui #screen-battle #erow .uc.cx-big.miniboss .uc-art{min-height:96px}
+  body.codex-ui #screen-battle #erow .uc.cx-big.miniboss .uc-art img{width:92px!important;height:92px!important}
+  body.codex-ui #screen-battle .uc.card-lg:not(.patron-card) .uc-art img{width:88px!important;height:88px!important}
+  body.codex-ui #screen-battle .uc.patron-card .uc-art img{width:108px!important;height:108px!important} /* v1649: was card-lg only; 3-4 unit parties drop card-lg */
+  .act-dock .dock-who{flex-basis:170px} /* v1649: gives the description room for 2 lines instead of 3 */
+}
 #cap-area.cap-intro{position:fixed;inset:0;z-index:9000;margin:0;background:rgba(10,6,3,.62);display:flex;align-items:center;justify-content:center} /* v1546 */
 #cap-area.cap-intro .cap-pop{max-width:520px;width:calc(100% - 48px);box-shadow:0 0 34px rgba(212,175,55,.35);border-color:#d4af37}
 .uc.cap-pending{border:3px solid #ffd060!important;box-shadow:0 0 16px rgba(255,208,96,.5);display:flex;flex-direction:column;align-items:stretch;gap:4px;padding:6px;cursor:default;min-width:140px}
@@ -7993,7 +8016,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1645'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1649'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -12284,7 +12307,7 @@ function clearTransientFx(){
     });
   }catch(e){}
 }
-function showScr(id){clearTransientFx();relicTipHide();document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');} // v655: hide any orphaned tooltip — a screen torn down under the cursor never fires mouseleave
+function showScr(id){clearTransientFx();relicTipHide();{const _pt=document.getElementById('party-overflow-tip');if(_pt)_pt.remove();}document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');} // v655: hide any orphaned tooltip — a screen torn down under the cursor never fires mouseleave
 function notify(msg,col){const n=document.getElementById('notif');
   /* v1178: innerHTML, not textContent -- offering icons can be tl- SVG tokens (Moctezuma
      Shield) and were being printed as raw tags. All callers build from internal strings. */
@@ -29523,7 +29546,7 @@ function showShop(){
       const r=btn.getBoundingClientRect();
       const tip=document.createElement('div');
       tip.style.cssText='position:fixed;z-index:9999;max-width:230px;font-size:11px;color:#d4af37;background:#1a1400;border:1px solid #8a6a10;border-radius:8px;padding:7px 10px;box-shadow:0 4px 14px #000a;left:'+Math.max(8,r.right-230)+'px;top:'+(r.bottom+6)+'px';
-      tip.textContent=t('ui.party.overflowTip');
+      tip.textContent=t('ui.party.overflowTip');tip.id='party-overflow-tip'; /* v1649: removed by showScr -- fixed position made it follow the player onto Deploy and cover enemies */
       document.body.appendChild(tip);
       btn.classList.add('tab-pulse');
       setTimeout(()=>{tip.remove();btn.classList.remove('tab-pulse');},7000);
@@ -31187,14 +31210,19 @@ function restart(){G.dte=getDTEffects();initG();showScr('screen-intro');if(typeo
 
   /* --- snapshot every px font-size declared in the game's own stylesheets, once --- */
   var baseRules = [];
-  function harvest(rules){
+  /* v1648 [found while making iPad-only rules]: @media blocks were flattened, so a font-size meant for one screen size
+     was re-emitted for every screen. The condition is now kept and the scaled rule is wrapped in it. */
+  function harvest(rules, cond){
     if(!rules) return;
     for(var j=0;j<rules.length;j++){
       var r = rules[j];
-      if(r.cssRules && !r.selectorText){ harvest(r.cssRules); continue; }
+      if(r.cssRules && !r.selectorText){
+        var mt = r.media ? r.media.mediaText : '';
+        harvest(r.cssRules, mt ? (cond ? cond + ' and ' + mt : mt) : cond); continue;
+      }
       if(!r.style || !r.selectorText) continue;
       var fs = r.style.fontSize;
-      if(fs && /px$/.test(fs)) baseRules.push([r.selectorText, parseFloat(fs)]);
+      if(fs && /px$/.test(fs)) baseRules.push([r.selectorText, parseFloat(fs), cond || '']);
     }
   }
   for(var i=0;i<document.styleSheets.length;i++){
@@ -31236,7 +31264,8 @@ function restart(){G.dte=getDTEffects();initG();showScr('screen-intro');if(typeo
       css += '.div-tree-svg{width:' + (100*mult) + '% !important;min-width:'
            + Math.round(1200*mult) + 'px !important}\n';
       for(var a=0;a<baseRules.length;a++){
-        css += baseRules[a][0] + '{font-size:' + px(baseRules[a][1]*mult) + ' !important}\n';
+        var _r = baseRules[a][0] + '{font-size:' + px(baseRules[a][1]*mult) + ' !important}';
+        css += (baseRules[a][2] ? '@media ' + baseRules[a][2] + '{' + _r + '}' : _r) + '\n';
       }
       for(var b=0;b<INLINE.length;b++){
         var v = INLINE[b];
