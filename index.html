@@ -348,13 +348,15 @@ body.codex-ui .uc>.uc-lvtag~.uc-art{padding-top:14px}
 /* v1631: enemy lists become unit cards (route choice, Guardian, boss previews, spoils). One row, cards shrink to fit. */
 .ec-row{display:flex;gap:10px;justify-content:center;align-items:flex-end;margin:14px 0 4px;width:100%;box-sizing:border-box}
 .ec-row.ec-spoils{align-items:stretch;margin:12px 0 10px}
+#battle-choice-cards .ec-row{align-items:stretch} /* v1667: route cards line up top and bottom; the name area takes the slack and centres its text */
+#battle-choice-cards .ec-nm{flex:1 0 auto}
 .ec{position:relative;flex:0 1 140px;min-width:0;box-sizing:border-box;border:2px solid #4a3b2c;background:#1c110b;border-radius:3px;display:flex;flex-direction:column;align-items:center}
-.ec-top{align-self:stretch;display:flex;justify-content:space-between;align-items:center;gap:3px;padding:3px 5px 0;font-size:11px;color:#c9b896;min-height:18px;flex-wrap:wrap}
+.ec-top{align-self:stretch;display:flex;justify-content:space-between;align-items:center;gap:3px;padding:3px 5px 0;font-size:11px;color:#c9b896;min-height:18px;flex-wrap:nowrap} /* v1667: was wrap -- level + element badge split onto two lines and staggered the row; ecFitCards() scales it to fit instead */
 .ec-top .elem-badge{margin:0;font-size:10px;padding:0 4px}
 .ec-art{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;padding:4px 10px;box-sizing:border-box}
 .ec-art img{width:100%!important;height:100%!important;object-fit:contain}
 .ec-art .ico-emoji{font-size:44px!important}
-.ec-nm{align-self:stretch;border-top:1px solid #3a2c20;padding:4px 4px 5px;text-align:center;font-size:13px;line-height:1.1;color:#e8786a;overflow-wrap:anywhere}
+.ec-nm{align-self:stretch;border-top:1px solid #3a2c20;padding:4px 4px 5px;text-align:center;font-size:13px;line-height:1.1;color:#e8786a;overflow-wrap:normal;word-break:normal} /* v1667: was overflow-wrap:anywhere -- "Espect/ro Cempo/al"; ecFitCards() shrinks a name whose longest word doesn't fit */
 .ec-fl{font-size:10px;line-height:1.15;color:#a8957a;padding:0 5px 6px;text-align:center;font-style:italic}
 .ec-tag{position:absolute;top:-9px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:.5px;padding:0 6px;border-radius:3px;white-space:nowrap;text-transform:uppercase;z-index:1}
 .ec-guard{flex-basis:180px;border-color:#4f8fd8;background:#121a2a;box-shadow:0 0 12px rgba(79,143,216,.4)}
@@ -8107,7 +8109,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1665'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1668'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -14861,14 +14863,14 @@ function buildB1(){
   if(G.layer===4){
     const pool=getCEHUPool();
     const src=[...pool];const picks=[];
-    while(picks.length<4&&src.length){picks.push(src.splice(Math.floor(Math.random()*src.length),1)[0]);}
+    while(picks.length<3&&src.length){picks.push(src.splice(Math.floor(Math.random()*src.length),1)[0]);} /* v1668: 4 -> 3, one fewer than hard's 4 */
     return picks.map((cu,i)=>mkEnemy(cu,i,0.875,layerLvBonus()));
   }
   if(G.layer===3){
-    // L3 B1: 4 L3 enemies (mix of earth and night), gentle scale
+    // L3 B1: 3 L3 enemies (mix of earth and night), gentle scale
     const pool=[...OBSIDIAN_EARTH_CAPS,...OBSIDIAN_NIGHT_CAPS];
     const src=[...pool];const picks=[];
-    while(picks.length<4&&src.length){picks.push(src.splice(Math.floor(Math.random()*src.length),1)[0]);}
+    while(picks.length<3&&src.length){picks.push(src.splice(Math.floor(Math.random()*src.length),1)[0]);} /* v1668: 4 -> 3, one fewer than hard's 4 */
     return picks.map((cu,i)=>mkEnemy(cu,i,0.7,layerLvBonus()));
   }
   if(G.layer===2){
@@ -15369,11 +15371,11 @@ function _buildEnemySetRaw(bn,diff){
   // and paid nothing. Hard's bespoke HP curve is replaced by easy's curve x the per-layer ratio,
   // so HARD_HP_BY_LAYER is the single source of truth for the difficulty gap.
   const _ehs=(0.5+bn*.065)*(LAYER_HP_BONUS[G.layer]||1); /* v1485: per-layer table (was x1.25 on L4-L6 only) */
-  if(diff==='easy'){count=Math.max(1,bc-1);lv=Math.max(1,bl-1);hs=_ehs;
+  if(diff==='easy'){count=Math.max(1,Math.min(bc+1,maxCnt)-1);lv=Math.max(1,bl-1);hs=_ehs; /* v1668: easy is always exactly one enemy fewer than hard (hard = min(bc+1,cap)); was bc-1, two fewer */
     /* v1390: Gamepalooza -- L1 easy openers (B1-B4) rolled bc-1 = 1 lone enemy, no variety.
        Floor at 2 on L1, and split the old single enemy's HP across the pair (x0.5 each) so
        the total HP pool stays ~the same and the run's balance doesn't shift. */
-    if(!isL2&&!isL3&&!isL4&&!isL5&&!isL6&&!isL7&&!isL8&&!isL9&&count<2){count=2;hs*=0.5;}
+    if(!isL2&&!isL3&&!isL4&&!isL5&&!isL6&&!isL7&&!isL8&&!isL9&&bc-1<2){count=Math.max(count,2);hs*=0.5;} /* v1668: keyed on the old bc-1 so L1 B1-B4 keep the same pair at the same HP */
   } // v679: bc-1 — was bc (equal to base), which made some easy battles as dense as hard
   else{count=Math.min(bc+1,maxCnt);lv=bl+1;hs=_ehs*hardHpRatio();}
   let picks=Array.from({length:count},(_,i)=>mkEnemy(capPool[Math.floor(Math.random()*capPool.length)],i,hs,lv));
@@ -15721,7 +15723,7 @@ function ecIcon(u,sz){
   if(!u.isAlly&&(u.isGod||u.isBoss))return unitIconHtml({...u,id:String(u.id||'').replace(/^en_/,'').replace(/^boss_/,'').replace(/_\d+.*/,''),isGod:false,icon:u.icon},sz);
   return unitIconHtml(u,sz);
 }
-function enemyCardHtml(u,o){
+function enemyCardHtml(u,o){ecFitSoon(); /* v1667: Battle Spoils adds cards one at a time -- each asks for a fit pass */
   o=o||{};if(!u)return '';
   const kind=u.isAlly?'':u.isBoss?'boss':u.isMiniBoss?'guard':'';
   const em=ELEM_META[u.element];
@@ -15741,7 +15743,27 @@ function enemyCardHtml(u,o){
     +(o.foot?'<div class="ec-foot">'+o.foot+'</div>':'')
     +'</div>';
 }
-function enemyCardRow(list,o){
+/* v1667 [Genaro: route choice / Battle Spoils -- names broke mid-word and cards staggered on the iPad]: one batched fitting pass
+   per frame for every enemy card on screen: a name shrinks until its longest word fits (wrapping only between words), and a
+   level/element line that's too wide is scaled down. Requested by the card builders, so every screen that shows them gets it. */
+let _ecFitRaf=0;
+function ecFitSoon(){if(_ecFitRaf)return;_ecFitRaf=requestAnimationFrame(function(){_ecFitRaf=0;ecFitCards();});}
+function ecFitCards(){
+  try{
+    const nms=[...document.querySelectorAll('.ec .ec-nm')].filter(e=>e.offsetParent);
+    const tops=[...document.querySelectorAll('.ec .ec-top')].filter(e=>e.offsetParent);
+    if(!nms.length&&!tops.length)return;
+    nms.forEach(e=>e.style.removeProperty('font-size'));tops.forEach(e=>e.style.removeProperty('zoom'));
+    const mn=nms.map(e=>({e,cw:e.clientWidth,sw:e.scrollWidth,fs:parseFloat(getComputedStyle(e).fontSize)||13}));
+    const mt=tops.map(e=>({e,cw:e.clientWidth,sw:e.scrollWidth}));
+    mn.forEach(o=>{if(o.cw>8&&o.sw>o.cw+0.5){o.f=Math.max(Math.round(o.fs*0.5),Math.floor(o.fs*(o.cw-8)/(o.sw-8)));o.e.style.setProperty('font-size',o.f+'px','important');}});
+    /* second pass: font metrics don't scale perfectly linearly -- trim whatever still overflows */
+    mn.forEach(o=>{if(o.f){o.sw2=o.e.scrollWidth;o.cw2=o.e.clientWidth;}});
+    mn.forEach(o=>{if(o.f&&o.sw2>o.cw2+0.5){const f2=Math.max(Math.round(o.fs*0.5),Math.floor(o.f*(o.cw2-8)/(o.sw2-8))-1);o.e.style.setProperty('font-size',f2+'px','important');}});
+    mt.forEach(o=>{if(o.cw>0&&o.sw>o.cw+0.5)o.e.style.zoom=String(Math.max(0.6,o.cw/o.sw).toFixed(3));});
+  }catch(e){}
+}
+function enemyCardRow(list,o){ecFitSoon();
   let a=(list||[]).filter(Boolean);
   /* a lone Boss/Guardian sits in the middle of its escorts -- display order only, never the turn order */
   const big=a.filter(function(e){return e.isBoss||e.isMiniBoss;});
@@ -15750,7 +15772,7 @@ function enemyCardRow(list,o){
 }
 function renderChoiceCards(){
   renderTecpatlModPanel('tecpatl-panel-deploy');
-  const el=document.getElementById('battle-choice-cards');el.innerHTML='';
+  const el=document.getElementById('battle-choice-cards');el.innerHTML='';el.style.gridTemplateColumns=''; /* v1667: reset (set below for Easy / Hard) */
   // Update subtitle hint
   const hint=document.querySelector('#step-choice>p');
   if(hint)hint.textContent=G.pendingEvent?'An event has appeared!':'';
@@ -15778,6 +15800,9 @@ function renderChoiceCards(){
       el.appendChild(card);
     }else{
       // Normal Easy / Hard cards
+      /* v1667 [Genaro: iPad -- hard-route names broke mid-word]: the two routes split the width by how many enemies each shows,
+         so every enemy card on the screen is the same size (the hard route no longer gets squeezed into half). */
+      {const _ne=Math.max(1,(G.cachedEasy||[]).length),_nh=Math.max(1,(G.cachedHard||[]).length);el.style.gridTemplateColumns='minmax(0,'+_ne+'fr) minmax(0,'+_nh+'fr)';}
       [['easy',G.cachedEasy,t('ui.deploy.easier'),''],['hard',G.cachedHard,t('ui.deploy.harder'),t('ui.deploy.harderDesc')]].forEach(([diff,enemies,label,desc])=>{
         const card=document.createElement('div');card.className=`choice-card ${diff}`;
         let list=enemyCardRow(enemies); /* v1631 */
@@ -32793,6 +32818,9 @@ function tick(dt){
   S.acc=Math.max(-MFX_STEP,Math.min(MFX_STEP*8,(S.acc||0)+dt));
   const _ns=Math.floor(S.acc/MFX_STEP+.25);S.acc-=_ns*MFX_STEP;
   for(let _i=0;_i<_ns;_i++){fx.step(MFX_STEP);if(S.old)S.old.step(MFX_STEP);}
+  /* v1666: while a special's cinematic plays, the action hold (capture window, next actor) can't end before it does --
+     on slow frames its clock runs behind real time */
+  try{const _C=fx.cine;if(_C&&S.rec&&S.rec.cine===_C){const _u=performance.now()+Math.max(0,_C.dur-_C.t)*1000+150;if(!(window._mfxHoldUntil>=_u))window._mfxHoldUntil=_u;}}catch(_e){}
   fx.draw();
   if(S.old){S.oldT+=dt;S.old.fade=Math.max(0,1-S.oldT/.9);S.old.draw();if(S.oldT>=.9)S.old=null;}
 }
@@ -32974,9 +33002,19 @@ window.MFX={
        front and the next render swapped the card at once. A foe already at 0 HP whose hit waits for an impact beat is now
        marked as dying AT that beat (the latest beat, for multi-hits); renderBattle keeps its live card until then, and the
        beat's own full render brings in the defeated card and kill burst. Self-expiring: no beat, no hold. */
-    if(wait>16){const a=arguments,self=this;
-      try{if(!isHeal){const _fe=(G.enemies||[]).find(x=>x&&x.id===uid);if(_fe&&!(_fe.currentHp>0)){const _pk=(G._mfxPendKill=G._mfxPendKill||{}),_at=performance.now()+wait+200; /* +200: animateHit pops its number ~200ms after the call */if(!(_pk[uid]>_at))_pk[uid]=_at;}}}catch(_e){}
-      setTimeout(()=>{ah0.apply(self,a);mfxRerender(uid);try{if(G._mfxPendKill&&G._mfxPendKill[uid])setTimeout(function(){mfxRerender(uid);},Math.max(0,G._mfxPendKill[uid]-performance.now())+16);}catch(_e){}},wait);return;} /* v1653: +uid -> beat patch; v1665: one more render when the held death is due */
+    /* v1666 [Genaro: on the iPad, Old Fire's fireball still landed AFTER the defeat + capture window]: the cinematic runs on
+       its own clock, which falls behind real time on slow frames; these timers ran on real time. The hit (and a held death)
+       now fire when the cinematic itself reaches the beat -- never earlier than before, and never later than ~1.5s past it. */
+    if(wait>16){const a=arguments,self=this,rec=S.rec,beatT=rec?((performance.now()-rec.t0)+wait)/1000:0;
+      let _dying=false;
+      try{if(!isHeal){const _fe=(G.enemies||[]).find(x=>x&&x.id===uid);if(_fe&&!(_fe.currentHp>0)){_dying=true;
+        const _pk=(G._mfxPendKill=G._mfxPendKill||{}),_pn=(G._mfxPendKillN=G._mfxPendKillN||{});_pn[uid]=(_pn[uid]||0)+1;
+        const _far=performance.now()+wait+3000;if(!(_pk[uid]>_far))_pk[uid]=_far;}}}catch(_e){}
+      mfxAtBeat(rec,beatT,wait,()=>{ah0.apply(self,a);
+        if(_dying){try{const _pn=G._mfxPendKillN||{};_pn[uid]=Math.max(0,(_pn[uid]||1)-1);
+          if(!_pn[uid]&&G._mfxPendKill){G._mfxPendKill[uid]=performance.now()+200; /* animateHit pops its number ~200ms after the call */
+            setTimeout(function(){mfxRerender(uid);},216);}}catch(_e){}}
+        mfxRerender(uid);});return;} /* v1653: +uid -> beat patch */
     if(S.rec&&!S.rec.done)mfxRerender(uid);
     return ah0.apply(this,arguments);};})();
 /* v1518 [Genaro]: statuses a special applies AFTER its own last renderBattle (Torrid Tornado's Burn lands once all
@@ -32984,6 +33022,17 @@ window.MFX={
    unit's turn re-rendered them. Re-render on every impact beat and once more as the special ends, so pips appear
    with the hit instead of a turn late. Coalesced to one render per frame. */
 let _mfxRR=0;
+/* v1666: run fn when the special's cinematic reaches beatT seconds (its own clock). Never before the real-time wait it
+   replaced; fires anyway if the special has no cinematic, the cinematic ended, or ~1.5s after the wait (safety). */
+function mfxAtBeat(rec,beatT,wallWait,fn){
+  const t0=performance.now(),min=t0+wallWait,deadline=min+1500;
+  (function chk(){const now=performance.now();
+    if(now>=deadline){try{fn();}catch(_e){}return;}
+    if(now>=min){const C=rec&&rec.cine,live=!!(C&&S.fx&&S.fx.cine===C);
+      if(!rec||(rec.started&&!live)||(live&&C.t>=beatT)){try{fn();}catch(_e){}return;}}
+    if(document.hidden){setTimeout(chk,50);return;}
+    requestAnimationFrame(chk);})();
+}
 /* v1653: with a uid (an impact beat) only that card is patched; no uid (the special's closing call) = the full render as before */
 let _mfxRU=null,_mfxFull=false;
 function mfxRerender(uid){if(uid)(_mfxRU=_mfxRU||new Set()).add(uid);else _mfxFull=true;
