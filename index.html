@@ -8109,7 +8109,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1668'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1669'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -18275,7 +18275,7 @@ function startBattle(){try{if(window._cxVictoryFinish)window._cxVictoryFinish();
   // v610: silent safety net — no glow class survives into a new battle (diagnostic warn removed; it fired on v609's own soft glow, since retired)
   document.querySelectorAll('.uc.ftue-glow,.uc.ftue-glow-soft').forEach(e=>e.classList.remove('ftue-glow','ftue-glow-soft'));
   G.log=[];if(!G._fullLog)G._fullLog=[];G._fullLog.push("=== "+(isEs()?"Batalla ":"Battle ")+G.battleNum+" ===");G.tutStep=0;G.captureProcessed=new Set();G.capturedDiedThisBattle=[];G._darClaim=null; // v509: Death and Rebirth claim resets each battle
-  G.captureQueue=[];G.capActive=false;G._actingEnemy=null;G._animQueue=[];G._unitStates={};G._enemyHitsPending=false;G._enemyHitsDone=null; /* v1329 */
+  G.captureQueue=[];G.capActive=false;G._capPendOk=false;G._actingEnemy=null;G._animQueue=[];G._unitStates={};G._enemyHitsPending=false;G._enemyHitsDone=null; /* v1329 */
   G.spoils={killed:[],captured:[],allyDeaths:[]};G._spoilIds=new Set();G._deathProcessed=new Set();G.mercPool=null;G._shopRolled=false;
   G.cachedEasy=null;G.cachedHard=null;
   /* v776: clear the phase-gate flags at battle start, or a retry after a loss would find
@@ -26693,6 +26693,17 @@ function processNextCap(){
     if(!G._capFxWait){G._capFxWait=true;setTimeout(()=>{G._capFxWait=false;G._capFxReady=true;processNextCap();},650);}
     return;
   }
+  /* v1669 [Genaro: iPad showed the old big capture box mid-cinematic]: since v1665 a foe killed by a special keeps its live card
+     until the special's impact beat, so a capture opened before then found no card to put Capture/Slay on and fell back to the
+     old box. Wait for that foe's death beat AND the end of the special's cinematic hold (max 4s), then open on the card. */
+  const _cq=G.captureQueue[0],_cqPend=()=>{if(!_cq)return false;const n=(G._mfxPendKillN||{})[_cq.id],k=(G._mfxPendKill||{})[_cq.id];
+    return n>0||k>performance.now()||(window._mfxHoldUntil||0)>performance.now();};
+  if(!G._capPendOk&&_cqPend()){
+    if(!G._capPendWait){G._capPendWait=true;const _t0=performance.now();
+      (function _w(){if(_cqPend()&&performance.now()-_t0<4000){setTimeout(_w,60);return;}G._capPendWait=false;G._capPendOk=true;processNextCap();})();}
+    return;
+  }
+  G._capPendOk=false;
   G._capFxReady=false;G._lastCapFxT=Date.now();
   G.capActive=true;
   const dead=G.captureQueue.shift();
@@ -27210,7 +27221,7 @@ function renderBattle(){try{amoxScanSeen();}catch(_amx){} /* v1440 */
     return (e&&e.id&&e.id.indexOf('boss_cipactli_')===0)?_cipWrap:_hostWrap;
   };
   G.enemies.forEach(e=>{
-    if(e.currentHp<=0&&G._mfxPendKill&&G._mfxPendKill[e.id]>performance.now()){ /* v1665: dies at its impact beat, not before */
+    if(e.currentHp<=0&&G._mfxPendKill&&G._mfxPendKill[e.id]>performance.now()&&!(G._capCard&&G._capCard.id===e.id)){ /* v1669: an open capture always wins · v1665: dies at its impact beat, not before */
       const _lc=_erOldCards.get(e.id);
       if(_lc&&_lc.classList.contains('uc')&&!_lc.classList.contains('slain')&&!_lc.classList.contains('cap-pending')&&!_lc.classList.contains('captured-enemy')){
         if(_erSync){_erBuilt.push(_lc);return;} _placeCip(_lc,e);_dest(e).appendChild(_lc);return;}
