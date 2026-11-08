@@ -2656,9 +2656,23 @@ function roundsTxt(r){
   return (LANG==='es')?(', quedan '+r+' '+plural(r,'ronda')):(', '+r+' '+plural(r,'round')+' left');
 }
 
+/* v1664 [Genaro: iPad animations got choppier v1657 -> v1663]: in Safari every window.matchMedia(...) call can force a style
+   recalculation on the spot. fxOn() (several calls per hit), cxBossLayout (every render), cxCapNote (every action-panel
+   render), killFxMul (every kill) and the auto-scroll all called it mid-animation. The answers are now read once and kept
+   current by the media queries' own change events (rotation, Low Power / Reduce Motion toggles); hot code reads MQ.* only. */
+const MQ={coarse:false,shortL:false,reduce:false};
+(function(){
+  if(typeof window==='undefined'||!window.matchMedia)return;
+  const watch=function(q,key){try{const m=window.matchMedia(q);MQ[key]=!!m.matches;const up=function(){MQ[key]=!!m.matches;};
+    if(m.addEventListener)m.addEventListener('change',up);else if(m.addListener)m.addListener(up);}catch(e){}};
+  watch('(pointer:coarse)','coarse');
+  watch('(pointer:coarse) and (orientation:landscape) and (max-height:860px)','shortL');
+  watch('(prefers-reduced-motion: reduce)','reduce');
+  watch('(hover: none) and (pointer: coarse)','touchUi'); /* i18nTouch -- called from i18nTokens on most text the battle draws */
+})();
 function i18nTouch(){
   try{
-    if(typeof window!=='undefined'&&window.matchMedia&&window.matchMedia('(hover: none) and (pointer: coarse)').matches)return true;
+    if(MQ.touchUi)return true; /* v1664: cached (was ~400 matchMedia calls per battle round) */
     return (typeof window!=='undefined'&&'ontouchstart' in window)||(typeof navigator!=='undefined'&&navigator.maxTouchPoints>0);
   }catch(e){return false;}
 }
@@ -8093,7 +8107,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1663'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1664'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -10239,7 +10253,7 @@ function cxBossLayout(er){
   /* v1657 [Genaro: iPad landscape -- L4/L7 bosses with 5 escorts wrapped to two rows and the codex ran ~170px past the
      screen]: escort cards are ~126px + gap, so on short touch landscape screens the column budget is 136px, which fits
      one more column. Desktop keeps the 156px budget and its layout unchanged. */
-  let _colW=156,_shortL=false;try{if(window.matchMedia&&matchMedia('(pointer:coarse) and (orientation:landscape) and (max-height:860px)').matches){_colW=136;_shortL=true;}}catch(_e){}
+  const _shortL=MQ.shortL,_colW=_shortL?136:156; /* v1664: cached media query */
   let cols=Math.max(1,Math.min(esc.length||1,_w?Math.floor((_w-_bw)/_colW):4));
   /* v1660 [Genaro: iPad landscape -- Mayahuel's six escorts still wrapped to two rows]: on short touch landscape screens, when
      the escorts would wrap, scale them down (CSS zoom, never below 0.8) so they stay in one row. Desktop is untouched. */
@@ -19960,7 +19974,7 @@ function selectActor(unitId){
 // G._fxCtx (attacker element, timestamped) tints the flash. Toggle: DT.fxMode + prefers-reduced-motion.
 const FX_ELEM_COLORS={fire:'#ff7030',water:'#40a0ff',wind:'#a0e8d8',earth:'#c08040',nature:'#60c040',night:'#9060ff',day:'#ffd24a',humanity:'#e8c8a0',thunder:'#ffe860'};
 function elemColor(el){return FX_ELEM_COLORS[el]||'#d4af37';}
-function fxOn(){try{if((DT.fxMode||'full')==='minimal')return false;if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return false;}catch(e){}return true;}
+function fxOn(){try{if((DT.fxMode||'full')==='minimal')return false;if(MQ.reduce)return false;} /* v1664: cached */catch(e){}return true;}
 function fxCard(uid){return document.querySelector(`[data-uid="${uid}"]`);}
 /* v1390 FX SCROLL ANCHOR (Gamepalooza: "heals and captures play outside the unit").
    Every card FX (damage/heal numbers, motes, capture binding, slain blood) is spawned on <body>
@@ -20192,7 +20206,7 @@ function fxPulse(attId,color){
 function bloodMul(){return (typeof fxOn==='function'&&!fxOn())?1:1.6;}
 /* v1652 [Genaro: kill bursts hitch on the GCMX iPad -- 40% fewer kill particles on touch devices only]: each kill spawned ~100
    animated layers (glow + gradient each); desktop keeps the full count. Applied to enemySlainFx + enemyDefeatFx bursts only. */
-function killFxMul(){try{return (window.matchMedia&&window.matchMedia('(pointer:coarse)').matches)?0.6:1;}catch(e){return 1;}}
+function killFxMul(){return MQ.coarse?0.6:1;} /* v1664: cached media query */
 /* v1309: a small spill on every damaging hit. Scales with the hit's share of the target's max HP
    (3..10 droplets, +4 on a crit), sprays from a slightly random point on the card and lets a few
    drops fall. Body-level at position:fixed like the other blood FX, so a re-render can't cut it off.
@@ -27453,7 +27467,7 @@ function _asScroll(el,block){
   block='nearest';
   try{el.style.scrollMarginTop=_asTopInset()+'px';}catch(e){} /* v1541: land below the sticky bar, not under it */
   let smooth=true;
-  try{ smooth=!window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+  smooth=!MQ.reduce; /* v1664: cached */
   try{ el.scrollIntoView({behavior:smooth?'smooth':'auto',block:block||'center',inline:'nearest'}); }
   catch(e){ try{ el.scrollIntoView(); }catch(e2){} }
 }
@@ -27534,7 +27548,7 @@ function cxCapNote(){
   try{document.body.classList.toggle('cap-focus',!!G._capCard);}catch(e){} /* v1547 */
   const fold=document.getElementById('cx-fold');if(!fold)return;
   /* v1662: on touch screens the note sits in its own holder pinned over the (empty, greyed) bottom bar */
-  let bot=null;try{if(window.matchMedia&&matchMedia('(pointer:coarse)').matches){bot=document.getElementById('cx-capnote-bot');
+  let bot=null;try{if(MQ.coarse){bot=document.getElementById('cx-capnote-bot'); /* v1664: cached */
     if(!bot){const ap=document.getElementById('act-panel-area');if(ap&&ap.parentNode){bot=document.createElement('div');bot.id='cx-capnote-bot';ap.parentNode.insertBefore(bot,ap.nextSibling);}}}}catch(_e){}
   const host=bot||fold.querySelector('span');let n=document.getElementById('cx-capnote');
   if(!(G._capCard&&G._capCard.note)){if(n)n.style.display='none';if(bot)bot.style.display='none';return;}
