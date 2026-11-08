@@ -8107,7 +8107,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1664'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1665'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -27185,6 +27185,11 @@ function renderBattle(){try{amoxScanSeen();}catch(_amx){} /* v1440 */
     return (e&&e.id&&e.id.indexOf('boss_cipactli_')===0)?_cipWrap:_hostWrap;
   };
   G.enemies.forEach(e=>{
+    if(e.currentHp<=0&&G._mfxPendKill&&G._mfxPendKill[e.id]>performance.now()){ /* v1665: dies at its impact beat, not before */
+      const _lc=_erOldCards.get(e.id);
+      if(_lc&&_lc.classList.contains('uc')&&!_lc.classList.contains('slain')&&!_lc.classList.contains('cap-pending')&&!_lc.classList.contains('captured-enemy')){
+        if(_erSync){_erBuilt.push(_lc);return;} _placeCip(_lc,e);_dest(e).appendChild(_lc);return;}
+    }
     if(e.currentHp<=0&&G._capCard&&G._capCard.id===e.id){ /* v1546: capture / slay on the card */
       const d=document.createElement('div');
       d.className='uc cap-pending'+(e.isMiniBoss?' miniboss':'');d.dataset.uid=e.id;
@@ -32965,7 +32970,13 @@ window.MFX={
     try{if(isHeal&&dmg>0&&_pastFx===undefined){const _hb=performance.now()+Math.max(0,wait)+(typeof paceMs==='function'?paceMs(HEAL_BEAT_MS):HEAL_BEAT_MS);
       if(!(window._mfxHoldUntil>_hb))window._mfxHoldUntil=_hb;}}catch(_e){}
     /* v1496: the number (and the card's own hit flash) waits for the special's impact beat */
-    if(wait>16){const a=arguments,self=this;setTimeout(()=>{ah0.apply(self,a);mfxRerender(uid);},wait);return;} /* v1653: +uid -> beat patch */
+    /* v1665 [Genaro: enemies showed DEFEATED while the special was still flying at them]: the special applies all its damage up
+       front and the next render swapped the card at once. A foe already at 0 HP whose hit waits for an impact beat is now
+       marked as dying AT that beat (the latest beat, for multi-hits); renderBattle keeps its live card until then, and the
+       beat's own full render brings in the defeated card and kill burst. Self-expiring: no beat, no hold. */
+    if(wait>16){const a=arguments,self=this;
+      try{if(!isHeal){const _fe=(G.enemies||[]).find(x=>x&&x.id===uid);if(_fe&&!(_fe.currentHp>0)){const _pk=(G._mfxPendKill=G._mfxPendKill||{}),_at=performance.now()+wait+200; /* +200: animateHit pops its number ~200ms after the call */if(!(_pk[uid]>_at))_pk[uid]=_at;}}}catch(_e){}
+      setTimeout(()=>{ah0.apply(self,a);mfxRerender(uid);try{if(G._mfxPendKill&&G._mfxPendKill[uid])setTimeout(function(){mfxRerender(uid);},Math.max(0,G._mfxPendKill[uid]-performance.now())+16);}catch(_e){}},wait);return;} /* v1653: +uid -> beat patch; v1665: one more render when the held death is due */
     if(S.rec&&!S.rec.done)mfxRerender(uid);
     return ah0.apply(this,arguments);};})();
 /* v1518 [Genaro]: statuses a special applies AFTER its own last renderBattle (Torrid Tornado's Burn lands once all
