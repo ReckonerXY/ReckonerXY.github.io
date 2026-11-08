@@ -635,6 +635,19 @@ body.codex-ui #screen-battle .cx-fold{min-height:30px}
   .act-dock .dock-who{flex:1 1 140px}
   .act-dock .act-btns{flex:0 1 auto;min-width:0}
   .act-dock .dock-desc{flex:1 1 100%;order:3}
+  .act-dock .dock-desc>.dk-pane{flex:1 1 auto} /* v1655: the pane sized to its text, leaving the box half empty */
+}
+/* v1655 [Genaro: iPad portrait, "Round 1" hidden behind the "Itzucuintlan - Battle 1" chip]: the chip is absolutely placed at the
+   left of the strip (up to 30% wide) while the strip's own row is centred on the full width; below ~1100px they collide.
+   The row now starts past the chip whenever the chip is showing. Desktop widths keep the centred layout. */
+/* v1659 [Genaro: iPad landscape -- the Options box cut off its Close button]: pop-ups were capped at 85% of the screen height
+   (inline style), ~690px on an 810px-tall iPad. Short touch landscape screens let them use the full height minus the margin. */
+@media (pointer:coarse) and (orientation:landscape) and (max-height:860px){
+  #mo:not(.ssm-mode) .mb{max-height:calc(100vh - 32px)!important;max-width:min(620px,100%)} /* wider, so long (Spanish) lines wrap less */
+}
+@media (min-width:760px) and (max-width:1099px){
+  body.codex-ui #screen-battle .cx-fold-row:has(> .cx-phase:not(:empty)) > .cx-fold{padding-left:calc(30% + 6px);gap:4px}
+  body.codex-ui #screen-battle .cx-fold-row:has(> .cx-phase:not(:empty)) > .cx-fold::before{display:none} /* the left rail has no room here */
 }
 /* v1647: short touch screens (iPad landscape, 810px tall) were ~115px over, so the sticky dock covered the bottom of
    the party cards. Touch-only so desktop windows of the same height keep the current layout. */
@@ -684,7 +697,17 @@ body.cap-focus #screen-battle .uc.cap-pending{position:relative;z-index:3}
   color:#f0d080;background:#2a2008;border:1px solid #8a6a10;box-shadow:0 0 8px #8a6a1066} /* v1542 */
 .cx-cancel:hover{background:#3a2c0c;color:#ffe9a0}
 .cx-cancel kbd{font:inherit;font-size:9px;opacity:.6;margin-left:4px;padding:0 3px;border:1px solid currentColor;border-radius:3px}
-@media (hover:none) and (pointer:coarse){.cx-cancel kbd{display:none}} /* v1543 [Genaro]: no Esc hint on phones/iPads -- touch-only devices have no Esc key */
+@media (hover:none) and (pointer:coarse){.cx-cancel kbd{display:none}}
+/* v1656 [Genaro: GCMX iPad -- tap targets under Apple's ~44pt for first-time players]: touch screens only.
+   Back in the battle strip keeps its look (the strip is a fixed height) and gets an invisible, larger touch area;
+   the Battle Log toggle gets 44px of touch height (it has no background); Edit Battle Codex grows into a real button. */
+@media (pointer:coarse){
+  body.codex-ui #screen-battle .cx-fold{position:relative;z-index:3} /* the strip sits above the codex frames that border it, so Back's larger touch area isn't covered */
+  body.codex-ui #screen-battle .cx-fold .cx-cancel{position:relative}
+  body.codex-ui #screen-battle .cx-fold .cx-cancel::after{content:"";position:absolute;inset:-9px -6px}
+  #screen-battle button[onclick*="getElementById('blog')"]{min-height:44px;padding:0 14px 0 0!important}
+  #deploy-party-chips>button.btn{min-height:44px;padding:8px 14px!important}
+} /* v1543 [Genaro]: no Esc hint on phones/iPads -- touch-only devices have no Esc key */
 .cx-turn-enemy{display:inline-block;color:#ff9a8a;background:#2e1210;border-color:#a0382c;box-shadow:0 0 8px #a0382c66} /* v1385 */
 /* v1629: turn tracker -- the next 2 actions beside the turn tag. Chips are 20px so the fold keeps its height. */
 .cxq{display:inline-flex;align-items:center;gap:4px;margin-left:8px;vertical-align:middle}
@@ -757,6 +780,7 @@ body.codex-ui #erow.cx-bf::before{content:"";grid-column:var(--cxdiv,2);grid-row
 body.codex-ui #erow.cx-bf.cx-solo{grid-template-columns:repeat(var(--cxbig,1),auto);grid-template-rows:auto}
 body.codex-ui #erow.cx-bf.cx-solo::before{display:none}
 body.codex-ui #erow.cx-bf>.uc{grid-column:var(--cxc,auto);grid-row:var(--cxr,auto)}
+body.codex-ui #erow.cx-bf.cx-tight>.uc:not(.cx-big){zoom:var(--cxz,1)} /* v1660: set only on short touch landscape screens by cxBossLayout */
 body.codex-ui #erow .uc.cx-big:not(.miniboss){min-width:270px!important;max-width:290px!important;width:280px} /* v1553: was 240 -- titles up to 'Dios Jaguar Gemelo Matadioses' fit on one line */
 body.codex-ui #erow .uc.cx-big.miniboss{min-width:240px!important;max-width:260px!important;width:250px} /* v1553: was 180 -- 'Semidiosa de la Ola que Corre' and most titles fit on one line */
 body.codex-ui #erow .uc.cx-big:not(.miniboss) .uc-art{min-height:150px}
@@ -3424,6 +3448,7 @@ Object.assign(T_EN,{
   'ui.penance.tier':'Tier {n}', /* v1300 */
   'ui.party.patron':'Patron God',
   'ui.party.deployed':'Deployed Party',
+  'ui.party.reserves':'Reserves — not in party', /* v1658 */
   'ui.tianguis.offerings':'OFFERINGS:',
   // status pip tooltips -- English lives here now that fn() is t()-driven
   'st.poison.fn':'Loses <strong>{p}% of max HP</strong> after it acts ({s}).',
@@ -4528,6 +4553,7 @@ Object.assign(T_ES,{
   'ui.penance.tier':'Rango {n}', /* v1300 */
   'ui.party.patron':'Dios patrón',
   'ui.party.deployed':'Grupo desplegado',
+  'ui.party.reserves':'Reservas — fuera del grupo', /* v1658 [Genaro: was hard-coded English on the Tianguis] */
   'ui.tianguis.title':'Tianguis Sagrado',
   'ui.tianguis.offerings':'OFRENDAS:',
   'ui.battle.change':'Cambiar',
@@ -8016,7 +8042,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1652'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1660'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -10139,11 +10165,12 @@ function cxBossLayout(er){
   if(!er)return;
   const cards=[...er.children].filter(c=>c.classList&&c.classList.contains('uc'));
   const want=new Map(cards.map(c=>[c,{big:false,c:null,r:null}]));
-  const ew={bf:false,solo:false,rows:null,cols:null,big:null,div:null};
+  const ew={bf:false,solo:false,rows:null,cols:null,big:null,div:null,tight:false,z:null};
   const setC=(el,cl,on)=>{if(el.classList.contains(cl)!==on)el.classList.toggle(cl,on);};
   const setP=(el,p,v)=>{const cur=el.style.getPropertyValue(p);if(v==null){if(cur!=='')el.style.removeProperty(p);}else if(cur!==v)el.style.setProperty(p,v);};
   const apply=()=>{for(const [c,w] of want){setC(c,'cx-big',w.big);setP(c,'--cxc',w.c);setP(c,'--cxr',w.r);}
-    setC(er,'cx-bf',ew.bf);setC(er,'cx-solo',ew.solo);setP(er,'--cxrows',ew.rows);setP(er,'--cxcols',ew.cols);setP(er,'--cxbig',ew.big);setP(er,'--cxdiv',ew.div);};
+    setC(er,'cx-bf',ew.bf);setC(er,'cx-solo',ew.solo);setP(er,'--cxrows',ew.rows);setP(er,'--cxcols',ew.cols);setP(er,'--cxbig',ew.big);setP(er,'--cxdiv',ew.div);
+    setC(er,'cx-tight',ew.tight);setP(er,'--cxz',ew.z);};
   if(G._cipactliPhase)return apply();
   const en=id=>(G.enemies||[]).find(e=>e&&e.id===id);
   const alive=c=>{const e=en(c.dataset.uid);return e&&e.currentHp>0?e:null;};
@@ -10158,7 +10185,14 @@ function cxBossLayout(er){
      codex is only as tall as the boss card. ~156px per escort column, ~270px for boss + divider. */
   const _w=cxErWidth(er);
   const _bw=bigs.length*(grp?196:250)+20;
-  const cols=Math.max(1,Math.min(esc.length||1,_w?Math.floor((_w-_bw)/156):4));
+  /* v1657 [Genaro: iPad landscape -- L4/L7 bosses with 5 escorts wrapped to two rows and the codex ran ~170px past the
+     screen]: escort cards are ~126px + gap, so on short touch landscape screens the column budget is 136px, which fits
+     one more column. Desktop keeps the 156px budget and its layout unchanged. */
+  let _colW=156,_shortL=false;try{if(window.matchMedia&&matchMedia('(pointer:coarse) and (orientation:landscape) and (max-height:860px)').matches){_colW=136;_shortL=true;}}catch(_e){}
+  let cols=Math.max(1,Math.min(esc.length||1,_w?Math.floor((_w-_bw)/_colW):4));
+  /* v1660 [Genaro: iPad landscape -- Mayahuel's six escorts still wrapped to two rows]: on short touch landscape screens, when
+     the escorts would wrap, scale them down (CSS zoom, never below 0.8) so they stay in one row. Desktop is untouched. */
+  if(_shortL&&_w&&esc.length>cols){const _z=Math.min(1,(_w-_bw-40)/(esc.length*142)); /* real sizes: escort ~135px + 6px gap; boss column ~40px wider than _bw with its divider */if(_z>=0.8){cols=esc.length;ew.tight=true;ew.z=_z.toFixed(3);}}
   const rows=Math.max(1,Math.ceil(esc.length/cols));
   ew.cols=String(cols);
   ew.bf=true;ew.solo=!esc.length;
@@ -26724,6 +26758,27 @@ function mkUnitCard(u){
   return d;
 }
 
+/* v1653: the bar-patch status pips, shared by renderBattle's patch path and the special impact-beat patch (mfxBeatPatch)
+   so the two can never disagree -- add new badges HERE. */
+function enStatusHtml(e){return pPips(e.poisonStacks)+bPips(e.burnStacks)+paraPips(e.paralyzStacks||0)+slowBadge(e.id)+woundBadge(e.woundStacks||0)+lethargyBadge(e.lethargyStacks||0)+drunkBadge(e.drunkStacks||0)+atkBuffBadge(e.atkBuffStacks||0,e.atkBuffRounds||0)+defBuffBadge(e.defBuffStacks||0,e.defBuffRounds||0)+critBuffBadge(e.critBuffStacks||0,e.critBuffRounds||0);}
+function alStatusHtml(u){return pPips(u.poisonStacks,true)+bPips(u.burnStacks)+paraPips(u.paralyzStacks||0)+slowBadge(u.id)+woundBadge(u.woundStacks||0)+lethargyBadge(u.lethargyStacks||0)+drunkBadge(u.drunkStacks||0)+atkBuffBadge(u.atkBuffStacks||0,u.atkBuffRounds||0)+defBuffBadge(u.defBuffStacks||0,u.defBuffRounds||0)+critBuffBadge(u.critBuffStacks||0,u.critBuffRounds||0)+turquoiseBadge(u)+remedyBadge(u._remedy||0);}
+/* v1653 [Genaro: god specials / AoE specials still choppy on the GCMX iPad]: an impact beat used to re-run the whole
+   renderBattle (about one frame of work on the A10 by itself) once per target. It now patches just the hit card's bars
+   and pips. Returns false when only a full render will do: the unit died (slain card + defeat burst), or its card is gone. */
+function mfxBeatPatch(uid){
+  const e=(G.enemies||[]).find(x=>x&&x.id===uid),u=e?null:(G.units||[]).find(x=>x&&x.id===uid),x=e||u;
+  if(!x||!(x.currentHp>0))return false;
+  const el=document.querySelector('#screen-battle .uc[data-uid="'+String(uid).replace(/"/g,'')+'"]');
+  if(!el||el.classList.contains('slain')||el.classList.contains('captured-enemy')||el.classList.contains('fallen-ally'))return false;
+  if(e){
+    patchBarsOnEl(el,Math.min(100,Math.round(e.currentHp/e.maxHp*100)),`${Math.round(e.currentHp)}/${e.maxHp}`,e.maxNP>0?Math.round(e.currentNP/e.maxNP*100):0,`${Math.round(e.currentNP||0)}/${e.maxNP||0}`,enStatusHtml(e),e.armor||0,e.maxHp,
+      ((e.maxHp>0&&e.currentHp>e.maxHp)?'linear-gradient(90deg,#2e8b57,#4fd67f)':'var(--en)'));
+  }else{
+    const _np=u.currentNP||0,_mnp=u.maxNP||1;
+    patchBarsOnEl(el,Math.min(100,Math.round(u.currentHp/u.maxHp*100)),`${Math.round(u.currentHp)}/${u.maxHp}`,Math.round(_np/_mnp*100),`${Math.round(_np)}/${_mnp}`,alStatusHtml(u),u.armor||0,u.maxHp);
+  }
+  return true;
+}
 function patchBarsOnEl(el,hpPct,hpTxt,npPct,npTxt,statusHtml,armor,maxHp,hpBg){ /* v1086: +hpBg */
   // v561: Chimalli shimmer on ANY armor gain — render-time diff, so every grant source is covered
   if(armor!==undefined&&el&&el.dataset&&el.dataset.uid){
@@ -27135,7 +27190,7 @@ function renderBattle(){try{amoxScanSeen();}catch(_amx){} /* v1440 */
     const _existingEnemy=_erOldCards.get(e.id);
     if(_existingEnemy&&e.currentHp>0&&_existingEnemy.classList.contains('uc')&&!_existingEnemy.classList.contains('slain')&&!_existingEnemy.classList.contains('captured-enemy')){
       const _eSzNew=G.enemies.filter(x=>x.currentHp>0&&!G.captureProcessed.has(x.id)).length;
-      patchBarsOnEl(_existingEnemy,Math.min(100,Math.round(e.currentHp/e.maxHp*100)), /* v1065 */`${Math.round(e.currentHp)}/${e.maxHp}`,e.maxNP>0?Math.round(e.currentNP/e.maxNP*100):0,`${Math.round(e.currentNP||0)}/${e.maxNP||0}`,pPips(e.poisonStacks)+bPips(e.burnStacks)+paraPips(e.paralyzStacks||0)+slowBadge(e.id)+woundBadge(e.woundStacks||0)+lethargyBadge(e.lethargyStacks||0)+drunkBadge(e.drunkStacks||0)+atkBuffBadge(e.atkBuffStacks||0,e.atkBuffRounds||0)+defBuffBadge(e.defBuffStacks||0,e.defBuffRounds||0)+critBuffBadge(e.critBuffStacks||0,e.critBuffRounds||0),e.armor||0,e.maxHp,
+      patchBarsOnEl(_existingEnemy,Math.min(100,Math.round(e.currentHp/e.maxHp*100)), /* v1065 */`${Math.round(e.currentHp)}/${e.maxHp}`,e.maxNP>0?Math.round(e.currentNP/e.maxNP*100):0,`${Math.round(e.currentNP||0)}/${e.maxNP||0}`,enStatusHtml(e),e.armor||0,e.maxHp,
         /* v1086: same expression the create path uses for _eHpBg, so create and patch agree. */
         ((e.maxHp>0&&e.currentHp>e.maxHp)?'linear-gradient(90deg,#2e8b57,#4fd67f)':'var(--en)')); /* v1086: matches the create path */
       // Update targeting/acting classes
@@ -27192,7 +27247,7 @@ function renderBattle(){try{amoxScanSeen();}catch(_amx){} /* v1440 */
       const _np=u.currentNP||0,_mnp=u.maxNP||1,_npPct=Math.round(_np/_mnp*100);
       const existing=_psOldCards.get(u.id);
       if(existing&&!existing.classList.contains('fallen-ally')&&u.currentHp>0){
-        patchBarsOnEl(existing,_pct,`${Math.round(u.currentHp)}/${u.maxHp}`,_npPct,`${Math.round(_np)}/${_mnp}`,pPips(u.poisonStacks,true)+bPips(u.burnStacks)+paraPips(u.paralyzStacks||0)+slowBadge(u.id)+woundBadge(u.woundStacks||0)+lethargyBadge(u.lethargyStacks||0)+drunkBadge(u.drunkStacks||0)+atkBuffBadge(u.atkBuffStacks||0,u.atkBuffRounds||0)+defBuffBadge(u.defBuffStacks||0,u.defBuffRounds||0)+critBuffBadge(u.critBuffStacks||0,u.critBuffRounds||0)+turquoiseBadge(u)+remedyBadge(u._remedy||0),u.armor||0,u.maxHp);
+        patchBarsOnEl(existing,_pct,`${Math.round(u.currentHp)}/${u.maxHp}`,_npPct,`${Math.round(_np)}/${_mnp}`,alStatusHtml(u),u.armor||0,u.maxHp);
         const isSel=u.id===G.selectedActorId;
         const isAct=G.actedIds.has(u.id);
         const isAllyTarget=G.battlePhase==='player_ally_targeting'&&u.isAlly&&u.currentHp>0;
@@ -29274,14 +29329,19 @@ function temazcalCost(){
 function fitOneLine(el){
   if(!el)return;
   try{
+    /* v1654 [Genaro: long Spanish names (Anguila del Rio Negro) overlap the Nivel/Vasallo badges on training cards]:
+       the text-scale sheet (#ft-style) sets these sizes with !important, which beat the plain inline size, so this loop
+       never shrank anything. The inline size is now !important too; a name still too long at the floor wraps to a
+       second line instead of running under the badges. */
     el.style.whiteSpace='nowrap';
-    el.style.fontSize='';
+    el.style.removeProperty('font-size');
     const base=parseFloat(getComputedStyle(el).fontSize)||14;
     const floor=Math.max(9,base*0.7);
     let fs=base,guard=40;
     while(el.scrollWidth>el.clientWidth+0.5&&fs>floor&&guard-->0){
-      fs-=1;el.style.fontSize=fs+'px';
+      fs-=1;el.style.setProperty('font-size',fs+'px','important');
     }
+    if(el.scrollWidth>el.clientWidth+0.5)el.style.whiteSpace='normal';
   }catch(e){}
 }
 function fitCardText(){
@@ -30142,7 +30202,7 @@ function renderTraining(){
   const sections=[
     {label:t('ui.party.patron'),units:patronEntry,inline:true},   // v613: inline groups share the first grid row,
     {label:t('ui.party.deployed'),units:[...godsDep,...capsDep],inline:true}, // label rides above the group's first card
-    {label:'Reserves — not in party',units:[...godsRes,...capsRes]},
+    {label:t('ui.party.reserves'),units:[...godsRes,...capsRes]}, /* v1658: was hard-coded English */
   ];
   if(!patronEntry.length&&!allyGods.length&&!caps.length){el.innerHTML='<div style="font-size:12px;color:var(--td)">'+t('ui.telpo.none')+'</div>';return;}
   sections.forEach(sec=>{
@@ -32835,16 +32895,21 @@ window.MFX={
     try{if(isHeal&&dmg>0&&_pastFx===undefined){const _hb=performance.now()+Math.max(0,wait)+(typeof paceMs==='function'?paceMs(HEAL_BEAT_MS):HEAL_BEAT_MS);
       if(!(window._mfxHoldUntil>_hb))window._mfxHoldUntil=_hb;}}catch(_e){}
     /* v1496: the number (and the card's own hit flash) waits for the special's impact beat */
-    if(wait>16){const a=arguments,self=this;setTimeout(()=>{ah0.apply(self,a);mfxRerender();},wait);return;}
-    if(S.rec&&!S.rec.done)mfxRerender();
+    if(wait>16){const a=arguments,self=this;setTimeout(()=>{ah0.apply(self,a);mfxRerender(uid);},wait);return;} /* v1653: +uid -> beat patch */
+    if(S.rec&&!S.rec.done)mfxRerender(uid);
     return ah0.apply(this,arguments);};})();
 /* v1518 [Genaro]: statuses a special applies AFTER its own last renderBattle (Torrid Tornado's Burn lands once all
    four hits are in; most multi-hits add Slow/Burn per hit after the render) sat invisible on the cards until the next
    unit's turn re-rendered them. Re-render on every impact beat and once more as the special ends, so pips appear
    with the hit instead of a turn late. Coalesced to one render per frame. */
 let _mfxRR=0;
-function mfxRerender(){if(_mfxRR)return;_mfxRR=requestAnimationFrame(()=>{_mfxRR=0;
-  try{const sc=document.getElementById('screen-battle');if(sc&&sc.classList.contains('active')&&typeof renderBattle==='function')renderBattle();}catch(_e){}});}
+/* v1653: with a uid (an impact beat) only that card is patched; no uid (the special's closing call) = the full render as before */
+let _mfxRU=null,_mfxFull=false;
+function mfxRerender(uid){if(uid)(_mfxRU=_mfxRU||new Set()).add(uid);else _mfxFull=true;
+  if(_mfxRR)return;_mfxRR=requestAnimationFrame(()=>{_mfxRR=0;const ids=_mfxRU;_mfxRU=null;let full=_mfxFull;_mfxFull=false;
+  try{const sc=document.getElementById('screen-battle');if(!(sc&&sc.classList.contains('active')&&typeof renderBattle==='function'))return;
+    if(!full&&ids&&typeof mfxBeatPatch==='function'){for(const id of ids){if(!mfxBeatPatch(id)){full=true;break;}}}else full=true;
+    if(full)renderBattle();}catch(_e){}});}
 const HEAL_BEAT_MS=650; /* v1532: tune here */
 window._mfxHoldMs=function(){return Math.min(2500,Math.max(0,(window._mfxHoldUntil||0)-performance.now()));};
 requestAnimationFrame(frame);
