@@ -2429,7 +2429,7 @@ body.fx-min .bless-spark{display:none}
   <div style="margin-top:.75rem" id="party-section" class="cx-page cx-ally"></div>
   <div id="act-panel-area"></div>
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
-    <button onclick="(function(){const b=document.getElementById('blog');const open=b.style.display!=='none';b.style.display=open?'none':'block';this.innerHTML=open?t('ui.battle.logClosed'):t('ui.battle.logOpen')}).call(this)" style="font-size:10px;color:var(--td);background:none;border:none;cursor:pointer;padding:0" data-i18n="ui.battle.logClosed">📜 Battle Log ▸</button>
+    <button onclick="(function(){const b=document.getElementById('blog');const open=b.style.display!=='none';b.style.display=open?'none':'block';if(!open)blogSync();this.innerHTML=open?t('ui.battle.logClosed'):t('ui.battle.logOpen')}).call(this)" style="font-size:10px;color:var(--td);background:none;border:none;cursor:pointer;padding:0" data-i18n="ui.battle.logClosed">📜 Battle Log ▸</button>
     <button id="dl-log-btn" onclick="downloadBattleLog()" style="display:none" data-i18n="ui.battle.download">⬇ Download</button>
   </div>
   <div class="blog" id="blog" style="display:none"></div>
@@ -8016,7 +8016,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1649'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1652'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -10128,35 +10128,47 @@ function cxMiniGroup(includeDead){
   const g=CX_GROUPS.find(gr=>minis.every(e=>gr.ids.includes(base(e))));
   return {minis,name:g?L(g,'name'):minis.map(e=>e.name).join(' & '),sub:g?L(g,'sub'):''};
 }
+/* v1650 [Genaro: choppy attacks on the GCMX iPad]: this ran on every renderBattle and used to strip every card's layout
+   class/vars, read er.clientWidth (a forced layout of the half-built board), then write them all back. Now the width
+   comes from a ResizeObserver (read when layout is already clean) and only values that actually changed are written. */
+function cxErWidth(er){
+  if(er._cxW==null){er._cxW=er.clientWidth||0;
+    if(window.ResizeObserver&&!er._cxRO){er._cxRO=new ResizeObserver(()=>{const w=er.clientWidth||0;if(w!==er._cxW){er._cxW=w;try{cxBossLayout(er);}catch(e){}}});er._cxRO.observe(er);}}
+  return er._cxW;}
 function cxBossLayout(er){
   if(!er)return;
   const cards=[...er.children].filter(c=>c.classList&&c.classList.contains('uc'));
-  cards.forEach(c=>{c.classList.remove('cx-big');c.style.removeProperty('--cxc');c.style.removeProperty('--cxr');});
-  er.classList.remove('cx-bf','cx-solo');['--cxrows','--cxcols','--cxbig','--cxdiv'].forEach(p=>er.style.removeProperty(p));
-  if(G._cipactliPhase)return;
+  const want=new Map(cards.map(c=>[c,{big:false,c:null,r:null}]));
+  const ew={bf:false,solo:false,rows:null,cols:null,big:null,div:null};
+  const setC=(el,cl,on)=>{if(el.classList.contains(cl)!==on)el.classList.toggle(cl,on);};
+  const setP=(el,p,v)=>{const cur=el.style.getPropertyValue(p);if(v==null){if(cur!=='')el.style.removeProperty(p);}else if(cur!==v)el.style.setProperty(p,v);};
+  const apply=()=>{for(const [c,w] of want){setC(c,'cx-big',w.big);setP(c,'--cxc',w.c);setP(c,'--cxr',w.r);}
+    setC(er,'cx-bf',ew.bf);setC(er,'cx-solo',ew.solo);setP(er,'--cxrows',ew.rows);setP(er,'--cxcols',ew.cols);setP(er,'--cxbig',ew.big);setP(er,'--cxdiv',ew.div);};
+  if(G._cipactliPhase)return apply();
   const en=id=>(G.enemies||[]).find(e=>e&&e.id===id);
   const alive=c=>{const e=en(c.dataset.uid);return e&&e.currentHp>0?e:null;};
   const boss=cards.find(c=>{const e=alive(c);return e&&e.isBoss&&!e.isMiniBoss;})||cards.find(c=>{const e=alive(c);return e&&(e.isBoss||e.isMiniBoss);});
-  if(!boss)return;
+  if(!boss)return apply();
   const grp=cxMiniGroup(false);
   const bigs=grp?cards.filter(c=>grp.minis.some(e=>e.id===c.dataset.uid)):[boss]; /* v1368: the whole group stands big */
-  bigs.forEach(c=>c.classList.add('cx-big'));
-  if((window.innerWidth||1024)<560)return; /* narrow: big boss, escorts flow beneath */
+  bigs.forEach(c=>{want.get(c).big=true;});
+  if((window.innerWidth||1024)<560)return apply(); /* narrow: big boss, escorts flow beneath */
   const esc=cards.filter(c=>!bigs.includes(c));
   /* v1363: as many escort columns as the page width allows (one row for typical fights), so the boss
      codex is only as tall as the boss card. ~156px per escort column, ~270px for boss + divider. */
-  const _w=er.clientWidth||0;
+  const _w=cxErWidth(er);
   const _bw=bigs.length*(grp?196:250)+20;
   const cols=Math.max(1,Math.min(esc.length||1,_w?Math.floor((_w-_bw)/156):4));
   const rows=Math.max(1,Math.ceil(esc.length/cols));
-  er.style.setProperty('--cxcols',String(cols));
-  er.classList.add('cx-bf');if(!esc.length)er.classList.add('cx-solo');
+  ew.cols=String(cols);
+  ew.bf=true;ew.solo=!esc.length;
   /* v1362: escorts sit at the BOTTOM of the boss codex (Genaro). Row 1 is an empty 1fr spacer that soaks up
      the boss's extra height; the boss spans it plus every escort row; escorts start at row 2. */
-  er.style.setProperty('--cxrows',String(rows+1));
-  const nb=bigs.length;er.style.setProperty('--cxbig',String(nb));er.style.setProperty('--cxdiv',String(nb+1));
-  bigs.forEach((c,i)=>{c.style.setProperty('--cxc',String(1+i));c.style.setProperty('--cxr','1 / span '+(rows+1));});
-  esc.forEach((c,i)=>{c.style.setProperty('--cxc',String(nb+2+(i%cols)));c.style.setProperty('--cxr',String(2+Math.floor(i/cols)));});
+  ew.rows=String(rows+1);
+  const nb=bigs.length;ew.big=String(nb);ew.div=String(nb+1);
+  bigs.forEach((c,i)=>{const w=want.get(c);w.c=String(1+i);w.r='1 / span '+(rows+1);});
+  esc.forEach((c,i)=>{const w=want.get(c);w.c=String(nb+2+(i%cols));w.r=String(2+Math.floor(i/cols));});
+  apply();
 }
 /* v1366: victory sequence (codex mode). VICTORY! sweeps across the centre fold, the enemy codex drains, your
    codex flares gold; boss/miniboss wins add "{name} has fallen", a shake and a longer hold. Never overlaps a
@@ -19876,17 +19888,23 @@ function fxCard(uid){return document.querySelector(`[data-uid="${uid}"]`);}
 (function(){
   const FX_RX=/(^|\s)(dmg-pop|dmg-pip|fx-part|bind-|blood-|flay-pip|fx-flay|lv-column|lv-spark|tz-|sac-flash|slain|st-callout|status-pop)/;
   const live=new Set();
-  function cardAt(x,y){
-    try{const els=document.elementsFromPoint(x,y);for(const e of els){const c=e.closest&&e.closest('[data-uid]');if(c)return c;}}catch(e){}
-    return null;
+  /* v1651 [Genaro: choppy attacks on the GCMX iPad]: every damage number / particle used to run a hit test (elementsFromPoint)
+     and a getBoundingClientRect the moment it was appended -- a forced layout per node in the middle of the hit. New nodes
+     are now queued and resolved once per frame against one pass of card rects (smallest card containing the spawn point). */
+  const pend=[];let praf=0;
+  function flushTrack(){
+    praf=0;if(!pend.length)return;
+    const cs=[];document.querySelectorAll('[data-uid]').forEach(c=>{const r=c.getBoundingClientRect();if(r.width>0&&r.height>0)cs.push([c,r]);});
+    for(const n of pend.splice(0)){
+      if(!n.isConnected)continue;
+      let x=parseFloat(n.style.left),y=parseFloat(n.style.top);
+      if(isNaN(x)||isNaN(y)){const r=n.getBoundingClientRect();x=r.left+r.width/2;y=r.top+r.height/2;}
+      let best=null,ba=Infinity;
+      for(const cr of cs){const r=cr[1];if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom){const a=r.width*r.height;if(a<ba){ba=a;best=cr;}}}
+      if(best)live.add({n:n,uid:best[0].getAttribute('data-uid'),x0:best[1].left,y0:best[1].top});
+    }
   }
-  function track(n){
-    let x=parseFloat(n.style.left),y=parseFloat(n.style.top);
-    if(isNaN(x)||isNaN(y)){const r=n.getBoundingClientRect();x=r.left+r.width/2;y=r.top+r.height/2;}
-    const card=cardAt(x,y);if(!card)return;
-    const r=card.getBoundingClientRect();
-    live.add({n:n,uid:card.getAttribute('data-uid'),x0:r.left,y0:r.top});
-  }
+  function track(n){pend.push(n);if(!praf)praf=requestAnimationFrame(flushTrack);}
   function follow(){
     if(!live.size)return;
     for(const t of live){
@@ -19907,7 +19925,12 @@ function fxCard(uid){return document.querySelector(`[data-uid="${uid}"]`);}
   }
   if(document.body)boot();else document.addEventListener('DOMContentLoaded',boot);
 })();
-function fxClass(el,cls,ms){if(!el)return;el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);setTimeout(()=>{try{el.classList.remove(cls);}catch(e){}},ms);}
+function fxClass(el,cls,ms){if(!el)return;
+  /* v1651 [Genaro: choppy attacks on the GCMX iPad]: 'void el.offsetWidth' forced a full layout on every hit shake. Only a
+     re-trigger while the class is still on needs a restart; that now happens across two frames instead of a forced layout. */
+  if(el.classList.contains(cls)){el.classList.remove(cls);requestAnimationFrame(()=>requestAnimationFrame(()=>{try{el.classList.add(cls);}catch(e){}}));}
+  else el.classList.add(cls);
+  setTimeout(()=>{try{el.classList.remove(cls);}catch(e){}},ms);}
 function fxSetCtx(attacker,originId,mainId,base){
   G._fxCtx={element:(attacker&&attacker.element)||'',t:Date.now(),originId:originId||(attacker&&attacker.id),mainId:mainId||null,base:base||0,ally:!!(attacker&&attacker.isAlly)};
   G._fxWaved={}; // v557: reset per action — guards wave re-entry
@@ -20082,6 +20105,9 @@ function fxPulse(attId,color){
 /* v1309: blood multiplier for the kill/sacrifice/oblation bursts -- 1.6x under Full FX, the original
    counts under Minimal FX / reduced motion (those paths never checked fxOn, so they keep playing). */
 function bloodMul(){return (typeof fxOn==='function'&&!fxOn())?1:1.6;}
+/* v1652 [Genaro: kill bursts hitch on the GCMX iPad -- 40% fewer kill particles on touch devices only]: each kill spawned ~100
+   animated layers (glow + gradient each); desktop keeps the full count. Applied to enemySlainFx + enemyDefeatFx bursts only. */
+function killFxMul(){try{return (window.matchMedia&&window.matchMedia('(pointer:coarse)').matches)?0.6:1;}catch(e){return 1;}}
 /* v1309: a small spill on every damaging hit. Scales with the hit's share of the target's max HP
    (3..10 droplets, +4 on a crit), sprays from a slightly random point on the card and lets a few
    drops fall. Body-level at position:fixed like the other blood FX, so a re-render can't cut it off.
@@ -20127,7 +20153,7 @@ function enemyDefeatFx(uid){
   if(!full)return;
   try{el.classList.remove('df-hit');void el.offsetWidth;el.classList.add('df-hit');setTimeout(function(){try{el.classList.remove('df-hit');}catch(e){}},460);}catch(e){}
   const pal=['#1c1a22','#2e2a36','#4a4458','#e8dcc0','#cfc2a2',col];
-  const nc=18, spread=Math.max(60,r.width*0.85);
+  const nc=Math.round(18*killFxMul()), spread=Math.max(60,r.width*0.85); /* v1652: 18 -> 11 on touch (the ring still spreads evenly) */
   for(let i=0;i<nc;i++){
     const ang=(Math.PI*2*i)/nc+(Math.random()*0.6-0.3), mag=spread*(0.45+Math.random()*0.75);
     const sz=3+Math.round(Math.random()*5);
@@ -20135,7 +20161,8 @@ function enemyDefeatFx(uid){
       +'--dx:'+(Math.cos(ang)*mag).toFixed(1)+'px;--dy:'+(Math.sin(ang)*mag*0.75+mag*0.55).toFixed(1)+'px;--rot:'+Math.round(Math.random()*720-360)+'deg;'
       +'--dur:'+(0.7+Math.random()*0.45).toFixed(2)+'s;animation-delay:'+(Math.random()*0.05).toFixed(2)+'s;',1300);
   }
-  for(let i=0;i<9;i++){
+  const _ns=Math.round(9*killFxMul()); /* v1652: 9 -> 5 on touch */
+  for(let i=0;i<_ns;i++){
     add('df-soul','left:'+(cx+(Math.random()*2-1)*r.width*0.28)+'px;top:'+(cy+Math.random()*r.height*0.2)+'px;'
       +'--sx:'+((Math.random()*2-1)*22).toFixed(1)+'px;--sy:'+(-(r.height*0.55+Math.random()*60)).toFixed(1)+'px;'
       +'--dur:'+(1.1+Math.random()*0.7).toFixed(2)+'s;animation-delay:'+(0.15+Math.random()*0.35).toFixed(2)+'s;',2400);
@@ -25043,7 +25070,7 @@ function enemySlainFx(uid){
   const stain=document.createElement('div');stain.className='blood-stain';
   stain.style.cssText='left:'+cx+'px;top:'+cy+'px;width:'+Math.max(48,r.width*0.85)+'px;height:'+Math.max(48,r.width*0.85)+'px;';
   document.body.appendChild(stain);setTimeout(function(){stain.remove();},1050);
-  const n=Math.round(18*bloodMul()), spread=Math.max(46,r.width*0.75); /* v1309: 18 -> 29 under Full FX */
+  const n=Math.max(1,Math.round(18*bloodMul()*killFxMul())), spread=Math.max(46,r.width*0.75); /* v1309: 18 -> 29 under Full FX; v1652: x0.6 on touch */
   for(let i=0;i<n;i++){
     const ang=(Math.PI*2*i)/n+(Math.random()*0.5-0.25);
     const mag=spread*(0.45+Math.random()*0.75);
@@ -25055,7 +25082,8 @@ function enemySlainFx(uid){
     document.body.appendChild(d);setTimeout(function(){d.remove();},1250);
   }
   if(bloodMul()>1){ /* v1309: drops falling off the body + a pool under it, like the sacrifice spill */
-    for(let i=0;i<12;i++){
+    const _nd=Math.round(12*killFxMul()); /* v1652: 12 -> 7 on touch */
+    for(let i=0;i<_nd;i++){
       const d=document.createElement('div');d.className='blood-drop';
       d.style.cssText='left:'+(cx+(Math.random()*2-1)*r.width*0.3)+'px;top:'+(cy+Math.random()*10)+'px;'
         +'--dx:'+((Math.random()*2-1)*r.width*0.2).toFixed(1)+'px;--dy:'+(r.height*0.45+Math.random()*40).toFixed(1)+'px;'
@@ -26709,10 +26737,10 @@ function patchBarsOnEl(el,hpPct,hpTxt,npPct,npTxt,statusHtml,armor,maxHp,hpBg){ 
     /* v1086: the fill COLOUR is re-derived here too. The create path sets it from live state but
        this patch path only ever updated the width, so a card kept whatever colour it was born
        with -- a miniboss stayed blue after its Chimalli broke and nothing could repaint it. */
-    if(f&&hpBg)f.style.background=hpBg;if(l)l.textContent=fmtN(hpTxt.split('/')[0])+'/'+fmtN(hpTxt.split('/')[1])||hpTxt;
+    if(f&&hpBg)f.style.background=hpBg;if(l){const _ht=fmtN(hpTxt.split('/')[0])+'/'+fmtN(hpTxt.split('/')[1])||hpTxt;if(l.textContent!==_ht)l.textContent=_ht;} /* v1650: only when changed */
     if(armor!==undefined){const a=rows[0].querySelector('.bar-armor'),sb=rows[0].querySelector('.bar-shield-badge');const ap=maxHp>0?Math.min(100,Math.round((armor||0)/maxHp*100)):0;if(a){a.style.display=(armor||0)>0?'block':'none';a.style.width=ap+'%';}if(sb){sb.style.display=(armor||0)>0?'block':'none';sb.innerHTML='<svg class="tl tl-chimalli" style="width:16px;height:16px;vertical-align:-.18em"><use href="#tl-chimalli"/></svg> '+fmtN(Math.round(armor||0)); /* v1077: was raw. renderBattle has a CREATE path and a PATCH path; v1076 abbreviated the create path only, so a shield re-rendered in place reverted to 5 raw digits. */const _bw=sb.parentElement;if(_bw)_bw.classList.toggle('has-shield',(armor||0)>0);}}}
-  if(rows[1]){const f=rows[1].querySelector('.bar-fill'),l=rows[1].querySelector('.bar-lbl');if(f)f.style.width=npPct+'%';if(l)l.textContent=npTxt;}
-  if(statusHtml!==undefined){const sr=el.querySelector('.status-row');if(sr)sr.innerHTML=statusHtml;}
+  if(rows[1]){const f=rows[1].querySelector('.bar-fill'),l=rows[1].querySelector('.bar-lbl');if(f)f.style.width=npPct+'%';if(l&&l.textContent!==String(npTxt))l.textContent=npTxt;}
+  if(statusHtml!==undefined){const sr=el.querySelector('.status-row');if(sr&&sr._sh!==statusHtml){sr.innerHTML=statusHtml;sr._sh=statusHtml;}} /* v1650: pips only rebuilt when they changed */
 }
 function patchUnitBars(uid,hpPct,hpTxt,npPct,npTxt){
   const d=document.querySelector(`.uc[data-uid="${uid}"]`);
@@ -26946,7 +26974,10 @@ function tgtArrowDraw(){
   if(svg._taLast!==h){svg.innerHTML=h;svg._taLast=h;} /* only touch the DOM when geometry changed -- keeps the dash animation running */
   _taRaf=requestAnimationFrame(tgtArrowDraw); /* keep tracking while anything is drawn */
 }
-function tgtArrowUpdate(){if(_taRaf){cancelAnimationFrame(_taRaf);_taRaf=0;}tgtArrowDraw();}
+/* v1651 [Genaro: choppy attacks on the GCMX iPad]: used to cancel the loop and redraw synchronously -- called from inside renders,
+   so it measured both cards on a half-built board (a forced layout) several times per action. Now it just makes sure a draw is
+   queued for the next frame, when layout is clean; arrows can lag the board by at most one frame. */
+function tgtArrowUpdate(){if(!_taRaf)_taRaf=requestAnimationFrame(tgtArrowDraw);}
 (function(){
   const over=function(e){const c=e.target&&e.target.closest&&e.target.closest('#screen-battle .uc[data-uid]');const id=c?c.getAttribute('data-uid'):null;if(id!==_taHover){_taHover=id;tgtArrowUpdate();}};
   document.addEventListener('mouseover',over,{passive:true});
@@ -27217,7 +27248,7 @@ function renderBattle(){try{amoxScanSeen();}catch(_amx){} /* v1440 */
   // Action panel
   renderActionPanel();
   // Log
-  const bl=document.getElementById('blog');bl.innerHTML=G.log.map(l=>`<div>${l}</div>`).join('');bl.scrollTop=bl.scrollHeight;
+  blogSync(); /* v1650 [Genaro: choppy attacks on the GCMX iPad]: was a full rebuild of every log line + a forced layout (scrollHeight) on EVERY render, open or not */
   /* v1125: AFTER the repaint, never before. Called at the top of this function the anchor is
      still connected and the check passes, and then the very repaint we were guarding against
      detaches it -- the tooltip survives and the fix does nothing. */
@@ -27773,6 +27804,10 @@ function isBro(u,id){
 }
 
 function addLog(m){G.log.push(m);if(G._fullLog)G._fullLog.push(m);}
+/* v1650: the battle log only rebuilds while it is open, and only when a line was added (or a new battle swapped G.log) */
+function blogSync(){const bl=document.getElementById('blog');if(!bl||bl.style.display==='none')return;
+  if(bl._lg===G.log&&bl._ln===G.log.length)return;
+  bl.innerHTML=G.log.map(l=>`<div>${l}</div>`).join('');bl._lg=G.log;bl._ln=G.log.length;bl.scrollTop=bl.scrollHeight;}
 function downloadBattleLog(){
   try{
     const entries=G.log||[];
