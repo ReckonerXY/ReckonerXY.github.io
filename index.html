@@ -640,14 +640,27 @@ body.codex-ui #screen-battle .cx-fold{min-height:30px}
 /* v1655 [Genaro: iPad portrait, "Round 1" hidden behind the "Itzucuintlan - Battle 1" chip]: the chip is absolutely placed at the
    left of the strip (up to 30% wide) while the strip's own row is centred on the full width; below ~1100px they collide.
    The row now starts past the chip whenever the chip is showing. Desktop widths keep the centred layout. */
+/* v1662 [Genaro: touch screens -- the "Itzucuintlan - Battle N" chip was cut off in the round strip; it now sits centred above the
+   Enemy Codex. The capture note (Mercy bonus / Capture or Slay) now sits in the bottom bar instead of squeezing the strip.] */
+@media (pointer:coarse){
+  body.codex-ui #screen-battle .cx-phase-top{display:flex;justify-content:center;margin:0 0 6px}
+  body.codex-ui #screen-battle .cx-phase-top>.cx-phase:not(:empty){display:block;position:static;transform:none;max-width:100%;white-space:nowrap}
+  #cx-capnote-bot{position:sticky;bottom:0;z-index:31;margin-top:-76px;min-height:76px;display:flex;align-items:center;justify-content:center;padding:6px 14px;box-sizing:border-box;pointer-events:none}
+  #cx-capnote-bot>.cx-capnote{margin:0;max-width:100%;text-align:center;font-size:13px;padding:6px 14px}
+}
 /* v1659 [Genaro: iPad landscape -- the Options box cut off its Close button]: pop-ups were capped at 85% of the screen height
    (inline style), ~690px on an 810px-tall iPad. Short touch landscape screens let them use the full height minus the margin. */
 @media (pointer:coarse) and (orientation:landscape) and (max-height:860px){
-  #mo:not(.ssm-mode) .mb{max-height:calc(100vh - 32px)!important;max-width:min(620px,100%)} /* wider, so long (Spanish) lines wrap less */
+  #mo:not(.ssm-mode) .mb{max-height:calc(100vh - 32px)!important;max-width:min(620px,100%)}
+  /* v1662: no room for an extra row here -- the battle chip rides the Enemy Codex's top border like a title tab (zero height) */
+  body.codex-ui #screen-battle .cx-phase-top{height:0;margin:0;position:relative;z-index:8;align-items:flex-start} /* above the codex frame (its label is 6); no stretch, or the chip collapses to the 0 height */
+  body.codex-ui #screen-battle .cx-phase-top>.cx-phase:not(:empty){transform:translateY(-2px)} /* sits on the frame line, clear of the cards below */ /* wider, so long (Spanish) lines wrap less */
 }
 @media (min-width:760px) and (max-width:1099px){
-  body.codex-ui #screen-battle .cx-fold-row:has(> .cx-phase:not(:empty)) > .cx-fold{padding-left:calc(30% + 6px);gap:4px}
-  body.codex-ui #screen-battle .cx-fold-row:has(> .cx-phase:not(:empty)) > .cx-fold::before{display:none} /* the left rail has no room here */
+  /* v1663 [Genaro: iPad felt laggier since v1655]: was a :has() rule, which Safari re-checks on every change inside the strip; now a
+     class renderBattle sets when the chip is in the strip and has text (desktop windows 760-1099px; touch screens moved the chip). */
+  body.codex-ui #screen-battle .cx-fold-row.cx-ph-in > .cx-fold{padding-left:calc(30% + 6px);gap:4px}
+  body.codex-ui #screen-battle .cx-fold-row.cx-ph-in > .cx-fold::before{display:none} /* the left rail has no room here */
 }
 /* v1647: short touch screens (iPad landscape, 810px tall) were ~115px over, so the sticky dock covered the bottom of
    the party cards. Touch-only so desktop windows of the same height keep the current layout. */
@@ -702,7 +715,8 @@ body.cap-focus #screen-battle .uc.cap-pending{position:relative;z-index:3}
    Back in the battle strip keeps its look (the strip is a fixed height) and gets an invisible, larger touch area;
    the Battle Log toggle gets 44px of touch height (it has no background); Edit Battle Codex grows into a real button. */
 @media (pointer:coarse){
-  body.codex-ui #screen-battle .cx-fold{position:relative;z-index:3} /* the strip sits above the codex frames that border it, so Back's larger touch area isn't covered */
+  /* v1663: removed the strip's z-index:3 (v1656) -- a lag suspect on Safari (it can force extra GPU layers around the animated cards).
+     Back's touch area is a little smaller as a result (~38px instead of 47px). */
   body.codex-ui #screen-battle .cx-fold .cx-cancel{position:relative}
   body.codex-ui #screen-battle .cx-fold .cx-cancel::after{content:"";position:absolute;inset:-9px -6px}
   #screen-battle button[onclick*="getElementById('blog')"]{min-height:44px;padding:0 14px 0 0!important}
@@ -2182,6 +2196,7 @@ body.fx-min .bless-spark{display:none}
     <div style="border-top:1px solid #4a2a6a;margin-top:6px;padding-top:8px">
       <div style="font-size:11px;color:#a070c0;font-weight:500;margin-bottom:4px">⚔️ Custom Battle</div>
       <button class="btn btn-debug" onclick="debugCustomBattle()" style="font-size:11px;padding:4px 10px">⚔️ Launch Custom Battle…</button>
+<button class="btn btn-debug" onclick="dbgPerfHud()" style="font-size:11px;padding:4px 10px">📈 Frame meter</button>
     </div>
     <div style="border-top:1px solid #4a2a6a;margin-top:6px;padding-top:8px">
       <div style="font-size:11px;color:#ffd060;font-weight:500;margin-bottom:4px">🎬 Trailer Studio</div>
@@ -6541,6 +6556,42 @@ function relicTipHide(){const tt=document.getElementById('relic-tooltip');if(tt)
   };
   new MutationObserver(fit).observe(tt,{attributes:true,attributeFilter:['style'],childList:true,subtree:true,characterData:true});
 })();
+/* v1661 [Genaro: on the iPad a tapped tooltip stayed on screen while scrolling, until the next tap]: on touch screens any
+   scroll or finger drag outside the tooltip now closes it. Desktop hover tips are unchanged. */
+(function(){
+  let coarse=false;try{coarse=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches);}catch(_e){}
+  if(!coarse)return;
+  const hideIfOpen=function(ev){const tt=document.getElementById('relic-tooltip');if(!tt||tt.style.display==='none')return;
+    if(ev&&ev.target&&ev.target.nodeType===1&&tt.contains(ev.target))return;relicTipHide();};
+  window.addEventListener('scroll',hideIfOpen,{capture:true,passive:true});
+  window.addEventListener('touchmove',hideIfOpen,{capture:true,passive:true});
+})();
+/* v1662: touch screens -- move the battle chip out of the round strip to a centred row above the Enemy Codex */
+(function(){
+  let coarse=false;try{coarse=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches);}catch(_e){}
+  if(!coarse)return;
+  const cp=document.getElementById('cx-phase'),ce=document.getElementById('cx-enemy');if(!cp||!ce||!ce.parentNode)return;
+  const top=document.createElement('div');top.className='cx-phase-top';top.id='cx-phase-top';
+  ce.parentNode.insertBefore(top,ce);top.appendChild(cp);
+})();
+/* v1663 [Genaro: measure stutter on the real iPad]: debug-panel frame meter. Shows FPS over the last second, frames slower than
+   33ms / 50ms since the last reset, and the worst frame. Tap it to reset; the button toggles it. Its loop runs only while shown. */
+function dbgPerfHud(){
+  let h=document.getElementById('perf-hud');
+  if(h){h._on=false;h.remove();return;}
+  h=document.createElement('div');h.id='perf-hud';h._on=true;
+  h.style.cssText='position:fixed;left:6px;top:6px;z-index:99999;background:rgba(0,0,0,.78);color:#9f9;font:12px/1.35 monospace;padding:5px 8px;border:1px solid #3a6;border-radius:6px;pointer-events:auto;white-space:pre';
+  document.body.appendChild(h);
+  let last=0,win=[],n33=0,n50=0,worst=0,shown=0;
+  h.onclick=function(){n33=0;n50=0;worst=0;};
+  const loop=function(t){if(!h._on)return;
+    if(last){const d=t-last;win.push(t);if(d>33.4)n33++;if(d>50)n50++;if(d>worst)worst=d;}
+    last=t;while(win.length&&t-win[0]>1000)win.shift();
+    if(t-shown>250){shown=t;h.textContent='FPS '+win.length+'\n>33ms '+n33+'  >50ms '+n50+'\nworst '+Math.round(worst)+'ms  (tap=reset)';}
+    requestAnimationFrame(loop);};
+  requestAnimationFrame(loop);
+}
+window.dbgPerfHud=dbgPerfHud;
 function relicTipReap(){
   const tt=document.getElementById('relic-tooltip');
   if(!tt||tt.style.display==='none')return;
@@ -8042,7 +8093,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1660'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1663'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -27080,7 +27131,8 @@ function renderBattle(){try{amoxScanSeen();}catch(_amx){} /* v1440 */
   _phSet(document.getElementById('phase-ban'));
   const _isL5=G.layer===5;
   document.getElementById('phase-ban').style.borderColor=G.battleNum===8?'#8b2020':G.battleNum===5?(_isL5?'#8a4010':isL4?'#204080':isL3?'#4a3a8a':isL2?'#5a4a10':'#2a6a8a'):'#3a3a6a';
-  {const _cp=document.getElementById('cx-phase');if(_cp){_phSet(_cp);_cp.style.borderColor=document.getElementById('phase-ban').style.borderColor;}} /* v1555: the same label, on the round divider · v1622: + glyph */
+  {const _cp=document.getElementById('cx-phase');if(_cp){_phSet(_cp);_cp.style.borderColor=document.getElementById('phase-ban').style.borderColor;
+    const _pr=_cp.parentNode;if(_pr&&_pr.classList&&_pr.classList.contains('cx-fold-row')){const _on=!!_cp.textContent.trim();if(_pr.classList.contains('cx-ph-in')!==_on)_pr.classList.toggle('cx-ph-in',_on);}}} /* v1663 */ /* v1555: the same label, on the round divider · v1622: + glyph */
   // Enemies
   const er=document.getElementById('erow');
   // Patch existing enemy cards in-place to avoid icon flicker
@@ -27481,8 +27533,12 @@ window.cancelTargeting=cancelTargeting;
 function cxCapNote(){
   try{document.body.classList.toggle('cap-focus',!!G._capCard);}catch(e){} /* v1547 */
   const fold=document.getElementById('cx-fold');if(!fold)return;
-  const host=fold.querySelector('span');let n=document.getElementById('cx-capnote');
-  if(!(G._capCard&&G._capCard.note)){if(n)n.style.display='none';return;}
+  /* v1662: on touch screens the note sits in its own holder pinned over the (empty, greyed) bottom bar */
+  let bot=null;try{if(window.matchMedia&&matchMedia('(pointer:coarse)').matches){bot=document.getElementById('cx-capnote-bot');
+    if(!bot){const ap=document.getElementById('act-panel-area');if(ap&&ap.parentNode){bot=document.createElement('div');bot.id='cx-capnote-bot';ap.parentNode.insertBefore(bot,ap.nextSibling);}}}}catch(_e){}
+  const host=bot||fold.querySelector('span');let n=document.getElementById('cx-capnote');
+  if(!(G._capCard&&G._capCard.note)){if(n)n.style.display='none';if(bot)bot.style.display='none';return;}
+  if(bot)bot.style.display='';
   if(!host)return;
   if(!n||n.parentNode!==host){if(n)n.remove();n=document.createElement('span');n.id='cx-capnote';n.className='cx-capnote';host.appendChild(n);}
   n.innerHTML=G._capCard.note;n.style.display='';
