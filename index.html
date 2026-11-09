@@ -779,6 +779,13 @@ body.fx-min .cxq-slowfx,body.fx-min .cxq-slowfx .cxq-hg,body.fx-min .cxq-push{an
 .cxq-out{filter:grayscale(1);border-style:dashed;border-color:#6b5a44;animation:cxqOut .38s ease-in both}
 .cxq-out::before{content:"";position:absolute;inset:0;background:linear-gradient(45deg,transparent 44%,#e8786a 44% 56%,transparent 56%),linear-gradient(-45deg,transparent 44%,#e8786a 44% 56%,transparent 56%);z-index:1}
 @keyframes cxqIn{0%{transform:scale(.3);opacity:0}100%{transform:scale(1);opacity:1}}
+/* v1681: a defeated unit's chip dies in place (absolute ghost over its old spot): flash red, an X strikes through, then it drops away */
+#cx-queue{position:relative}
+.cxq-die{position:absolute!important;margin:0;pointer-events:none;z-index:2;animation:cxqDie .66s ease-in both}
+.cxq-die::before{content:"";position:absolute;inset:-1px;background:linear-gradient(45deg,transparent 42%,#ff6a5a 42% 58%,transparent 58%),linear-gradient(-45deg,transparent 42%,#ff6a5a 42% 58%,transparent 58%);z-index:1;animation:cxqX .2s .1s cubic-bezier(.2,.9,.3,1.4) both}
+@keyframes cxqDie{0%{transform:none;opacity:1;filter:none}12%{transform:scale(1.22);box-shadow:0 0 8px 2px #ff4a3a;filter:brightness(1.6)}35%{transform:scale(1);filter:grayscale(.6)}55%{transform:scale(1);opacity:1;filter:grayscale(1)}100%{transform:translateY(9px) rotate(-16deg) scale(.45);opacity:0;filter:grayscale(1)}}
+@keyframes cxqX{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+body.fx-min .cxq-die,body.fx-min .cxq-die::before{animation:none}
 @keyframes cxqOut{0%{opacity:.9;transform:scale(1)}60%{opacity:.6;transform:scale(1)}100%{opacity:0;transform:scale(.4);margin-right:-24px}}
 .uc.cxq-hl{outline:2px solid #f2c45a;outline-offset:2px}
 body.fx-min .cxq-in,body.fx-min .cxq-out{animation:none}
@@ -8129,7 +8136,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1680'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1681'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -27072,8 +27079,11 @@ function cxQueueTag(){
   /* v1639: remember where every chip sat before the rebuild, keyed by unit (sun chips by their order) */
   const _fxOk=(typeof fxOn==='function')?fxOn():true;
   const _keyOf=function(c,n){return c.dataset.q==='you'?'you'+n:c.dataset.q;};
-  const _oldX={};
-  if(_fxOk){let _n=0;el.querySelectorAll('.cxq-chip[data-q]').forEach(function(c){_oldX[_keyOf(c,c.dataset.q==='you'?_n++:0)]=c.getBoundingClientRect().left;});}
+  const _oldX={},_oldR={};let _elR=null,_oldYou=0;
+  if(_fxOk){let _n=0;_elR=el.getBoundingClientRect();el.querySelectorAll('.cxq-chip[data-q]').forEach(function(c){const r=c.getBoundingClientRect(),k=_keyOf(c,c.dataset.q==='you'?_n++:0);_oldX[k]=r.left;_oldR[k]=r;if(c.dataset.q==='you')_oldYou++;});}
+  /* v1681: did one of YOUR units just fall? Then a vanished 'your turn' chip is a lost action, not a used one */
+  const _allyAlive=(G.units||[]).filter(function(u){return u&&u.currentHp>0;}).map(function(u){return u.id;});
+  const _allyDied=(G._cxqPrevAlly||[]).some(function(id){return !_allyAlive.includes(id);});G._cxqPrevAlly=_allyAlive;
   const _prevSlow=G._cxqPrevSlow||[];
   const prevE=G._cxqPrevE||[];
   const nowE=list.filter(function(it){return it.kind==='enemy';}).map(function(it){return it.u.id;});
@@ -27086,7 +27096,8 @@ function cxQueueTag(){
   const nowSlow=list.filter(function(it){return it.kind==='enemy'&&it.slow;}).map(function(it){return it.u.id;});
   G._cxqPrevSlow=nowSlow;
   let h='<span class="cxq-lbl">'+t('ui.battle.qNext')+'</span>';
-  gone.forEach(function(id){const u=(G.enemies||[]).find(function(x){return x&&x.id===id;});if(u)h+='<span class="cxq-chip cxq-out" data-ghost="1">'+unitIconHtml(u,18)+'</span>';});
+  /* v1681: the defeated chip's ghost is no longer put in the flow (front of the strip) -- it is laid over the spot
+     where the chip actually sat, after the rebuild below, so nothing jumps when it is removed */
   list.forEach(function(it,k){
     if(k>0)h+='<span class="cxq-sep">›</span>';
     if(it.round)h+='<span class="cxq-r">'+cxqEsc(t('ui.battle.qRound',{n:it.round}))+'</span>'; /* v1630: Round N / Ronda N, not R N */
@@ -27098,6 +27109,15 @@ function cxQueueTag(){
   if(_after){h+='<span class="cxq-sep">\u203a</span>';if(_after.round)h+='<span class="cxq-r">'+cxqEsc(t('ui.battle.qRound',{n:_after.round}))+'</span>';} /* v1632 */
   if(_fxOk)pushed.forEach(function(id){const u=(G.enemies||[]).find(function(x){return x&&x.id===id;});if(u)h+='<span class="cxq-chip cxq-push" data-ghost="1">'+unitIconHtml(u,18)+'<span class="cxq-hg">'+CXQ_HG+'</span></span>';});
   el.innerHTML=h;
+  /* v1681 [Genaro: a defeated unit's chip just vanished]: it now dies in place -- red flash, X struck through, then it
+     drops and fades -- while the rest of the strip slides over (the FLIP below). Works for enemies and for a lost 'your turn'. */
+  if(_fxOk&&_elR){
+    const _ghost=function(k,inner,cls){const r=_oldR[k];if(!r)return;const g=document.createElement('span');g.className='cxq-chip cxq-die'+(cls||'');g.dataset.ghost='1';
+      g.style.left=(r.left-_elR.left)+'px';g.style.top=(r.top-_elR.top)+'px';g.innerHTML=inner;el.appendChild(g);};
+    gone.forEach(function(id){const u=(G.enemies||[]).find(function(x){return x&&x.id===id;});if(u)_ghost(id,unitIconHtml(u,18));});
+    if(_allyDied){const _nowYou=list.filter(function(it){return it.kind==='you';}).length;for(let i=_nowYou;i<_oldYou;i++)_ghost('you'+i,CXQ_SUN,' cxq-you');}
+  }
+  const _dieDelay=el.querySelector('.cxq-die')?220:0;
   if(_fxOk){
     let _n=0;
     el.querySelectorAll('.cxq-chip[data-q]').forEach(function(c){
@@ -27105,7 +27125,7 @@ function cxQueueTag(){
       if(c.dataset.q!=='you'&&nowSlow.includes(c.dataset.q)&&!_prevSlow.includes(c.dataset.q))c.classList.add('cxq-slowfx'); /* just slowed */
       if(_oldX[k]===undefined||!c.animate)return;
       const dx=_oldX[k]-c.getBoundingClientRect().left;
-      if(Math.abs(dx)>1)c.animate([{transform:'translateX('+dx+'px)'},{transform:'translateX(0)'}],{duration:420,easing:'cubic-bezier(.3,.7,.2,1)'});
+      if(Math.abs(dx)>1)c.animate([{transform:'translateX('+dx+'px)'},{transform:'translateX(0)'}],{duration:420,delay:_dieDelay,fill:'backwards',easing:'cubic-bezier(.3,.7,.2,1)'}); /* v1681: waits for the X when a unit died */
     });
   }
   el.querySelectorAll('.cxq-chip[data-q]').forEach(function(c){
@@ -27116,7 +27136,7 @@ function cxQueueTag(){
     };
     c.onmouseleave=cxqClearHl;
   });
-  if(gone.length||pushed.length){const _el=el;setTimeout(function(){_el.querySelectorAll('[data-ghost]').forEach(function(g){g.remove();});},_fxOk?(pushed.length?720:400):0);} /* v1639: + pushed ghosts */
+  if(el.querySelector('[data-ghost]')){const _el=el;setTimeout(function(){_el.querySelectorAll('[data-ghost]').forEach(function(g){g.remove();});},_fxOk?720:0);} /* v1639: + pushed ghosts · v1681: + in-place death ghosts */
 }
 /* v1629: round-start pill under the fold (round 2+). Rides a fixed overlay so the fold keeps its size. */
 function cxRoundToast(){
