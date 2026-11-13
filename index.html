@@ -10,6 +10,9 @@
    transition, so no CSS fade could have been the shared cause. A narrow version of this rule
    already sat on #screen-shop .btn / .tab; this generalises it. */
 *{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation}
+/* v1699 [Genaro: white lines on the right edge in Safari]: with macOS scroll bars set to always show (or a mouse
+   plugged in) the page scroll bar was drawn in the light scheme -- a white track on a dark game. */
+:root{color-scheme:dark}
 :root{--bd:#1a1009;--bm:#2a1f0e;--bp:#1e1408;--br:#4a3520;--tx:#e8d5b0;--td:#9a7d5a;--bn:#3d2a10;--bh:#5a3f18;--am:#e8a020;--hp:#c0392b;--en:#8b1a1a}
 body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-size:14px}
 .screen{padding:1rem;display:none;min-height:420px}.screen.active{display:block}
@@ -6715,7 +6718,7 @@ const CHIMA_ATTRS='style="cursor:help" onmouseenter="chimaTip(event)" onmouselea
 function chimaTip(e){_tipOwn(e);
   const tt=document.getElementById('relic-tooltip');if(!tt)return;
   tt.innerHTML='<div style="font-weight:700;color:#60c0e0;margin-bottom:3px"><svg class="tl tl-chimalli"><use href="#tl-chimalli"/></svg> Chimalli</div>'
-    +'<div style="font-size:12px">'+t('ui.chima.body',{h:'<span style="color:#e05050">\u2764</span>'})+'</div>'; /* v1338: was English-only */
+    +'<div style="font-size:12px">'+t('ui.chima.body',{h:stIco('hp')})+'</div>'; /* v1338: was English-only */
   tt.style.display='block';
   const x=(e.clientX!==undefined?e.clientX:(e.touches&&e.touches[0]?e.touches[0].clientX:0));
   const y=(e.clientY!==undefined?e.clientY:(e.touches&&e.touches[0]?e.touches[0].clientY:0));
@@ -6999,13 +7002,13 @@ function specFmtHtml(ak,tbl){
   const chip=(lbl,val,col)=>'<span class="sf-c"'+(col?' style="color:'+col+'"':'')+'>'+(lbl?'<b>'+lbl+'</b>':'')+val+'</span>';
   let r1='';
   if(f.ty==='SUP'){
-    r1+=chip('','\u2764\ufe0f '+_sfL('support'),'#70d0a0');
+    r1+=chip('',stIco('hp')+' '+_sfL('support'),'#70d0a0'); /* v1700 [Genaro]: Ian's heart replaces the emoji */
     if(f.sumL)r1+=chip(_sfL('summon'),L(f,'sumL')); /* v1349: summoners (Call of the Sun) */
     else if(f.heal)r1+=chip(_sfL('heal'),f.heal+' \u00b7 '+_sfL(f.healLow?'lowAlly':'allAllies')); /* v1344: healLow = single lowest-HP ally */
     else r1+=chip(_sfL('targets'),f.tgL?L(f,'tgL'):_sfL('allAllies')); /* v1342: pure-buff supports (Cinder Mend) · v1347: tgL (Basalt Shield) */
     if(f.cleanse)r1+='<span class="sf-c" style="border-color:#70e0b066"><span class="cleanse-pip" '+CLEANSE_ATTRS+'><span style="color:#70e0b0">\u2726</span> '+t('ui.cleanse.title')+'</span></span>';
   }else{
-    r1+=f.ty==='MAG'?chip('',stIco('mag')+' '+statLbl('mag'),'#b08cf0'):chip('',stIco('atk')+' '+statLbl('atk'),'#f0a070'); /* v1684: Ian's icons; SUP keeps the heart */
+    r1+=f.ty==='MAG'?chip('',stIco('mag')+' '+statLbl('mag'),'#b08cf0'):chip('',stIco('atk')+' '+statLbl('atk'),'#f0a070'); /* v1684: Ian's icons */
     r1+=chip(_sfL('power'),f.powL?L(f,'powL'):(f.pow+(f.perHit?' '+_sfL('perHit'):'')));
     if(f.hits||f.hitsL)r1+=chip(_sfL('hits'),f.hitsL?L(f,'hitsL'):(f.hits+(f.random?' '+_sfL('random'):'')));
     else r1+=chip(_sfL('targets'),f.tgL?L(f,'tgL'):((f.upTo?_sfL('upTo')+' ':'')+f.tg)); /* v1339: powL/hitsL/tgL overrides */
@@ -7172,7 +7175,7 @@ function _sfHd(ad){return /data-sty="/.test(String(ad||''))?' sf-hd':'';} /* v13
 function _sfBd(ad){return /data-sty="/.test(String(ad||''))?' sf-bd':'';}
 function specNameHtml(name,ad,pre){
   if(/data-sty="/.test(String(ad||'')))return pre?(pre+name):('<span class="sf-nm">'+name+'</span>');
-  return (pre||'\u{1F52E} ')+name+': <span style="font-weight:400;font-size:12px">'+specTypeEmoji(ad)+'</span>';
+  return (pre||'\u{1F52E} ')+name+': <span style="font-weight:400;font-size:12px">'+stGlyphs(specTypeEmoji(ad))+'</span>';
 }
 function specFmtApply(){
   try{
@@ -8165,7 +8168,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1698'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1701'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -10269,7 +10272,7 @@ ${t('ui.howto.combat')}<br><br>
 ${t('ui.howto.status')}<br><br>
 ${t('ui.howto.resources')}<br><br>
 ${t('ui.howto.capture')}<br><br>
-${t('ui.howto.tp')}<br><br>
+${stGlyphs(t('ui.howto.tp'))}<br><br>
 ${t('ui.howto.prestige')}</div>`,
     [{label:t('ui.common.gotIt'),fn:()=>{}}]
   );
@@ -12651,14 +12654,14 @@ function showDivTreeIntro(){
    first mercenary on offer are read live, so the pictures always show THIS run's god. */
 function _pgTpStop(){if(window._pgTpT){clearInterval(window._pgTpT);window._pgTpT=null;}}
 function _pgTpStart(maxTp,maxHp){_pgTpStop(); /* v1418: HP and TP both refill, the way a Temazcal restore does */
-  const bars=[['pw-tp','pw-tpn','✨ ',maxTp,0.2],['pw-hp','pw-hpn','❤️ ',maxHp,0.4]];
+  const bars=[['pw-tp','pw-tpn',stIco('tp')+' ',maxTp,0.2],['pw-hp','pw-hpn',stIco('hp')+' ',maxHp,0.4]] /* v1701: Ian's icons -> innerHTML below */;
   const run=()=>{const r=document.getElementById('pw-rest');
     if(!r||!document.getElementById('mo').classList.contains('open')){_pgTpStop();return;}
     r.classList.add('go');
     bars.forEach(([bi,ni,ic,mx,f])=>{const i=document.getElementById(bi),n=document.getElementById(ni);if(!i||!n)return;const lo=Math.max(1,Math.round(mx*f));
-      i.style.transition='none';i.style.width=Math.round(f*100)+'%';n.textContent=ic+lo+'/'+mx;void i.offsetWidth;
+      i.style.transition='none';i.style.width=Math.round(f*100)+'%';n.innerHTML=ic+lo+'/'+mx;void i.offsetWidth;
       setTimeout(()=>{if(!document.getElementById(bi))return;i.style.transition='width 1s ease-out';i.style.width='100%';r.classList.remove('go');
-        let v=lo;const k=setInterval(()=>{v=Math.min(mx,v+Math.ceil((mx-lo)/8));if(n)n.textContent=ic+v+'/'+mx;if(v>=mx)clearInterval(k);},110);},900);});};
+        let v=lo;const k=setInterval(()=>{v=Math.min(mx,v+Math.ceil((mx-lo)/8));if(n)n.innerHTML=ic+v+'/'+mx;if(v>=mx)clearInterval(k);},110);},900);});};
   run();window._pgTpT=setInterval(run,3200);}
 function showTianguisIntro(){
   const gd=G.god||{},gk='god_'+gd.id,sp=_pgSpr(gd.id),nm=L(gd,'name');
@@ -21789,7 +21792,7 @@ function fireGodSpecial(u,ae,aa,ft){rollCrit._lc=false;
     const healTarget=aliveAllies.length?aliveAllies.reduce((a,b)=>a.currentHp<b.currentHp?a:b):null;
     const heal=Math.round(dmg*lifestealMult());
     if(healTarget&&dmg>0){healTarget.currentHp=healTo(healTarget,heal);animateHit(healTarget.id,heal,true);}
-    addLog(isEs()?`<span class="log-ab">☀️ ¡Quiebre Áureo! ${dmg} → ${liveName(pickT)}${healTarget&&dmg>0?' + ❤️ '+healTarget.icon+' +'+heal:''}!</span>`:`<span class="log-ab">☀️ Aurum Break! ${dmg} → ${pickT.name}${healTarget&&dmg>0?' + ❤️ '+healTarget.icon+' +'+heal:''}!</span>`);
+    addLog(isEs()?`<span class="log-ab">☀️ ¡Quiebre Áureo! ${dmg} → ${liveName(pickT)}${healTarget&&dmg>0?' + '+stIco('hp')+' '+healTarget.icon+' +'+heal:''}!</span>`:`<span class="log-ab">☀️ Aurum Break! ${dmg} → ${pickT.name}${healTarget&&dmg>0?' + '+stIco('hp')+' '+healTarget.icon+' +'+heal:''}!</span>`);
     onHitContact(u,pickT);if(pickT.currentHp<=0)handleDeath(pickT);
   }
   else if(gd.ak==='rabidBloodrink'&&pickT){
@@ -25493,7 +25496,7 @@ function tzCallout(sel,delay){
   const r=el.getBoundingClientRect();
   if(!r.width&&!r.height)return;
   const frozen={getBoundingClientRect:()=>r};
-  fxCallout(frozen,'\u2764\ufe0f '+t('ui.fx.restored'),'#9ad8b0',(delay||0)+120,String(sel));
+  fxCallout(frozen,stIco('hp')+' '+t('ui.fx.restored'),'#9ad8b0',(delay||0)+120,String(sel));
 }
 function healFx(card,delay){
   const r=_fxRect(card);if(!r)return;
@@ -25511,7 +25514,7 @@ function healFx(card,delay){
       document.body.appendChild(d);setTimeout(function(){d.remove();},1600);
     }
     const lbl=document.createElement('div');lbl.className='dmg-pop';
-    lbl.textContent='\u2764\uFE0F '+t('ui.fx.restored'); /* v869: heart, not the herb · v1415: ES */
+    lbl.innerHTML=stIco('hp')+' '+t('ui.fx.restored'); /* v869: heart, not the herb · v1415: ES */
     lbl.style.cssText='color:#7ef0c0;font-weight:800;font-size:14px;left:'+(r.left+r.width/2-46)+'px;top:'+(r.top+6)+'px;text-shadow:0 0 9px #1e7a58,0 1px 3px #000;';
     document.body.appendChild(lbl);setTimeout(function(){lbl.remove();},1100);
   },delay||0);
@@ -29697,7 +29700,7 @@ function doTemazcalAll(){ // v417: restore every unit's TP for the sum of indivi
   const _hpOvA=G.unitHpOverride||{};
   G.party.forEach(gdId=>{const gd=GODS.find(g=>g.id===gdId);if(!gd)return;const k='god_'+gdId;const mx=maxNPFor(k,gd.np||30);if(!mx)return;const cur=G.unitNP[k]!==undefined?G.unitNP[k]:mx;const mhp=allyMaxHpFor(k,gd.hp||140,G.dte.godHpMult||1);const chp=rosterCurHp(k,mhp);if(cur<mx||chp<mhp)tasks.push({id:k,maxNP:mx,hp:mhp});});
   G.captured.forEach(cu=>{const k=capKey(cu);const mx=maxNPFor(k,cu.np||20);if(!mx)return;const cur=G.unitNP[k]!==undefined?G.unitNP[k]:mx;const mhp=allyMaxHpFor(k,cu.hp||50,G.dte.vassalHpMult||1);const chp=rosterCurHp(k,mhp);if(cur<mx||chp<mhp)tasks.push({id:k,maxNP:mx,hp:mhp});});
-  if(!tasks.length){notify(t('ui.msg.alreadyFull'),'#9050c0');return;}
+  if(!tasks.length){notify(stGlyphs(t('ui.msg.alreadyFull')),'#9050c0');return;}
   const total=cost*tasks.length;
   if(G.res.cacao<total){notify(t('ui.msg.noCacaoBang'),'#e05050');return;}
   G.res.cacao-=total;
@@ -29847,7 +29850,7 @@ function ftueGateUpdate(){
   const pM=document.getElementById('panel-mercs');
   if(pM&&(!s2||!s3)){
     const d=document.createElement('div');d.id='ftue-tip-mercs';d.className='ftue-tip';
-    d.innerHTML=(!s2?t('ui.ftue.restorePatron'):(!s3?t('ui.ftue.hireMerc'):''));
+    d.innerHTML=(!s2?stGlyphs(t('ui.ftue.restorePatron')):(!s3?t('ui.ftue.hireMerc'):''));
     pM.prepend(d);
   }
   // v312: while the training step is pending, the patron's Level Up button glows (via renderTraining)
@@ -31312,7 +31315,7 @@ function maybeWarnTemazcal(){
   if(G._temazcalWarned){proceedShop();return;}
   G._temazcalWarned=true;
   showMo('🌿',t('ui.restorePrompt.title'),
-    '<div style="font-size:13px;line-height:1.6">'+t('ui.restorePrompt.body',{cost:cost})+'</div>',
+    '<div style="font-size:13px;line-height:1.6">'+stGlyphs(t('ui.restorePrompt.body',{cost:cost}))+'</div>',
     [{label:t('ui.restorePrompt.go'),fn:()=>{switchTab('mercs');renderTemazcal();}},
      {label:t('ui.restorePrompt.skip'),cls:'btn-hard',fn:()=>proceedShop()}]); /* v1399: ES */
 }
@@ -32894,7 +32897,11 @@ class LayerFx{
     return w*(this.mode==='battle'?.8:1);}
   /* screen offset for earthquakes, in CSS px */
   shake(){const Q=this.p.quake;if(!Q||this.quakeT<=0)return null;const u=1-this.quakeT/this.quakeDur,env=Math.sin(Math.PI*u);
-    const amp=this.lerp(Q.amp)*env*(this.mode==='battle'?.5:1);return [Math.round(rnd(-amp,amp)),Math.round(rnd(-amp*.6,amp*.6))];}
+    const amp=this.lerp(Q.amp)*env*(this.mode==='battle'?.5:1);
+    /* v1699 [Genaro: Layer 2 quakes showed a twitching white bar at the bottom in Safari]: the offset is never positive.
+       Pushing the full-width screen right/down made the page wider/taller than the window for a frame, so a page
+       scroll bar flickered in and out. Left/up overflow cannot scroll; the travel (2*amp) is unchanged. */
+    return [-Math.round(rnd(0,amp*2)),-Math.round(rnd(0,amp*1.2))];}
   beat(){const hb=this.p.heartbeat;if(!hb)return 1;const ph=(this.t%hb)/hb;const pulse=x=>Math.exp(-Math.pow((ph-x)/0.045,2));return .55+.45*Math.max(pulse(.08),.8*pulse(.26));}
   step(dt){
     this.t+=dt;if(this.burstT>0)this.burstT-=dt;this.resize();
