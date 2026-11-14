@@ -593,6 +593,16 @@ body.codex-ui #screen-battle .bar-row{margin:2px 0}
 body.codex-ui #screen-battle .cx-fold{margin-top:3px}
 #act-panel-area .act-panel.act-dock{margin:.15rem 0 0;padding:.2rem .6rem}
 .act-dock .act-btns>.btn{padding-top:2px;padding-bottom:2px}
+/* v1704: first-battle focus. Same dim as cap-focus (v1547), minus the action bar, which is the thing being pointed at. */
+body.b1-focus #screen-battle .uc,body.b1-focus #screen-battle .battle-head,body.b1-focus #screen-battle .cx-phase,body.b1-focus #screen-battle .battle-sticky,body.b1-focus #screen-battle .row-lbl{filter:grayscale(1) brightness(.45);transition:filter .25s ease}
+body.b1-focus #screen-battle .cx-page::after{filter:grayscale(1) brightness(.5)}
+body.b1-focus #battle-bg{filter:grayscale(1) brightness(.45)}
+body.b1-focus #act-panel-area .act-btns>.btn:not(:disabled){animation:tabPulse 1.2s ease-out infinite;outline:2px solid #ffd24d;outline-offset:2px}
+body.b1-focus #act-panel-area .dock-sub{color:#ffe9a8;font-size:1.2em;font-weight:700}
+#act-panel-area .act-panel.b1-one>.act-panel-title{color:#ffe9a8;font-size:15px}
+#act-panel-area.b1-hint .act-panel:not(.act-dock)>div:not(.act-panel-title){color:#e8dcc0!important;font-size:13px!important}
+body.codex-ui #screen-battle #tut-area{position:sticky;bottom:var(--actH,76px);z-index:29} /* v1703: rides on top of the sticky action bar */
+#screen-battle #tut-area .tut-box{margin:.35rem 0 0}
 body.codex-ui #act-panel-area{position:sticky;bottom:0;z-index:30;background:var(--bd);min-height:76px!important;box-sizing:border-box} /* v1550: a floor, not a ceiling -- the bar grows instead of clipping its buttons */
 /* every other panel shown in that slot (your-turn prompt, target picking, enemy acting) is one row of the same height */
 body.codex-ui #act-panel-area .act-panel:not(.act-dock){display:flex;align-items:center;gap:12px;flex-wrap:nowrap;margin:.15rem 0 0;padding:.3rem .8rem;min-height:70px;box-sizing:border-box;overflow:hidden}
@@ -1107,7 +1117,11 @@ body.fx-min .amx-pend{animation:none}
 /* v635: Sacrifice Altar card grids */
 .sac-grid,.rg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,320px));gap:10px;margin-top:6px;justify-content:center} /* v654 */
 @media(max-width:520px){.sac-grid,.rg-grid{grid-template-columns:1fr}}
-.sac-card.sel{outline:2px solid #8a208a;background:#1a0a1a!important}
+.sac-card.sel{outline:2px solid #d070d0;background:#1a0a1a!important}
+.sac-chk{width:26px;height:26px;border-radius:6px;border:2px solid #d070d0;background:#2a0f2a;box-shadow:0 0 6px rgba(208,112,208,.45);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:#fff;line-height:1} /* v1703 */
+.sac-chk.on{background:#b030b0;border-color:#f4b0f4;box-shadow:0 0 9px rgba(240,150,240,.7)}
+.sac-hint{font-size:13px;color:#e4a8e4;font-weight:600}
+.sac-selall{font-size:12px;padding:5px 12px;background:#2a0f2a;border-color:#d070d0;color:#f0c0f0}
 .sac-fv{font-size:20px;font-weight:700;color:#d4af37;line-height:1.1}
 .sac-card .tc-action{display:flex;gap:6px}
 .sac-card .tc-action .btn{flex:1;font-size:14px;padding:8px 0}
@@ -2518,10 +2532,11 @@ body.fx-min .bless-spark{display:none}
     <div class="round-banner" id="round-banner"></div>
   </div>
   <div class="action-msg" id="action-msg"></div>
-  <div id="tut-area"></div><div id="cap-area"></div>
+  <div id="cap-area"></div>
   <div class="cx-page cx-enemy" id="cx-enemy"><div class="row-lbl" data-i18n="ui.battle.enemies">Enemies</div><div class="unit-row" id="erow"></div></div>
   <div class="cx-fold-row"><div class="cx-phase" id="cx-phase"></div><div class="cx-fold" id="cx-fold"></div></div>
   <div style="margin-top:.75rem" id="party-section" class="cx-page cx-ally"></div>
+  <div id="tut-area"></div><!-- v1703 [Genaro, GCMX]: was above the enemies, a screen away from the buttons it explains -->
   <div id="act-panel-area"></div>
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
     <button onclick="(function(){const b=document.getElementById('blog');const open=b.style.display!=='none';b.style.display=open?'none':'block';if(!open)blogSync();this.innerHTML=open?t('ui.battle.logClosed'):t('ui.battle.logOpen')}).call(this)" style="font-size:10px;color:var(--td);background:none;border:none;cursor:pointer;padding:0" data-i18n="ui.battle.logClosed">📜 Battle Log ▸</button>
@@ -2578,7 +2593,7 @@ body.fx-min .bless-spark{display:none}
     <div class="altar-sec-lbl" id="altar-sac-title" data-i18n="ui.altar.sacTitle">Sacrifice Units</div><div id="altar-sacrifice-list"></div>
     <div class="altar-sec-lbl" data-i18n="ui.altar.recruit">Recruit Gods <span style="font-size:10px;color:var(--td);font-weight:400;letter-spacing:0;text-transform:none">(summoned at Lv1)</span></div><div id="altar-reroll-dbg" style="display:none;margin-bottom:6px"></div><div id="altar-gods-list"></div>
     <div id="altar-god-specials-section" style="display:none"><div class="altar-sec-lbl" data-i18n="ui.altar.godUpgrades">God Special Upgrades</div><div id="altar-god-specials"></div></div>
-    <div class="altar-sec-lbl"><svg class="tl tl-chimalli" style="width:1.5em;height:1.5em;vertical-align:-.34em;color:#8ad4f0"><use href="#tl-chimalli"/></svg> Chimalli Armor</div><div id="altar-shields"></div>
+    <div class="altar-sec-lbl" data-i18n="ui.altar.chimaTitle"><svg class="tl tl-chimalli" style="width:1.5em;height:1.5em;vertical-align:-.34em;color:#8ad4f0"><use href="#tl-chimalli"/></svg> Chimalli Armor</div><div id="altar-shields"></div>
   </div>
 
 </div>
@@ -3696,7 +3711,7 @@ Object.assign(T_EN,{
   /* v1402 */
   'ui.altar.noneAvail':'No units available for sacrifice (Battle Codex units cannot be sacrificed).',
   'ui.altar.selCount':'{n} selected — {icon} {fp} Flowers total',
-  'ui.altar.sacBtnN':'Sacrifice ({n})',
+  'ui.altar.sacBtnN':'Sacrifice ({n})','ui.altar.selAll':'Select all','ui.altar.selNone':'Clear selection', /* v1703 */
   'ui.altar.spareBtnN':'Spare ({n})',
   'ui.altar.sacBtn':'Sacrifice',
   'ui.altar.spareBtn':'Spare',
@@ -3979,6 +3994,7 @@ Object.assign(T_EN,{
   /* v1420 */
   'ui.fx.tlaloque':'TLALOQUE RISES',
   /* v1422: run-1 tutorial, Tianguis empty states, Tlacuilo, small UI */
+  'ui.b1.selectPatron':'👆 Select your Patron God first','ui.b1.selectPatronF':'👆 Select your Patron Goddess first','ui.b1.selectPatronN':'👆 Select your Patron deity first', /* v1704 */
   'ui.b1.tpRegen':'✨ A small amount of <strong>Tonalli Points</strong> is restored at the end of every round',
   'ui.b1.pickStrike':'👆 <strong>Select a target</strong> — tap a highlighted enemy to attack',
   'ui.b1.pickSpecial':'👆 <strong>Select a target</strong> — tap a highlighted enemy to use your Special',
@@ -3994,6 +4010,7 @@ Object.assign(T_EN,{
   'ui.deploy.mbL4':'Mictlampehecatl','ui.deploy.mbL5':'Tlacateocotl Approaches','ui.deploy.mbL6':'Demigods of the Shore',
   'ui.deploy.mbL7':'Ometochtli & the Warren','ui.deploy.mbL8':'Ixpuxtequi & Nexoxcho',
   'ui.poch.noStall':'The Pochteca has not set up his stall this time. He may return after a future battle.',
+  'ui.poch.reroll':'Reroll Wares', /* v1703 */
   'ui.telpo.none':'No units to train yet.',
   'ui.merc.allHired':'All available mercenaries hired.',
   'ui.altar.allGods':'All available gods recruited.',
@@ -4859,7 +4876,7 @@ Object.assign(T_ES,{
   /* v1402 */
   'ui.altar.noneAvail':'No hay unidades para sacrificar (las unidades del Códice de Batalla no se pueden sacrificar).',
   'ui.altar.selCount':'{n} seleccionadas — {icon} {fp} Flores en total',
-  'ui.altar.sacBtnN':'Sacrificar ({n})',
+  'ui.altar.sacBtnN':'Sacrificar ({n})','ui.altar.selAll':'Seleccionar todas','ui.altar.selNone':'Quitar selección', /* v1703 */
   'ui.altar.spareBtnN':'Perdonar ({n})',
   'ui.altar.sacBtn':'Sacrificar',
   'ui.altar.spareBtn':'Perdonar',
@@ -5142,6 +5159,7 @@ Object.assign(T_ES,{
   /* v1420 */
   'ui.fx.tlaloque':'SURGE UN TLALOQUE',
   /* v1422: run-1 tutorial, Tianguis empty states, Tlacuilo, small UI */
+  'ui.b1.selectPatron':'👆 Primero selecciona a tu Dios Patrón','ui.b1.selectPatronF':'👆 Primero selecciona a tu Diosa Patrona','ui.b1.selectPatronN':'👆 Primero selecciona a tu deidad patrona', /* v1704 */
   'ui.b1.tpRegen':'✨ Al final de cada ronda se restauran algunos <strong>Puntos de Tonalli</strong>',
   'ui.b1.pickStrike':'👆 <strong>Elige un objetivo</strong> — toca un enemigo resaltado para atacar',
   'ui.b1.pickSpecial':'👆 <strong>Elige un objetivo</strong> — toca un enemigo resaltado para usar tu Especial',
@@ -5157,6 +5175,8 @@ Object.assign(T_ES,{
   'ui.deploy.mbL4':'Mictlampehecatl','ui.deploy.mbL5':'Se acerca Tlacateocotl','ui.deploy.mbL6':'Semidioses de la Orilla',
   'ui.deploy.mbL7':'Ometochtli y la Madriguera','ui.deploy.mbL8':'Ixpuxtequi y Nexoxcho',
   'ui.poch.noStall':'El Pochteca no instaló su puesto esta vez. Puede volver después de una batalla futura.',
+  'ui.poch.reroll':'Cambiar mercancía', /* v1703 */
+  'ui.altar.chimaTitle':'<svg class="tl tl-chimalli" style="width:1.5em;height:1.5em;vertical-align:-.34em;color:#8ad4f0"><use href="#tl-chimalli"/></svg> Armadura Chimalli', /* v1703 */
   'ui.telpo.none':'Aún no hay unidades para entrenar.',
   'ui.merc.allHired':'Ya contrataste a todos los mercenarios disponibles.',
   'ui.altar.allGods':'Ya reclutaste a todos los dioses disponibles.',
@@ -7428,7 +7448,7 @@ function renderPochtecaReal(){
       if(!getDTEffects().offeringRerollUnlocked)return '';
       var c=offeringRerollCost(),can=(G.res.cacao||0)>=c&&pochtecaPool().length>0;
       return '<div style="margin-top:10px;text-align:center">'+
-        '<button class="btn btn-ca" '+(can?'':'disabled')+' onclick="rerollPochteca()" style="font-size:11px;padding:5px 14px">\ud83c\udfb2 Reroll Wares \u2014 '+c+' \ud83e\uded8</button>'+
+        '<button class="btn btn-ca" '+(can?'':'disabled')+' onclick="rerollPochteca()" style="font-size:11px;padding:5px 14px">\ud83c\udfb2 '+t('ui.poch.reroll')+' \u2014 '+c+' \ud83e\uded8</button>'+
       '</div>';
     })();
 }
@@ -8168,7 +8188,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1701'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1705'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -13090,13 +13110,22 @@ function maybeStatusTut(kind,target){
   if(typeof hasV!=='function'||hasV('status_tut_seen'))return;
   const s=STATUS_INFO[kind];if(!s)return; // v586: single source of truth
   markV('status_tut_seen');
+  /* v1703 [Genaro, GCMX: the battle kept running behind the popup]: the hold is raised NOW, when the status lands, not
+     700ms later when the popup opens -- advanceTurn parks itself while it is up, so the hit that caused the status
+     finishes and then nothing else starts. Released by the button, the X / backdrop (onDismiss), or the watcher below
+     if another popup replaces this one, so it can never strand the battle. */
+  G._tutHold=true;G._tutHoldQ=[];
+  const _rel=()=>{if(!G||!G._tutHold)return;G._tutHold=false;const q=G._tutHoldQ||[];G._tutHoldQ=[];q.forEach(f=>{try{f();}catch(e){console.error('tut hold resume failed',e);}});};
   setTimeout(()=>{
+    const _ttl=t('ui.status.tutTitle');
+    setTimeout(function _w(){if(!G||!G._tutHold)return;const mo=document.getElementById('mo'),tt=document.getElementById('mo-title');
+      if(!mo||!mo.classList.contains('open')||!tt||tt.textContent!==_ttl){_rel();return;}setTimeout(_w,300);},50);
     showMo(s.icon,t('ui.status.tutTitle'),
       '<div style="text-align:left;font-size:13px;line-height:1.65;color:var(--td)">'+
       '<div style="color:'+s.color+';font-weight:600;margin-bottom:.3rem">'+t('ui.status.tutLead',{icon:s.icon,name:L(s,'name')})+'</div>'+
       '<div>'+L(s,'base')+'</div>'+
       '</div>',
-      [{label:t('ui.common.gotIt'),fn:()=>{}}]);
+      [{label:t('ui.common.gotIt'),fn:_rel}],_rel);
   },700);
 }
 function applyDrunk(target,stacks,friendly){
@@ -18669,11 +18698,7 @@ function startBattle(){try{if(window._cxVictoryFinish)window._cxVictoryFinish();
   const _showB1Hints=G.battleNum===1&&G.layer===1&&!hasV('b1_hints_done');
   G._b1HintState=_showB1Hints?'combat':'';
   G._b1SpecHintSeen=false; // reset each battle
-  if(tutEl)tutEl.innerHTML=_showB1Hints
-    ?(()=>{const _es=LANG==='es';const specName=G.god?(L(G.god,'ability')||'Special'):'Special'; /* v1384: points at the Patron God + ES */
-      return _es?`<div class="tut-box">✦ <strong>Combate por turnos</strong> — Selecciona a tu Dios Patrón y luego elige <strong>💥 Golpe</strong> o <strong>🔮 ${specName}</strong>. ¡El jugador siempre mueve primero!</div>`
-                :`<div class="tut-box">✦ <strong>Turn-Based Combat</strong> — Select your Patron God, then choose <strong>💥 Strike</strong> or <strong>🔮 ${specName}</strong>. Player always moves first!</div>`;})()
-    :'';
+  if(tutEl)tutEl.innerHTML=''; /* v1704 [Genaro]: the 'Turn-Based Combat' box duplicated the action bar under it -- the bar now carries the one instruction (ui.b1.selectPatron) */
   showScr('screen-battle');
   G._bossHintKey=bossHintKeyNow(); /* v1409: fixed at battle start -- dead bosses may leave G.enemies */
   if(window.DBG_AUTOLOSE_BOSS&&G._bossHintKey){ /* v1409 debug: lose this boss fight through the real path */
@@ -18903,6 +18928,14 @@ function teotlanLogoCanvas(sz){
   return img.outerHTML;
 }
 // ─── B1 TUT-AREA HINT HELPER ─────────────────────────────────
+/* v1705: the same "nothing earned yet" test ftuePatronGlowActive / ftueGateActive use -- false from the second run on */
+function b1FirstRunEver(){try{return DT.teotl===0&&[...DT.unlocked].length===0&&DT.tecpatl_level===0;}catch(e){return false;}}
+function b1TutTurn(){return !!(G&&G._b1HintState&&(G.roundNum||1)<=1&&G.battlePhase!=='done');} /* v1704 */
+/* v1703: the hint is sticky just above the action bar; the bar can grow past its 76px floor, so its real height feeds --actH */
+(function(){function boot(){try{const a=document.getElementById('act-panel-area'),sc=document.getElementById('screen-battle');
+    if(!a||!sc||typeof ResizeObserver==='undefined')return;
+    new ResizeObserver(function(){const h=a.offsetHeight;if(h>0)sc.style.setProperty('--actH',h+'px');}).observe(a);}catch(e){}}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();})();
 function setB1Hint(msg){
   if(!G._b1HintState)return;
   const el=document.getElementById('tut-area');
@@ -19818,6 +19851,7 @@ function yauhtliSweep(only){
   if(_yl.length){_yl.forEach(function(u){cleanseUnit(u);animateStatusPop(u.id,'🌼','#80d0ff');});if(G._yauhtliLogRound!==G.roundNum){G._yauhtliLogRound=G.roundNum;addLog(isEs()?`<span class="log-cp">🌼 Flor de Yauhtli — estados negativos limpiados</span>`:'<span class="log-cp">🌼 Yauhtli Flower — ailments cleansed</span>');}}
 }
 function advanceTurn(actorId){
+  if(G._tutHold&&G.battlePhase!=='done'){(G._tutHoldQ=G._tutHoldQ||[]).push(()=>advanceTurn(actorId));return;} /* v1703: parked while the status tutorial is open */
   G._taRec=null; /* v1396: the resolved enemy action's arrows stay up through the read-the-damage pause, then clear here */
   if(G.battlePhase==='done')return; // battle already ended — swallow all queued setTimeout callbacks
   if(G._ihiyotlUsed)G._ihiyotlArmed=false; /* v1073: the boosted ACTION is over — disarm for the rest of the battle */
@@ -20805,7 +20839,7 @@ function doPlayerStrike(){
   if(!ae.length)return;
   G.pendingAction={type:'strike'};
   G.battlePhase='player_targeting';{const _lt=G.enemies.filter(u=>u.currentHp>0&&!G.captureProcessed.has(u.id));if(_lt.length===1){doPlayerTarget(_lt[0].id);return;}}
-  setB1Hint(t('ui.b1.pickStrike'));
+  setB1Hint(''); /* v1704: the action bar says it */
   renderBattle();
 }
 
@@ -20865,7 +20899,7 @@ function doPlayerSpecial(useOblation){
         G.pendingAction={type:'aoe',oblation:G._useOblationSpecial};
         G.aoeCap=_aoeCap;G.aoeSelected=[];
         G.battlePhase='player_aoe_targeting';
-        setB1Hint(t('ui.b1.pickAoe',{n:_aoeCap,left:_aoeCap}));
+        setB1Hint(''); /* v1704 */
         renderBattle();
         return;
       }
@@ -20910,7 +20944,7 @@ function doPlayerSpecial(useOblation){
     }else{
       G.pendingAction={type:'special',oblation:G._useOblationSpecial};
       G.battlePhase='player_targeting';{const _lt=G.enemies.filter(u=>u.currentHp>0&&!G.captureProcessed.has(u.id));if(_lt.length===1){doPlayerTarget(_lt[0].id);return;}}
-      setB1Hint(t('ui.b1.pickSpecial'));
+      setB1Hint(''); /* v1704 */
       renderBattle();
     }
   }
@@ -20959,12 +20993,12 @@ function doPlayerAoeTarget(enemyId){
   const _i=G.aoeSelected.indexOf(enemyId);
   if(_i>=0){
     G.aoeSelected.splice(_i,1);
-    setB1Hint(t('ui.b1.pickAoe',{n:G.aoeCap,left:G.aoeCap-G.aoeSelected.length}));
+    setB1Hint(''); /* v1704 */
     renderBattle();return;
   }
   G.aoeSelected.push(enemyId);
   if(G.aoeSelected.length<G.aoeCap){
-    setB1Hint(t('ui.b1.pickAoe',{n:G.aoeCap,left:G.aoeCap-G.aoeSelected.length}));
+    setB1Hint(''); /* v1704 */
     renderBattle();return;
   }
   const actorId=actor.id;
@@ -27769,6 +27803,8 @@ document.addEventListener('contextmenu',function(e){
 function renderActionPanel(){
   document.body.classList.toggle('tgt-pulse',['player_targeting','player_aoe_targeting','player_ally_targeting'].includes(G.battlePhase)); /* v1305 */
   const el=document.getElementById('act-panel-area');if(!el)return;
+  /* v1704 [Genaro]: first battle, first turn -- while the action menu is open the board greys out and the two buttons pulse */
+  try{document.body.classList.toggle('b1-focus',b1TutTurn()&&b1FirstRunEver()&&G.battlePhase==='player_selected'&&!!G.selectedActorId); /* v1705 [Genaro]: first run ever only */el.classList.toggle('b1-hint',!!G._b1HintState);}catch(e){}
   requestAnimationFrame(alignActPanel); // v600: after paint, when card positions are final
   requestAnimationFrame(apHeightRatchet); // v1534
   battleAutoScroll(); // v1154
@@ -27796,6 +27832,9 @@ function renderActionPanel(){
         serendipityBtn=`<button class="btn" disabled style="margin-top:6px;width:100%;font-size:11px;background:#0e0814;border-color:#4a2060;color:#604080;cursor:not-allowed">${t('ui.ser.off')} <span style="font-size:9px">${t('ui.ser.wait')}</span></button>`;
       }
     }
+    /* v1704 [Genaro]: first battle, first turn -- one line, nothing else */
+    if(b1TutTurn()){const _gs=godPronoun(G.god,'subj');
+      el.innerHTML=`<div class="act-panel b1-one"><div class="act-panel-title">${t(_gs==='she'?'ui.b1.selectPatronF':_gs==='he'?'ui.b1.selectPatron':'ui.b1.selectPatronN')}</div>${serendipityBtn}</div>`;return;}
     el.innerHTML=`<div class="act-panel"><div class="act-panel-title">${t('ui.battle.yourTurn')}</div><div style="font-size:11px;color:var(--td)">${t('ui.battle.yourTurnHint')}</div>${serendipityBtn}</div>`;
     return;
   }
@@ -30877,6 +30916,14 @@ function doSacrificeSelected(){
     animateResGain('rb-shop','Flowers',_flBeforeT,G.res.flower,900+units.length*110); /* v846: tween spans the stagger */
   }},{label:t('ui.common.cancel'),fn:()=>{}}]);
 }
+/* v1703: one press checks (or clears) every unit on the Altar list -- same predicate renderAltar lists by */
+function toggleSacSelAll(){
+  G.sacSelected=G.sacSelected||new Set();
+  const list=G.captured.filter(cu=>!(G.deplSel.includes(capKey(cu))||isInSacSlot(capKey(cu)))).map(capKey);
+  const all=list.length>0&&list.every(k=>G.sacSelected.has(k));
+  if(all)list.forEach(k=>G.sacSelected.delete(k));else list.forEach(k=>G.sacSelected.add(k));
+  renderAltar();
+}
 function toggleSacSel(capId){
   G.sacSelected=G.sacSelected||new Set();
   if(G.sacSelected.has(capId))G.sacSelected.delete(capId);else G.sacSelected.add(capId);
@@ -31125,7 +31172,10 @@ function renderAltar(){
     const titleEl=document.getElementById('altar-sac-title');if(titleEl)titleEl.textContent=sacSectionLabel;
     const hdr=document.createElement('div');hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px';
     const spareableSelCount=sorted.filter(cu=>G.sacSelected.has(capKey(cu))&&!cu._isHiredMerc).length;
-    hdr.innerHTML=`<span style="font-size:11px;color:var(--td)">${selCount>0?t('ui.altar.selCount',{n:selCount,fp:selFP,icon:'<svg class="tl tl-quincunx" style="width:1.3em;height:1.3em;vertical-align:-.28em"><use href="#tl-quincunx"/></svg>'}):sacSectionHint}</span>${selCount>0?`<div style="display:flex;gap:6px"><button class="btn btn-sac" onclick="doSacrificeSelected()" style="font-size:12px;padding:5px 12px">${t('ui.altar.sacBtnN',{n:selCount})}</button>${spareEnabled?`<button class="btn" onclick="${spareableSelCount>0?'doSpareSelected()':'void 0'}" style="font-size:12px;padding:5px 12px;${spareableSelCount>0?'background:#1a2a10;border-color:#508040;color:#90d070':'background:#1a1a1a;border-color:#333;color:#555;cursor:not-allowed;opacity:0.5'}">${t('ui.altar.spareBtnN',{n:spareableSelCount})}</button>`:''}</div>`:''}`;
+    hdr.style.flexWrap='wrap';hdr.style.gap='6px'; /* v1703 */
+    const _allSel=sorted.length>0&&selCount===sorted.length;
+    const _selAllBtn=sorted.length>1?`<button class="btn sac-selall" onclick="toggleSacSelAll()">${_allSel?t('ui.altar.selNone'):'☑ '+t('ui.altar.selAll')}</button>`:'';
+    hdr.innerHTML=`<span class="sac-hint">${selCount>0?t('ui.altar.selCount',{n:selCount,fp:selFP,icon:'<svg class="tl tl-quincunx" style="width:1.3em;height:1.3em;vertical-align:-.28em"><use href="#tl-quincunx"/></svg>'}):'☑ '+sacSectionHint}</span><div style="display:flex;gap:6px;flex-wrap:wrap">${_selAllBtn}${selCount>0?`<button class="btn btn-sac" onclick="doSacrificeSelected()" style="font-size:12px;padding:5px 12px">${t('ui.altar.sacBtnN',{n:selCount})}</button>${spareEnabled?`<button class="btn" onclick="${spareableSelCount>0?'doSpareSelected()':'void 0'}" style="font-size:12px;padding:5px 12px;${spareableSelCount>0?'background:#1a2a10;border-color:#508040;color:#90d070':'background:#1a1a1a;border-color:#333;color:#555;cursor:not-allowed;opacity:0.5'}">${t('ui.altar.spareBtnN',{n:spareableSelCount})}</button>`:''}`:''}</div>`;
     sacEl.appendChild(hdr);
     /* v1300: the deployed note and the empty-list line share one row (they read as one statement) */
     const _nr=document.createElement('div');_nr.style.cssText='display:flex;flex-wrap:wrap;align-items:baseline;column-gap:14px;row-gap:2px;margin-bottom:4px';
@@ -31143,7 +31193,8 @@ function renderAltar(){
       const isHired=!!cu._isHiredMerc;
       const canSpare=spareEnabled&&!isHired;
       const card=document.createElement('div');card.className='train-card sac-card'+(isSel?' sel':'');card.dataset.sacck=ck; /* v846: lets sacrificeFx locate this card's rect before it is torn down */
-      const checkEl='<div style="width:18px;height:18px;border-radius:4px;border:1px solid '+(isSel?'#c060c0':'var(--br)')+';background:'+(isSel?'#8a208a':'transparent')+';flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px">'+(isSel?'✓':'')+'</div>';
+      /* v1703 [Genaro, GCMX]: the box was 18px with a border the colour of the card -- players never saw it and sacrificed one by one */
+      const checkEl='<div class="sac-chk'+(isSel?' on':'')+'">'+(isSel?'✓':'')+'</div>';
       card.innerHTML='<div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="toggleSacSel(\''+ck+'\')">'+checkEl
         +'<div class="tc-name" style="flex:1">'+cu.name+' <span style="color:var(--am);font-size:12px">'+lvAb()+getLevel(ck)+'</span></div></div>'
         +'<div style="margin-top:2px">'+eb(cu.element)+(shHp?' <span style="font-size:11px;color:#60c0e0"><svg class="tl tl-chimalli" style="width:16px;height:16px;vertical-align:-.18em"><use href="#tl-chimalli"/></svg> '+shHp+' '+_sgW('HP')+'</span>':'')+'</div>' // v636: merc tag dropped — meaning was unclear
@@ -32150,7 +32201,7 @@ const SPECIALS={
    const rain=SPP(t,.25,.4)*(1-SPP(t,1.1,1.4));if(rain>0)for(const d of C.d){const T=S.foes[(d.x*S.foes.length)|0],X=T.x+((d.x*S.foes.length)%1)*T.w,sp=(t*3+d.o)%1,Y=cyl+6+sp*(T.y+T.h-cyl-6);
      px(X+sp*3,Y,1,d.L,'#8cc4f4',f*rain*.85);if(sp>.92)px(X+2,T.y+T.h-2,3,1,'#cfe8ff',f*rain);}
    S.foes.forEach((T,i)=>{const [x,y]=SPC(T),v=SPP(t,.45+i*.05,.75+i*.05);if(v>0&&v<1)spRing(ctx,x,y,4+v*12,'#6aa8e8',f*(1-v));});
-   if(S.kill&&t>.9){const T=S.foes[S.killIdx!=null?S.killIdx:0]||S.foes[0], /* v1495: the unit that actually died first */[x]=SPC(T),v=SPE(SPP(t,.9,1.3)),y=T.y+T.h-v*T.h*.7;
+   if(S.kill&&t>.9&&S.side!=='p'){ /* v1702 [Genaro, GCMX]: on the player side fxTlaloqueRise raises the real card, so the painted figure read as a second Tlaloque */const T=S.foes[S.killIdx!=null?S.killIdx:0]||S.foes[0], /* v1495: the unit that actually died first */[x]=SPC(T),v=SPE(SPP(t,.9,1.3)),y=T.y+T.h-v*T.h*.7;
      ctx.globalAlpha=f*v;ctx.fillStyle='#4a88c8';ctx.fillRect(x-3,y-8,6,8);ctx.fillStyle='#8cc4f4';ctx.fillRect(x-2,y-12,4,4);ctx.fillStyle='#ffffff';ctx.fillRect(x-1,y-11,1,1);ctx.fillRect(x+1,y-11,1,1);
      spRing(ctx,x,y-6,6+v*8,'#8cc4f4',f*(1-v)*.8);}}},
  /* Coatlicue — Ophidian Mother: a serpent coils up each ally, dark flecks fly off (cleanse), green + rise; the weakest gets a scale shield */
@@ -32581,7 +32632,9 @@ const VSP=(function(){
         for(let m=0;m<7;m++){const ph=(v*1.6+m*.14)%1;motif(el,R.x+4+hr(m+fi*9)*(R.w-8),R.y+R.h-ph*R.h,f*(1-ph)*end*.8,.6,m,t);}
         for(let m=0;m<3;m++){const ph=(v*1.3+m*.33)%1;plus(x-8+m*8,R.y+R.h*.55-ph*R.h*.45,'#b8f0c0',f*(1-ph)*end);}
         const g=P(t,.55+k*.07,.95+k*.07);if(g>0&&g<1)ell(x,R.y+R.h*.5,R.w*.55,R.h*.5,c[1],f*bell(g)*.18);});
-      A.hits.forEach((fi,i)=>{const T=A.foes[fi];if(T){const [tx,ty]=CC(T);impact(el,tx,ty,P(t,B(i),B(i)+.45),f,i*3);}});}};}
+      /* v1702 [Genaro, GCMX]: buildSpec pads an empty hit list with [0], so a pure heal drew an impact on the first
+         (top-left) enemy. Only hits the recorder actually saw get an impact. */
+      (A.hitsReal?A.hits:A.hits.slice(1)).forEach((fi,i)=>{const T=A.foes[fi];if(T){const [tx,ty]=CC(T);impact(el,tx,ty,P(t,B(i),B(i)+.45),f,i*3);}});}};}
 
   const D={};
   Object.keys(EL).forEach(el=>{D['vs_strike_'+el]=strike(el);D['vs_cast_'+el]=cast(el);D['vs_mend_'+el]=mend(el);});
@@ -32807,7 +32860,7 @@ const VSP=(function(){
   const mk=(d,sc)=>({dur:d.dur/sc,durPre:d.durPre&&(u=>d.durPre(u)/sc),durFor:d.durFor&&((S,r)=>d.durFor(S,r)/sc),beat:d.beat&&((...a)=>{const v=d.beat(...a);return v==null?v:v/sc;}),
     tail:.62/sc,healish:!!d.healish,vsp:true,
     draw(ctx,C,W,H,u,fade){const S=C.spec;if(!S||!S.caster)return;X=ctx;VW=W;VH=H;
-      const A={t:C.t*sc,caster:S.caster,foes:S.foes||[],friends:S.friends||[],hits:S.hits||[],heals:S.heals||[],self:S.selfIdx,crits:S.crits||[],casterU:unitOf(S.caster.uid),
+      const A={t:C.t*sc,caster:S.caster,foes:S.foes||[],friends:S.friends||[],hits:S.hits||[],hitsReal:!!S.hitsReal, /* v1703: the adapter copies fields by name -- without this the mend fix read undefined */heals:S.heals||[],self:S.selfIdx,crits:S.crits||[],casterU:unitOf(S.caster.uid),
         off(x,y){C._off=[x,y];C._offOn=true;},shake(i,a){if(i>=0&&i<(S.foes||[]).length)spShake(C,i,a);},shakeAll(a){(S.foes||[]).forEach((_,i)=>spShake(C,i,a));}};
       C._off=null;
       try{d.draw(A,fade);}catch(_e){}
@@ -33425,7 +33478,7 @@ function buildSpec(rec,my,their){
   else if(PRIMARY.has(rec.k)&&foes.length>1){const dmg=r=>rec.hits.filter(h=>h.uid===r.uid).reduce((a,h)=>a+(h.dmg||0),0);let mi=0;foes.forEach((r,i)=>{if(dmg(r)>dmg(foes[mi]))mi=i;});
     if(mi>0){const m=foes.splice(mi,1)[0];foes.unshift(m);const mu=fu.splice(mi,1)[0];fu.unshift(mu);for(let q=0;q<hits.length;q++)hits[q]=hits[q]===mi?0:hits[q]<mi?hits[q]+1:hits[q];}}
   const killHit=rec.hits.find(h=>{const u=unitOf(h.uid);return u&&u.currentHp<=0;}),killIdx=killHit?foes.findIndex(r=>r.uid===killHit.uid):-1;
-  return {caster,foes,friends,hits:hits.length?hits:[0],killIdx:killIdx>=0?killIdx:null,kill:fu.some(u=>u&&u.currentHp<=0),kills:hits.map(i=>!!(fu[i]&&fu[i].currentHp<=0)),
+  return {caster,foes,friends,hits:hits.length?hits:[0],hitsReal:hits.length>0,side:rec.side, /* v1702 */killIdx:killIdx>=0?killIdx:null,kill:fu.some(u=>u&&u.currentHp<=0),kills:hits.map(i=>!!(fu[i]&&fu[i].currentHp<=0)),
     crits:foes.map(r=>rec.hits.some(h=>h.uid===r.uid&&h.crit)),gods:fu.map(u=>!!(u&&(u.isGod||(u.isBoss&&!u.isMiniBoss)))),
     stacks:Math.max(0,((t0&&t0.burnStacks)||0)-2),hurt:!!(t0&&last&&t0.currentHp+last.dmg<(t0.maxHp||1)*.999),elements:Math.max(1,Math.min(9,els.size)),
     first:hits.length>=2,furyHits:Math.max(1,hits.length),patron:!!patron,nature:friendsU.map(u=>u.element==='nature'),low:Math.max(0,low),
