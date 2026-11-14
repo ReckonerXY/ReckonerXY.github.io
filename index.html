@@ -943,6 +943,7 @@ body.codex-ui .uc.cx-unfold{transform-origin:0 50%;animation:kaUnfold calc(.55s*
 .tc-desc{font-size:11.5px;color:var(--td);line-height:1.35}
 .tc-sacpill{font-size:10px;color:#b09030;margin-top:2px}
 .tc-action{margin-top:auto}
+.tc-action.tc-action-top{margin-top:0} /* v1706: at the top there is no free space to absorb -- it would open a gap under the name */
 .tc-action .btn-bl{width:100%;padding:9px 0;font-size:14px;font-weight:700;background:linear-gradient(180deg,#7a1818,#5a1010);border:1px solid #a03030;border-radius:10px}
 .tc-action .btn-bl:hover{background:linear-gradient(180deg,#8a2020,#6a1515)}
 .tc-action>div{min-width:0!important}
@@ -8188,7 +8189,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1705'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1706'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -30636,6 +30637,7 @@ function renderTraining(){
       :'<span class="elem-badge" style="background:#1a2418;color:#8ab070;border:0.5px solid #3a5a34;font-size:9px">'+t('ui.card.vassal')+'</span> ')
       +eb(u.element)+((calcSynergy().count>0&&synMatchesPatron(u.element))?'<div style="font-size:9px;color:#d4af37;margin-top:2px" '+SYN_ATTRS+'>'+t('ui.tc.synergy',{pct:Math.round(calcSynergy().pct*100)})+'</div>':'')+'</div></div>' /* v617–v620 · v640 pill · v647 total · v648: a trailing // comment had commented out these closing divs, shattering the card layout */
       +'</div>'
+      +'<div class="tc-action tc-action-top">'+rightColHtml+'</div>' /* v1706 [Genaro, GCMX: players fought the scroll wheel to reach it]: Level Up (and the surge pickers / cap notice that share its slot) sits under the name, not under the special text */
       +'<div class="tc-mid">'
       +'<div class="tc-art" style="cursor:pointer" onclick="showUnitTooltip(G._tcModal[\''+ukJs+'\'])" title="'+t('ui.tc.viewStats')+'">'+unitIconHtml(u,92)+'</div>' // v628 · v643: art opens the stats modal
       +'<div class="tc-stats">'
@@ -30648,8 +30650,7 @@ function renderTraining(){
       +'</div></div>'
       +forcesRow
       +specBlock
-      +oblBlock /* v774 */
-      +'<div class="tc-action">'+rightColHtml+'</div>';
+      +oblBlock; /* v774 · v1706: the action row moved up, under the header */
     if(ftueGateActive()&&!G._ftueDidTrain&&!isPatronRow){d.style.opacity='.35';d.style.pointerEvents='none';} // v641: allies wait until the patron has trained once
     if(sec.inline){ // v613: overline label on the group's first card keeps patron + deployed in one row flow
       const wrap=document.createElement('div');wrap.className='tc-wrap';
