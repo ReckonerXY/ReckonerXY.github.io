@@ -17,7 +17,8 @@
 body{background:var(--bd);color:var(--tx);font-family:system-ui,sans-serif;font-size:14px}
 .screen{padding:1rem;display:none;min-height:420px}.screen.active{display:block}
 /* v1670 [Genaro: on a short desktop window, Spoils with both enemies and fallen allies pushed Continue below the fold]: the button sticks to the bottom of the viewport */
-#spoils-cont{position:sticky;bottom:0;z-index:6;padding:14px 0 12px;margin-top:-6px;background:linear-gradient(to bottom,rgba(0,0,0,0),var(--bd) 45%)}
+#spoils-cont{position:sticky;bottom:0;z-index:6;padding:14px 0 12px;margin-top:-6px;background:none}
+#spoils-cont.ovf{background:linear-gradient(to bottom,rgba(0,0,0,0),var(--bd) 45%)} /* v1712: the fade only when the list really runs under the bar -- full-width, it hid the patron's power (Coatlicue's vines) in a band */
 #spoils-cont>div{margin-top:0!important}
 #spoils-total{scroll-margin-bottom:84px}
 .btn{background:var(--bn);color:var(--tx);border:0.5px solid var(--br);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:14px;transition:background .15s}
@@ -278,6 +279,12 @@ body.codex-ui .uc>.uc-lvtag~.uc-art{padding-top:14px}
 .ftue-arrow.down{transform:rotate(90deg);animation-name:ftueArrowDrop}
 @keyframes ftueArrowNudge{from{translate:-6px 0}to{translate:4px 0}}
 @keyframes ftueArrowDrop{from{translate:0 -6px}to{translate:0 4px}}
+.nudge-glow{animation:nudgeGlow 1.8s ease-in-out infinite} /* v1717 [Genaro, GCMX day 2 #6]: Level Up affordable */
+.nudge-surge{animation:nudgeSurge 1.8s ease-in-out infinite;border-color:#c0a0e0!important} /* v1717: Soul Surge pick waiting */
+#tab-training.nudge-tab{animation:nudgeGlow 1.8s ease-in-out infinite}
+@keyframes nudgeGlow{0%,100%{box-shadow:0 0 0 0 rgba(212,175,55,0)}50%{box-shadow:0 0 12px 3px rgba(212,175,55,.6)}}
+@keyframes nudgeSurge{0%,100%{box-shadow:0 0 0 0 rgba(192,160,224,0)}50%{box-shadow:0 0 12px 3px rgba(192,160,224,.65)}}
+@media (prefers-reduced-motion:reduce){.nudge-glow,.nudge-surge,#tab-training.nudge-tab{animation:none;box-shadow:0 0 8px 2px rgba(212,175,55,.5)}}
 .tab-pulse{animation:tabPulse 1.2s ease-out infinite;outline:2px solid #ffd24d;outline-offset:2px} /* v1378: stronger, and the outline survives Minimal FX (the cue used to vanish there) */
 .ftue-tip{font-size:13px;color:#d4af37;background:#1a1400;border:0.5px solid #5a4a10;border-radius:8px;padding:8px 11px;margin-bottom:8px}
 /* v306: bigger touch targets in the Tianguis — !important beats per-button inline styles */
@@ -505,8 +512,8 @@ body.fx-min #screen-god.gt-intro *,body.fx-min #screen-god.gt-intro .god-head-c:
 .tc-mid{display:flex;gap:10px;align-items:center}
 .tc-art{flex:1;display:flex;align-items:center;justify-content:center;min-height:86px}
 /* v645: training-card art is clickable (opens the stats modal) — glow on hover so it reads as interactive */
-#training-list .train-card .tc-art{transition:filter .15s ease,transform .15s ease;border-radius:10px}
-#training-list .train-card .tc-art:hover{filter:drop-shadow(0 0 8px #ffd24d) brightness(1.15);transform:scale(1.05)}
+#training-list .train-card .tc-art,#mercs-list .merc-card .tc-art[onclick]{transition:filter .15s ease,transform .15s ease;border-radius:10px}
+#training-list .train-card .tc-art:hover,#mercs-list .merc-card .tc-art[onclick]:hover{filter:drop-shadow(0 0 8px #ffd24d) brightness(1.15);transform:scale(1.05)} /* v1718: mercenary art too */
 .tc-stats{flex-shrink:0;min-width:122px;font-size:12.5px;color:var(--td);display:flex;flex-direction:column;gap:2px;background:#00000022;border:0.5px solid var(--br);border-radius:8px;padding:6px 8px}
 .tc-forces{font-size:10px;color:#c8a040;background:#00000022;border:0.5px solid var(--br);border-radius:7px;padding:3px 6px;text-align:center}
 .tc-forces .f0{opacity:.4}
@@ -1884,8 +1891,8 @@ body.fx-min .mm-nav{transition:none}
 /* The layer you are standing on is not a silhouette -- you can see what is waiting -- but it is
    not a trophy either, because you have not beaten it. Held between the two. */
 .mm-dim{filter:brightness(.42) saturate(.7);opacity:.9}
-.mm-num{font-size:calc(11px*var(--mmk,1));letter-spacing:1.5px;color:#5a4a2a}
-.mm-name{font-size:calc(14px*var(--mmk,1));line-height:1.25;color:#6a5a38;overflow-wrap:break-word}
+.mm-num{font-size:calc(11px*var(--mmk,1));letter-spacing:1.5px;color:#5a4a2a;white-space:nowrap} /* v1714: 'NIVEL / 3' */
+.mm-name{font-size:calc(14px*var(--mmk,1));line-height:1.25;color:#6a5a38;white-space:nowrap} /* v1714 [Genaro]: was overflow-wrap:break-word -- 'Itztép/etl', 'Cehuélōyā/n' */
 .mm-node.done .mm-name{color:#50c080}
 .mm-node.done .mm-num{color:#3a8050}
 .mm-node.here .mm-name{color:#e8c060;font-weight:500;font-size:calc(16px*var(--mmk,1))}
@@ -2122,6 +2129,19 @@ body.fx-min .bless-spark{display:none}
 .pa-arrow{font-size:15.5px;color:#d4af37}
 .pa-spr{width:72px;height:72px;image-rendering:pixelated}
 .pa-col{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:9.5px;color:var(--tx)}
+/* v1719 [Genaro]: the patron's power bursting -- a flickering gold aura behind the sprite and sparks rising off it */
+.pa-aura{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:9.5px;color:#e8c060}
+.pa-aura .pa-auraw{position:relative;width:96px;height:96px;display:flex;align-items:center;justify-content:center}
+.pa-aura .pa-auraw::before{content:"";position:absolute;inset:-18%;border-radius:50% 50% 45% 45%;background:radial-gradient(ellipse at 50% 60%,rgba(255,236,140,.75),rgba(232,160,32,.38) 42%,rgba(232,160,32,0) 70%);animation:auraPulse .45s ease-in-out infinite alternate}
+.pa-aura .pa-spr{position:relative;z-index:1;width:88px;height:88px;animation:auraSpr .45s ease-in-out infinite alternate}
+.pa-aura .spk{position:absolute;bottom:18%;width:3px;height:3px;background:#ffe890;box-shadow:0 0 4px #ffd24d;opacity:0;animation:auraSpk 1.1s linear infinite;z-index:2}
+.pa-aura .lvt{background:#e8a020;color:#1a1009;font-size:10px;padding:0 5px;border-radius:4px;line-height:1.4} /* v1720: its own row above the art */
+.pa-forces{display:flex;flex-direction:column;gap:6px;font-size:11px;text-align:left}
+.pa-forces span{display:flex;align-items:center;gap:6px}
+@keyframes auraPulse{from{transform:scale(.94);opacity:.75}to{transform:scale(1.08);opacity:1}}
+@keyframes auraSpr{from{filter:drop-shadow(0 0 6px #ffd24d) brightness(1.05)}to{filter:drop-shadow(0 0 16px #ffe890) brightness(1.25)}}
+@keyframes auraSpk{0%{opacity:0;transform:translateY(0)}15%{opacity:1}100%{opacity:0;transform:translateY(-70px)}}
+@media (prefers-reduced-motion:reduce){.pa-aura .pa-auraw::before,.pa-aura .pa-spr,.pa-aura .spk{animation:none}.pa-aura .spk{display:none}.pa-aura .pa-spr{filter:drop-shadow(0 0 12px #ffd24d)}}
 .pa-col .tl{width:56px;height:56px}
 .pa-sep{color:#d4af37;font-size:9px}
 .pa-unit{position:relative;display:flex;flex-direction:column;align-items:center;border:1px solid #6a5020;border-radius:8px;background:#1e1408;padding:6px 10px 4px;font-size:9px;color:var(--tx);line-height:1.1}
@@ -3560,6 +3580,7 @@ Object.assign(T_EN,{
   'st.lethargy.fn':'Special abilities cost <strong>{p}% more TP</strong> ({s}).',
   'st.drunk.fn':'<strong>{p}% chance</strong> an action hits the wrong target — its own side, itself included ({s}).',
   'st.slow.fn':'Acts last this round. <em>(Cannot stack.)</em>',
+  'st.slow.fnNext':'Will act last next round. <em>(Cannot stack.)</em>', /* v1710 */
   'st.atkup.fn':'<strong>+{p}% ATK & MAG</strong> — strikes and 🔮 specials hit harder ({s}{r}).',
   'st.defup.fn':'<strong>+{p}% DEF & RES</strong> — takes less physical and magical damage ({s}{r}).',
   'st.critup.fn':'<strong>+{p}% critical hit chance</strong> ({s}{r}).',
@@ -3628,6 +3649,12 @@ Object.assign(T_EN,{
   'ui.common.on':'ON',
   'ui.common.off':'OFF',
   'ui.altarIntro.title':'Sacrifice Altar Unlocked!',
+  'ui.tutOffer.title':'A soul offers itself', /* v1711 */
+  'ui.tutOffer.body':'A defeated {name} wants to give itself to {god}. Sacrifice it at the Altar to earn <span style="color:#d4af37">{fv} Flowers</span>.',
+  'ui.tutOffer.go':'Go to the Altar',
+  'ui.tutOffer.hint':'This {name} offers itself to {god}. <span style="color:#d4af37">Sacrifice it</span> to turn it into Flowers.',
+  'ui.tutOffer.tag':'OFFERING',
+  'ui.tutOffer.must':'💡 Sacrifice the offering to continue',
   'ui.altarIntro.body':'You can now sacrifice captured allies to earn <span style="color:#d4af37;font-weight:500"><svg class="tl tl-quincunx"><use href="#tl-quincunx"/></svg> Flowers</span>, which can be used to:<br><br><strong>Recruit Ally Gods</strong> — Bring new deities to your cause.<br><strong>Purchase Chimalli Armor</strong> — Protect your units with additional HP.',
   'ui.opt.title':'Options',
   'ui.opt.guide':'Guide','ui.opt.guideSub':'How to play Teotlan',
@@ -3775,6 +3802,12 @@ Object.assign(T_EN,{
   'ui.unlock.mictLead':'He has seen his realm crossed end to end, and found it wanting.',
   'ui.unlock.mictBanner':'<strong>Mictlantecuhtli</strong> has been unlocked — the God King of the Dead will answer as your Patron.',
   'ui.surge.title':'Soul Surge!',
+  'ui.ssIntro.title':'{name} reached Level {lv}!', /* v1719 */
+  'ui.ssIntro.body':'Every 5 levels, your allies\' power awakens into a <span style="color:#e8a020">Soul Surge</span>. Pick a force to channel.', /* v1720 */
+  'ui.ssIntro.ihiyotl':'Deal more damage.',
+  'ui.ssIntro.teyolia':'Increase your durability.',
+  'ui.ssIntro.tonalli':'Cast more specials.',
+  'ui.ssIntro.go':'Channel my power',
   'ui.surge.lead':'{icon} <b>{name}</b>\'s soul surges with power — choose a vital force to channel:',
   'ui.surge.ihiyotl':'Force of Power',
   'ui.surge.teyolia':'Force of Vitality',
@@ -3936,8 +3969,8 @@ Object.assign(T_EN,{
   'ui.evr.pat.fp':'+{v0} Flowers',
   'ui.evr.pat.beans':'{n} {w} (Roll: {r})',
   /* v1408 */
-  'ui.card.slowNow':'Slowed (this round)',
-  'ui.card.slowNext':'Slowed (next round)',
+  'ui.card.slowNow':'now', /* v1710 [Genaro]: short word -- the full text lives in the tooltip */
+  'ui.card.slowNext':'next',
   'ui.card.fallen':'Fallen',
   'ui.battle.special':'Special',
   'ui.tgt.ally':'💚 {icon} {name} — {act} — choose an ally',
@@ -4684,6 +4717,7 @@ Object.assign(T_ES,{
   'st.lethargy.fn':'Las habilidades especiales cuestan <strong>{p}% más PT</strong> ({s}).',
   'st.drunk.fn':'<strong>{p}% de probabilidad</strong> de que una acción golpee al objetivo equivocado — incluido su propio bando ({s}).',
   'st.slow.fn':'Actúa al final de esta ronda. <em>(No se acumula.)</em>',
+  'st.slow.fnNext':'Actuará al final de la próxima ronda. <em>(No se acumula.)</em>', /* v1710 */
   'st.atkup.fn':'<strong>+{p}% ATQ y MAG</strong> — los golpes y los 🔮 especiales pegan más fuerte ({s}{r}).',
   'st.defup.fn':'<strong>+{p}% DEF y RES</strong> — recibe menos daño físico y mágico ({s}{r}).',
   'st.critup.fn':'<strong>+{p}% de probabilidad de golpe crítico</strong> ({s}{r}).',
@@ -4793,6 +4827,12 @@ Object.assign(T_ES,{
   'ui.common.on':'SÍ',
   'ui.common.off':'NO',
   'ui.altarIntro.title':'¡Altar de Sacrificio desbloqueado!',
+  'ui.tutOffer.title':'Un alma se ofrece', /* v1711 */
+  'ui.tutOffer.body':'Un {name} derrotado quiere entregarse a {god}. Sacrifícalo en el Altar para obtener <span style="color:#d4af37">{fv} Flores</span>.',
+  'ui.tutOffer.go':'Ir al Altar',
+  'ui.tutOffer.hint':'Este {name} se ofrece a {god}. <span style="color:#d4af37">Sacrifícalo</span> para convertirlo en Flores.',
+  'ui.tutOffer.tag':'OFRENDA',
+  'ui.tutOffer.must':'💡 Sacrifica la ofrenda para continuar',
   'ui.altarIntro.body':'Ahora puedes sacrificar aliados capturados para obtener <span style="color:#d4af37;font-weight:500"><svg class="tl tl-quincunx"><use href="#tl-quincunx"/></svg> Flores</span>, que sirven para:<br><br><strong>Reclutar dioses aliados</strong> — Suma nuevas deidades a tu causa.<br><strong>Comprar Armadura Chimalli</strong> — Protege a tus unidades con PV adicionales.',
   'ui.opt.title':'Opciones',
   'ui.opt.guide':'Guía','ui.opt.guideSub':'Cómo jugar Teotlan',
@@ -4945,6 +4985,12 @@ Object.assign(T_ES,{
   'ui.surge.teyolia':'Fuerza de la Vitalidad',
   'ui.surge.tonalli':'Fuerza del Vigor',
   'ui.surge.head':'OLEADA DE ALMA', /* v1523 */
+  'ui.ssIntro.title':'¡{name} alcanzó el Nivel {lv}!', /* v1719 */
+  'ui.ssIntro.body':'Cada 5 niveles, el poder de tus aliados despierta en una <span style="color:#e8a020">Oleada de Alma</span>. Elige una fuerza para canalizarla.', /* Genaro's wording -- not only the patron surges · v1720 */
+  'ui.ssIntro.ihiyotl':'Haz más daño.',
+  'ui.ssIntro.teyolia':'Aumenta tu durabilidad.',
+  'ui.ssIntro.tonalli':'Lanza más especiales.',
+  'ui.ssIntro.go':'Canalizar mi poder',
   'ui.surge.sub':'{name} — canaliza una fuerza vital.',
   'ui.surge.done':'{name} canalizó {force}.',
   'ui.surge.later':'Decidir después',
@@ -5101,8 +5147,8 @@ Object.assign(T_ES,{
   'ui.evr.pat.fp':'+{v0} Flores',
   'ui.evr.pat.beans':'{n} {w} (Tirada: {r})',
   /* v1408 */
-  'ui.card.slowNow':'Lentitud (esta ronda)',
-  'ui.card.slowNext':'Lentitud (próxima ronda)',
+  'ui.card.slowNow':'ahora', /* v1710 */
+  'ui.card.slowNext':'próx.',
   'ui.card.fallen':'Caído',
   'ui.battle.special':'Especial',
   'ui.tgt.ally':'💚 {icon} {name} — {act} — elige un aliado',
@@ -5696,7 +5742,7 @@ function grantRandomOffering(tier){
 function offeringRewardLine(r){
   /* v1295: o.name/o.desc are already Spanish here -- i18nExpandProse rewrites them in place --
      so only the surrounding chrome needed keys. */
-  if(r.granted)return `${t('ui.off.youGain',{icon:r.o.icon,name:r.o.name})}<br><em style="color:#c0e060">${r.o.desc}</em>`;
+  if(r.granted)return `${t('ui.off.youGain',{icon:r.o.icon,name:r.o.name})}<br><em style="color:#c0e060">${offDescHtml(r.o.desc)}</em>`;
   const _res=r.res==='cacao'?'<svg class="tl tl-cacao"><use href="#tl-cacao"/></svg> '+t('ui.res.cacao'):'<svg class="tl tl-quincunx"><use href="#tl-quincunx"/></svg> '+t('ui.res.flowers');
   return `${t('ui.off.complete')}<br><em style="color:#e0c060">${t('ui.off.instead',{amt:r.amount,res:_res})}</em>`;
 }
@@ -6433,7 +6479,7 @@ function renderRelicBar(){
 function relicTip(e,id){_tipOwn(e);const o=OFFERINGS[id];if(!o)return;const tt=document.getElementById('relic-tooltip');if(!tt)return;
   const _n=offeringStatusNote(id);
   const _ns=_n?`<br><span style="color:${_n.exhausted?'#d07040':'#c0a040'};font-size:11px;font-weight:600">${_n.exhausted?'⛔':'⏳'} ${_n.label}</span>`:'';
-  tt.innerHTML=`<strong>${o.icon} ${L(o,'name')}</strong><br><span style="color:#c0e060">${L(o,'desc')}</span>${_ns}<br><span style="color:var(--td);font-style:italic;font-size:11px">${L(o,'flavor')}</span>`; /* v1641: was English in ES */
+  tt.innerHTML=`<strong>${o.icon} ${L(o,'name')}</strong><br><span style="color:#c0e060">${offDescHtml(L(o,'desc'))}</span>${_ns}<br><span style="color:var(--td);font-style:italic;font-size:11px">${L(o,'flavor')}</span>`; /* v1641: was English in ES */
   tt.style.display='block';tt.style.left=Math.min(e.clientX+12,window.innerWidth-216)+'px';tt.style.top=Math.min(e.clientY+14,window.innerHeight-96)+'px';}
 // ═══ v585: status pip tooltips — hover on desktop, tap on touch. Reuses #relic-tooltip. ═══
 // v586: stack-aware descriptions. Coefficients verified against source:
@@ -6469,7 +6515,7 @@ const STATUS_INFO={
   slow:{icon:'🐢',name:'Slowed',nameEs:'Lentitud',color:'#7ec8e3',
     base:'Acts last this round. <em>(Cannot stack.)</em>',
     baseEs:'Actúa al final de esta ronda. <em>(No se acumula.)</em>',
-    fn:n=>t('st.slow.fn')},
+    fn:(n,a,rd)=>t(rd===2?'st.slow.fnNext':'st.slow.fn')}, /* v1710: rd 2 = slowed for next round */
   // v624: buff pips get the same hover treatment as debuffs
   atkup:{icon:'⬆',name:'ATK/MAG UP',nameEs:'AUMENTO ATQ/MAG',color:'#ffe080',
     base:'<strong>+10% ATK & MAG per stack</strong>.',
@@ -6900,6 +6946,32 @@ function resPip(k){
   const lbl=k==='blood'?(es?'Sangre':'Blood'):k==='cacao'?'Cacao':k==='flowers'?(es?'Flores':'Flowers'):String(k||'');
   return '<span class="res-pip res-'+k+'"><svg class="tl tl-'+k+'"><use href="#tl-'+k+'"/></svg>'+lbl+'</span>';
 }
+/* v1708 [Genaro, GCMX day 2 #5]: offering descriptions are plain data strings ("WATER units +8% MAG").
+   offDescHtml() decorates them AT RENDER TIME ONLY -- element words become elemPip, status words stPip,
+   stat words get Ian's stIco glyph. The data is untouched on purpose: offeringElems() regex-reads o.desc.
+   One alternation, one pass, so nothing inserted is re-scanned. Both languages share the table. */
+var _offDescRe=null,_offDescMap=null;
+function offDescHtml(str){
+  str=String(str==null?'':str);if(!str)return str;
+  if(!_offDescRe){
+    var m={},add=function(w,f){if(w)m[w]=f;};
+    if(typeof ELEM_META!=='undefined')Object.keys(ELEM_META).forEach(function(k){var e=ELEM_META[k];
+      [e.label,e.labelEs].forEach(function(w){if(w)add(String(w).toUpperCase(),function(){return elemPip(k);});});});
+    var st={poison:['Poison','Veneno','POISON','VENENO'],burn:['Burn','Burned','BURN','Quemadura','QUEMADURA'],
+      paralyze:['PARALYZED','Paralyzed','Paralyze','PARALYZE','Parálisis','PARÁLISIS'],wound:['Wound','Wounded','WOUND','Herida','HERIDA'],
+      lethargy:['Lethargy','Lethargic','LETHARGY','Letargo','LETARGO'],drunk:['DRUNK','Drunk','EBRIEDAD','Ebriedad'],
+      slow:['Slow','Slowed','SLOWED','Lentitud','LENTITUD'],atkup:['ATK/MAG UP','AUMENTO ATQ/MAG'],
+      defup:['DEF/RES UP','AUMENTO DEF/RES'],critup:['CRIT UP','AUMENTO CRIT']};
+    Object.keys(st).forEach(function(k){st[k].forEach(function(w){add(w,function(){return stPip(k);});});});
+    add('quemados',function(){return 'con '+stPip('burn');}); /* 'Los enemigos quemados' -> 'Los enemigos con QUEMADURA' */
+    var sk={ATK:'atk',ATQ:'atk',MAG:'mag',DEF:'def',RES:'res',HP:'hp',PV:'hp',TP:'tp',PT:'tp',PHYS:'atk','FÍS':'atk'};
+    Object.keys(sk).forEach(function(w){add(w,function(){return '<span style="white-space:nowrap">'+stIco(sk[w])+w+'</span>';});});
+    add('MIX',function(){return '<span style="white-space:nowrap">'+stIco('atk')+stIco('mag')+'MIX</span>';});
+    var keys=Object.keys(m).sort(function(a,b){return b.length-a.length;}).map(function(w){return w.replace(/[.*+?^${}()|[\]\\\/]/g,'\\$&');});
+    _offDescRe=new RegExp('(?<![\\p{L}])('+keys.join('|')+')(?![\\p{L}])','gu');_offDescMap=m;
+  }
+  return str.replace(_offDescRe,function(w){var f=_offDescMap[w];return f?f():w;});
+}
 function expandPips(str){
   if(typeof str!=='string'||str.indexOf('{{')<0)return str;
   return str.replace(/\{\{res:(\w+)\}\}/g,function(_,k){return resPip(k);})
@@ -6935,7 +7007,7 @@ const SPEC_FMT={
   /* v1339: the remaining player gods. Each line checked against its fireGodSpecial branch. */
   featherEmbrace:{ty:'MAG',pow:'1.5\u00d7',tg:1,
     fx:'A defeated target is caught automatically, with double rewards.',
-    fxEs:'Un objetivo derrotado queda atrapado autom\u00e1ticamente, con recompensa doble.'},
+    fxEs:'Un objetivo derrotado queda capturado autom\u00e1ticamente, con recompensa doble.' /* v1707: atrapado -> capturado */},
   obsidianStorm:{ty:'ATK',pow:'1.25\u00d7',tg:5,upTo:1,
     fx:'Each enemy hit gets {st:wound} \u00d71.',
     fxEs:'Cada enemigo alcanzado recibe {st:wound} \u00d71.'},
@@ -7262,7 +7334,7 @@ function statAttrs(key){return 'style="cursor:help" onmouseenter="statTip(event,
 function showOfferingInfo(id){const o=OFFERINGS[id];if(!o)return;
   const _n=offeringStatusNote(id);
   const _ns=_n?`<div style="font-size:12px;color:${_n.exhausted?'#d07040':'#c0a040'};margin-bottom:.5rem;font-weight:600">${_n.exhausted?'⛔':'⏳'} ${_n.label}</div>`:'';
-  showMo(o.icon,o.name,`<div style="text-align:center"><div style="font-size:13px;color:#c0e060;margin-bottom:.5rem">${o.desc}</div>${_ns}<div style="font-size:12px;color:var(--td);font-style:italic">${o.flavor}</div></div>`,[{label:t('ui.common.close'),fn:()=>{}}]); /* v1433: ES */
+  showMo(o.icon,o.name,`<div style="text-align:center"><div style="font-size:13px;color:#c0e060;margin-bottom:.5rem">${offDescHtml(o.desc)}</div>${_ns}<div style="font-size:12px;color:var(--td);font-style:italic">${o.flavor}</div></div>`,[{label:t('ui.common.close'),fn:()=>{}}]); /* v1433: ES */
 }
 let POCHTECA_TEST_FREE=false; // v346: real rolled vendor live — debug toggle flips this at runtime
 /* v1330: Run 1, Layer 1 stalls (B4, B5, and the L1-boss stall, which opens at L2/B1) only stock
@@ -7440,7 +7512,7 @@ function renderPochtecaReal(){
         '<span style="font-size:30px;line-height:1">'+o.icon+'</span>'+
         '<div style="font-size:12px;font-weight:600;line-height:1.15">'+o.name+'</div>'+
         '<div style="font-size:8px;color:var(--td);text-transform:uppercase;letter-spacing:.5px">'+tierLabel(o.tier)+'</div>'+
-        '<div style="font-size:11px;color:#c0e060;line-height:1.3">'+o.desc+'</div>'+
+        '<div style="font-size:11px;color:#c0e060;line-height:1.3">'+offDescHtml(o.desc)+'</div>'+
         '<div style="font-size:9px;color:var(--td);font-style:italic;line-height:1.3;margin-bottom:6px">'+o.flavor+'</div>'+
         btn+
       '</div>';}).join('')+
@@ -7462,7 +7534,7 @@ function renderPochteca(){
       return '<div style="display:flex;align-items:center;gap:8px;padding:6px;border:0.5px solid var(--br);border-radius:8px;margin-bottom:5px">'+
         '<span style="font-size:22px;flex-shrink:0">'+o.icon+'</span>'+
         '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500">'+o.name+' <span style="font-size:9px;color:var(--td);text-transform:uppercase">'+tierLabel(o.tier)+'</span></div>'+
-        '<div style="font-size:11px;color:#c0e060">'+o.desc+'</div>'+
+        '<div style="font-size:11px;color:#c0e060">'+offDescHtml(o.desc)+'</div>'+
         '<div style="font-size:10px;color:var(--td);font-style:italic">'+o.flavor+'</div></div>'+
         '<div style="flex-shrink:0">'+(held?'<span style="font-size:11px;color:#50c080">Held ✦</span>':'<button class="btn btn-ca" onclick="testGrantOffering(\''+id+'\')" style="font-size:11px">Acquire</button>')+'</div>'+
       '</div>';}).join('');
@@ -8189,7 +8261,7 @@ const STORY_LINES_L2=[
   "His heart beats inside the mountain itself.",
   "Cross. Or be buried."
 ];
-const GAME_VERSION='v1706'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
+const GAME_VERSION='v1720'; // v679: single source for the HUD stamp — was a hardcoded literal that never got bumped
 const L1_TRANSITION_LINES=[
   "The black river parts. You have crossed the first layer.",
   "But the path ahead shudders.",
@@ -10917,7 +10989,7 @@ function dbgAllTestableTpls(){return dbgMinibossTpls().concat(dbgBossTpls());}
    lead MICTLAN_CAPS, so they open Layer I as #001/#002. */
 const AMOX_MB_LAYER={xochitonal:1,quinametzin:2,xiuhnel:3,mimich:3,mictlampehecatl:4,tlacateocotl:5,amimitl:6,atlaua:6,acuecueyotl:6,ocetekuani:7,ometochtli:7,ixpuxtequi:8,nexoxcho:8};
 const AMOX_TLALOQUE_TPL={id:'mq_tlaloque',name:'Tlaloque',icon:'\u{1F327}',element:'water',type:'MAG',hp:45,atk:0,mag:16,def:3,res:5,np:15,npCost:6,
-  ability:'Rain Drop',abilityEs:'Gota de Lluvia',ad:'1.3×MAG',adEs:'1.3×MAG',flavor:"Tlaloc's rain spirits",flavorEs:'Los espíritus de lluvia de Tlaloc'}; /* mirrors spawnTlaloque() */
+  ability:'Rain Drop',abilityEs:'Gota de Lluvia',ad:'1.3×MAG to 1 target',adEs:'1.3×MAG a 1 enemigo' /* v1714: current special-text format */,flavor:"Tlaloc's rain spirits",flavorEs:'Los espíritus de lluvia de Tlaloc'}; /* mirrors spawnTlaloque() */
 function AMOX_LAYER_POOLS(){return [[1,MICTLAN_CAPS],[1,HUMANITY_CAPS],[2,TEPEME_CAPS],[2,NATURE_CAPS],[3,OBSIDIAN_CAPS],
   [4,CEHUYLOAN_WATER_CAPS],[4,CEHUYLOAN_WIND_CAPS],[4,TONATIUH_DAY_CAPS],[5,PANCUET_FIRE_CAPS],[5,PANCUET_WIND_CAPS],
   [6,TEMIMINA_WATER_CAPS],[6,TEMIMINA_HUMAN_CAPS],[7,TEYOLLO_NATURE_CAPS],[7,TEYOLLO_DAY_CAPS],[8,APANO_NIGHT_CAPS],[8,APANO_THUNDER_CAPS]];}
@@ -11830,7 +11902,7 @@ function debugJumpB7Spoils(){
   // Force show the spoils continue button immediately (skip animation)
   document.getElementById('spoils-list').innerHTML='<div style="font-size:11px;color:var(--td);padding:8px 0">🧪 Debug spoils — click Continue to test B7→B8 transition</div>';
   document.getElementById('spoils-total').style.display='none';
-  document.getElementById('spoils-cont').style.display='block';
+  document.getElementById('spoils-cont').style.display='block';spoilsContOvf(); /* v1712 */
   notify('🧪 At B7 Spoils — click Continue to advance to B8','#60c0ff');
 }
 function debugJumpL5B7(){
@@ -12598,14 +12670,14 @@ function showPaged(o){
   const paint=()=>{
     const p=o.pages[i];_pgStopFx();
     $('mo-icon').style.display='none';
-    $('mo-step').textContent=(i+1)+' / '+n;
+    $('mo-step').textContent=n>1?(i+1)+' / '+n:''; /* v1720: no '1 / 1' on a one-page intro */
     $('mo-art').innerHTML='<div class="pg-art'+(p.tall?' tall':'')+'" style="--glow:'+(o.glow||'#3a2a10')+'">'+(p.art?p.art():'')+'</div>';
     $('mo-title').textContent=p.title;
     $('mo-body').innerHTML='<div style="font-size:13px;line-height:1.7">'+p.body+'</div>';
-    $('mo-dots').innerHTML=o.pages.map((_,k)=>'<i class="'+(k===i?'on':'')+'"></i>').join('');
+    $('mo-dots').innerHTML=n>1?o.pages.map((_,k)=>'<i class="'+(k===i?'on':'')+'"></i>').join(''):'';
     const ac=$('mo-actions');ac.innerHTML='';
     const mk=(label,cls,fn)=>{const b=document.createElement('button');b.className='btn '+cls;b.textContent=label;b.onclick=fn;ac.appendChild(b);};
-    mk(t('ui.ob.back'),'pg-back'+(i===0?' hide':''),()=>go(-1));
+    if(n>1)mk(t('ui.ob.back'),'pg-back'+(i===0?' hide':''),()=>go(-1)); /* v1720: the hidden Back still took space -- one-page intros centre their button */
     if(i<n-1)mk(t('ui.ob.next'),'btn-event',()=>go(1));
     else mk(o.done.label,'btn-event',()=>{if(typeof G!=='undefined'&&G)G._moDismiss=null;hideMo();fin();});
     if(typeof p.onShow==='function')p.onShow();
@@ -12647,14 +12719,44 @@ function showPochtecaIntro(xochi){
      body:t('ui.ob.poch3B')+(xochi?'<br><br><span style="color:#60a0e0">'+t('ui.pochteca.introXochi')+'</span>':'')}
   ]});
 }
+/* v1711 [Genaro, GCMX day 1]: a first-run player with nothing to sacrifice got only text at the Altar intro.
+   They now receive a Lv 5 Nemini OFFERING -- the same unit page 1 already uses as its example. It lives in
+   G.tutOffer, NOT in G.captured, so it is sacrifice-only by construction (no party, training, spare, events,
+   Tlacuilo -- none of the ~180 G.captured sites can see it). Continue stays gated until it is sacrificed. */
+function tutOfferNeeded(){return !(G.captured||[]).some(cu=>!(G.deplSel.includes(capKey(cu))||isInSacSlot(capKey(cu))));}
+function doTutOfferSac(){
+  const o=G.tutOffer;if(!o)return;const _fl0=G.res.flower;
+  sacrificeFx('tutoffer',o.fv); /* before renderAltar tears the card down */
+  G.tutOffer=null;G.res.flower+=o.fv;if(G.runStats)G.runStats.sacrificed++;
+  notify(t('ui.msg.plusFlowers',{n:o.fv}),'#d4af37');
+  if(typeof ftueArrowClear==='function')ftueArrowClear();
+  renderRes('rb-shop');renderPartyChips();renderAltar();animateResGain('rb-shop','Flowers',_fl0,G.res.flower);
+  ftueGateUpdate();try{saveRun();}catch(e){}
+}
+function tutOfferPoint(){setTimeout(()=>{const b=document.getElementById('tut-offer-btn');if(!b)return;try{b.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){}setTimeout(()=>ftuePointAt(b),350);},120);}
+/* v1719 [Genaro, GCMX day 2 #3]: players ignored Soul Surge after the bare picker popup. The patron's first
+   surge (same trigger and once-ever flag as before) now opens with an intro page in the paged-tutorial style --
+   the patron bursting with power, the three forces -- and its button opens the existing picker unchanged. */
+function showSurgeIntro(key){
+  const gd=G.god||{},lv=getLevel(key),nm=L(gd,'name');
+  const spk=[18,34,52,68,82].map((x,i)=>'<i class="spk" style="left:'+x+'%;animation-delay:'+(i*0.21).toFixed(2)+'s"></i>').join('');
+  const forces='<div class="pa-forces">'+['ihiyotl','teyolia','tonalli'].map(id=>{const F=SURGE_FORCES.find(f=>f.id===id);return '<span style="color:'+F.col+'">'+surgeIco(id)+' <b>'+id.charAt(0).toUpperCase()+id.slice(1)+'</b> <em style="color:var(--td);font-style:normal">'+t('ui.ssIntro.'+id)+'</em></span>';}).join('')+'</div>'; /* v1720: what each force DOES */
+  showPaged({icon:'\u26a1',glow:'#2a1c04',done:{label:t('ui.ssIntro.go'),fn:()=>{setTimeout(()=>showSurgeModal(key),120);}},pages:[
+    {art:()=>'<div class="pa-aura"><span class="lvt">'+lvAb()+' '+lv+'</span><div class="pa-auraw"><img class="pa-spr" src="'+_pgSpr(gd.id)+'">'+spk+'</div>'+nm+'</div><div class="pa-arrow">\u279c</div>'+forces,
+     title:t('ui.ssIntro.title',{name:nm,lv:lv}),body:t('ui.ssIntro.body')}]});
+}
 function showAltarIntro(){
   const nem=tplById('mw1'),fv=sacFPAtLv(nem,5); /* live yield: a template retune can't make the example lie */
-  showPaged({icon:_pgQX,glow:'#2a2408',done:{label:t('ui.common.understood'),fn:()=>{switchTab('altar');}},pages:[
+  if(!G.tutOffer&&!G._tutOfferGiven&&tutOfferNeeded()){G.tutOffer={baseId:'mw1',lv:5,fv:fv};G._tutOfferGiven=true;ftueGateUpdate();try{saveRun();}catch(e){}} /* v1711 */
+  const _off=!!G.tutOffer,_gd=G.god||{};
+  const _offPage=_off?[{art:()=>'<div class="pa-unit"><span class="lv">'+lvAb()+' 5</span><img class="pa-spr" src="'+_pgSpr('mw1')+'" style="transform:rotate(-8deg)">'+L(nem,'name')+'</div><div class="pa-arrow">➜</div><div class="pa-col"><img class="pa-spr" src="'+_pgSpr(_gd.id)+'">'+L(_gd,'name')+'</div>',
+     title:t('ui.tutOffer.title'),body:t('ui.tutOffer.body',{name:L(nem,'name'),god:L(_gd,'name'),fv:fv})}]:[];
+  showPaged({icon:_pgQX,glow:'#2a2408',done:{label:_off?t('ui.tutOffer.go'):t('ui.common.understood'),fn:()=>{switchTab('altar');if(G.tutOffer)tutOfferPoint();}},pages:[
     {art:()=>'<div class="pa-unit" id="pg-sac-unit"><span class="lv">'+lvAb()+' 5</span><img class="pa-spr" src="'+_pgSpr('mw1')+'">'+L(nem,'name')+'</div><div class="pa-arrow">➜</div><div class="pa-gain" id="pg-sac-gain">'+_pgQX+'<span>'+t('ui.ob.flowersN',{n:fv})+'</span></div>',
      title:t('ui.altarIntro.title'),body:t('ui.ob.altar1B'),onShow:_pgSacStart},
     {art:()=>'<div class="pa-col" style="color:#d4af37">'+_pgQX+'<span>'+t('ui.ob.flowers')+'</span></div><div class="pa-arrow">➜</div><div class="pa-col"><img class="pa-spr" src="'+_pgSpr('tlaloc')+'">'+t('ui.ob.allyGods')+'</div><div class="pa-sep">/</div><div class="pa-col" style="color:#60c0e0"><svg class="tl tl-chimalli"><use href="#tl-chimalli"/></svg><span>Chimalli</span></div>',
      title:t('ui.ob.altar2T'),body:t('ui.ob.altar2B')}
-  ]});
+  ].concat(_offPage)}); /* v1711: 'Un alma se ofrece' is the last page, only when an offering was given */
 }
 function showDivTreeIntro(){
   const nd=id=>{const x=_pgNode(id);return '<span class="pa-node">'+L(x,'label')+'<span class="c">'+_pgTE+x.cost+'</span></span>';};
@@ -12742,7 +12844,7 @@ function contReadySync(){
   c.classList.toggle('cont-ready',on);
 }
 function renderRes(id){
-  if(id==='rb-shop')setTimeout(contReadySync,0); /* v1623 */
+  if(id==='rb-shop'){setTimeout(contReadySync,0);setTimeout(nudgeTraining,0);} /* v1623 · v1717 */
   if(id==='rb-shop'&&typeof G!=='undefined'&&G&&G._shopRolled){try{saveRun();}catch(e){}} // v416: persist shop purchases
   const r=G.res;
   const inBattle=id==='rb-battle';
@@ -18433,7 +18535,7 @@ function l9TauntSummon(done){ /* v1000: done() replaces the hardcoded buildRound
     if(typeof done==='function')done(); else buildRoundQueue(); /* v1000 */
   },L9_TAUNT_HOLD_MS);
 }
-function startBattle(){try{if(window._cxVictoryFinish)window._cxVictoryFinish();}catch(_cxv){}refreshStaleEventFight(); /* v1606 */ /* v1374: never carry a popup hold into a new fight */
+function startBattle(){try{if(window._cxVictoryFinish)window._cxVictoryFinish();}catch(_cxv){}G._erLockH=0;{const _er=document.getElementById('erow');if(_er)_er.style.minHeight='';} /* v1712 */refreshStaleEventFight(); /* v1606 */ /* v1374: never carry a popup hold into a new fight */
   try{_amoxSeenB=new Set();amoxScanBound();}catch(_amx){} /* v1440: per-battle Glimpsed reset; roster joins from shop/events */
   // v610: silent safety net — no glow class survives into a new battle (diagnostic warn removed; it fired on v609's own soft glow, since retired)
   document.querySelectorAll('.uc.ftue-glow,.uc.ftue-glow-soft').forEach(e=>e.classList.remove('ftue-glow','ftue-glow-soft'));
@@ -18940,7 +19042,7 @@ function b1TutTurn(){return !!(G&&G._b1HintState&&(G.roundNum||1)<=1&&G.battlePh
 function setB1Hint(msg){
   if(!G._b1HintState)return;
   const el=document.getElementById('tut-area');
-  if(el)el.innerHTML=msg?`<div class="tut-box">${msg}</div>`:'';
+  if(el)el.innerHTML=msg?`<div class="tut-box">${stGlyphs(msg)}</div>`:''; /* v1707: old ✨ emoji -> current TP glyph (tpRegen, specTp) */
 }
 // ─── TURN ENGINE ──────────────────────────────────────────────
 function interleaveSlots(ps,es){
@@ -22271,7 +22373,7 @@ function spawnTlaloque(enemyLv,fromId){
     baseId:'mq_tlaloque',      // species reference
     name:'Tlaloque',icon:'🌧',element:'water',type:'MAG',
     hp:baseHp,atk:0,mag:baseMag,def:baseDef,res:baseRes,np:baseNP,npCost:6,
-    ability:'Rain Drop',abilityEs:'Gota de Lluvia',ad:'1.3×MAG',adEs:'1.3×MAG',fv:2
+    ability:'Rain Drop',abilityEs:'Gota de Lluvia',ad:'1.3×MAG to 1 target',adEs:'1.3×MAG a 1 enemigo' /* v1714: current special-text format */,fv:2
   };
   G.captured.push(rosterEntry);
   G.levels[captureId]=lv;markJoin(captureId,lv);
@@ -22300,7 +22402,7 @@ function spawnTlaloqueAsSpoil(enemyLv){
     id:captureId,_captureId:captureId,baseId:'mq_tlaloque',
     name:'Tlaloque',icon:'🌧',element:'water',type:'MAG',
     hp:45,atk:0,mag:16,def:3,res:5,np:15,npCost:6,
-    ability:'Rain Drop',abilityEs:'Gota de Lluvia',ad:'1.3×MAG',adEs:'1.3×MAG',fv:2
+    ability:'Rain Drop',abilityEs:'Gota de Lluvia',ad:'1.3×MAG to 1 target',adEs:'1.3×MAG a 1 enemigo' /* v1714: current special-text format */,fv:2
   };
   G.captured.push(rosterEntry);
   G.levels[captureId]=lv;markJoin(captureId,lv);
@@ -23700,6 +23802,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
       addLog(isEs()?`<span class="log-ab">🗿 ¡Aplastamiento Antiguo! 1.4×ATQ en área ${total} + Parálisis ×1 + ¡AUMENTO DEF/RES ×1 a los aliados!</span>`:`<span class="log-ab">🗿 Ancient Crush! 1.4×ATK AoE ${total} + Paralyze ×1 + DEF/RES UP ×1 allies!</span>`);
     }else{
       const lo=aa.reduce((a,b)=>a.currentHp<b.currentHp?a:b);
+      try{if(window.MFX&&MFX.setPrimary)MFX.setPrimary(lo.id);}catch(_e){} /* v1709: aim the roar cinematic at the real main target */
       const preArmorMap=new Map(aa.map(a=>[a.id,a.armor||0])); // snapshot BEFORE any hits
       const dPriBase=Math.max(1,Math.round(u.atk*1.8-(lo.def||0)*0.4));const dPri=critify(dPriBase,u,false);
       const hPri=applyArmorDamage(lo,dPri,true);
@@ -23943,6 +24046,7 @@ function enemyFireSpecial(u,aa,ae){rollCrit._lc=false;
     const alTP=aa.filter(a=>a.currentHp>0);
     if(alTP.length){
       const tTP=alTP[Math.floor(Math.random()*alTP.length)];
+      try{if(window.MFX&&MFX.setPrimary)MFX.setPrimary(tTP.id);}catch(_e){} /* v1709: same fix -- random main target + splash */
       const rawTP=critify(Math.max(1,Math.round((u.mag||0)*coefTP-(tTP.res||0)*0.4)),u,true);
       let totTP=0;
       const hTP=applyArmorDamage(tTP,rawTP,true);
@@ -25056,6 +25160,9 @@ function woundHealMult(unit){return (unit&&(unit.woundStacks||0)>0)?WOUND_HEAL_M
    The ceiling is re-evaluated on every rebuild rather than trusted from the stored ratio, so a run
    that loses the passive settles back to 100% instead of carrying a stale overheal forever. */
 const OVERHEAL_MAX=1.20;
+function spoilsContOvf(){try{const c=document.getElementById('spoils-cont'),s=document.getElementById('screen-spoils');if(!c||!s)return;c.classList.toggle('ovf',document.documentElement.scrollHeight>window.innerHeight+4);}catch(_e){}} /* v1712 */
+window.addEventListener('resize',spoilsContOvf);
+window.addEventListener('resize',function(){try{if(typeof G!=='undefined'&&G){G._erLockH=0;const _er=document.getElementById('erow');if(_er)_er.style.minHeight='';}}catch(_e){}}); /* v1712: re-measure the Enemy Codex lock after a resize */
 /* v1051: renamed from overhealActive -- Tlalli Iyollo drives BOTH the overheal ceiling and the
    buff-stack ceiling, so the predicate is named for the passive rather than for one consumer. */
 function tlalliIyolloOn(){
@@ -26902,7 +27009,7 @@ function slowBadge(uid){
   const until=G._slowedUnits&&G._slowedUnits.get(uid);
   if(!until||G.roundNum>until)return'';
   const label=until===G.roundNum?t('ui.card.slowNow'):t('ui.card.slowNext'); /* v1408: ES */
-  return`<div style="margin-top:2px" ${pipAttrs('slow',1)}><span class="slow-pip">🐢 ${label}</span></div>`;
+  return`<div style="margin-top:2px" ${pipAttrs('slow',1,0,until===G.roundNum?1:2)}><span class="slow-pip">🐢 ${label}</span></div>`; /* v1710: tooltip knows now vs next */
 }
 
 function armorBadge(armor){if(!armor)return'';return`<div style="margin-top:3px;font-size:10px;color:#60c0e0;font-weight:500"><svg class="tl tl-chimalli"><use href="#tl-chimalli"/></svg> ${Math.round(armor)}</div>`;}
@@ -27513,6 +27620,11 @@ function renderBattle(){try{amoxScanSeen();}catch(_amx){} /* v1440 */
   });
   if(_erSync)syncChildren(er,_erBuilt); // v952
   try{cxBossLayout(er);}catch(_cxE){console.warn('[cx] boss layout',_cxE);} /* v1361 */
+  /* v1712 [Genaro, GCMX day 2 #2]: captured/slain cards are much shorter than live ones, so the LAST capture of
+     a battle collapsed the Enemy Codex mid-animation -- the whole board jumped up and the -22, the capture
+     binding and the reward orb were left floating where the cards had been (B1 R1, Feather Embrace). The row
+     now keeps the tallest height it has reached this battle; startBattle and a window resize clear the lock. */
+  try{const _h=er.offsetHeight;if(_h>(G._erLockH||0))G._erLockH=_h;if(G._erLockH)er.style.minHeight=G._erLockH+'px';}catch(_lk){}
   // Party — patron + allies in one row
   {const _cxE=document.getElementById('cx-enemy'),_cxL=_cxE&&_cxE.querySelector(':scope > .row-lbl'); /* v1357: BOSS CODEX for layer/event bosses, not minibosses */
    if(_cxL){const _bf=(G.enemies||[]).some(e=>e&&e.isBoss&&!e.isMiniBoss);_cxL.dataset.cx=t(_bf?'ui.battle.cxBoss':'ui.battle.cxEnemy');_cxE.classList.toggle('cx-boss',_bf);}}
@@ -27890,7 +28002,7 @@ function renderActionPanel(){
        Spanish, then switched to English -> Spanish description). Read the live MINIBOSS_CAP_STATS copy
        first, which i18nExpandProse rewrites on every language change; same priority as liveAd(). */
     const _mcs=(!gd&&typeof MINIBOSS_CAP_STATS!=='undefined'&&!actor.isMiniBoss&&!actor.isBoss)?MINIBOSS_CAP_STATS[_bid]:null;
-    const specDesc=(_mcs&&_mcs.ad)||(_tpl&&_tpl.ad)||actor.ad;
+    const specDesc=(!gd&&isTlaloqueUnit(actor)&&typeof liveAd==='function'&&liveAd(actor))||(_mcs&&_mcs.ad)||(_tpl&&_tpl.ad)||actor.ad; /* v1715 [Genaro]: a summoned Tlaloque read the raw '1.3×MAG' here -- liveAd builds its structured text, with Tlaloque Tamales' 1.6x */
     const isAoe=isAoeOrAutoSpecial(actor);
     const _aoeCapN=aoeCapFor(actor);const _aoeLbl=_aoeCapN?(' '+_aoeCapN+' targets'):(isAoe?' AoE':'');
     const ae=G.enemies.filter(u=>u.currentHp>0&&!G.captureProcessed.has(u.id));
@@ -28639,7 +28751,7 @@ function showSpoils(){
             if(isPerfect){G.perfectBattles=(G.perfectBattles||0)+1;}
             /* v1499: Blessed Crops banner dropped for the same reason -- the source list already prints it. */
             if(note){const n=document.createElement('div');n.innerHTML=note;tot.appendChild(n);}
-            G.res.blood+=curB;G.res.cacao+=curC;G._stage='spoils';saveRun();document.getElementById('spoils-cont').style.display='block';try{if(tot.getBoundingClientRect().bottom>innerHeight-70)tot.scrollIntoView({block:'nearest',behavior:'smooth'});}catch(_e){} /* v1670: bring the final totals above the sticky Continue */
+            G.res.blood+=curB;G.res.cacao+=curC;G._stage='spoils';saveRun();document.getElementById('spoils-cont').style.display='block';spoilsContOvf(); /* v1712 */try{if(tot.getBoundingClientRect().bottom>innerHeight-70)tot.scrollIntoView({block:'nearest',behavior:'smooth'});}catch(_e){} /* v1670: bring the final totals above the sticky Continue */
             return;
           }
           const st=steps[si++];
@@ -29778,6 +29890,7 @@ function ftueAutoChecks(){
 /* v711: which FTUE step is still outstanding, in the order the tutorial teaches them.
    Returns null when the gate is inactive or already satisfied. */
 function ftuePendingStep(){
+  if(typeof G!=='undefined'&&G&&G.tutOffer)return 'sacrifice'; /* v1711: forced offering sacrifice */
   if(!ftueGateActive())return null;
   ftueAutoChecks();
   if(!G._ftueDidTrain)return 'train';
@@ -29813,6 +29926,7 @@ function ftueArrowClear(){if(!_ftueArrow)return;const f=_ftueArrow;_ftueArrow=nu
   try{f.el.removeEventListener('pointerdown',f.onTap);}catch(e){}if(f.a.parentNode)f.a.parentNode.removeChild(f.a);}
 function ftueJumpToStep(){
   const st=ftuePendingStep(); if(!st)return;
+  if(st==='sacrifice'){switchTab('altar');notify(t('ui.tutOffer.must'),'#d4af37');tutOfferPoint();return;} /* v1711 */
   if(st==='party'){
     const b=document.getElementById('edit-party-btn');
     if(b){b.classList.add('tab-pulse');try{b.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){}setTimeout(()=>ftuePointAt(b),350);} /* v1378 */
@@ -29869,6 +29983,7 @@ function ftueGateUpdate(){
   ['ftue-tip-training','ftue-tip-mercs','ftue-gate-hint'].forEach(i=>{const e=document.getElementById(i);if(e)e.remove();});
   ['training','mercs'].forEach(x=>{const tb=document.getElementById('tab-'+x);if(tb)tb.classList.remove('tab-pulse');});
   const epBtn=document.getElementById('edit-party-btn');if(epBtn)epBtn.classList.remove('tab-pulse');
+  if(G.tutOffer){if(cont){cont.disabled=false;cont.style.display='';cont.classList.remove('btn-pulse');cont.classList.add('btn-ghost');cont.title=t('ui.tutOffer.must');}return;} /* v1711: greyed, click routes to the Altar */
   if(!ftueGateActive()){if(cont){cont.disabled=false;cont.style.display='';cont.classList.remove('btn-ghost');cont.removeAttribute('title');cont.classList.toggle('btn-pulse',!!G._pulseContinue);}return;} // v593: gate cleared → honor the pulse flag
   ftueAutoChecks();
   const s1=!!G._ftueDidTrain,s2=!!G._ftueDidTemazcal,s3=!!G._ftueDidMerc;
@@ -30281,7 +30396,7 @@ function showUnitTooltip(u){
      already level-scaled via _oblCostLv -- it just was not presented like the real one. The
      oblated PASSIVE moved up beside the native passive; see the card head below. */
   const oblLine=(u.isPatron&&G._oblationAk&&G._oblationAbility)?('<div class="tc-spec'+_sfHd(G._oblationAd)+'" style="margin-top:4px;border-top:0.5px dashed #4a2a6a;padding-top:5px"><span class="tc-spec-name" style="color:#a060e0">'+specNameHtml(G._oblationAbility,G._oblationAd||'','\u271f ')+'</span><span class="tc-cost" '+statAttrs('cost')+'>'+stIco('tp')+' Cost: '+npCostDisplayHtml(_oblCostLv,_oblPlainLv)+'</span></div><div class="tc-desc'+_sfBd(G._oblationAd)+'">'+(G._oblationAd||'')+'</div>'):'';
-  const offSec=_ol.affecting.length?('<div style="margin-top:6px;border-top:0.5px solid var(--br);padding-top:6px"><div style="font-size:10px;color:var(--td);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">🪶 '+t('ui.card.offBoost')+'</div>'+_ol.affecting.map(id=>{const o=OFFERINGS[id];return '<div style="font-size:11px;color:#c0e060;margin-bottom:2px">'+o.icon+' '+o.name+': <span style="color:var(--td)">'+o.desc+'</span></div>';}).join('')+'</div>'):'';
+  const offSec=_ol.affecting.length?('<div style="margin-top:6px;border-top:0.5px solid var(--br);padding-top:6px"><div style="font-size:10px;color:var(--td);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">🪶 '+t('ui.card.offBoost')+'</div>'+_ol.affecting.map(id=>{const o=OFFERINGS[id];return '<div style="font-size:11px;color:#c0e060;margin-bottom:2px">'+o.icon+' '+o.name+': <span style="color:var(--td)">'+offDescHtml(o.desc)+'</span></div>';}).join('')+'</div>'):'';
   const cardBody='<div class="train-card'+(u.isPatron?' tc-patron':'')+'" style="text-align:left;max-width:520px;margin:0 auto">'
     +'<div class="tc-head"><div class="tc-name">'+liveName(u)+(u.isPatron?' ⭐':u.isGod?' ✦':'')
       +((u.isPatron&&(G._oblationGodName||(G._oblationHistory&&G._oblationHistory.length&&G._oblationHistory[G._oblationHistory.length-1].name)))?' <span style="font-style:italic;font-weight:400;font-size:13px;color:#a060e0">'+(G._oblationGodName||G._oblationHistory[G._oblationHistory.length-1].name)+'</span>':'')
@@ -30444,7 +30559,7 @@ const cu=G.captured.find(c=>capKey(c)===unitId);if(cu)cu.level=lv+1;
 // v309: Soul Surge milestone (5, 10, then every 10) — sets pending; patron's first surge ever gets the tutorial popup
 if(lv+1>=nextSurgeAt(sg.claimedUpTo)){
   sg.pending=true;
-  if(unitId===patronKey&&!hasV('first_soul_surge_seen')){markV('first_soul_surge_seen');setTimeout(()=>showSurgeModal(unitId),60);}
+  if(unitId===patronKey&&!hasV('first_soul_surge_seen')){markV('first_soul_surge_seen');setTimeout(()=>showSurgeIntro(unitId),60);} /* v1719: intro page first */
 }
 levelUpFx('.train-card[data-uk="'+String(unitId).replace(/"/g,'')+'"]',lv+1); /* v866: BEFORE renderTraining() replaces the card */
 notify(t('ui.msg.levelUp',{n:lv+1}),'#e8a020');renderRes('rb-shop');renderPartyChips();renderTraining();renderAltar();
@@ -30452,8 +30567,17 @@ notify(t('ui.msg.levelUp',{n:lv+1}),'#e8a020');renderRes('rb-shop');renderPartyC
 setTimeout(()=>{const _b=document.querySelector(`button[onclick="doLevelUp('${unitId}')"]`);if(_b){_b.classList.add('lv-burst');const _p=_b.parentElement;if(_p){_p.style.position='relative';const _f=document.createElement('span');_f.className='lv-float';_f.textContent='+1';_p.appendChild(_f);setTimeout(()=>{_b.classList.remove('lv-burst');_f.remove();},700);}}},0);
 if(ftueGateActive()&&!G._ftueDidTrain&&unitId===('god_'+G.god.id)){G._ftueDidTrain=true;ftueGateUpdate();renderTraining();renderTemazcal();renderMercs();} // v305 · v312 · v314: patron-only, unlock next steps
 }
+/* v1717: the Training tab itself glows while something there is actionable -- an affordable Level Up or a
+   Soul Surge waiting to be picked -- so a player on another tab still sees it. Re-checked on every resource
+   change (renderRes), since buying elsewhere can make a level-up unaffordable without re-rendering Training. */
+function nudgeTraining(){try{
+  const tb=document.getElementById('tab-training');if(!tb)return;
+  const rows=G._trainNudge||[];
+  const on=!ftueGateActive()&&rows.some(r=>{const sg=ensureSurge(r.uk);if(surgePickable(sg))return true;return !r.capped&&G.res.blood>=lvCost(r.uk);});
+  tb.classList.toggle('nudge-tab',on);
+}catch(_e){}}
 function renderTraining(){
-  const el=document.getElementById('training-list');el.innerHTML='';
+  const el=document.getElementById('training-list');el.innerHTML='';G._trainNudge=[];setTimeout(nudgeTraining,0); /* v1717 */
   requestAnimationFrame(fitCardText); // v1157
   // v615: same gate as the Sacrifice Altar tab (see shop unlock logic)
   const _isFirstRun=DT.teotl===0&&[...DT.unlocked].length===0&&DT.tecpatl_level===0;
@@ -30578,9 +30702,9 @@ function renderTraining(){
       const p1=surgePreview(uk,'ihiyotl'),p2=surgePreview(uk,'teyolia'),p3=surgePreview(uk,'tonalli');
       rightColHtml='<div style="display:flex;flex-direction:column;gap:4px;min-width:175px">'
         +'<div style="font-size:10px;color:#d4af37;text-align:center;font-weight:600">'+(sgT.pending?t('ui.tc.surgePick'):t('ui.tc.blessedPick'))+((sgT.bonus||0)>0?'<span style="color:#c0a0e0">'+t('ui.tc.left',{n:(sgT.pending?1:0)+(sgT.bonus||0)})+'</span>':'')+'</div>'
-        +'<button class="btn surge-pick" onclick="surgePick(\''+ukJs+'\',\'ihiyotl\')" onmouseenter="surgeHover(\''+ukJs+'\',\'ihiyotl\',1)" onmouseleave="surgeHover(\''+ukJs+'\',\'ihiyotl\',0)" style="font-size:13px">'+surgeIco('ihiyotl')+' <b>Ihiyotl '+forceLvAb()+p1.lv+'</b> <span style="font-size:12px;opacity:.85">'+p1.txt+'</span></button>'
-        +'<button class="btn surge-pick" onclick="surgePick(\''+ukJs+'\',\'teyolia\')" onmouseenter="surgeHover(\''+ukJs+'\',\'teyolia\',1)" onmouseleave="surgeHover(\''+ukJs+'\',\'teyolia\',0)" style="font-size:13px">'+surgeIco('teyolia')+' <b>Teyolia '+forceLvAb()+p2.lv+'</b> <span style="font-size:12px;opacity:.85">'+p2.txt+'</span></button>'
-        +'<button class="btn surge-pick" onclick="surgePick(\''+ukJs+'\',\'tonalli\')" onmouseenter="surgeHover(\''+ukJs+'\',\'tonalli\',1)" onmouseleave="surgeHover(\''+ukJs+'\',\'tonalli\',0)" style="font-size:13px">'+surgeIco('tonalli')+' <b>Tonalli '+forceLvAb()+p3.lv+'</b> <span style="font-size:12px;opacity:.85">'+p3.txt+'</span></button>' // v627: single row, larger, bold force names
+        +'<button class="btn surge-pick nudge-surge" onclick="surgePick(\''+ukJs+'\',\'ihiyotl\')" onmouseenter="surgeHover(\''+ukJs+'\',\'ihiyotl\',1)" onmouseleave="surgeHover(\''+ukJs+'\',\'ihiyotl\',0)" style="font-size:13px">'+surgeIco('ihiyotl')+' <b>Ihiyotl '+forceLvAb()+p1.lv+'</b> <span style="font-size:12px;opacity:.85">'+p1.txt+'</span></button>'
+        +'<button class="btn surge-pick nudge-surge" onclick="surgePick(\''+ukJs+'\',\'teyolia\')" onmouseenter="surgeHover(\''+ukJs+'\',\'teyolia\',1)" onmouseleave="surgeHover(\''+ukJs+'\',\'teyolia\',0)" style="font-size:13px">'+surgeIco('teyolia')+' <b>Teyolia '+forceLvAb()+p2.lv+'</b> <span style="font-size:12px;opacity:.85">'+p2.txt+'</span></button>'
+        +'<button class="btn surge-pick nudge-surge" onclick="surgePick(\''+ukJs+'\',\'tonalli\')" onmouseenter="surgeHover(\''+ukJs+'\',\'tonalli\',1)" onmouseleave="surgeHover(\''+ukJs+'\',\'tonalli\',0)" style="font-size:13px">'+surgeIco('tonalli')+' <b>Tonalli '+forceLvAb()+p3.lv+'</b> <span style="font-size:12px;opacity:.85">'+p3.txt+'</span></button>' // v627: single row, larger, bold force names
         +'</div>';
     }else if(capped){
       // v311: not `disabled` — clicking routes through doLevelUp's cap guard, which fires the notify
@@ -30591,8 +30715,9 @@ function renderTraining(){
       //        during the FTUE training step the patron's button carries the guiding glow (tab no longer pulses)
       const surgeSoon=(lv+1)>=nextSurgeAt(sgT.claimedUpTo);
       const ftuePulse=ftueGateActive()&&!G._ftueDidTrain&&isPatronRow;
-      rightColHtml='<button class="btn btn-bl'+(surgeSoon?' surge-soon':'')+(ftuePulse?' tab-pulse':'')+'" onclick="doLevelUp(\''+ukJs+'\')"'+(surgeSoon?' title="'+t('ui.tc.surgeSoonTitle')+'"':'')+' style="line-height:1.3;font-size:16px'+(canAfford?'':';opacity:.45;cursor:not-allowed')+'">'+t('ui.tc.levelUp')+(surgeSoon?' ⚡':'')+' <span style="font-size:14px;opacity:.9"><svg class="tl tl-blood"><use href="#tl-blood"/></svg> '+cost+'</span></button>'; // v627: single row, larger
+      rightColHtml='<button class="btn btn-bl'+(surgeSoon?' surge-soon':'')+(ftuePulse?' tab-pulse':(canAfford?' nudge-glow':''))+'" onclick="doLevelUp(\''+ukJs+'\')"'+(surgeSoon?' title="'+t('ui.tc.surgeSoonTitle')+'"':'')+' style="line-height:1.3;font-size:16px'+(canAfford?'':';opacity:.45;cursor:not-allowed')+'">'+t('ui.tc.levelUp')+(surgeSoon?' ⚡':'')+' <span style="font-size:14px;opacity:.9"><svg class="tl tl-blood"><use href="#tl-blood"/></svg> '+cost+'</span></button>'; // v627: single row, larger
     }
+    G._trainNudge.push({uk,capped:!!capped}); /* v1717 */
     // v612: trading-card layout (Genaro's mockup). Emojis locked to the original mock: 🔮 special, ✨ TP cost.
     const _F=sgT.forces; // v613: row appears only once the surge mechanic has been touched; L0 forces stay hidden
     const _fParts=[];
@@ -30702,6 +30827,15 @@ function doHireMerc(baseId){
     ftueGateUpdate();
   }
 }
+/* v1716: the Training stats modal for a mercenary still on offer. It is built at the hire level it is offered at,
+   and joins at that level (no pre-join milestones), exactly as the card and mkCap do -- a preview key carries
+   that join level so showUnitTooltip's curve matches the card instead of a Lv 1 join. */
+function showMercStats(id){
+  const pool=getMercPool()||[];const u=pool.find(m=>m&&m.id===id);if(!u)return;
+  const lv=(u._tier&&u._tier.lv)||1,pk='mercprev_'+u.id;
+  G.joinLv=G.joinLv||{};G.joinLv[pk]=lv;
+  showUnitTooltip({id:pk,_captureId:pk,baseId:u.baseId||u.id /* v1718: the portrait lookup -- the preview key has no sprite */,name:liveName(u),icon:u.icon,element:u.element,level:lv,isPatron:false,isGod:false,_isHiredMerc:true,baseObj:u});
+}
 function renderMercs(){
   const el=document.getElementById('mercs-list');el.innerHTML='';
   // v307 (FTUE order): mercs stay locked until the Temazcal step completes — spending here first could
@@ -30736,7 +30870,7 @@ function renderMercs(){
     const _chip=(_wouldBond&&_mm)?('<span class="elem-badge '+_mm.cls+'" style="animation:elemSynPulse .8s ease-in-out infinite alternate" '+SYN_ATTRS.replace('style="','style="display:inline-block;')+'>'+_mm.icon+' '+L(_mm,'label')+'</span>'):eb(u.element);
     card.innerHTML='<div class="tc-name">'+liveName(u)+' <span style="color:var(--am);font-size:12px">Lv '+lv+'</span></div>'
       +'<div style="margin-top:2px">'+_chip+'</div>'
-      +'<div class="tc-mid"><div class="tc-art">'+unitIconHtml(u,60)+'</div><div class="tc-stats">'
+      +'<div class="tc-mid"><div class="tc-art" style="cursor:pointer" onclick="showMercStats(\''+String(u.id).replace(/'/g,"\\'")+'\')" title="'+t('ui.tc.viewStats')+'">'+unitIconHtml(u,60)+'</div><div class="tc-stats">' /* v1716 [Genaro, GCMX day 2 #12]: art opens the full stats, as on Training */
       +'<span data-stat="hp" '+statAttrs('hp')+'>'+stIco('hp')+' <b>'+statLbl('hp')+'</b> '+hp+'</span>'
       +'<span data-stat="tp" '+statAttrs('tp')+'>'+stIco('tp')+' <b>'+statLbl('tp')+'</b> '+tpMax+'</span>'
       +(_altarOn?'<span class="tc-sacpill">'+t('ui.tc.sacrifice')+' '+sacFPAtLv(u,lv)+' <svg class="tl tl-quincunx"><use href="#tl-quincunx"/></svg></span>':'')
@@ -31156,7 +31290,7 @@ function renderAltar(){
       '<div style="font-size:13px;line-height:1.7;color:var(--td)">'+t('ui.spareUnlock.body',{fl:'<svg class="tl tl-quincunx"><use href="#tl-quincunx"/></svg>',bl:'<svg class="tl tl-blood"><use href="#tl-blood"/></svg>',ca:'<svg class="tl tl-cacao"><use href="#tl-cacao"/></svg>'})+'</div>',
       [{label:t('ui.common.understood'),fn:()=>{}}]),200);
   }
-  if(!G.captured.length){sacEl.innerHTML='<div style="font-size:12px;color:var(--td)">'+t('ui.altar.noCaptured')+'</div>'; /* v1415: ES */}
+  if(!G.captured.length){if(!G.tutOffer)sacEl.innerHTML='<div style="font-size:12px;color:var(--td)">'+t('ui.altar.noCaptured')+'</div>'; /* v1415: ES · v1711: not under the offering */}
   else{
     G.sacSelected=G.sacSelected||new Set();
     // v635: deployed units leave the list (a blurb explains why); the rest become selectable cards
@@ -31182,7 +31316,7 @@ function renderAltar(){
     const _nr=document.createElement('div');_nr.style.cssText='display:flex;flex-wrap:wrap;align-items:baseline;column-gap:14px;row-gap:2px;margin-bottom:4px';
     /* v1402: empty list -> ONE line (playtest: the hint + note + empty line read as three statements).
        The multi-select hint is dropped too, since there is nothing to check. */
-    if(!sorted.length){hdr.style.display='none';const ne=document.createElement('div');ne.style.cssText='font-size:12px;color:var(--td)';ne.textContent=t('ui.altar.noneAvail');_nr.appendChild(ne);}
+    if(!sorted.length){hdr.style.display='none';if(!G.tutOffer){const ne=document.createElement('div');ne.style.cssText='font-size:12px;color:var(--td)';ne.textContent=t('ui.altar.noneAvail');_nr.appendChild(ne);}}
     else if(deployedCount>0){const dn=document.createElement('div');dn.style.cssText='font-size:12px;color:var(--td)';dn.innerHTML=t('ui.altar.deployedNote');_nr.appendChild(dn);}
     if(_nr.children.length)sacEl.appendChild(_nr);
     const sgrid=document.createElement('div');sgrid.className='sac-grid';sacEl.appendChild(sgrid);
@@ -31207,6 +31341,18 @@ function renderAltar(){
         +'</div>';
       sgrid.appendChild(card);
     });
+  }
+  if(G.tutOffer){ /* v1711: the tutorial offering, drawn with the regular sac-card markup */
+    const o=G.tutOffer,tpl=tplById(o.baseId)||{},nm=L(tpl,'name'),gn=L(G.god||{},'name');
+    const hint=document.createElement('div');hint.className='tut-box';hint.innerHTML=t('ui.tutOffer.hint',{name:nm,god:gn});
+    const grid=document.createElement('div');grid.className='sac-grid';
+    const card=document.createElement('div');card.className='train-card sac-card sel';card.dataset.sacck='tutoffer';
+    card.innerHTML='<div class="tc-name">'+nm+' <span style="color:var(--am);font-size:12px">'+lvAb()+o.lv+'</span> <span style="font-size:10px;color:#1a1009;background:#d4af37;border-radius:4px;padding:0 5px;vertical-align:1px">'+t('ui.tutOffer.tag')+'</span></div>'
+      +'<div style="margin-top:2px">'+eb(tpl.element)+'</div>'
+      +'<div class="tc-mid"><div class="tc-art">'+unitIconHtml(tpl,52)+'</div>'
+      +'<div class="tc-stats" style="align-items:center;justify-content:center"><span class="sac-fv"><svg class="tl tl-quincunx" style="width:1.3em;height:1.3em;vertical-align:-.28em"><use href="#tl-quincunx"/></svg> '+o.fv+'</span></div></div>'
+      +'<div class="tc-action"><button id="tut-offer-btn" class="btn btn-sac tab-pulse" onclick="doTutOfferSac()">'+t('ui.altar.sacBtn')+'</button></div>';
+    grid.appendChild(card);sacEl.insertBefore(grid,sacEl.firstChild);sacEl.insertBefore(hint,grid);
   }
   const rc=godCost();const pool=G.altarGodPool||[];
   // v635: recruit slots as training cards, one row of 3, cost lives on the button
@@ -32900,7 +33046,14 @@ class LayerFx{
     this.nextQuake=rnd(2,4);this.quakeT=0;this.quakeDur=1;this.nextBlast=rnd(2,5);this.blastT=0;this.resize();}
   lerp(a){return a[0]+(a[1]-a[0])*this.intensity;}
   resize(){const r=this.c.getBoundingClientRect();const px=r.width>700?4:PIX;const w=Math.max(40,Math.round(r.width/px)),h=Math.max(24,Math.round(r.height/px));
-    if(w!==this.w||h!==this.h){if(!this.noClear){this.c.width=w;this.c.height=h;}this.w=w;this.h=h;if(this.fg){this.fg.width=w;this.fg.height=h;}this.parts=[];this.crops=null;this.fill();
+    if(w!==this.w||h!==this.h){
+      /* v1712 [Genaro, GCMX day 2 #8]: parts and crops reset on a resize, but Coatlicue's vines and the ground
+         snakes kept their old coordinates -- battle -> spoils grew the canvas, so the old vines stayed rooted on
+         the OLD bottom edge and ended abruptly mid-screen. Re-root them on the new edges instead of dropping them. */
+      if(this.w&&this.h){const sx=w/this.w,dy=h-this.h;
+        if(this.vines)this.vines.forEach(v=>{v.pts=v.pts.map(([x,y])=>[x*sx,y+dy]);});
+        if(this.events)this.events.forEach(e=>{if(e.k==='snake'){e.y+=dy;}});}
+      if(!this.noClear){this.c.width=w;this.c.height=h;}this.w=w;this.h=h;if(this.fg){this.fg.width=w;this.fg.height=h;}this.parts=[];this.crops=null;this.fill();
       this.frostPts=this.p.frost?(()=>{const a=[],R=Math.min(w,h)*.38;for(const [cx,cy] of [[0,0],[w,0],[0,h],[w,h]])for(let i=0;i<110;i++){const r=R*Math.pow(Math.random(),1.8),an=Math.random()*1.5708;
         a.push({x:(cx?cx-Math.cos(an)*r:Math.cos(an)*r)|0,y:(cy?cy-Math.sin(an)*r:Math.sin(an)*r)|0,r:r/R,ph:rnd(0,6)});}return a;})():null;
       this.starList=this.p.stars?Array.from({length:this.p.stars},()=>({x:rnd(0,w)|0,y:rnd(0,h*.7)|0,ph:rnd(0,6),c:pick(this.p.pal.star)})):null;}}
@@ -33511,6 +33664,9 @@ window.MFX={
     const HEALISH=new Set(['ophidian','filth','steam','sustenance','harvest','peyote']);
     if(HEALISH.has(k)||k==='roll'||(SPECIALS[k]&&SPECIALS[k].healish))setTimeout(go,0);
     else{let n=0;const poll=()=>{if(rec.started)return;if(rec.hits.length||(rec.qhits&&rec.qhits.length)||(rec.att&&rec.att.length)||n++>=10)go();else setTimeout(poll,50);};setTimeout(poll,0);}}, /* v1568: attempts count too */
+  /* v1709 [Genaro, Tepeyollotl fight]: an enemy special can name its main target. Without it the cinematic guesses
+     'most damage taken', which picks a SPLASHED unit whenever Chimalli soaks the main hit (or absorbs it entirely). */
+  setPrimary(uid){const r=S.rec;if(r&&uid&&!r.primary)r.primary=uid;},
   willSpecial(u){if(!u||!S.fx||MFX_REDUCE||!S.on||S.entScr)return false;
     if(u.isGod&&(G.units||[]).includes(u)){const gd=(typeof GODS!=='undefined'&&GODS.find(g=>g.id===u.baseGodId))||G.god,ob=G._useOblationSpecial;
       return !!specialKey(ob?G._oblationAk:(gd&&gd.ak),ob?G._oblationAbility:(gd&&gd.ability),ob?null:gd);}
